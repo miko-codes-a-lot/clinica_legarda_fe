@@ -13,7 +13,7 @@ export const ADMIN_ROUTES: Routes = [
       },
       {
         path: 'user',
-        loadComponent: () => import('./user/user').then(m => m.User)
+        loadChildren: () => import('./user/user.routes').then(m => m.USER_ROUTES)
       },
       {
         path: 'clinic',
