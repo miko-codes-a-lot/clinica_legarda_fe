@@ -1,1 +1,9 @@
-<app-user-form></app-user-form>
+@if (user) {
+  <app-user-form
+    [isLoading]="isLoading"
+    [user]="user"
+    (onSubmitEvent)="onSubmit($event)"
+  ></app-user-form>
+} @else {
+  <p>Fetching details...</p>
+}

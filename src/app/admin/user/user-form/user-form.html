@@ -1,8 +1,10 @@
-{{ rxform.value | json }}
-
 <form [formGroup]="rxform" (ngSubmit)="onSubmit()">
   <label for="firstName">First Name </label>
-  <input formControlName="firstName" id="firstName"> <br>
+  <input formControlName="firstName" id="firstName">
+  @if (firstName.hasError('required') && firstName.touched) {
+    <p style="color: red">First name is required</p>
+  }
+  <br>
   
   <label for="middleName">Middle Name </label>
   <input formControlName="middleName" id="middleName"> <br>

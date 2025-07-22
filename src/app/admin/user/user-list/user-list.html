@@ -5,12 +5,17 @@
     <tr>
       <th>ID</th>
       <th>Name</th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>1</td>
       <td>Eweng</td>
+      <td>
+        <button (click)="onDetails(1)">Details</button>
+        <button (click)="onUpdate(1)">Update</button>
+      </td>
     </tr>
   </tbody>
 </table>

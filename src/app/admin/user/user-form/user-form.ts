@@ -1,34 +1,47 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RxUserForm } from './rx-user-form.interface';
-import { JsonPipe } from '@angular/common';
 import { User } from '../../../_shared/model/user';
 
 @Component({
   selector: 'app-user-form',
-  imports: [ReactiveFormsModule, JsonPipe],
+  imports: [ReactiveFormsModule],
   templateUrl: './user-form.html',
   styleUrl: './user-form.css'
 })
 export class UserForm implements OnInit {
   @Output() onSubmitEvent = new EventEmitter<User>()
   @Input() isLoading = false
+  @Input() user: User = this.getDefaultUser()
 
   rxform!: FormGroup<RxUserForm>
 
   constructor(private readonly fb: FormBuilder) {}
 
+  getDefaultUser(): User {
+    return {
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      emailAddress: '',
+      mobileNumber: '',
+      address: '',
+      password: '',
+      roles: 'patient',
+    }
+  }
+
   ngOnInit(): void {
     this.rxform = this.fb.nonNullable.group({
-      firstName: [''],
-      middleName: [''],
-      lastName: [''],
-      emailAddress: [''],
-      mobileNumber: [''],
-      address: [''],
+      firstName: [this.user.firstName, Validators.required],
+      middleName: [this.user.middleName],
+      lastName: [this.user.lastName, Validators.required],
+      emailAddress: [this.user.emailAddress, [Validators.required, Validators.email]],
+      mobileNumber: [this.user.mobileNumber, Validators.required],
+      address: [this.user.address, Validators.required],
       password: [''],
       passwordConfirm: [''],
-      roles: ['patient'],
+      roles: [this.user.roles, Validators.required],
     })
   }
 
