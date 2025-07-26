@@ -1,14 +1,14 @@
 import { Routes } from '@angular/router';
 import { Clinic } from './clinic';
 
-export const USER_ROUTES: Routes = [
+export const CLINIC_ROUTES: Routes = [
   {
     path: '',
     component: Clinic,
     children: [
       {
         path: '',
-        redirectTo: '/admin/user/list',
+        redirectTo: '/admin/clinic/list',
         pathMatch: 'full'
       },
       {

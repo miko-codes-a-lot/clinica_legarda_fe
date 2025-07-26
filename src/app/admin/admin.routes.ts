@@ -17,7 +17,7 @@ export const ADMIN_ROUTES: Routes = [
       },
       {
         path: 'clinic',
-        loadComponent: () => import('./clinic/clinic').then(m => m.Clinic)
+        loadChildren: () => import('./clinic/clinic.routes').then(m => m.CLINIC_ROUTES)
       }
     ]
   }
