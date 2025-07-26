@@ -1,4 +1,5 @@
 export interface OperatingHour {
   day: string
-  hours: string
+  startTime: string
+  endTime: string
 }
