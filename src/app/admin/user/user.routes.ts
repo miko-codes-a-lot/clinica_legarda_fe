@@ -16,11 +16,15 @@ export const USER_ROUTES: Routes = [
         loadComponent: () => import('./user-list/user-list').then(m => m.UserList)
       },
       {
+        path: 'details/:id',
+        loadComponent: () => import('./user-details/user-details').then(m => m.UserDetails)
+      },
+      {
         path: 'create',
         loadComponent: () => import('./user-create/user-create').then(m => m.UserCreate)
       },
       {
-        path: 'update',
+        path: 'update/:id',
         loadComponent: () => import('./user-update/user-update').then(m => m.UserUpdate)
       },
     ]

@@ -1,1 +1,38 @@
-<p>user-form works!</p>
+<form [formGroup]="rxform" (ngSubmit)="onSubmit()">
+  <label for="firstName">First Name </label>
+  <input formControlName="firstName" id="firstName">
+  @if (firstName.hasError('required') && firstName.touched) {
+    <p style="color: red">First name is required</p>
+  }
+  <br>
+  
+  <label for="middleName">Middle Name </label>
+  <input formControlName="middleName" id="middleName"> <br>
+  
+  <label for="lastName">Last Name </label>
+  <input formControlName="lastName" id="lastName"> <br>
+  
+  <label for="emailAddress">Email Address </label>
+  <input formControlName="emailAddress" id="emailAddress"> <br>
+  
+  <label for="mobileNumber">Mobile Number </label>
+  <input formControlName="mobileNumber" id="mobileNumber"> <br>
+  
+  <label for="address">Address </label>
+  <input formControlName="address" id="address"> <br>
+  
+  <label for="password">Password </label>
+  <input formControlName="password" id="password" type="password"> <br>
+  
+  <label for="passwordConfirm">Confirm Password </label>
+  <input formControlName="passwordConfirm" id="passwordConfirm" type="password"> <br>
+  
+  <label for="roles">Roles </label> 
+  <select name="roles" id="roles" formControlName="roles">
+    <option value="patient">Patient</option>
+    <option value="dentist">Dentist</option>
+    <option value="admin">Admin</option>
+  </select> <br>
+
+  <button [disabled]="isLoading">Save</button>
+</form>
