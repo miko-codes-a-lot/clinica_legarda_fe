@@ -1,1 +1,18 @@
-<p>clinic-details works!</p>
+@if (clinic) {
+  <button (click)="onUpdate()">Edit</button> <br>
+  <ul>
+    <li>Name: {{ clinic.name }}</li>
+    <li>Address: {{ clinic.address }}</li>
+    <li>Mobile Number: {{ clinic.mobileNumber }}</li>
+    <li>Email Address: {{ clinic.emailAddress }}</li>
+    <li>
+      <ul>
+        @for (hour of clinic.operatingHours; track hour.day) {
+          <li>{{ hour.day }} - {{ hour.hours }}</li>
+        }
+      </ul>
+    </li>
+  </ul>
+} @else {
+  <p>Fetching details...</p>
+}
