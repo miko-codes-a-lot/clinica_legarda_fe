@@ -9,13 +9,19 @@
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td>1</td>
-      <td>Eweng</td>
-      <td>
-        <button (click)="onDetails(1)">Details</button>
-        <button (click)="onUpdate(1)">Update</button>
-      </td>
-    </tr>
+    @for (user of users; track user._id) {
+      <tr>
+        <td>{{ user._id }}</td>
+        <td>{{ user.firstName }} {{ user.lastName }}</td>
+        <td>
+          <button (click)="onDetails(user._id!!)">Details</button>
+          <button (click)="onUpdate(user._id!!)">Update</button>
+        </td>
+      </tr>
+    }
   </tbody>
 </table>
+
+@if (users.length == 0) {
+  <p>Fetching data...</p>
+}
