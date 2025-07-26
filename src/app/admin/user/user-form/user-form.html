@@ -34,5 +34,5 @@
     <option value="admin">Admin</option>
   </select> <br>
 
-  <button [disabled]="isLoading">Save</button>
+  <button [disabled]="isLoading || !rxform.valid">Save</button>
 </form>
