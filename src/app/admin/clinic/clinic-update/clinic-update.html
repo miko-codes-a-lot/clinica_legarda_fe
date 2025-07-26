@@ -1,1 +1,9 @@
-<p>clinic-update works!</p>
+@if (clinic) {
+  <app-clinic-form
+    [isLoading]="isLoading"
+    [clinic]="clinic"
+    (onSubmitEvent)="onSubmit($event)"
+  ></app-clinic-form>
+} @else {
+  <p>Fetching details...</p>
+}
