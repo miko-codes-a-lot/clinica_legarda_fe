@@ -8,7 +8,7 @@
     <li>
       <ul>
         @for (hour of clinic.operatingHours; track hour.day) {
-          <li>{{ hour.day }} - {{ hour.hours }}</li>
+          <li>{{ hour.day }}: {{ hour.startTime }}-{{ hour.endTime }}</li>
         }
       </ul>
     </li>

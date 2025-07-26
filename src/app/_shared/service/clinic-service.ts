@@ -9,13 +9,13 @@ const mockClinic: () => Clinic = () => ({
   mobileNumber: '+639391112236',
   emailAddress: 'contact@clinicalegarda.com',
   operatingHours: [
-    { day: 'Monday', startTime: '09:00', endTime: '18:00' },
-    { day: 'Tuesday', startTime: '09:00', endTime: '18:00' },
-    { day: 'Wednesday', startTime: '09:00', endTime: '18:00' },
-    { day: 'Thursday', startTime: '09:00', endTime: '18:00' },
-    { day: 'Friday', startTime: '09:00', endTime: '18:00' },
-    { day: 'Saturday', startTime: '10:00', endTime: '15:00' },
-    { day: 'Sunday', startTime: '10:00', endTime: '15:00' },
+    { day: 'monday', startTime: '09:00', endTime: '18:00' },
+    { day: 'tuesday', startTime: '09:00', endTime: '18:00' },
+    { day: 'wednesday', startTime: '09:00', endTime: '18:00' },
+    { day: 'thursday', startTime: '09:00', endTime: '18:00' },
+    { day: 'friday', startTime: '09:00', endTime: '18:00' },
+    { day: 'saturday', startTime: '10:00', endTime: '15:00' },
+    { day: 'sunday', startTime: '10:00', endTime: '15:00' },
   ]
 })
 

@@ -14,8 +14,12 @@
   <div formArrayName="operatingHours">
     @for (hour of this.operatingHours.controls; track $index) {
       <div [formGroupName]="$index">
-        <span>Day </span>
-        <input formControlName="day" [id]="'day' + $index" [name]="'day' + $index" type="text">
+        <span>Day </span> 
+        <select [id]="'day' + $index" [name]="'day' + $index" formControlName="day">
+          @for (day of days; track $index) {
+            <option [value]="day.code">{{ day.label }}</option>
+          }
+        </select>
         <span> Hours </span>
         <input type="time" formControlName="startTime" [id]="'startTime' + $index">
         <span>-</span>
