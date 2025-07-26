@@ -1,1 +1,28 @@
-<p>clinic-form works!</p>
+<form [formGroup]="rxform" (ngSubmit)="onSubmit()">  
+  <label for="name">Name </label>
+  <input formControlName="name" id="name"> <br>
+  
+  <label for="address">Last Name </label>
+  <input formControlName="address" id="address"> <br>
+  
+  <label for="mobileNumber">Mobile Number </label>
+  <input formControlName="mobileNumber" id="mobileNumber"> <br>
+  
+  <label for="emailAddress">Email Address </label>
+  <input formControlName="emailAddress" id="emailAddress"> <br>
+
+  <div formArrayName="operatingHours">
+    @for (hour of this.operatingHours.controls; track $index) {
+      <div [formGroupName]="$index">
+        <span>Day </span>
+        <input formControlName="day" [id]="'day' + $index" [name]="'day' + $index" type="text">
+        <span> Hours </span>
+        <input type="time" formControlName="startTime" [id]="'startTime' + $index">
+        <span>-</span>
+        <input type="time" formControlName="endTime" [id]="'endTime' + $index">
+      </div> <br>
+    }
+  </div>
+
+  <button [disabled]="isLoading || !rxform.valid">Save</button>
+</form>
