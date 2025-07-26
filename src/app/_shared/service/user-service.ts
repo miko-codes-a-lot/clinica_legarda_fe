@@ -45,4 +45,13 @@ export class UserService {
       }, 1000);
     })
   }
+
+  delete(): Observable<void> {
+    return new Observable((s) => {
+      setTimeout(() => {
+        s.next()
+        s.complete()
+      }, 1000);
+    })
+  }
 }
