@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class UserUpdate implements OnInit {
   isLoading = false
-  id!: number
+  id!: string
   user!: User
 
   constructor(
@@ -24,7 +24,7 @@ export class UserUpdate implements OnInit {
   ngOnInit(): void {
     this.isLoading = true
 
-    this.id = +this.route.snapshot.params['id']
+    this.id = this.route.snapshot.params['id']
 
     this.userService.getOne(this.id).subscribe({
       next: (u) => this.user = u,

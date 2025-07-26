@@ -11,7 +11,7 @@ import { User } from '../../../_shared/model/user';
 })
 export class UserDetails implements OnInit {
   isLoading = false
-  id!: number
+  id!: string
   user?: User
 
   constructor(
