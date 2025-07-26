@@ -21,7 +21,7 @@ export class UserCreate {
   onSubmit(user: User) {
     this.isLoading = true
     this.userService.create(user).subscribe({
-      next: (u) => this.router.navigate(['admin/user/details', u.id], { replaceUrl: true }),
+      next: (u) => this.router.navigate(['admin/user/details', u._id], { replaceUrl: true }),
       error: (e) => alert(`Something went wrong: ${e}`)
     }).add(() => this.isLoading = false)
   }
