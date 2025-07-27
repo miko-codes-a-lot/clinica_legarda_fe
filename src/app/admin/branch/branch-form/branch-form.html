@@ -1,1 +1,21 @@
-<p>branch-form works!</p>
+<form [formGroup]="rxform" (ngSubmit)="onSubmit()">  
+  <label for="name">Name </label>
+  <input formControlName="name" id="name"> <br>
+  
+  <label for="address">Last Name </label>
+  <input formControlName="address" id="address"> <br>
+  
+  <label for="mobileNumber">Mobile Number </label>
+  <input formControlName="mobileNumber" id="mobileNumber"> <br>
+  
+  <label for="emailAddress">Email Address </label>
+  <input formControlName="emailAddress" id="emailAddress"> <br>
+
+  <select name="clinic" id="clinic" formControlName="clinic">
+    @for(clinic of clinics; track clinic._id) {
+      <option [value]="clinic._id">{{ clinic.name }}</option>
+    }
+  </select>
+
+  <button [disabled]="isLoading || !rxform.valid">Save</button>
+</form>
