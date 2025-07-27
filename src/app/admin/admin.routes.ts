@@ -18,6 +18,10 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'clinic',
         loadChildren: () => import('./clinic/clinic.routes').then(m => m.CLINIC_ROUTES)
+      },
+      {
+        path: 'branch',
+        loadChildren: () => import('./branch/branch.routes').then(m => m.BRANCH_ROUTES)
       }
     ]
   }
