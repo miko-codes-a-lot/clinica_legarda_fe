@@ -1,34 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Clinic } from '../model/clinic';
 import { Observable } from 'rxjs';
-
-const mockClinic: () => Clinic = () => ({
-  _id: '1',
-  name: 'Clinica Legarda Dental Clinic',
-  address: '2275 Legarda st. Sampaloc Manila',
-  mobileNumber: '+639391112236',
-  emailAddress: 'contact@clinicalegarda.com',
-  operatingHours: [
-    { day: 'monday', startTime: '09:00', endTime: '18:00' },
-    { day: 'tuesday', startTime: '09:00', endTime: '18:00' },
-    { day: 'wednesday', startTime: '09:00', endTime: '18:00' },
-    { day: 'thursday', startTime: '09:00', endTime: '18:00' },
-    { day: 'friday', startTime: '09:00', endTime: '18:00' },
-    { day: 'saturday', startTime: '10:00', endTime: '15:00' },
-    { day: 'sunday', startTime: '10:00', endTime: '15:00' },
-  ]
-})
-
+import { MockService } from './mock-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClinicService {
+  constructor(private readonly mockService: MockService) {}
+
   getAll(): Observable<Clinic[]> {
     return new Observable((s) => {
       setTimeout(() => {
         const items = [
-          mockClinic()
+          this.mockService.mockClinic()
         ]
 
         s.next(items)
@@ -40,7 +25,7 @@ export class ClinicService {
   getOne(id: string): Observable<Clinic> {
     return new Observable((s) => {
       setTimeout(() => {
-        const clinic: Clinic = mockClinic()
+        const clinic: Clinic = this.mockService.mockClinic()
 
         s.next(clinic)
         s.complete()

@@ -1,40 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Branch } from '../model/branch';
 import { Observable } from 'rxjs';
-
-const mockBranch: () => Branch = () => ({
-  _id: '1',
-  name: 'Branch A',
-  address: '2275 Legarda st. Sampaloc Manila',
-  mobileNumber: '+639391112236',
-  emailAddress: 'contact@clinicalegarda.com',
-  clinic: {
-    _id: '1',
-    name: 'Clinica Legarda Dental Clinic',
-    address: '2275 Legarda st. Sampaloc Manila',
-    mobileNumber: '+639391112236',
-    emailAddress: 'contact@clinicalegarda.com',
-    operatingHours: [
-      { day: 'monday', startTime: '09:00', endTime: '18:00' },
-      { day: 'tuesday', startTime: '09:00', endTime: '18:00' },
-      { day: 'wednesday', startTime: '09:00', endTime: '18:00' },
-      { day: 'thursday', startTime: '09:00', endTime: '18:00' },
-      { day: 'friday', startTime: '09:00', endTime: '18:00' },
-      { day: 'saturday', startTime: '10:00', endTime: '15:00' },
-      { day: 'sunday', startTime: '10:00', endTime: '15:00' },
-    ]
-  }
-})
+import { BranchPayload } from '../../admin/branch/branch-form/branch-payload';
+import { MockService } from './mock-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BranchService {
+    constructor(private readonly mockService: MockService) {}
+
     getAll(): Observable<Branch[]> {
       return new Observable((s) => {
         setTimeout(() => {
           const items = [
-            mockBranch()
+            this.mockService.mockBranch()
           ]
   
           s.next(items)
@@ -46,7 +26,7 @@ export class BranchService {
     getOne(id: string): Observable<Branch> {
       return new Observable((s) => {
         setTimeout(() => {
-          const branch: Branch = mockBranch()
+          const branch: Branch = this.mockService.mockBranch()
   
           s.next(branch)
           s.complete()
@@ -54,11 +34,15 @@ export class BranchService {
       })
     }
   
-    create(branch: Branch): Observable<Branch> {
+    create(branch: BranchPayload): Observable<Branch> {
       return new Observable((s) => {
         setTimeout(() => {
-          branch._id = '5'
-          s.next(branch)
+          const b: Branch = {
+            ...branch,
+            _id: '5',
+            clinic: this.mockService.mockClinic(),
+          }
+          s.next(b)
           s.complete()
         }, 1000);
       })
