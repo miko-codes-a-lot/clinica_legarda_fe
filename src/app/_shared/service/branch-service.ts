@@ -10,6 +10,32 @@ import { MockService } from './mock-service';
 export class BranchService {
     constructor(private readonly mockService: MockService) {}
 
+    getEmptyNonNullBranch(): Branch {
+      return {
+        name: '',
+        address: '',
+        mobileNumber: '',
+        emailAddress: '',
+        clinic: {
+          _id: '',
+          name: '',
+          address: '',
+          mobileNumber: '',
+          emailAddress: '',
+          operatingHours: [
+            { day: 'monday', startTime: '09:00', endTime: '18:00' },
+            { day: 'tuesday', startTime: '09:00', endTime: '18:00' },
+            { day: 'wednesday', startTime: '09:00', endTime: '18:00' },
+            { day: 'thursday', startTime: '09:00', endTime: '18:00' },
+            { day: 'friday', startTime: '09:00', endTime: '18:00' },
+            { day: 'saturday', startTime: '10:00', endTime: '15:00' },
+            { day: 'sunday', startTime: '10:00', endTime: '15:00' },
+          ],
+          branches: [],
+        },
+    }
+    }
+
     getAll(): Observable<Branch[]> {
       return new Observable((s) => {
         setTimeout(() => {

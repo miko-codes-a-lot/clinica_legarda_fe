@@ -11,11 +11,14 @@
   <label for="emailAddress">Email Address </label>
   <input formControlName="emailAddress" id="emailAddress"> <br>
 
+  @if (clinics.length === 0) {
+    <p>Fetching clinics...</p>
+  }
   <select name="clinic" id="clinic" formControlName="clinic">
     @for(clinic of clinics; track clinic._id) {
       <option [value]="clinic._id">{{ clinic.name }}</option>
     }
-  </select>
+  </select> <br>
 
   <button [disabled]="isLoading || !rxform.valid">Save</button>
 </form>

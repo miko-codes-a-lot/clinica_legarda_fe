@@ -14,7 +14,7 @@ import { Clinic } from '../../../_shared/model/clinic';
 export class BranchForm implements OnInit {
   @Output() onSubmitEvent = new EventEmitter<BranchPayload>()
   @Input() isLoading = false
-  @Input() branch: Branch = this.getDefaultBranch()
+  @Input() branch!: Branch
   @Input() clinics: Clinic[] = []
 
   rxform!: FormGroup<RxBranchForm>
@@ -30,32 +30,6 @@ export class BranchForm implements OnInit {
       clinic: [this.branch.clinic._id || '', Validators.required],
     })
   }
-
-  getDefaultBranch(): Branch {
-    return {
-      name: '',
-      address: '',
-      mobileNumber: '',
-      emailAddress: '',
-      clinic: {
-        name: '',
-        address: '',
-        mobileNumber: '',
-        emailAddress: '',
-        operatingHours: [
-          { day: 'monday', startTime: '09:00', endTime: '18:00' },
-          { day: 'tuesday', startTime: '09:00', endTime: '18:00' },
-          { day: 'wednesday', startTime: '09:00', endTime: '18:00' },
-          { day: 'thursday', startTime: '09:00', endTime: '18:00' },
-          { day: 'friday', startTime: '09:00', endTime: '18:00' },
-          { day: 'saturday', startTime: '10:00', endTime: '15:00' },
-          { day: 'sunday', startTime: '10:00', endTime: '15:00' },
-        ],
-        branches: [],
-      },
-    }
-  }
-
 
   onSubmit() {
     const branch: BranchPayload = {

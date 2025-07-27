@@ -13,7 +13,8 @@
       </ul>
     </li>
     <li>
-      <b>Branches</b>
+      <b>Branches</b> <span> - </span>
+      <button (click)="onAddBranch()">New Branch</button>
       <ul>
         @for(branch of clinic.branches; track branch._id) {
           <li><a [routerLink]="['/admin/branch/details', branch._id]">{{ branch.name }}</a></li>

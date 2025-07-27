@@ -34,4 +34,8 @@ export class ClinicDetails {
   onUpdate() {
     this.router.navigate(['/admin/clinic/update', this.id])
   }
+
+  onAddBranch() {
+    this.router.navigate(['/admin/branch/create'], { queryParams: { clinicId: this.id } })
+  }
 }
