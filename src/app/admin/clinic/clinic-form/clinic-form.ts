@@ -43,6 +43,7 @@ export class ClinicForm implements OnInit {
         { day: 'saturday', startTime: '10:00', endTime: '15:00' },
         { day: 'sunday', startTime: '10:00', endTime: '15:00' },
       ],
+      branches: []
     }
   }
 
@@ -79,6 +80,7 @@ export class ClinicForm implements OnInit {
         startTime: o.controls.startTime.value,
         endTime: o.controls.endTime.value,
       })),
+      branches: []
     }
 
     this.onSubmitEvent.emit(clinic)

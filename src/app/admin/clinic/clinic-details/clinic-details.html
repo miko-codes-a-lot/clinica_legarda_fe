@@ -12,6 +12,14 @@
         }
       </ul>
     </li>
+    <li>
+      <b>Branches</b>
+      <ul>
+        @for(branch of clinic.branches; track branch._id) {
+          <li><a [routerLink]="['/admin/branch/details', branch._id]">{{ branch.name }}</a></li>
+        }
+      </ul>
+    </li>
   </ul>
 } @else {
   <p>Fetching details...</p>

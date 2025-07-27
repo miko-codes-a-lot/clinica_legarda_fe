@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { Clinic } from '../../../_shared/model/clinic';
 import { ClinicService } from '../../../_shared/service/clinic-service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-clinic-details',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './clinic-details.html',
   styleUrl: './clinic-details.css'
 })

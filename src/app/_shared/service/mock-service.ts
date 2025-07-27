@@ -26,7 +26,8 @@ export class MockService {
           { day: 'friday', startTime: '09:00', endTime: '18:00' },
           { day: 'saturday', startTime: '10:00', endTime: '15:00' },
           { day: 'sunday', startTime: '10:00', endTime: '15:00' },
-        ]
+        ],
+        branches: []
       }
     }
   }
@@ -46,6 +47,9 @@ export class MockService {
         { day: 'friday', startTime: '09:00', endTime: '18:00' },
         { day: 'saturday', startTime: '10:00', endTime: '15:00' },
         { day: 'sunday', startTime: '10:00', endTime: '15:00' },
+      ],
+      branches: [
+        this.mockBranch()
       ]
     }
   }

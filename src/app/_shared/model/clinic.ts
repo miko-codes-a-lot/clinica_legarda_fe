@@ -1,3 +1,4 @@
+import { Branch } from "./branch"
 import { OperatingHour } from "./operating-hour"
 
 export interface Clinic {
@@ -7,4 +8,5 @@ export interface Clinic {
   mobileNumber: string
   emailAddress: string
   operatingHours: OperatingHour[]
+  branches: Branch[]
 }
