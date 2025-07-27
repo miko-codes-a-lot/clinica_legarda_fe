@@ -1,1 +1,10 @@
-<p>branch-update works!</p>
+@if (branch) {
+<app-branch-form
+  [isLoading]="isLoading"
+  [branch]="branch"
+  [clinics]="clinics"
+  (onSubmitEvent)="onSubmit($event)">
+</app-branch-form>
+} @else {
+  <p>Fetching the data...</p>
+}
