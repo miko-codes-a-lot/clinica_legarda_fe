@@ -3,7 +3,7 @@ import { AppointmentHistory, AppointmentNote, AppointmentStatus } from "../../_s
 export interface AppointmentPayload {
     patient: string
     dentist: string
-    service: string
+    services: string[]
     appointmentDate: Date
     status: AppointmentStatus
     notes: AppointmentNote

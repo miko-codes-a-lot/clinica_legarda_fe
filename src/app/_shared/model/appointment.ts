@@ -21,7 +21,7 @@ export interface Appointment {
   _id: string
   patient: User
   dentist: User
-  service: DentalService
+  services: DentalService[]
   appointmentDate: Date
   status: AppointmentStatus
   notes: AppointmentNote

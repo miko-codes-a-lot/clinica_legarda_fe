@@ -1,27 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../model/user';
-
-const mockUser: () => User = () => ({
-  _id: '1',
-  firstName: 'Juan',
-  middleName: 'Della',
-  lastName: 'Cruz',
-  emailAddress: 'juan@gmail.com',
-  mobileNumber: '09394252236',
-  address: 'blk 2 lot 75',
-  roles: 'dentist',
-})
+import { MockService } from './mock-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+  constructor(private readonly mockService: MockService) {}
+
   getAll(): Observable<User[]> {
     return new Observable((s) => {
       setTimeout(() => {
         const items = [
-          mockUser()
+          this.mockService.mockUser()
         ]
 
         s.next(items)
@@ -33,7 +25,7 @@ export class UserService {
   getOne(id: string): Observable<User> {
     return new Observable((s) => {
       setTimeout(() => {
-        const user = mockUser()
+        const user = this.mockService.mockUser()
 
         s.next(user)
         s.complete()
