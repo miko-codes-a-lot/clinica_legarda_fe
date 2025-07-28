@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AppointmentPayload } from '../appointment-payload';
 import { Appointment, AppointmentStatus } from '../../../_shared/model/appointment';
 import { User } from '../../../_shared/model/user';
 import { RxAppointmentForm } from './rx-appointment-form';
+import { DentalService } from '../../../_shared/model/dental-service';
 
 @Component({
   selector: 'app-appointment-form',
@@ -15,6 +16,7 @@ export class AppointmentForm {
   @Output() onSubmitEvent = new EventEmitter<AppointmentPayload>()
   @Input() isLoading = false
   @Input() appointment!: Appointment
+  @Input() dentalServices: DentalService[] = []
   @Input() patients: User[] = []
   @Input() dentists: User[] = []
 
@@ -24,10 +26,10 @@ export class AppointmentForm {
 
   ngOnInit(): void {
     this.rxform = this.fb.nonNullable.group({
-      dentist: [this.appointment.dentist._id || ''],
-      patient: [this.appointment.patient._id || ''],
-      services: [this.appointment.services.map(s => s._id || '')],
-      date: [this.appointment.date.toISOString()]
+      dentist: [this.appointment.dentist._id || '', Validators.required],
+      patient: [this.appointment.patient._id || '', Validators.required],
+      services: [this.appointment.services.map(s => s._id || ''), Validators.required],
+      date: [this.appointment.date.toISOString(), Validators.required]
     })
   }
 
