@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Clinic } from '../model/clinic';
+import { DentalService } from '../model/dental-service';
 
 @Injectable({
   providedIn: 'root'
@@ -51,6 +52,13 @@ export class MockService {
       branches: [
         this.mockBranch()
       ]
+    }
+  }
+
+  mockDentalService(): DentalService {
+    return {
+      _id: '1',
+      name: 'Dental Cleaning',
     }
   }
 }
