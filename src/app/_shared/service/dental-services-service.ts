@@ -8,6 +8,12 @@ import { Observable } from 'rxjs';
 })
 export class DentalServicesService {
     constructor(private readonly mockService: MockService) {}
+
+    getEmptyOrNullDoc(): DentalService {
+      return {
+        name: ''
+      }
+    }
   
     getAll(): Observable<DentalService[]> {
       return new Observable((s) => {
