@@ -24,7 +24,7 @@ export class AppointmentService {
       _id: '',
       dentist: Object.assign({}, user),
       patient: Object.assign({}, user),
-      appointmentDate: new Date(),
+      date: new Date(),
       services: [],
       status: AppointmentStatus.PENDING,
       notes: {
@@ -68,7 +68,7 @@ export class AppointmentService {
           patient: this.mockService.mockUser(),
           history: [],
           services: [this.mockService.mockDentalService()],
-          appointmentDate: appointment.appointmentDate,
+          date: appointment.date,
           status: AppointmentStatus.PENDING,
           notes: {
             clinicNotes: '',

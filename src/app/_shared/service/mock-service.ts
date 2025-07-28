@@ -82,7 +82,7 @@ export class MockService {
       _id: '1',
       dentist: this.mockUser(),
       patient: this.mockUser(),
-      appointmentDate: new Date(),
+      date: new Date(),
       services: [
         this.mockDentalService()
       ],

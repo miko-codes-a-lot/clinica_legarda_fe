@@ -22,7 +22,7 @@ export interface Appointment {
   patient: User
   dentist: User
   services: DentalService[]
-  appointmentDate: Date
+  date: Date
   status: AppointmentStatus
   notes: AppointmentNote
   history: AppointmentHistory[]

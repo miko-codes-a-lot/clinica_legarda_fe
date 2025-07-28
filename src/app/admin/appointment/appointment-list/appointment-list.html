@@ -1,1 +1,36 @@
-<p>appointment-list works!</p>
+<button (click)="onCreate()">Create</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>Dentist</th>
+      <th>Patient</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (appointment of appointments; track appointment._id) {
+      <tr>
+        <td>
+          <a [routerLink]="['/admin/user/details', appointment.dentist._id || '']">
+            {{ getName(appointment.dentist) }}
+          </a>
+        </td>
+        <td>
+          <a [routerLink]="['/admin/user/details', appointment.patient._id || '']">
+            {{ getName(appointment.patient) }}
+          </a>
+        </td>
+        <td>{{ appointment.date }}</td>
+        <td>
+          <button (click)="onDetails(appointment._id!!)">Details</button>
+          <button (click)="onUpdate(appointment._id!!)">Update</button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+@if (isLoading) {
+  <p>Fetching data...</p>
+}
