@@ -2,10 +2,14 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Clinic } from '../../../_shared/model/clinic';
 import { RxClinicForm, RxOperatingHour } from './rx-clinic-form';
+import { timeRangeValidator } from '../../../utils/time-range.validator';
+import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
+
+
 
 @Component({
   selector: 'app-clinic-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FormControlErrorsComponent],
   templateUrl: './clinic-form.html',
   styleUrl: './clinic-form.css'
 })
@@ -55,18 +59,27 @@ export class ClinicForm implements OnInit {
     this.rxform = this.fb.nonNullable.group({
       name: [this.clinic.name, Validators.required],
       address: [this.clinic.address, Validators.required],
-      mobileNumber: [this.clinic.mobileNumber, Validators.required],
-      emailAddress: [this.clinic.emailAddress, Validators.required],
+      mobileNumber: [this.clinic.mobileNumber, [Validators.required, Validators.pattern(/^\+639\d{9}$/)]],
+      emailAddress: [this.clinic.emailAddress, [Validators.required, Validators.email]],
+
       operatingHours: this.fb.array<FormGroup<RxOperatingHour>>(
         this.clinic.operatingHours.map(
           (o) => this.fb.nonNullable.group({
             day: [o.day, Validators.required],
             startTime: [o.startTime, Validators.required],
             endTime: [o.endTime, Validators.required]
-          })
+          }, {validators: timeRangeValidator})
         )
       ),
     })
+    
+    // +63 prefix logic for mobile Number
+    this.rxform.get('mobileNumber')?.valueChanges.subscribe(value => {
+      if (value && !value.startsWith('+63')) {
+        const sanitized = value.replace(/^0+/, ''); // Remove leading 0s
+        this.rxform.get('mobileNumber')?.setValue(`+63${sanitized}`, { emitEvent: false });
+      }
+    });
   }
 
   onSubmit() {
@@ -82,7 +95,6 @@ export class ClinicForm implements OnInit {
       })),
       branches: []
     }
-
     this.onSubmitEvent.emit(clinic)
   }
 
@@ -104,5 +116,11 @@ export class ClinicForm implements OnInit {
 
   get operatingHours() {
     return this.rxform.controls.operatingHours
+  }
+
+  // check selected day filter
+  getDayOptions(index: number): any[] {
+    const selectedCode = this.operatingHours.at(index).get('day')?.value;
+    return this.days.filter(day => day.code === selectedCode);
   }
 }
