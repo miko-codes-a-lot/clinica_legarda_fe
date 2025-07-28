@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'app-dental-service',
+  selector: 'app-appointment',
   imports: [RouterOutlet],
-  templateUrl: './dental-service.html',
-  styleUrl: './dental-service.css'
+  templateUrl: './appointment.html',
+  styleUrl: './appointment.css'
 })
-export class DentalService {
+export class Appointment {
 
 }

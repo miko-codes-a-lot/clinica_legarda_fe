@@ -1,10 +1,26 @@
 import { Injectable } from '@angular/core';
 import { Clinic } from '../model/clinic';
+import { DentalService } from '../model/dental-service';
+import { Appointment, AppointmentStatus } from '../model/appointment';
+import { User } from '../model/user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MockService {
+  mockUser(): User {
+    return {
+        _id: '1',
+        firstName: 'Juan',
+        middleName: 'Della',
+        lastName: 'Cruz',
+        emailAddress: 'juan@gmail.com',
+        mobileNumber: '09394252236',
+        address: 'blk 2 lot 75',
+        roles: 'dentist',
+    }
+  }
+
   mockBranch(): import("../model/branch").Branch {
     return {
       _id: '1',
@@ -51,6 +67,31 @@ export class MockService {
       branches: [
         this.mockBranch()
       ]
+    }
+  }
+
+  mockDentalService(): DentalService {
+    return {
+      _id: '1',
+      name: 'Dental Cleaning',
+    }
+  }
+
+  mockAppointment(): Appointment {
+    return {
+      _id: '1',
+      dentist: this.mockUser(),
+      patient: this.mockUser(),
+      date: new Date(),
+      services: [
+        this.mockDentalService()
+      ],
+      status: AppointmentStatus.PENDING,
+      notes: {
+        clinicNotes: '',
+        patientNotes: '',
+      },
+      history: [],
     }
   }
 }

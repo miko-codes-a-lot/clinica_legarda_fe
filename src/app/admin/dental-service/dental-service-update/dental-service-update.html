@@ -1,1 +1,9 @@
-<p>dental-service-update works!</p>
+@if (dentalService) {
+  <app-dental-service-form
+      [isLoading]="isLoading"
+      [dentalService]="dentalService"
+      (onSubmitEvent)="onSubmit($event)"
+  ></app-dental-service-form>
+} @else {
+  <p>Fetching data...</p>
+}

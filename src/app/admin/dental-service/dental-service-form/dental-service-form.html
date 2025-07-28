@@ -1,1 +1,6 @@
-<p>dental-service-form works!</p>
+<form [formGroup]="rxform" (ngSubmit)="onSubmit()">  
+  <label for="name">Name </label>
+  <input formControlName="name" id="name"> <br>
+
+  <button [disabled]="isLoading || !rxform.valid">Save</button>
+</form>

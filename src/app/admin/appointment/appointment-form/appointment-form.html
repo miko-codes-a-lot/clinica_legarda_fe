@@ -1,0 +1,32 @@
+<form [formGroup]="rxform" (ngSubmit)="onSubmit()">
+  @if (dentists.length === 0) {
+    <p>Fetching dentists...</p>
+  }
+  <label for="dentist">Dentist </label>
+  <select name="dentist" id="dentist" formControlName="dentist">
+    @for(dentist of dentists; track dentist._id) {
+      <option [value]="dentist._id">{{ dentist.firstName }} {{ dentist.lastName }}</option>
+    }
+  </select> <br>
+  @if (patients.length === 0) {
+    <p>Fetching patients...</p>
+  }
+  <label for="patient">Patient </label>
+  <select name="patient" id="patient" formControlName="patient">
+    @for(patient of patients; track patient._id) {
+      <option [value]="patient._id">{{ patient.firstName }} {{ patient.lastName }}</option>
+    }
+  </select> <br>
+
+  @if (dentalServices.length === 0) {
+    <p>Fetching services...</p>
+  }
+  <label for="services">Services </label>
+  <select name="services" id="services" formControlName="services" multiple>
+    @for(service of dentalServices; track service._id) {
+      <option [value]="service._id">{{ service.name }}</option>
+    }
+  </select> <br>
+
+  <button [disabled]="isLoading || !rxform.valid">Save</button>
+</form>

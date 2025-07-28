@@ -22,6 +22,14 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'branch',
         loadChildren: () => import('./branch/branch.routes').then(m => m.BRANCH_ROUTES)
+      },
+      {
+        path: 'service',
+        loadChildren: () => import('./dental-service/dental-service.routes').then(m => m.DENTAL_SERVICE)
+      },
+      {
+        path: 'appointment',
+        loadChildren: () => import('./appointment/appointment.routes').then(m => m.APPOINTMENT_ROUTES)
       }
     ]
   }
