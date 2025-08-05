@@ -2,7 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Clinic } from '../../../_shared/model/clinic';
 import { RxClinicForm, RxOperatingHour } from './rx-clinic-form';
-import { timeRangeValidator } from '../../../utils/time-range.validator';
+import { timeRangeValidator } from '../../../utils/forms/form-custom-validator';
+import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
 import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
 
 
@@ -72,14 +73,13 @@ export class ClinicForm implements OnInit {
         )
       ),
     })
-    
-    // +63 prefix logic for mobile Number
-    this.rxform.get('mobileNumber')?.valueChanges.subscribe(value => {
-      if (value && !value.startsWith('+63')) {
-        const sanitized = value.replace(/^0+/, ''); // Remove leading 0s
-        this.rxform.get('mobileNumber')?.setValue(`+63${sanitized}`, { emitEvent: false });
-      }
-    });
+
+    // change the format to E.164    
+    const mobileNumber = this.rxform.get('mobileNumber');
+    if (mobileNumber) {
+      applyPHMobilePrefix(mobileNumber)
+    }
+
   }
 
   onSubmit() {
