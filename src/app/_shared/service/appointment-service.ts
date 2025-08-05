@@ -18,8 +18,10 @@ export class AppointmentService {
       emailAddress: '',
       mobileNumber: '',
       address: '',
-      roles: ''
+      role: '',
+      operatingHours: [],
     }
+
     return {
       _id: '',
       dentist: Object.assign({}, user),

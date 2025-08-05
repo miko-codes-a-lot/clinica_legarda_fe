@@ -31,14 +31,58 @@
   <label for="passwordConfirm">Confirm Password </label>
   <input formControlName="passwordConfirm" id="passwordConfirm" type="password">
   <app-form-control-errors [control]="rxform.get('passwordConfirm')" [customMessage]="'Passwords do not match'"></app-form-control-errors>
-  <br>
-  
-  <label for="roles">Roles </label> 
-  <select name="roles" id="roles" formControlName="roles">
+  <br>  
+  <label for="role">Role </label> 
+  <select name="role" id="role" formControlName="role">
     <option value="patient">Patient</option>
     <option value="dentist">Dentist</option>
     <option value="admin">Admin</option>
   </select> <br>
+
+
+  @if (role.value === 'dentist') {
+    <label for="clinic">Clinic </label>
+    <select name="clinic" id="clinic" formControlName="clinic">
+      @for (clinic of clinics; track clinic._id) {
+        <option [value]="clinic._id">{{ clinic.name }}</option>
+      }
+    </select>
+    
+    @if (!this.clinic.value) {
+      <p><i>Please select a clinic</i></p>
+    } @else {
+      <br> <br>
+      <button type="button" (click)="onAddSchedule()">Add Schedule</button> <br> <br>
+
+      <div formArrayName="operatingHours">
+        @for (hour of this.operatingHours.controls; track $index) {
+          <div [formGroupName]="$index">
+            <span>Day </span> 
+            <select [id]="'day' + $index" [name]="'day' + $index" formControlName="day">
+              @for (day of days; track day.code) {
+                <option [value]="day.code">{{ day.label }}</option>
+              }
+            </select>
+            <span> Hours </span>
+            <input type="time" formControlName="startTime" [id]="'startTime' + $index">
+            <span>-</span>
+            <input type="time" formControlName="endTime" [id]="'endTime' + $index">
+
+            @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
+              <div class="error">
+                End time must be after start time.
+              </div>
+            }
+          </div> <br>
+        }
+      </div>
+
+      @if (operatingHours.length === 0) {
+        <p><i>Please add a schedule</i></p>
+      }
+    }
+    <br><br>
+  }
 
   <button [disabled]="isLoading || !rxform.valid">Save</button>
 </form>

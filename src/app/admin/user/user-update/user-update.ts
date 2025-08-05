@@ -3,6 +3,9 @@ import { UserForm } from '../user-form/user-form';
 import { User } from '../../../_shared/model/user';
 import { UserService } from '../../../_shared/service/user-service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { DayService } from '../../../_shared/service/day-service';
+import { Day } from '../../../_shared/model/day';
 
 @Component({
   selector: 'app-user-update',
@@ -14,9 +17,11 @@ export class UserUpdate implements OnInit {
   isLoading = false
   id!: string
   user!: User
+  days: Day[] = []
 
   constructor(
     private readonly userService: UserService,
+    private readonly dayService: DayService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
   ) {}
@@ -26,10 +31,17 @@ export class UserUpdate implements OnInit {
 
     this.id = this.route.snapshot.params['id']
 
-    this.userService.getOne(this.id).subscribe({
-      next: (u) => this.user = u,
-      error: (e) => alert(`Something went wrong: ${e}`)
-    }).add(() => this.isLoading = false)
+    forkJoin({
+      user: this.userService.getOne(this.id),
+      days: this.dayService.getAll(),
+    }).subscribe({
+      next: ({ user, days }) => {
+        this.user = user
+        this.days = days
+      },
+      error: (e) => alert(`Something went wrong: ${e}`),
+      complete: () => this.isLoading = false,
+    })
   }
 
   onSubmit(user: User) {

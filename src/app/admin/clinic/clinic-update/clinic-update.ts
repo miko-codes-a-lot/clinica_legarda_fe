@@ -3,6 +3,9 @@ import { Clinic } from '../../../_shared/model/clinic';
 import { ClinicService } from '../../../_shared/service/clinic-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClinicForm } from '../clinic-form/clinic-form';
+import { Day } from '../../../_shared/model/day';
+import { forkJoin } from 'rxjs';
+import { DayService } from '../../../_shared/service/day-service';
 
 @Component({
   selector: 'app-clinic-update',
@@ -14,9 +17,11 @@ export class ClinicUpdate {
   isLoading = false
   id!: string
   clinic!: Clinic
+  days: Day[] = []
 
   constructor(
     private readonly clinicService: ClinicService,
+    private readonly dayService: DayService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
   ) {}
@@ -26,10 +31,17 @@ export class ClinicUpdate {
 
     this.id = this.route.snapshot.params['id']
 
-    this.clinicService.getOne(this.id).subscribe({
-      next: (c) => this.clinic = c,
-      error: (e) => alert(`Something went wrong: ${e}`)
-    }).add(() => this.isLoading = false)
+    forkJoin({
+      clinic: this.clinicService.getOne(this.id),
+      days: this.dayService.getAll(),
+    }).subscribe({
+      next: ({ clinic, days }) => {
+        this.clinic = clinic
+        this.days = days
+      },
+      error: (e) => alert(`Something went wrong: ${e}`),
+      complete: () => this.isLoading = false
+    })
   }
 
   onSubmit(clinic: Clinic) {

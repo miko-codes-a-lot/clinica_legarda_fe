@@ -23,9 +23,7 @@
     @for (hour of this.operatingHours.controls; track $index) {
       <div [formGroupName]="$index">
         <span>Day </span> 
-        <select [id]="'day' + $index" [name]="'day' + $index" formControlName="day"
-          [disabled]="true"
-        >
+        <select [id]="'day' + $index" [name]="'day' + $index" formControlName="day">
           @for (day of getDayOptions($index); track day.code) {
             <option [value]="day.code">{{ day.label }}</option>
           }

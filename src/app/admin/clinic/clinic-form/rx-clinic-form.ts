@@ -1,10 +1,5 @@
 import { FormArray, FormControl, FormGroup } from "@angular/forms";
-
-export interface RxOperatingHour {
-  day: FormControl<string>
-  startTime: FormControl<string>
-  endTime: FormControl<string>
-}
+import { RxOperatingHour } from "../../../_shared/model/reactive/rx-operating-hours";
 
 export interface RxClinicForm {
   name: FormControl<string>

@@ -1,10 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Clinic } from '../../../_shared/model/clinic';
-import { RxClinicForm, RxOperatingHour } from './rx-clinic-form';
-import { timeRangeValidator } from '../../../utils/forms/form-custom-validator';
+import { RxClinicForm } from './rx-clinic-form';
+import { MyValidators } from '../../../utils/forms/form-custom-validator';
 import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
 import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
+import { RxOperatingHour } from '../../../_shared/model/reactive/rx-operating-hours';
+import { Day } from '../../../_shared/model/day';
 
 @Component({
   selector: 'app-clinic-form',
@@ -16,18 +18,9 @@ export class ClinicForm implements OnInit {
   @Output() onSubmitEvent = new EventEmitter<Clinic>()
   @Input() isLoading = false
   @Input() clinic: Clinic = this.getDefaultClinic()
+  @Input() days: Day[] = []
 
   rxform!: FormGroup<RxClinicForm>
-
-  days = [
-    { label: 'Monday', code: 'monday', },
-    { label: 'Tuesday', code: 'tuesday', },
-    { label: 'Wednesday', code: 'wednesday', },
-    { label: 'Thursday', code: 'thursday', },
-    { label: 'Friday', code: 'friday', },
-    { label: 'Saturday', code: 'saturday', },
-    { label: 'Sunday', code: 'sunday', },
-  ]
 
   constructor(private readonly fb: FormBuilder) {}
 
@@ -67,7 +60,7 @@ export class ClinicForm implements OnInit {
             day: [o.day, Validators.required],
             startTime: [o.startTime, Validators.required],
             endTime: [o.endTime, Validators.required]
-          }, {validators: timeRangeValidator})
+          }, {validators: MyValidators.timeRangeValidator})
         )
       ),
     })
@@ -96,6 +89,12 @@ export class ClinicForm implements OnInit {
     this.onSubmitEvent.emit(clinic)
   }
 
+  // check selected day filter
+  getDayOptions(index: number): any[] {
+    const selectedCode = this.operatingHours.at(index).get('day')?.value;
+    return this.days.filter(day => day.code === selectedCode);
+  }
+
   get name() {
     return this.rxform.controls.name
   }
@@ -114,11 +113,5 @@ export class ClinicForm implements OnInit {
 
   get operatingHours() {
     return this.rxform.controls.operatingHours
-  }
-
-  // check selected day filter
-  getDayOptions(index: number): any[] {
-    const selectedCode = this.operatingHours.at(index).get('day')?.value;
-    return this.days.filter(day => day.code === selectedCode);
   }
 }

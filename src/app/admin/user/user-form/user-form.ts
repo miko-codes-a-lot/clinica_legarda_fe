@@ -4,7 +4,10 @@ import { RxUserForm } from './rx-user-form.interface';
 import { User } from '../../../_shared/model/user';
 import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
 import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
-import { passwordMatchValidator } from '../../../utils/forms/form-custom-validator';
+import { RxOperatingHour } from '../../../_shared/model/reactive/rx-operating-hours';
+import { Day } from '../../../_shared/model/day';
+import { MyValidators } from '../../../utils/forms/form-custom-validator';
+import { Clinic } from '../../../_shared/model/clinic';
 
 @Component({
   selector: 'app-user-form',
@@ -15,9 +18,12 @@ import { passwordMatchValidator } from '../../../utils/forms/form-custom-validat
 export class UserForm implements OnInit {
   @Output() onSubmitEvent = new EventEmitter<User>()
   @Input() isLoading = false
+  @Input() clinics: Clinic[] = []
   @Input() user: User = this.getDefaultUser()
 
   rxform!: FormGroup<RxUserForm>
+
+  @Input() days: Day[] = []
 
   constructor(private readonly fb: FormBuilder) {}
 
@@ -30,7 +36,18 @@ export class UserForm implements OnInit {
       mobileNumber: '',
       address: '',
       password: '',
-      roles: 'patient',
+      clinic: '',
+      branch: '',
+      role: 'patient',
+      operatingHours: [
+        // { day: 'monday', startTime: '09:00', endTime: '18:00' },
+        // { day: 'tuesday', startTime: '09:00', endTime: '18:00' },
+        // { day: 'wednesday', startTime: '09:00', endTime: '18:00' },
+        // { day: 'thursday', startTime: '09:00', endTime: '18:00' },
+        // { day: 'friday', startTime: '09:00', endTime: '18:00' },
+        // { day: 'saturday', startTime: '10:00', endTime: '15:00' },
+        // { day: 'sunday', startTime: '10:00', endTime: '15:00' },
+      ],
     }
   }
 
@@ -44,20 +61,51 @@ export class UserForm implements OnInit {
       address: [this.user.address, Validators.required],
       password: [''],
       passwordConfirm: [''],
-      roles: [this.user.roles, Validators.required],
+      clinic: [this.user.clinic],
+      branch: [this.user.branch],
+      role: [this.user.role, Validators.required],
+      operatingHours: this.fb.array<FormGroup<RxOperatingHour>>(
+        this.user.operatingHours.map(
+          (o) => this.fb.nonNullable.group(
+            {
+              day: [o.day, Validators.required],
+              startTime: [o.startTime, Validators.required],
+              endTime: [o.endTime, Validators.required]
+            },
+            {
+              validators: MyValidators.timeRangeValidator
+            }
+          )
+        )
+      ),
     }, {
-      validators: passwordMatchValidator('password', 'passwordConfirm')
+      validators: MyValidators.passwordMatchValidator('password', 'passwordConfirm')
     })
 
     // change the format to E.164    
     const mobileNumber = this.rxform.get('mobileNumber');
-    console.log('mobileNumber', mobileNumber);
     if (mobileNumber) {
       applyPHMobilePrefix(mobileNumber)
     }
   }
 
+  onAddSchedule() {
+    this.operatingHours.push(
+      this.fb.nonNullable.group({
+        day: ['monday'],
+        startTime: ['09:00'],
+        endTime: ['18:00'],
+      })
+    )
+  }
+
   onSubmit() {
+    const operatingHours = this.operatingHours.value.map((oh) => ({
+      day: oh.day ?? '',
+      startTime: oh.startTime ?? '',
+      endTime: oh.endTime ?? '',
+    }))
+
     const user: User = {
       firstName: this.firstName.value,
       middleName: this.middleName.value,
@@ -66,8 +114,12 @@ export class UserForm implements OnInit {
       mobileNumber: this.mobileNumber.value,
       address: this.address.value,
       password: this.password.value,
-      roles: this.roles.value,
+      clinic: this.clinic.value,
+      branch: this.clinic.value,
+      operatingHours: this.role.value === 'dentist' ? operatingHours : [],
+      role: this.role.value,
     }
+
     this.onSubmitEvent.emit(user)
   }
 
@@ -99,7 +151,15 @@ export class UserForm implements OnInit {
     return this.rxform.controls.password
   }
 
-  get roles() {
-    return this.rxform.controls.roles
+  get role() {
+    return this.rxform.controls.role
+  }
+
+  get clinic() {
+    return this.rxform.controls.clinic
+  }
+
+  get operatingHours() {
+    return this.rxform.controls.operatingHours
   }
 }

@@ -3,6 +3,7 @@ import { Clinic } from '../model/clinic';
 import { DentalService } from '../model/dental-service';
 import { Appointment, AppointmentStatus } from '../model/appointment';
 import { User } from '../model/user';
+import { Branch } from '../model/branch';
 
 @Injectable({
   providedIn: 'root'
@@ -17,11 +18,22 @@ export class MockService {
         emailAddress: 'juan@gmail.com',
         mobileNumber: '09394252236',
         address: 'blk 2 lot 75',
-        roles: 'dentist',
+        role: 'dentist',
+        branch: '1',
+        clinic: '1',        
+        operatingHours: [
+          { day: 'monday', startTime: '09:00', endTime: '18:00' },
+          { day: 'tuesday', startTime: '09:00', endTime: '18:00' },
+          { day: 'wednesday', startTime: '09:00', endTime: '18:00' },
+          { day: 'thursday', startTime: '09:00', endTime: '18:00' },
+          { day: 'friday', startTime: '09:00', endTime: '18:00' },
+          { day: 'saturday', startTime: '10:00', endTime: '15:00' },
+          { day: 'sunday', startTime: '10:00', endTime: '15:00' },
+        ],
     }
   }
 
-  mockBranch(): import("../model/branch").Branch {
+  mockBranch(): Branch {
     return {
       _id: '1',
       name: 'Branch A',

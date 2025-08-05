@@ -1,6 +1,7 @@
-@if (user) {
+@if (user && days.length > 0) {
   <app-user-form
     [isLoading]="isLoading"
+    [days]="days"
     [user]="user"
     (onSubmitEvent)="onSubmit($event)"
   ></app-user-form>
