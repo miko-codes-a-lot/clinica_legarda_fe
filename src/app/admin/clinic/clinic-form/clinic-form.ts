@@ -3,10 +3,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Clinic } from '../../../_shared/model/clinic';
 import { RxClinicForm, RxOperatingHour } from './rx-clinic-form';
 import { timeRangeValidator } from '../../../utils/forms/form-custom-validator';
-import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
 import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
-
-
+import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
 
 @Component({
   selector: 'app-clinic-form',
