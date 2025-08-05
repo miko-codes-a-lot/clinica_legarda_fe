@@ -7,7 +7,9 @@
     @for(dentist of dentists; track dentist._id) {
       <option [value]="dentist._id">{{ dentist.firstName }} {{ dentist.lastName }}</option>
     }
-  </select> <br>
+  </select>
+  <app-form-control-errors [control]="rxform.get('dentist')"></app-form-control-errors>
+  <br>
   @if (patients.length === 0) {
     <p>Fetching patients...</p>
   }
@@ -16,7 +18,9 @@
     @for(patient of patients; track patient._id) {
       <option [value]="patient._id">{{ patient.firstName }} {{ patient.lastName }}</option>
     }
-  </select> <br>
+  </select>
+  <app-form-control-errors [control]="rxform.get('patient')"></app-form-control-errors>
+  <br>
 
   @if (dentalServices.length === 0) {
     <p>Fetching services...</p>

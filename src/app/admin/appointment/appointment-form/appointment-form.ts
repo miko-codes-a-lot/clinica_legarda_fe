@@ -5,10 +5,11 @@ import { Appointment, AppointmentStatus } from '../../../_shared/model/appointme
 import { User } from '../../../_shared/model/user';
 import { RxAppointmentForm } from './rx-appointment-form';
 import { DentalService } from '../../../_shared/model/dental-service';
+import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
 
 @Component({
   selector: 'app-appointment-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FormControlErrorsComponent],
   templateUrl: './appointment-form.html',
   styleUrl: './appointment-form.css'
 })

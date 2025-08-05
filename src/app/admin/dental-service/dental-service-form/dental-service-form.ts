@@ -2,10 +2,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { DentalService } from '../../../_shared/model/dental-service';
 import { RxDentalServiceForm } from './rx-dental-service-form';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
 
 @Component({
   selector: 'app-dental-service-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FormControlErrorsComponent],
   templateUrl: './dental-service-form.html',
   styleUrl: './dental-service-form.css'
 })

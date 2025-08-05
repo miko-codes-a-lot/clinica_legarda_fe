@@ -4,10 +4,12 @@ import { Branch } from '../../../_shared/model/branch';
 import { RxBranchForm } from './rx-branch-form';
 import { BranchPayload } from './branch-payload';
 import { Clinic } from '../../../_shared/model/clinic';
+import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
+import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
 
 @Component({
   selector: 'app-branch-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FormControlErrorsComponent],
   templateUrl: './branch-form.html',
   styleUrl: './branch-form.css'
 })
@@ -25,10 +27,16 @@ export class BranchForm implements OnInit {
     this.rxform = this.fb.nonNullable.group({
       name: [this.branch.name, Validators.required],
       address: [this.branch.address, Validators.required],
-      mobileNumber: [this.branch.mobileNumber, Validators.required],
-      emailAddress: [this.branch.emailAddress, Validators.required],
+      mobileNumber: [this.branch.mobileNumber, [Validators.required, Validators.pattern(/^\+639\d{9}$/)]],
+      emailAddress: [this.branch.emailAddress, [Validators.required, Validators.email]],
       clinic: [this.branch.clinic._id || '', Validators.required],
     })
+
+    // change the format to E.164    
+    const mobileNumber = this.rxform.get('mobileNumber');
+    if (mobileNumber) {
+      applyPHMobilePrefix(mobileNumber)
+    }
   }
 
   onSubmit() {

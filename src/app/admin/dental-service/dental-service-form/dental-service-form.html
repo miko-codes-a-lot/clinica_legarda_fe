@@ -1,6 +1,8 @@
 <form [formGroup]="rxform" (ngSubmit)="onSubmit()">  
   <label for="name">Name </label>
-  <input formControlName="name" id="name"> <br>
+  <input formControlName="name" id="name">
+  <app-form-control-errors [control]="rxform.get('name')"></app-form-control-errors>
+  <br>
 
   <button [disabled]="isLoading || !rxform.valid">Save</button>
 </form>
