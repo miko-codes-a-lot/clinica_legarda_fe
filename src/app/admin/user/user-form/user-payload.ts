@@ -1,7 +1,6 @@
-import { Clinic } from "./clinic"
-import { OperatingHour } from "./operating-hour"
+import { OperatingHour } from "../../../_shared/model/operating-hour"
 
-export interface User {
+export interface UserPayload {
   _id?: string
   firstName: string
   middleName: string
@@ -10,7 +9,7 @@ export interface User {
   mobileNumber: string
   address: string
   password?: string
-  clinic?: Clinic
+  clinic?: string
   operatingHours: OperatingHour[]
   role: string
 }

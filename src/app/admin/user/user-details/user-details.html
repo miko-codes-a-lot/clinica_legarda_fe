@@ -1,13 +1,24 @@
 @if (user) {
   <button (click)="onUpdate()">Edit</button> <br>
   <ul>
-    <li>First Name: {{ user.firstName }}</li>
-    <li>Middle Name: {{ user.middleName }}</li>
-    <li>Last Name: {{ user.lastName }}</li>
-    <li>Email Address: {{ user.emailAddress }}</li>
-    <li>Mobile Number: {{ user.mobileNumber }}</li>
-    <li>Address: {{ user.address }}</li>
-    <li>Role: {{ user.role }}</li>
+    <li><b>First Name</b>: {{ user.firstName }}</li>
+    <li><b>Middle Name</b>: {{ user.middleName }}</li>
+    <li><b>Last Name</b>: {{ user.lastName }}</li>
+    <li><b>Email Address</b>: {{ user.emailAddress }}</li>
+    <li><b>Mobile Number</b>: {{ user.mobileNumber }}</li>
+    <li><b>Address</b>: {{ user.address }}</li>
+    <li><b>Role</b>: {{ user.role }}</li>
+    @if (user.role === 'dentist') {
+      <li><b>Clinic</b>: {{ user.clinic?.name }}</li>
+      <li>
+        <b>Schedule</b>
+          <ul>
+            @for (oh of user.operatingHours; track oh.day) {
+              <li>{{ oh.day }} - {{ oh.startTime }} - {{ oh.endTime }}</li>
+            }
+          </ul>
+      </li>
+    }
   </ul>
 } @else {
   <p>Fetching details...</p>

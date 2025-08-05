@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { DayService } from '../../../_shared/service/day-service';
 import { Day } from '../../../_shared/model/day';
+import { UserPayload } from '../user-form/user-payload';
 
 @Component({
   selector: 'app-user-update',
@@ -44,7 +45,7 @@ export class UserUpdate implements OnInit {
     })
   }
 
-  onSubmit(user: User) {
+  onSubmit(user: UserPayload) {
     this.isLoading = true
     this.userService.update(this.id, user).subscribe({
       next: () => this.router.navigate(['admin/user/details', this.id], { replaceUrl: true }),

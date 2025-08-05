@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { UserForm } from '../user-form/user-form';
-import { User } from '../../../_shared/model/user';
 import { UserService } from '../../../_shared/service/user-service';
 import { Router } from '@angular/router';
 import { DayService } from '../../../_shared/service/day-service';
@@ -8,6 +7,7 @@ import { Day } from '../../../_shared/model/day';
 import { ClinicService } from '../../../_shared/service/clinic-service';
 import { Clinic } from '../../../_shared/model/clinic';
 import { forkJoin } from 'rxjs';
+import { UserPayload } from '../user-form/user-payload';
 
 @Component({
   selector: 'app-user-create',
@@ -43,7 +43,7 @@ export class UserCreate implements OnInit {
     })
   }
 
-  onSubmit(user: User) {
+  onSubmit(user: UserPayload) {
     this.isLoading = true
     this.userService.create(user).subscribe({
       next: (u) => this.router.navigate(['admin/user/details', u._id], { replaceUrl: true }),

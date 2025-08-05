@@ -8,6 +8,7 @@ import { RxOperatingHour } from '../../../_shared/model/reactive/rx-operating-ho
 import { Day } from '../../../_shared/model/day';
 import { MyValidators } from '../../../utils/forms/form-custom-validator';
 import { Clinic } from '../../../_shared/model/clinic';
+import { UserPayload } from './user-payload';
 
 @Component({
   selector: 'app-user-form',
@@ -16,7 +17,7 @@ import { Clinic } from '../../../_shared/model/clinic';
   styleUrl: './user-form.css'
 })
 export class UserForm implements OnInit {
-  @Output() onSubmitEvent = new EventEmitter<User>()
+  @Output() onSubmitEvent = new EventEmitter<UserPayload>()
   @Input() isLoading = false
   @Input() clinics: Clinic[] = []
   @Input() user: User = this.getDefaultUser()
@@ -36,8 +37,14 @@ export class UserForm implements OnInit {
       mobileNumber: '',
       address: '',
       password: '',
-      clinic: '',
-      branch: '',
+      clinic: {
+        name: '',
+        address: '',
+        mobileNumber: '',
+        emailAddress: '',
+        operatingHours: [],
+        branches: []
+      },
       role: 'patient',
       operatingHours: [
         // { day: 'monday', startTime: '09:00', endTime: '18:00' },
@@ -61,8 +68,7 @@ export class UserForm implements OnInit {
       address: [this.user.address, Validators.required],
       password: [''],
       passwordConfirm: [''],
-      clinic: [this.user.clinic],
-      branch: [this.user.branch],
+      clinic: [this.user.clinic?._id],
       role: [this.user.role, Validators.required],
       operatingHours: this.fb.array<FormGroup<RxOperatingHour>>(
         this.user.operatingHours.map(
@@ -106,7 +112,7 @@ export class UserForm implements OnInit {
       endTime: oh.endTime ?? '',
     }))
 
-    const user: User = {
+    const user: UserPayload = {
       firstName: this.firstName.value,
       middleName: this.middleName.value,
       lastName: this.lastName.value,
@@ -115,7 +121,6 @@ export class UserForm implements OnInit {
       address: this.address.value,
       password: this.password.value,
       clinic: this.clinic.value,
-      branch: this.clinic.value,
       operatingHours: this.role.value === 'dentist' ? operatingHours : [],
       role: this.role.value,
     }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../model/user';
 import { MockService } from './mock-service';
+import { UserPayload } from '../../admin/user/user-form/user-payload';
 
 @Injectable({
   providedIn: 'root'
@@ -33,21 +34,21 @@ export class UserService {
     })
   }
 
-  create(user: User): Observable<User> {
+  create(user: UserPayload): Observable<User> {
     return new Observable((s) => {
       setTimeout(() => {
-        user._id = '5'
-        s.next(user)
+        const mockUser = this.mockService.mockUser()
+        s.next(mockUser)
         s.complete()
       }, 1000);
     })
   }
 
-  update(id: string, user: User): Observable<User> {
+  update(id: string, user: UserPayload): Observable<User> {
     return new Observable((s) => {
       setTimeout(() => {
-        user._id = 'id'
-        s.next(user)
+        const mockUser = this.mockService.mockUser()
+        s.next(mockUser)
         s.complete()
       }, 1000);
     })

@@ -11,7 +11,6 @@ export interface RxUserForm {
   password: FormControl<string>
   passwordConfirm: FormControl<string>
   clinic: FormControl<string | undefined>
-  branch: FormControl<string | undefined>
   operatingHours: FormArray<FormGroup<RxOperatingHour>>
   role: FormControl<string>
 }

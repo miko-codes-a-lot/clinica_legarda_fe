@@ -19,8 +19,7 @@ export class MockService {
         mobileNumber: '09394252236',
         address: 'blk 2 lot 75',
         role: 'dentist',
-        branch: '1',
-        clinic: '1',        
+        clinic: this.mockClinic(),    
         operatingHours: [
           { day: 'monday', startTime: '09:00', endTime: '18:00' },
           { day: 'tuesday', startTime: '09:00', endTime: '18:00' },
