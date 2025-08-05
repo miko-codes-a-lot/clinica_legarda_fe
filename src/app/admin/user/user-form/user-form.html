@@ -25,13 +25,16 @@
   <label for="address">Address </label>
   <input formControlName="address" id="address"> <br>
   
-  <label for="password">Password </label>
-  <input formControlName="password" id="password" type="password"> <br>
+  @if (!user._id) {
+    <label for="password">Password </label>
+    <input formControlName="password" id="password" type="password"> <br>
+    
+    <label for="passwordConfirm">Confirm Password </label>
+    <input formControlName="passwordConfirm" id="passwordConfirm" type="password">
+    <app-form-control-errors [control]="rxform.get('passwordConfirm')" [customMessage]="'Passwords do not match'"></app-form-control-errors>
+    <br>  
+  }
   
-  <label for="passwordConfirm">Confirm Password </label>
-  <input formControlName="passwordConfirm" id="passwordConfirm" type="password">
-  <app-form-control-errors [control]="rxform.get('passwordConfirm')" [customMessage]="'Passwords do not match'"></app-form-control-errors>
-  <br>  
   <label for="role">Role </label> 
   <select name="role" id="role" formControlName="role">
     <option value="patient">Patient</option>
