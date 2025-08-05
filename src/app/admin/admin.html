@@ -1,17 +1,65 @@
 
-<nav>
-  <ul>
-    <li><a routerLink="/admin/user">User</a></li>
-    <li><a routerLink="/admin/clinic">Clinic</a></li>
-    <li><a routerLink="/admin/branch">Branch</a></li>
-    <li><a routerLink="/admin/service">Service</a></li>
-    <li><a routerLink="/admin/appointment">Appointments</a></li>
-  </ul>
-</nav>
+<mat-drawer-container class="example-container">
+  <mat-drawer mode="side" opened>
+    <mat-toolbar color="primary">
+      <span class="system-title">Clinica Legarda</span>
+    </mat-toolbar>
+    <mat-list role="list">
+      <mat-list-item >
+        <a routerLink="/admin/user" routerLinkActive="active-link" class="nav-link">
+          <mat-icon fontIcon="search" class="nav-icon" aria-label="User icon"></mat-icon>
+          <span class="nav-text">User</span>
+        </a>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item>
+        <a routerLink="/admin/clinic" routerLinkActive="active-link" class="nav-link">
+          <mat-icon fontIcon="local_hospital" class="nav-icon" aria-label="User icon"></mat-icon>
+          <span class="nav-text">Clinic</span>
+        </a>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item>
+        <a routerLink="/admin/branch" routerLinkActive="active-link" class="nav-link">
+          <mat-icon fontIcon="account_tree" class="nav-icon" aria-label="User icon"></mat-icon>
+          <span class="nav-text">Branch</span>
+        </a>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item>
+        <a routerLink="/admin/service" routerLinkActive="active-link" class="nav-link">
+          <mat-icon fontIcon="miscellaneous_services" class="nav-icon" aria-label="User icon"></mat-icon>
+          <span class="nav-text">Service</span>
+        </a>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item>
+        <a routerLink="/admin/appointment" routerLinkActive="active-link" class="nav-link">
+          <mat-icon fontIcon="event_available" class="nav-icon" aria-label="Appointments"></mat-icon>
+          <span class="nav-text">Appointments</span>
+        </a>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+    </mat-list>
 
-<ul>
-  <li><a>Notifications</a></li>
-  <li>Logout</li>
-</ul>
+    <mat-list role="list">
+      <mat-list-item role="listitem">
+        <a routerLink="" routerLinkActive="active-link" class="nav-link">
+          <mat-icon fontIcon="notifications" class="nav-icon" aria-label="Appointments"></mat-icon>
+          <span class="nav-text">Notifications</span>
+        </a>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item role="listitem">
+        <a routerLink="" routerLinkActive="active-link" class="nav-link">
+          <mat-icon fontIcon="logout" class="nav-icon" aria-label="Logout"></mat-icon>
+          <span class="nav-text">Logout</span>
+        </a>
+      </mat-list-item>
+    </mat-list>
+  </mat-drawer>
 
-<router-outlet />
+  <mat-drawer-content>
+    <router-outlet></router-outlet>
+  </mat-drawer-content>
+</mat-drawer-container>
