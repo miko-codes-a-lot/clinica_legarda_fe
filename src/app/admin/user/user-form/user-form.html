@@ -45,12 +45,12 @@
 
   @if (role.value === 'dentist') {
     <label for="clinic">Clinic </label>
-    <select name="clinic" id="clinic" formControlName="clinic">
+    <select name="clinic" id="clinic" formControlName="clinic" (change)="onClinicChange($event)">
       @for (clinic of clinics; track clinic._id) {
         <option [value]="clinic._id">{{ clinic.name }}</option>
       }
     </select>
-    
+    <!-- get the this.clinic.value on change -->
     @if (!this.clinic.value) {
       <p><i>Please select a clinic</i></p>
     } @else {
@@ -61,8 +61,8 @@
         @for (hour of this.operatingHours.controls; track $index) {
           <div [formGroupName]="$index">
             <span>Day </span> 
-            <select [id]="'day' + $index" [name]="'day' + $index" formControlName="day">
-              @for (day of days; track day.code) {
+            <select [id]="'day' + $index" [name]="'day' + $index" formControlName="day" >
+              @for (day of getAvailableDays($index); track day.code) {
                 <option [value]="day.code">{{ day.label }}</option>
               }
             </select>
@@ -73,7 +73,13 @@
 
             @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
               <div class="error">
-                End time must be after start time.
+                Time must be between the start and end time.
+              </div>
+            }
+
+            @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) {
+              <div class="error">
+                Time must be within the clinic's operating hours.
               </div>
             }
           </div> <br>

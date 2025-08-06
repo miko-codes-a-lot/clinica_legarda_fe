@@ -35,7 +35,7 @@
 
         @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
           <div class="error">
-            End time must be after start time.
+            Time must be between the start and end time.
           </div>
         }
       </div> <br>
