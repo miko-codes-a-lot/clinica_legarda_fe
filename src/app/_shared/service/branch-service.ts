@@ -31,7 +31,7 @@ export class BranchService {
           { day: 'saturday', startTime: '10:00', endTime: '15:00' },
           { day: 'sunday', startTime: '10:00', endTime: '15:00' },
         ],
-        branches: [],
+        // branches: [],
       },
   }
   }

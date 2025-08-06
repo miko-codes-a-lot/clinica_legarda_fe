@@ -12,7 +12,7 @@
         }
       </ul>
     </li>
-    <li>
+    <!-- <li>
       <b>Branches</b> <span> - </span>
       <button (click)="onAddBranch()">New Branch</button>
       <ul>
@@ -20,7 +20,7 @@
           <li><a [routerLink]="['/admin/branch/details', branch._id]">{{ branch.name }}</a></li>
         }
       </ul>
-    </li>
+    </li> -->
   </ul>
 } @else {
   <p>Fetching details...</p>

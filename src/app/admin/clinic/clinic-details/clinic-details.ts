@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-clinic-details',
-  imports: [RouterLink],
+  // imports: [RouterLink],
   templateUrl: './clinic-details.html',
   styleUrl: './clinic-details.css'
 })
@@ -35,7 +35,7 @@ export class ClinicDetails {
     this.router.navigate(['/admin/clinic/update', this.id])
   }
 
-  onAddBranch() {
-    this.router.navigate(['/admin/branch/create'], { queryParams: { clinicId: this.id } })
-  }
+  // onAddBranch() {
+  //   this.router.navigate(['/admin/branch/create'], { queryParams: { clinicId: this.id } })
+  // }
 }

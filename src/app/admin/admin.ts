@@ -17,7 +17,7 @@ export class Admin {
   menuItems = [
     { label: 'User', icon: 'group', link: '/admin/user' },
     { label: 'Clinic', icon: 'local_hospital', link: '/admin/clinic' },
-    { label: 'Branch', icon: 'domain', link: '/admin/branch' },
+    // { label: 'Branch', icon: 'domain', link: '/admin/branch' },
     { label: 'Service', icon: 'medical_services', link: '/admin/service' },
     { label: 'Appointments', icon: 'event', link: '/admin/appointment' },
     { label: 'Notifications', icon: 'notifications', link: '/admin/notification' },
