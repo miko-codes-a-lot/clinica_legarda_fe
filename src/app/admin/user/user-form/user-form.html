@@ -55,7 +55,7 @@
       <p><i>Please select a clinic</i></p>
     } @else {
       <br> <br>
-      <button type="button" (click)="onAddSchedule()">Add Schedule</button> <br> <br>
+      <button type="button" (click)="onAddSchedule()" [disabled]="operatingHours.length >= (selectedClinic?.operatingHours?.length || 0)">Add Schedule</button> <br> <br>
 
       <div formArrayName="operatingHours">
         @for (hour of this.operatingHours.controls; track $index) {

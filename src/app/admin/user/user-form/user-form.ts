@@ -6,7 +6,7 @@ import { FormControlErrorsComponent } from '../../../_shared/component/form-cont
 import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
 import { RxOperatingHour } from '../../../_shared/model/reactive/rx-operating-hours';
 import { Day } from '../../../_shared/model/day';
-import { MyValidators, timeRangeValidator, withinClinicHoursValidator } from '../../../utils/forms/form-custom-validator';
+import { passwordMatchValidator, timeRangeValidator, withinClinicHoursValidator } from '../../../utils/forms/form-custom-validator';
 import { Clinic } from '../../../_shared/model/clinic';
 import { UserPayload } from './user-payload';
 
@@ -86,7 +86,7 @@ export class UserForm implements OnInit {
         )
       ),
     }, {
-      validators: MyValidators.passwordMatchValidator('password', 'passwordConfirm')
+      validators: passwordMatchValidator('password', 'passwordConfirm')
     })
 
     // change the format to E.164    
