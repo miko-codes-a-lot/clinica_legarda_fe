@@ -1,0 +1,11 @@
+<div class="nav-container">
+  <a
+    *ngFor="let item of menuItems"
+    [routerLink]="item.link"
+    routerLinkActive="active"
+    class="nav-link"
+  >
+    <span class="material-icons nav-icon">{{ item.icon }}</span>
+    <span>{{ item.label }}</span>
+  </a>
+</div>

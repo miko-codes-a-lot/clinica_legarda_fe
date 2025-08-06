@@ -1,26 +1,6 @@
 .example-container {
   width: auto;
-  height: 100vh; 
+  height: 100vh;
   background: #eee;
 }
 
-.active-link {
-  font-weight: bold;
-  color: #1976d2; /* Angular Material primary blue */
-  background-color: #e3f2fd; /* light blue background */
-  border-radius: 4px;
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  text-decoration: none;
-  color: inherit;
-}
-
-.nav-icon {
-  margin-right: 8px;
-  font-size: 20px;
-}
