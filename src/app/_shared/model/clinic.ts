@@ -8,5 +8,5 @@ export interface Clinic {
   mobileNumber: string
   emailAddress: string
   operatingHours: OperatingHour[]
-  branches: Branch[]
+  // branches: Branch[]
 }

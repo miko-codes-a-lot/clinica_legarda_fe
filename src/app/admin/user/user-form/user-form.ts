@@ -43,7 +43,7 @@ export class UserForm implements OnInit {
         mobileNumber: '',
         emailAddress: '',
         operatingHours: [],
-        branches: []
+        // branches: []
       },
       role: 'patient',
       operatingHours: [
