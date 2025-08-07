@@ -1,10 +1,12 @@
+import { Clinic } from "./clinic"
 import { DentalService } from "./dental-service"
 import { User } from "./user"
 
 export enum AppointmentStatus {
   PENDING = 'pending',
   CONFIRMED = 'confirmed',
-  REJECTED = 'rejected'
+  REJECTED = 'rejected',
+  CANCELLED = 'cancelled'
 }
 
 export interface AppointmentNote {
@@ -19,10 +21,13 @@ export interface AppointmentHistory {
 
 export interface Appointment {
   _id: string
+  clinic: Clinic
   patient: User
   dentist: User
   services: DentalService[]
   date: Date
+  startTime: string
+  endTime: string
   status: AppointmentStatus
   notes: AppointmentNote
   history: AppointmentHistory[]
