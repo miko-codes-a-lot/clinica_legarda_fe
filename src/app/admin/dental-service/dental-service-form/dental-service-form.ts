@@ -22,12 +22,14 @@ export class DentalServiceForm {
   ngOnInit(): void {
     this.rxform = this.fb.nonNullable.group({
       name: [this.dentalService.name, Validators.required],
+      duration: [this.dentalService.duration, Validators.required]
     })
   }
 
   onSubmit() {
     const service: DentalService = {
       name: this.name.value,
+      duration: this.duration.value,
     }
 
     this.onSubmitEvent.emit(service)
@@ -35,5 +37,9 @@ export class DentalServiceForm {
 
   get name() {
     return this.rxform.controls.name
+  }
+
+  get duration() {
+    return this.rxform.controls.duration
   }
 }
