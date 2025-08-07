@@ -1,0 +1,22 @@
+<mat-form-field [appearance]="appearance" [floatLabel]="floatLabel">
+  <mat-label *ngIf="label">{{ label }}</mat-label>
+  <input
+    matInput
+    [matDatepicker]="picker"
+    [placeholder]="placeholder"
+    [value]="value"
+    [disabled]="disabled"
+    [min]="minDate"
+    [max]="maxDate"
+    [matDatepickerFilter]="dateFilter"
+    (dateInput)="onDateChange($event)"
+    (dateChange)="onDateChange($event)"
+    readonly
+  />
+  <mat-hint *ngIf="hint">{{ hint }}</mat-hint>
+  <mat-datepicker-toggle matIconSuffix [for]="picker" [disabled]="disabled"></mat-datepicker-toggle>
+  <mat-datepicker #picker [touchUi]="touchUi" [startView]="startView"></mat-datepicker>
+  <mat-error *ngIf="showError">
+    {{ errorMessage }}
+  </mat-error>
+</mat-form-field>
