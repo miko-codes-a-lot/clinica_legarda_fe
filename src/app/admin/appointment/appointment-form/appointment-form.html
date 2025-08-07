@@ -1,36 +1,64 @@
 <form [formGroup]="rxform" (ngSubmit)="onSubmit()">
-  @if (dentists.length === 0) {
-    <p>Fetching dentists...</p>
+  @if (clinics.length === 0) {
+    <p>Fetching clinics...</p>
+  } @else {
+    <label for="clinic">Clinics</label>
+    <select name="clinic" id="clinic" formControlName="clinic">
+      @for (clinic of clinics; track clinic._id) {
+        <option [value]="clinic._id">{{ clinic.name }}</option>
+      }
+    </select>
+    <app-form-control-errors [control]="clinic"></app-form-control-errors>
+    <br>
   }
-  <label for="dentist">Dentist </label>
-  <select name="dentist" id="dentist" formControlName="dentist">
-    @for(dentist of dentists; track dentist._id) {
-      <option [value]="dentist._id">{{ dentist.firstName }} {{ dentist.lastName }}</option>
-    }
-  </select>
-  <app-form-control-errors [control]="rxform.get('dentist')"></app-form-control-errors>
-  <br>
+
+  @if (dentists.length === 0) {
+    <p>Please select a clinic</p>
+  } @else {
+    <label for="dentist">Dentist </label>
+    <select name="dentist" id="dentist" formControlName="dentist">
+      @for(dentist of dentists; track dentist._id) {
+        <option [value]="dentist._id">{{ dentist.firstName }} {{ dentist.lastName }}</option>
+      }
+    </select>
+    <app-form-control-errors [control]="dentist"></app-form-control-errors>
+    <br>
+  }
+
   @if (patients.length === 0) {
     <p>Fetching patients...</p>
+  } @else {
+    <label for="patient">Patient </label>
+    <select name="patient" id="patient" formControlName="patient">
+      @for(patient of patients; track patient._id) {
+        <option [value]="patient._id">{{ patient.firstName }} {{ patient.lastName }}</option>
+      }
+    </select>
+    <app-form-control-errors [control]="patient"></app-form-control-errors>
+    <br>
   }
-  <label for="patient">Patient </label>
-  <select name="patient" id="patient" formControlName="patient">
-    @for(patient of patients; track patient._id) {
-      <option [value]="patient._id">{{ patient.firstName }} {{ patient.lastName }}</option>
-    }
-  </select>
-  <app-form-control-errors [control]="rxform.get('patient')"></app-form-control-errors>
-  <br>
 
   @if (dentalServices.length === 0) {
     <p>Fetching services...</p>
+  } @else {
+    <label for="services">Services </label> <br>
+    <select name="services" id="services" formControlName="services" multiple>
+      @for(service of dentalServices; track service._id) {
+        <option [value]="service._id">{{ service.name }}</option>
+      }
+    </select>
+    <br>
   }
-  <label for="services">Services </label>
-  <select name="services" id="services" formControlName="services" multiple>
-    @for(service of dentalServices; track service._id) {
-      <option [value]="service._id">{{ service.name }}</option>
-    }
-  </select> <br>
+
+  <!-- date picker should be here -->
+  @if (selectedDentist) {
+    <app-date-picker 
+      formControlName="date"
+      label="Select Date"
+      placeholder="Choose a date"
+      [dentist]="selectedDentist">
+    </app-date-picker>
+  }
 
   <button [disabled]="isLoading || !rxform.valid">Save</button>
 </form>
