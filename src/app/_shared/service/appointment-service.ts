@@ -20,13 +20,26 @@ export class AppointmentService {
       address: '',
       role: '',
       operatingHours: [],
+      appointments: [],
+    }
+
+    const clinic = {
+      name: '',
+      address: '',
+      mobileNumber: '',
+      emailAddress: '',
+      operatingHours: [],
+      dentists: []
     }
 
     return {
       _id: '',
+      clinic: Object.assign({}, clinic),
       dentist: Object.assign({}, user),
       patient: Object.assign({}, user),
       date: new Date(),
+      startTime: '09:00',
+      endTime: '10:00',
       services: [],
       status: AppointmentStatus.PENDING,
       notes: {
@@ -66,11 +79,14 @@ export class AppointmentService {
       setTimeout(() => {
         const a: Appointment = {
           _id: '5',
+          clinic: this.mockService.mockClinic(),
           dentist: this.mockService.mockUser(),
           patient: this.mockService.mockUser(),
           history: [],
           services: [this.mockService.mockDentalService()],
           date: appointment.date,
+          startTime: '09:00',
+          endTime: '10:00',
           status: AppointmentStatus.PENDING,
           notes: {
             clinicNotes: '',
