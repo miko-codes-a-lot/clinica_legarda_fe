@@ -11,7 +11,8 @@ export class DentalServicesService {
 
     getEmptyOrNullDoc(): DentalService {
       return {
-        name: ''
+        name: '',
+        duration: 30,
       }
     }
   
