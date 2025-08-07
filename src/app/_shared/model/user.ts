@@ -1,3 +1,4 @@
+import { Appointment } from "./appointment"
 import { Clinic } from "./clinic"
 import { OperatingHour } from "./operating-hour"
 
@@ -12,5 +13,6 @@ export interface User {
   password?: string
   clinic?: Clinic
   operatingHours: OperatingHour[]
+  appointments: Appointment[]
   role: string
 }
