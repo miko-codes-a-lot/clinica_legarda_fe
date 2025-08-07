@@ -6,7 +6,7 @@ import { FormControlErrorsComponent } from '../../../_shared/component/form-cont
 import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
 import { RxOperatingHour } from '../../../_shared/model/reactive/rx-operating-hours';
 import { Day } from '../../../_shared/model/day';
-import { MyValidators } from '../../../utils/forms/form-custom-validator';
+import { passwordMatchValidator, timeRangeValidator, withinClinicHoursValidator } from '../../../utils/forms/form-custom-validator';
 import { Clinic } from '../../../_shared/model/clinic';
 import { UserPayload } from './user-payload';
 
@@ -27,6 +27,10 @@ export class UserForm implements OnInit {
   @Input() days: Day[] = []
 
   constructor(private readonly fb: FormBuilder) {}
+
+  // Global Variable
+  selectedClinic: Clinic | undefined;
+  indexToPush = 0;
 
   getDefaultUser(): User {
     return {
@@ -68,7 +72,7 @@ export class UserForm implements OnInit {
       emailAddress: [this.user.emailAddress, [Validators.required, Validators.email]],
       mobileNumber: [this.user.mobileNumber, [Validators.required, Validators.pattern(/^\+639\d{9}$/)]],
       address: [this.user.address, Validators.required],
-      password: [''],
+      password: [this.user.password ?? '', Validators.required],
       passwordConfirm: [''],
       clinic: [this.user.clinic?._id],
       role: [this.user.role, Validators.required],
@@ -79,15 +83,12 @@ export class UserForm implements OnInit {
               day: [o.day, Validators.required],
               startTime: [o.startTime, Validators.required],
               endTime: [o.endTime, Validators.required]
-            },
-            {
-              validators: MyValidators.timeRangeValidator
             }
           )
         )
       ),
     }, {
-      validators: MyValidators.passwordMatchValidator('password', 'passwordConfirm')
+      validators: passwordMatchValidator('password', 'passwordConfirm')
     })
 
     // change the format to E.164    
@@ -96,15 +97,59 @@ export class UserForm implements OnInit {
       applyPHMobilePrefix(mobileNumber)
     }
   }
+  onClinicChange(event: Event) {
+    const selectedId = (event.target as HTMLSelectElement).value;
+
+    const selectedClinicData = this.clinics.find(c => c._id === selectedId);
+    this.selectedClinic = selectedClinicData;
+  }
+
 
   onAddSchedule() {
-    this.operatingHours.push(
-      this.fb.nonNullable.group({
-        day: ['monday'],
-        startTime: ['09:00'],
-        endTime: ['18:00'],
-      })
-    )
+    const usedDays = this.operatingHours.controls.map(group => group.get('day')?.value);
+
+    // Find the next schedule with an unused day
+    if (this.selectedClinic?.operatingHours) {
+      const nextSchedule = this.selectedClinic.operatingHours.find(
+        sched => !usedDays.includes(sched.day)
+      );
+
+      if (nextSchedule) {
+        const newGroup = this.fb.nonNullable.group({
+            day: [{ value: nextSchedule.day, disabled: usedDays.includes(nextSchedule.day) }],
+            startTime: [nextSchedule.startTime],
+            endTime: [nextSchedule.endTime],
+          }, { validators: [
+            timeRangeValidator,
+            withinClinicHoursValidator(this.selectedClinic.operatingHours)
+          ] });
+
+        // Subscribe to day changes for dynamic updates
+        newGroup.get('day')?.valueChanges.subscribe((selectedDay: string) => {
+          const defaultSchedule = this.selectedClinic?.operatingHours?.find(d => d.day === selectedDay);
+          if (defaultSchedule) {
+            newGroup.get('startTime')?.setValue(defaultSchedule.startTime);
+            newGroup.get('endTime')?.setValue(defaultSchedule.endTime);
+          }
+        });
+
+        this.operatingHours.push(newGroup);
+      }
+    }
+  }
+
+  isDayUsed(dayCode: string, currentIndex: number): boolean {
+    return this.operatingHours.controls.some((group, i) => {
+      return i !== currentIndex && group.get('day')?.value === dayCode;
+    });
+  }
+
+  getAvailableDays(currentIndex: number) {
+    const selectedDays = this.operatingHours.controls
+      .map((group, i) => i !== currentIndex ? group.get('day')?.value : null)
+      .filter(day => !!day);
+
+    return this.days.filter(day => !selectedDays.includes(day.code));
   }
 
   onSubmit() {

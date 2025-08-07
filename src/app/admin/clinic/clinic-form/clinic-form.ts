@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Clinic } from '../../../_shared/model/clinic';
 import { RxClinicForm } from './rx-clinic-form';
-import { MyValidators } from '../../../utils/forms/form-custom-validator';
+import { timeRangeValidator } from '../../../utils/forms/form-custom-validator';
 import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
 import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
 import { RxOperatingHour } from '../../../_shared/model/reactive/rx-operating-hours';
@@ -54,14 +54,13 @@ export class ClinicForm implements OnInit {
       address: [this.clinic.address, Validators.required],
       mobileNumber: [this.clinic.mobileNumber, [Validators.required, Validators.pattern(/^\+639\d{9}$/)]],
       emailAddress: [this.clinic.emailAddress, [Validators.required, Validators.email]],
-
       operatingHours: this.fb.array<FormGroup<RxOperatingHour>>(
         this.clinic.operatingHours.map(
           (o) => this.fb.nonNullable.group({
             day: [o.day, Validators.required],
             startTime: [o.startTime, Validators.required],
             endTime: [o.endTime, Validators.required]
-          }, {validators: MyValidators.timeRangeValidator})
+          }, {validators: timeRangeValidator})
         )
       ),
     })
