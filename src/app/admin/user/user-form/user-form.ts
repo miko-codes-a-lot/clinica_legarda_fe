@@ -43,9 +43,11 @@ export class UserForm implements OnInit {
         mobileNumber: '',
         emailAddress: '',
         operatingHours: [],
+        dentists: [],
         // branches: []
       },
       role: 'patient',
+      appointments: [],
       operatingHours: [
         // { day: 'monday', startTime: '09:00', endTime: '18:00' },
         // { day: 'tuesday', startTime: '09:00', endTime: '18:00' },
