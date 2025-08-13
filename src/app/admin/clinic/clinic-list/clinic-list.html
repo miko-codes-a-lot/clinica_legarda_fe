@@ -1,27 +1,11 @@
-<button><a routerLink="/admin/clinic/create">Create</a></button>
-
-<table>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    @for (clinic of clinics; track clinic._id) {
-      <tr>
-        <td>{{ clinic._id }}</td>
-        <td>{{ clinic.name }}</td>
-        <td>
-          <button (click)="onDetails(clinic._id!!)">Details</button>
-          <button (click)="onUpdate(clinic._id!!)">Update</button>
-        </td>
-      </tr>
-    }
-  </tbody>
-</table>
-
-@if (isLoading) {
-  <p>Fetching data...</p>
-}
+<app-generic-table
+  [title]="title"
+  [createButtonLabel]="create.label"
+  [createButtonLink]="create.link"
+  [displayedColumns]="displayedColumns"
+  [columnDefs]="columnDefs"
+  [dataSource]="dataSource"
+  [isLoading]="isLoading"
+  (details)="onDetails($event)"
+  (update)="onUpdate($event)"
+></app-generic-table>

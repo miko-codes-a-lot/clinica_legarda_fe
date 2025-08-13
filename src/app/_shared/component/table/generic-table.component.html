@@ -1,0 +1,50 @@
+<div class="page-container">
+  <h1 class="page-title">{{ title }}</h1>
+
+  @if (createButtonLabel && createButtonLink) {
+    <div class="actions">
+      <button mat-raised-button color="primary" [routerLink]="createButtonLink">
+        {{ createButtonLabel }}
+      </button>
+    </div>
+  }
+
+  <div class="user-table-container">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 custom-table">
+
+      <!-- Dynamic columns -->
+      @for (col of columnDefs; track col.key) {
+        <ng-container [matColumnDef]="col.key">
+          <th mat-header-cell *matHeaderCellDef>{{ col.label }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ getCellValue(col, element) }}
+          </td>
+        </ng-container>
+      }
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="primary" (click)="onDetailsClick(element)">
+            Details
+          </button>
+          <button mat-raised-button color="accent" (click)="onUpdateClick(element)">
+            Update
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    @if (isLoading) {
+      <div class="spinner-container">
+        <mat-spinner [diameter]="50"></mat-spinner>
+      </div>
+    }
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  </div>
+</div>
