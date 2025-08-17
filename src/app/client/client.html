@@ -1,0 +1,30 @@
+<ul>
+  @for (nav of navigations; track nav.label) {
+    <li>
+      <a [routerLink]="nav.link && !isLoading ? nav.link : null">
+        <span class="material-icons nav-icon">{{ nav.icon }}</span>
+        {{ nav.label }}
+      </a>
+    </li>
+  }
+</ul>
+
+<ul>
+  @if (!user) {
+    <li>
+      <a [routerLink]="!isLoading ? '/app/login' : null">
+        <span class="material-icons nav-icon">login</span>
+        Login
+      </a>
+    </li>
+  } @else {
+    <li>
+      <a [routerLink]="null" (click)="onClickLogout()">
+        <span class="material-icons nav-icon">logout</span>
+        Logout
+      </a>
+    </li>
+  }
+</ul>
+
+<router-outlet />

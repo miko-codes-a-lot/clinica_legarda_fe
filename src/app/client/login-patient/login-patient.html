@@ -1,0 +1,8 @@
+<h2>Clinica Legarda</h2>
+<form [formGroup]="rxform" (ngSubmit)="onSubmit()">
+  <label for="username">Username </label>
+  <input type="text" placeholder="Enter username" formControlName="username"> <br>
+  <label for="password">Password </label>
+  <input type="password" placeholder="Enter password" formControlName="password"> <br>
+  <button [disabled]="!rxform.valid">Login</button>
+</form>
