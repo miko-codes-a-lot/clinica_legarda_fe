@@ -13,7 +13,7 @@ export class ClinicService {
     return new Observable((s) => {
       setTimeout(() => {
         const items = [
-          this.mockService.mockClinic()
+          this.mockService.mockClinic(),
         ]
 
         s.next(items)

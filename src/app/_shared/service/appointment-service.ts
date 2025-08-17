@@ -38,8 +38,8 @@ export class AppointmentService {
       dentist: Object.assign({}, user),
       patient: Object.assign({}, user),
       date: new Date(),
-      startTime: '09:00',
-      endTime: '10:00',
+      startTime: '',
+      endTime: '',
       services: [],
       status: AppointmentStatus.PENDING,
       notes: {

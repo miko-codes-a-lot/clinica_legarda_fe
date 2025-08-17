@@ -40,11 +40,17 @@ export class AppointmentForm {
 
   constructor(private readonly fb: FormBuilder) {}
 
+  private clearDateTime() {
+    this.date.setValue(new Date())
+    this.time.setValue('')
+  }
+
   private changeDentists(clinicId: string) {
     const clinic = this.clinics.find(c => c._id == clinicId)
     if (!clinic) return
 
     this.dentists = clinic.dentists
+    this.clearDateTime()
   }
 
   private setDentist(dentistId: string) {
@@ -52,6 +58,7 @@ export class AppointmentForm {
     if (!dentist) return
 
     this.selectedDentist = dentist
+    this.clearDateTime()
   }
 
   ngOnInit(): void {
@@ -64,7 +71,7 @@ export class AppointmentForm {
       patient: [this.appointment.patient._id || '', Validators.required],
       services: [this.appointment.services.map(s => s._id || ''), Validators.required],
       date: [this.appointment.date, Validators.required],
-      time: ['', Validators.required]
+      time: [this.appointment.startTime, Validators.required]
     })
 
     this.changeDentists(clinicId)
@@ -79,6 +86,12 @@ export class AppointmentForm {
     this.dentist.valueChanges.subscribe({
       next: (d) => {
         this.setDentist(d)
+      }
+    })
+
+    this.date.valueChanges.subscribe({
+      next: (v) => {
+        this.time.setValue('')
       }
     })
   }
