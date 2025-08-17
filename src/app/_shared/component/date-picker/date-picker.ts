@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { User } from '../../model/user';
 import { AppointmentStatus } from '../../model/appointment';
+import { TimeUtil } from '../../../utils/time-util';
 
 @Component({
   selector: 'app-date-picker',
@@ -170,16 +171,14 @@ export class DatePicker implements ControlValueAccessor, Validator, OnDestroy, O
           appointment.status !== AppointmentStatus.REJECTED)
     })
 
-    console.log(appointments, 'lollll')
-
     const totalBookedMinutes = appointments.reduce((total, appointment) => {
-      const startMinutes = this.timeToMinutes(appointment.startTime)
-      const endMinutes = this.timeToMinutes(appointment.endTime)
+      const startMinutes = TimeUtil.timeToMinutes(appointment.startTime)
+      const endMinutes = TimeUtil.timeToMinutes(appointment.endTime)
       return total + (endMinutes - startMinutes)
     }, 0)
 
-    const dayStartMinutes = this.timeToMinutes(daySchedule.startTime);
-    const dayEndMinutes = this.timeToMinutes(daySchedule.endTime);
+    const dayStartMinutes = TimeUtil.timeToMinutes(daySchedule.startTime);
+    const dayEndMinutes = TimeUtil.timeToMinutes(daySchedule.endTime);
     const totalAvailableMinutes = dayEndMinutes - dayStartMinutes;
     
     // considered fully book if 90% or more of the time is occupied
@@ -187,14 +186,7 @@ export class DatePicker implements ControlValueAccessor, Validator, OnDestroy, O
     return totalBookedMinutes > (totalAvailableMinutes * occupancyThreshold)
   }
 
-  private timeToMinutes(timeString: string): number {
-    const [hours, minutes] = timeString.split(':').map(Number);
-    return hours * 60 + minutes;
-  }
-
   private isSameDate(date1: Date, date2: Date): boolean {
-    console.log(date1.getFullYear(), 'd1')
-    console.log(date2.getFullYear(), 'd2')
     return date1.getFullYear() === date2.getFullYear() &&
       date1.getMonth() === date2.getMonth() &&
       date1.getDate() === date2.getDate();
