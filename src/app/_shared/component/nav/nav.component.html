@@ -1,8 +1,9 @@
 <div class="nav-container">
   <a
     *ngFor="let item of menuItems"
-    [routerLink]="item.link"
+    [routerLink]="!item.link || disabled ? null : item.link"
     routerLinkActive="active"
+    (click)="item.onClick ? item.onClick() : null"
     class="nav-link"
   >
     <span class="material-icons nav-icon">{{ item.icon }}</span>

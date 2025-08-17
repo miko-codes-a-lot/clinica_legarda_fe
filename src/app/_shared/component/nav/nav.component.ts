@@ -15,5 +15,11 @@ import { CommonModule } from '@angular/common';
 })
 
 export class NavComponent {
-  @Input() menuItems: { label: string; icon: string; link: string }[] = [];
+  @Input() disabled = false
+  @Input() menuItems: {
+    label: string
+    icon: string
+    link?: string
+    onClick?: () => void
+  }[] = [];
 }
