@@ -25,7 +25,6 @@ export class AppointmentCreate {
   dentalServices: DentalService[] = []
   clinics: Clinic[] = []
   patients: User[] = []
-  dentists: User[] = []
 
   constructor(
     private readonly dentalServicesService: DentalServicesService,
@@ -56,7 +55,6 @@ export class AppointmentCreate {
   }
 
   onSubmit(appointment: AppointmentPayload) {
-    console.log('lol')
     this.isLoading = true
     this.appointmentService.create(appointment).subscribe({
       next: (c) => this.router.navigate(['admin/appointment/details', c._id], { replaceUrl: true }),

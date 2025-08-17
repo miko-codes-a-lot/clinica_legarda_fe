@@ -6,4 +6,5 @@ export interface RxAppointmentForm {
   dentist: FormControl<string>
   services: FormControl<string[]>
   date: FormControl<Date>
+  time: FormControl<string>
 }

@@ -5,6 +5,8 @@ export interface AppointmentPayload {
     dentist: string
     services: string[]
     date: Date
+    startTime: string
+    endTime: string
     status: AppointmentStatus
     notes: AppointmentNote
     history: AppointmentHistory[]

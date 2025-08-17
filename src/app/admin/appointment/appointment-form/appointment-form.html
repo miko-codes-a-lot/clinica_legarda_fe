@@ -54,10 +54,24 @@
   @if (selectedDentist) {
     <app-date-picker 
       formControlName="date"
-      label="Select Date"
+      label="Appointment Day"
       placeholder="Choose a date"
       [dentist]="selectedDentist">
-    </app-date-picker>
+    </app-date-picker> <br>
+
+    <app-time-picker
+      label="Appointment Time"
+      [dentist]="selectedDentist"
+      [selectedDate]="date.value"
+      [serviceDuration]="60"
+      [timeSlotInterval]="30"
+      [required]="true"
+      formControlName="time"
+    >
+    </app-time-picker> <br>
+
+    <p><strong>Total Duration:</strong> {{ getFormattedDuration() }}</p>
+    <p><strong>Time:</strong> {{ getAppointmentTimeRange() }}</p>
   }
 
   <button [disabled]="isLoading || !rxform.valid">Save</button>
