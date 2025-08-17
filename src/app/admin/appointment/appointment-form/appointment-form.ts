@@ -50,7 +50,6 @@ export class AppointmentForm {
     if (!clinic) return
 
     this.dentists = clinic.dentists
-    this.clearDateTime()
   }
 
   private setDentist(dentistId: string) {
@@ -58,7 +57,6 @@ export class AppointmentForm {
     if (!dentist) return
 
     this.selectedDentist = dentist
-    this.clearDateTime()
   }
 
   ngOnInit(): void {
@@ -80,12 +78,14 @@ export class AppointmentForm {
     this.clinic.valueChanges.subscribe({
       next: (v) => {
         this.changeDentists(v)
+        this.clearDateTime()
       }
     })
 
     this.dentist.valueChanges.subscribe({
       next: (d) => {
         this.setDentist(d)
+        this.clearDateTime()
       }
     })
 

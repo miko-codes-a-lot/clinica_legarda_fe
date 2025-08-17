@@ -1,1 +1,12 @@
-<p>appointment-update works!</p>
+@if (clinics.length !== 0 && appointment) {
+  <app-appointment-form
+    [isLoading]="isLoading"
+    [dentalServices]="dentalServices"
+    [clinics]="clinics"
+    [patients]="patients"
+    [appointment]="appointment"
+    (onSubmitEvent)="onSubmit($event)">
+  </app-appointment-form>
+} @else {
+  <p>Fetching data...</p>
+}
