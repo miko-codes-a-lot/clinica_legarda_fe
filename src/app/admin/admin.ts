@@ -15,6 +15,7 @@ import { NavComponent } from '../_shared/component/nav/nav.component';
 })
 export class Admin {
   menuItems = [
+    { label: 'Dashboard', icon: 'dashboard', link: '/admin/dashboard' },
     { label: 'User', icon: 'group', link: '/admin/user' },
     { label: 'Clinic', icon: 'local_hospital', link: '/admin/clinic' },
     // { label: 'Branch', icon: 'domain', link: '/admin/branch' },

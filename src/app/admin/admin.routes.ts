@@ -8,8 +8,12 @@ export const ADMIN_ROUTES: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '/admin/user',
+        redirectTo: '/admin/dashboard',
         pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        loadChildren: () => import('./dashboard/dashboard.route').then(m => m.DASHBOARD_ROUTES)
       },
       {
         path: 'user',
@@ -30,7 +34,11 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'appointment',
         loadChildren: () => import('./appointment/appointment.routes').then(m => m.APPOINTMENT_ROUTES)
-      }
+      },
+      {
+        path: 'notification',
+        loadChildren: () => import('./notification/notification.route').then(m => m.NOTIFICATION_ROUTES)
+      },
     ]
   }
 ];
