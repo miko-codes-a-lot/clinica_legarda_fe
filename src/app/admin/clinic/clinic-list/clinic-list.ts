@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Clinic } from '../../../_shared/model/clinic';
 import { ClinicService } from '../../../_shared/service/clinic-service';
 import { MatTableDataSource } from '@angular/material/table';
@@ -11,22 +11,19 @@ import { GenericTableComponent } from '../../../_shared/component/table/generic-
   templateUrl: './clinic-list.html',
   styleUrl: './clinic-list.css'
 })
-export class ClinicList {
-  isLoading = false
-  title = 'Clinic'
-  create = {
-    label: 'Create Clinic',
-    link: '/admin/clinic/create',
-  }
-  dataSource = new MatTableDataSource<Clinic>();
 
+export class ClinicList implements OnInit {
+  isLoading = false
+  moduleUrl = '/admin/clinic/'
+  title = 'Clinic'
+  createLabel = 'Create Clinic'
+  dataSource = new MatTableDataSource<Clinic>();
   displayedColumns: string[] = ['_id', 'name', 'address', 'actions'];
   columnDefs = [
     { key: '_id', label: 'ID', cell: (clinic: Clinic) => clinic._id ?? '' },
-    { key: 'name', label: 'Name', cell: (clinic: Clinic) =>  clinic.name},
+    { key: 'name', label: 'Name', cell: (clinic: Clinic) => clinic.name},
     { key: 'address', label: 'Address', cell: (clinic: Clinic) =>  clinic.address},
   ];
-  
 
   constructor(
     private readonly clinicService: ClinicService,
@@ -37,18 +34,23 @@ export class ClinicList {
     this.isLoading = true
 
     this.clinicService.getAll().subscribe({
-      next: (clinics) => {
-        this.dataSource.data = clinics;
+      next: (data) => {
+        this.dataSource.data = data;
       },
       error: (e) => alert(`Something went wrong ${e}`)
     }).add(() => this.isLoading = false);
   }
 
   onDetails(id: string) {
-    this.router.navigate(['/admin/clinic/details', id])
+    this.router.navigate([`${this.moduleUrl}/details`, id])
   }
 
   onUpdate(id: string) {
-    this.router.navigate(['/admin/clinic/update', id])
+    this.router.navigate([`${this.moduleUrl}/update`, id])
   }
+
+  onCreate() {
+    this.router.navigate([`${this.moduleUrl}/create`])
+  }
+
 }

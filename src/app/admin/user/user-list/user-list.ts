@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserService } from '../../../_shared/service/user-service';
 import { User } from '../../../_shared/model/user';
-import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
+import { UserService } from '../../../_shared/service/user-service';
 import { MatTableDataSource } from '@angular/material/table';
+import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
 
 
 @Component({
@@ -15,12 +15,9 @@ import { MatTableDataSource } from '@angular/material/table';
 
 export class UserList implements OnInit {
   isLoading = false
+  moduleUrl = '/admin/user/'
   title = 'User Management'
-  create = {
-    label: 'Create User',
-    link: '/admin/user/create',
-  }
-
+  createLabel = 'Create User'
   dataSource = new MatTableDataSource<User>();
   displayedColumns: string[] = ['_id', 'name', 'actions'];
   columnDefs = [
@@ -45,11 +42,15 @@ export class UserList implements OnInit {
   }
 
   onDetails(id: string) {
-    this.router.navigate(['/admin/user/details', id])
+    this.router.navigate([`${this.moduleUrl}/details`, id])
   }
 
   onUpdate(id: string) {
-    this.router.navigate(['/admin/user/update', id])
+    this.router.navigate([`${this.moduleUrl}/update`, id])
+  }
+
+  onCreate() {
+    this.router.navigate([`${this.moduleUrl}/create`])
   }
 
 }

@@ -1,27 +1,11 @@
-<button (click)="onCreate()">Create</button>
-
-<table>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    @for (dentalService of dentalServices; track dentalService._id) {
-      <tr>
-        <td>{{ dentalService._id }}</td>
-        <td>{{ dentalService.name }}</td>
-        <td>
-          <button (click)="onDetails(dentalService._id!!)">Details</button>
-          <button (click)="onUpdate(dentalService._id!!)">Update</button>
-        </td>
-      </tr>
-    }
-  </tbody>
-</table>
-
-@if (isLoading) {
-  <p>Fetching data...</p>
-}
+<app-generic-table
+  [title]="title"
+  [createButtonLabel]="createLabel"
+  [displayedColumns]="displayedColumns"
+  [columnDefs]="columnDefs"
+  [dataSource]="dataSource"
+  [isLoading]="isLoading"
+  (details)="onDetails($event)"
+  (update)="onUpdate($event)"
+  (create)="onCreate()"
+></app-generic-table>
