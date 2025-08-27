@@ -4,6 +4,7 @@ import { DentalService } from '../model/dental-service';
 import { Appointment, AppointmentStatus } from '../model/appointment';
 import { User } from '../model/user';
 import { Branch } from '../model/branch';
+import { Notification } from '../model/notification';
 
 @Injectable({
   providedIn: 'root'
@@ -132,5 +133,17 @@ export class MockService {
     mock.patient = this.mockUserBase()
     mock.services = [this.mockDentalService()]
     return mock
+  }
+
+  mockNotification(): Notification {
+    return {
+      _id: '1',
+      type: 'new_booking',
+      timestamp: new Date(),
+      message: 'Patient Juan Della Cruz booked a new appointment',
+      isRead: false,
+      targetUser: '1',
+      createdBy: this.mockUser(),
+    }
   }
 }

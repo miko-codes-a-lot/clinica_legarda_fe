@@ -15,6 +15,10 @@ export const NOTIFICATION_ROUTES: Routes = [
         path: 'list',
         loadComponent: () => import('./notification-list/notification-list').then(m => m.NotificationList)
       },
+      {
+        path: 'details/:id',
+        loadComponent: () => import('./notification-details/notification-details').then(m => m.NotificationDetails)
+      }
     ]
   }
 ];
