@@ -1,1 +1,7 @@
 <p>home works!</p>
+
+@if (isChatOpen) {
+  <app-chatbot (chatClosed)="isChatOpen = false"></app-chatbot>
+} @else {
+  <button (click)="isChatOpen = true">ChatBot</button>
+}

@@ -1,0 +1,32 @@
+
+<div class="chatbot-container">
+  <div class="chat-header">
+    <h3>Dental Assistant</h3>
+
+    <button class="close-button" (click)="closeChat()" aria-label="Close Chat">
+      &times;
+    </button>
+  </div>
+  <div class="chat-messages">
+    @for (message of messages; track message) {
+      <div class="message-row" [ngClass]="{'user-row': message.sender === 'user', 'bot-row': message.sender === 'bot'}">
+        @if (message.sender === 'bot') {
+          <img src="chatbot.png" alt="Bot Icon" class="message-avatar bot-avatar">
+        }
+        <div class="message-bubble" [ngClass]="{'user-bubble': message.sender === 'user', 'bot-bubble': message.sender === 'bot'}">
+          {{ message.text }}
+        </div>
+        @if (message.sender === 'user') {
+          <!-- <img src="user-icon.png" alt="User Icon" class="message-avatar user-avatar"> -->
+        }
+      </div>
+    }
+  </div>
+  <div class="chat-options">
+    @for (option of currentNode.options; track option.id) {
+      <button (click)="handleUserChoice(option)">
+        {{ option.text }}
+      </button>
+    }
+  </div>
+</div>
