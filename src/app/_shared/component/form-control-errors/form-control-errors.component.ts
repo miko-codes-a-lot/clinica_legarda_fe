@@ -6,25 +6,24 @@ import { AbstractControl } from '@angular/forms';
   standalone: true,
   template: `
     @if (control?.touched && control?.invalid) {
-      <div class="error">
-        @if (control?.errors?.['required']) {
-          <div>This field is required.</div>
-        }
-        @if (control?.errors?.['pattern']) {
-          <div>Invalid format.</div>
-        }
-        @if (control?.errors?.['email']) {
-          <div>Enter a valid email address.</div>
-        }
-        @if (customMessage) {
-          <div>{{ customMessage }}</div>
-        }
-      </div>
+      @if (control?.errors?.['required']) {
+        <span>This field is required.</span>
+      }
+      @if (control?.errors?.['pattern']) {
+        <span>Invalid format.</span>
+      }
+      @if (control?.errors?.['email']) {
+        <span>Enter a valid email address.</span>
+      }
+      @if (customMessage) {
+        <span>{{ customMessage }}</span>
+      }
     }
   `,
   styleUrls: ['./form-control-errors.component.css']
 })
 export class FormControlErrorsComponent {
   @Input() control!: AbstractControl | null;
-  @Input() customMessage: string = '';
+  @Input() customMessage?: string;
+
 }

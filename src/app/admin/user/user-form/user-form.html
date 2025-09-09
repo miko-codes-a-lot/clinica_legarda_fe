@@ -1,97 +1,63 @@
-<form [formGroup]="rxform" (ngSubmit)="onSubmit()">
-  <label for="firstName">First Name </label>
-  <input formControlName="firstName" id="firstName">
-  <app-form-control-errors [control]="rxform.get('firstName')"></app-form-control-errors>
-  <br>
-  
-  <label for="middleName">Middle Name </label>
-  <input formControlName="middleName" id="middleName"> <br>
-  
-  <label for="lastName">Last Name </label>
-  <input formControlName="lastName" id="lastName"> 
-  <app-form-control-errors [control]="rxform.get('lastName')"></app-form-control-errors>
-  <br>
-  
-  <label for="emailAddress">Email Address </label>
-  <input formControlName="emailAddress" id="emailAddress">
-  <app-form-control-errors [control]="rxform.get('emailAddress')"></app-form-control-errors>
-  <br>
-  
-  <label for="mobileNumber">Mobile Number </label>
-  <input formControlName="mobileNumber" id="mobileNumber">
-  <app-form-control-errors [control]="rxform.get('mobileNumber')" [customMessage]="'Use only digits after +63 (e.g. +639123456789).'"></app-form-control-errors>
-  <br>
-  
-  <label for="address">Address </label>
-  <input formControlName="address" id="address"> <br>
-  
-  @if (!user._id) {
-    <label for="password">Password </label>
-    <input formControlName="password" id="password" type="password"> <br>
-    
-    <label for="passwordConfirm">Confirm Password </label>
-    <input formControlName="passwordConfirm" id="passwordConfirm" type="password">
-    <app-form-control-errors [control]="rxform.get('passwordConfirm')" [customMessage]="'Passwords do not match'"></app-form-control-errors>
-    <br>  
-  }
-  
-  <label for="role">Role </label> 
-  <select name="role" id="role" formControlName="role">
-    <option value="patient">Patient</option>
-    <option value="dentist">Dentist</option>
-    <option value="admin">Admin</option>
-  </select> <br>
+<h2 class="page-title">User</h2>
+<app-form
+  [form]="rxform"
+  [fields]="userFields" 
+  [isLoading]="isLoading"
+  (onSubmitEvent)="onSubmit()">
 
+  <form [formGroup]="rxform">
+    @if (rxform.get('role')?.value === 'dentist') {
+   
+      @if (!this.rxform.get('clinic')?.value) {
+        <p><i>Please select a clinic</i></p>
+      } @else {
+        <button type="button" (click)="onAddSchedule()" [disabled]="operatingHours.length >= (selectedClinic?.operatingHours?.length || 0)" matButton="outlined">Add Schedule</button>
 
-  @if (role.value === 'dentist') {
-    <label for="clinic">Clinic </label>
-    <select name="clinic" id="clinic" formControlName="clinic" (change)="onClinicChange($event)">
-      @for (clinic of clinics; track clinic._id) {
-        <option [value]="clinic._id">{{ clinic.name }}</option>
-      }
-    </select>
-    <!-- get the this.clinic.value on change -->
-    @if (!this.clinic.value) {
-      <p><i>Please select a clinic</i></p>
-    } @else {
-      <br> <br>
-      <button type="button" (click)="onAddSchedule()" [disabled]="operatingHours.length >= (selectedClinic?.operatingHours?.length || 0)">Add Schedule</button> <br> <br>
+        <!-- adjust the design of this -->
+        <div formArrayName="operatingHours" class="schedule">
+          @for (hour of this.operatingHours.controls; track $index) {
+            <div [formGroupName]="$index">
+              <!-- make this card instead of form-grid -->
+              <div class="form-with-Error">
+                <div class="form-grid">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Day</mat-label>
+                    <mat-select formControlName="day" [id]="'day' + $index">
+                      @for (day of getAvailableDays($index); track day.code) {
+                        <mat-option [value]="day.code">{{ day.label }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
 
-      <div formArrayName="operatingHours">
-        @for (hour of this.operatingHours.controls; track $index) {
-          <div [formGroupName]="$index">
-            <span>Day </span> 
-            <select [id]="'day' + $index" [name]="'day' + $index" formControlName="day" >
-              @for (day of getAvailableDays($index); track day.code) {
-                <option [value]="day.code">{{ day.label }}</option>
-              }
-            </select>
-            <span> Hours </span>
-            <input type="time" formControlName="startTime" [id]="'startTime' + $index">
-            <span>-</span>
-            <input type="time" formControlName="endTime" [id]="'endTime' + $index">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>From</mat-label>
+                    <input matInput type="time" formControlName="startTime" [id]="'startTime' + $index">
+                  </mat-form-field>
 
-            @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
-              <div class="error">
-                Time must be between the start and end time.
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>To</mat-label>
+                    <input matInput type="time" formControlName="endTime" [id]="'endTime' + $index">
+                  </mat-form-field>
+                </div>
+                @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
+                  <div class="error">
+                    Time must be between the start and end time.
+                  </div>
+                }
+                @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) {
+                  <div class="error">
+                    Time must be within the clinic's operating hours.
+                  </div>
+                }
               </div>
-            }
+            </div>
+          }
+        </div>
 
-            @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) {
-              <div class="error">
-                Time must be within the clinic's operating hours.
-              </div>
-            }
-          </div> <br>
+        @if (operatingHours.length === 0) {
+          <p><i>Please add a schedule</i></p>
         }
-      </div>
-
-      @if (operatingHours.length === 0) {
-        <p><i>Please add a schedule</i></p>
       }
     }
-    <br><br>
-  }
-
-  <button [disabled]="isLoading || !rxform.valid">Save</button>
-</form>
+  </form>
+</app-form>

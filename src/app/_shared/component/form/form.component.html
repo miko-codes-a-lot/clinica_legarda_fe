@@ -1,0 +1,43 @@
+<div class="form">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    @for (field of fields; track field.name) {
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>{{ field.label }}</mat-label>
+
+        @if (field.type !== 'select') {
+          <input
+            matInput
+            [type]="field.type"
+            [formControlName]="field.name"
+          />
+        }
+
+        @if (field.type === 'select') {
+          <mat-select [formControlName]="field.name" (selectionChange)="field.selectionChange ? field.selectionChange($event) : null">
+            @for (opt of field.options; track opt.value) {
+              <mat-option [value]="opt.value">
+                {{ opt.label }}
+              </mat-option>
+            }
+          </mat-select>
+        }
+
+        <mat-error>
+          <app-form-control-errors
+            [control]="form.get(field.name)"
+            [customMessage]="field.customError"
+          ></app-form-control-errors>
+        </mat-error>
+      </mat-form-field>
+    }
+
+    <ng-content></ng-content>
+
+    <!-- add a custom button here -->
+    <!-- if button is enable then use it -->
+    <!-- else use the default button -->
+    <button [disabled]="isLoading || !form.valid" mat-raised-button color="primary">
+      Save
+    </button>
+  </form>
+</div>
