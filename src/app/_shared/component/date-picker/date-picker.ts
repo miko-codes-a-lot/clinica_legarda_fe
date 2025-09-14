@@ -147,12 +147,17 @@ export class DatePicker implements ControlValueAccessor, Validator, OnDestroy, O
     // const operatingHours = this.dentist.operatingHours.filter((_, i) => i < 5)
     const operatingHours = this.dentist.operatingHours
     const days = operatingHours.map(o => this.dayNameToNumber[o.day])
-
+  
     // disable if dentist does not operate on this day
     if (!days.includes(day)) return false
 
     // disable if dentist is fully booked for the day
     if (this.isFullyBooked(date)) return false
+
+    // match the current to previous days/date
+    if (this.isPastDate(date)) {
+      return false
+    }
 
     return true
   }
@@ -201,5 +206,16 @@ export class DatePicker implements ControlValueAccessor, Validator, OnDestroy, O
     this.value = event.value
     this.onChange(this.value)
     this.onTouched()
+  }
+
+  isPastDate(dateToCheck: Date): boolean {
+    const today = new Date();
+
+    const toDateOnly = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+    const checkDateOnly = toDateOnly(dateToCheck);
+    const todayOnly = toDateOnly(today);
+    // Return true if the date s before today (i.e., a past date)
+    return checkDateOnly < todayOnly;
   }
 }

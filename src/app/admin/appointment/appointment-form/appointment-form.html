@@ -2,14 +2,15 @@
   @if (clinics.length === 0) {
     <p>Fetching clinics...</p>
   } @else {
-    <label for="clinic">Clinics</label>
-    <select name="clinic" id="clinic" formControlName="clinic">
-      @for (clinic of clinics; track clinic._id) {
-        <option [value]="clinic._id">{{ clinic.name }}</option>
-      }
-    </select>
-    <app-form-control-errors [control]="clinic"></app-form-control-errors>
-    <br>
+    <h2 class="page-title">Appointment</h2>
+    <!-- form here -->
+    <app-form
+      [form]="rxform"
+      [fields]="appointmentFields" 
+      [isLoading]="isLoading"
+      (onSubmitEvent)="onSubmit()"
+    >
+    </app-form>
   }
 
   @if (dentists.length === 0) {

@@ -11,6 +11,9 @@ import { DatePicker } from '../../../_shared/component/date-picker/date-picker';
 import { TimePicker } from '../../../_shared/component/time-picker/time-picker';
 import { TimeUtil } from '../../../utils/time-util';
 
+import { FormComponent } from '../../../_shared/component/form/form.component';
+
+
 @Component({
   selector: 'app-appointment-form',
   imports: [
@@ -18,6 +21,7 @@ import { TimeUtil } from '../../../utils/time-util';
     FormControlErrorsComponent,
     TimePicker,
     DatePicker,
+    FormComponent
   ],
   templateUrl: './appointment-form.html',
   styleUrl: './appointment-form.css'
@@ -34,6 +38,7 @@ export class AppointmentForm {
   selectedDentist?: User
 
   rxform!: FormGroup<RxAppointmentForm>
+  appointmentFields: any[] = [];
 
   minDate = new Date()
   maxDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 90 days from now only
@@ -50,6 +55,7 @@ export class AppointmentForm {
     if (!clinic) return
 
     this.dentists = clinic.dentists
+    this.builAppointmentFields();
   }
 
   private setDentist(dentistId: string) {
@@ -71,30 +77,62 @@ export class AppointmentForm {
       date: [this.appointment.date, Validators.required],
       time: [this.appointment.startTime, Validators.required]
     })
-
     this.changeDentists(clinicId)
     this.setDentist(dentistId)
-
     this.clinic.valueChanges.subscribe({
       next: (v) => {
         this.changeDentists(v)
         this.clearDateTime()
       }
     })
-
     this.dentist.valueChanges.subscribe({
       next: (d) => {
         this.setDentist(d)
         this.clearDateTime()
       }
     })
-
     this.date.valueChanges.subscribe({
       next: (v) => {
         this.time.setValue('')
       }
     })
+    this.builAppointmentFields();
   }
+
+  private builAppointmentFields() {
+    const customeSelectPatient = this.setUsersKey(this.patients)
+    const customSelectDentist = this.setUsersKey(this.dentists)
+
+    const selectClinic = this.maptoOptions(this.clinics)
+    const selectDentist = this.maptoOptions(customSelectDentist)
+    const selectPatient = this.maptoOptions(customeSelectPatient)
+    this.appointmentFields = [
+      { name: 'clinic', label: 'Clinic', type: 'select', options: selectClinic},
+      { name: 'patient', label: 'Patient', type: 'select', options: selectPatient},
+    ];
+    // push the object inside the array if the clinic is selected
+    if (this.dentists.length !== 0) {
+      this.appointmentFields.splice(1, 0, { 
+        name: 'dentist', label: 'Dentist', type: 'select', options: selectDentist
+      })
+    }
+
+  }
+
+  setUsersKey (items: {firstName: string; lastName: string}[]) {
+      return items.map((item) => ({
+      ...item,
+      name: item.firstName + ' ' + item.lastName
+    }))
+  }
+  maptoOptions (items: {_id?: string; name: string}[]): {value: string; label: string}[] {
+
+    return items.map(item => ({
+      value: item._id ?? '',
+      label: item.name,
+    }))
+  }
+
 
   serviceDuration() {
     const totalDuration = this.services.value.reduce((p, c) => {

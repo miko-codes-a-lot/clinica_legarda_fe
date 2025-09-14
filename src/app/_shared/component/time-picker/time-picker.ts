@@ -180,7 +180,6 @@ export class TimePicker implements ControlValueAccessor, Validator, OnInit {
       // Check if the slot (including service duration) fits within operating hours
       if (endTimeMinutes <= endMinutes) {
         const isAvailable = this.isTimeSlotAvailable(timeString, this.selectedDate);
-        
         slots.push({
           value: timeString,
           display: this.formatTimeDisplay(timeString),
@@ -193,6 +192,13 @@ export class TimePicker implements ControlValueAccessor, Validator, OnInit {
   }
 
   private isTimeSlotAvailable(startTime: string, date: Date): boolean {
+    // Get the current time
+    const dateNow = new Date();
+    const hours = String(dateNow.getHours()).padStart(2, '0');
+    const minutes = String(dateNow.getMinutes()).padStart(2, '0');
+
+    const currentTime = `${hours}:${minutes}`;
+ 
     const startMinutes = TimeUtil.timeToMinutes(startTime);
     const endMinutes = startMinutes + this.serviceDuration;
 
@@ -213,7 +219,8 @@ export class TimePicker implements ControlValueAccessor, Validator, OnInit {
       if (
         (startMinutes >= appointmentStart && startMinutes < appointmentEnd) ||
         (endMinutes > appointmentStart && endMinutes <= appointmentEnd) ||
-        (startMinutes <= appointmentStart && endMinutes >= appointmentEnd)
+        (startMinutes <= appointmentStart && endMinutes >= appointmentEnd) ||
+        (currentTime > startTime)
       ) {
         return false; // Time slot is not available
       }
