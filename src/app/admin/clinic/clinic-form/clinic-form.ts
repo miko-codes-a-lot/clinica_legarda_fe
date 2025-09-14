@@ -3,24 +3,31 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Clinic } from '../../../_shared/model/clinic';
 import { RxClinicForm } from './rx-clinic-form';
 import { timeRangeValidator } from '../../../utils/forms/form-custom-validator';
-import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
 import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
 import { RxOperatingHour } from '../../../_shared/model/reactive/rx-operating-hours';
 import { Day } from '../../../_shared/model/day';
+// for table component
+import { FormComponent } from '../../../_shared/component/form/form.component';
+import { MatFormFieldModule } from '@angular/material/form-field'; 
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+
+
 
 @Component({
   selector: 'app-clinic-form',
-  imports: [ReactiveFormsModule, FormControlErrorsComponent],
+  imports: [ReactiveFormsModule, FormComponent, MatFormFieldModule, MatSelectModule, MatInputModule],
   templateUrl: './clinic-form.html',
   styleUrl: './clinic-form.css'
 })
 export class ClinicForm implements OnInit {
   @Output() onSubmitEvent = new EventEmitter<Clinic>()
   @Input() isLoading = false
-  @Input() clinic: Clinic = this.getDefaultClinic()
   @Input() days: Day[] = []
+  @Input() clinic: Clinic = this.getDefaultClinic()
 
   rxform!: FormGroup<RxClinicForm>
+  clinicFields: any[] = []; // <-- declare here
 
   constructor(private readonly fb: FormBuilder) {}
 
@@ -71,6 +78,18 @@ export class ClinicForm implements OnInit {
       applyPHMobilePrefix(mobileNumber)
     }
 
+    this.buildClinicFields();
+  }
+
+  
+  private buildClinicFields() {
+    this.clinicFields = [
+      { name: 'name', label: 'Name', type: 'text'},
+      { name: 'address', label: 'Adress', type: 'text' },
+      { name: 'mobileNumber', label: 'Mobile Number', type: 'text', customError: 'Use +639 format only'  },
+      { name: 'emailAddress', label: 'Email Address', type: 'email' },
+    ];
+      // remove password validation and input on Update
   }
 
   onSubmit() {

@@ -1,10 +1,8 @@
-<form [formGroup]="rxform" (ngSubmit)="onSubmit()">  
-  <label for="name">Name </label>
-  <input formControlName="name" id="name">
-  <label for="duration">Duration </label>
-  <input formControlName="duration" id="duration" placeholder="In minutes">
-  <app-form-control-errors [control]="name"></app-form-control-errors>
-  <br>
-
-  <button [disabled]="isLoading || !rxform.valid">Save</button>
-</form>
+<h2 class="page-title">Dental Service</h2>
+<app-form
+  [form]="rxform"
+  [fields]="dentalServiceFields" 
+  [isLoading]="isLoading"
+  (onSubmitEvent)="onSubmit()"
+>
+</app-form>

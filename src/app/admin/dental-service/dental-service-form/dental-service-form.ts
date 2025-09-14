@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { DentalService } from '../../../_shared/model/dental-service';
 import { RxDentalServiceForm } from './rx-dental-service-form';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
+// for table component
+import { FormComponent } from '../../../_shared/component/form/form.component';
 
 @Component({
   selector: 'app-dental-service-form',
-  imports: [ReactiveFormsModule, FormControlErrorsComponent],
+  imports: [ReactiveFormsModule, FormComponent],
   templateUrl: './dental-service-form.html',
   styleUrl: './dental-service-form.css'
 })
@@ -16,6 +17,7 @@ export class DentalServiceForm {
   @Input() dentalService!: DentalService
 
   rxform!: FormGroup<RxDentalServiceForm>
+  dentalServiceFields: any[] = [];
 
   constructor(private readonly fb: FormBuilder) {}
 
@@ -24,6 +26,16 @@ export class DentalServiceForm {
       name: [this.dentalService.name, Validators.required],
       duration: [this.dentalService.duration, Validators.required]
     })
+
+    this.buildDentalServiceFields();
+  }
+
+  private buildDentalServiceFields() {
+    this.dentalServiceFields = [
+      { name: 'name', label: 'Name', type: 'text'},
+      { name: 'duration', label: 'duration', type: 'number'},
+    ];
+      // remove password validation and input on Update
   }
 
   onSubmit() {

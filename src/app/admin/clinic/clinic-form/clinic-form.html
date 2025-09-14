@@ -1,46 +1,45 @@
-<form [formGroup]="rxform" (ngSubmit)="onSubmit()">  
-  <label for="name">Name </label>
-  <input formControlName="name" id="name">
-  <app-form-control-errors [control]="rxform.get('name')"></app-form-control-errors>
-  <br>
-
-  <label for="address">Address </label>
-  <input formControlName="address" id="address">
-  <app-form-control-errors [control]="rxform.get('address')"></app-form-control-errors>
-  <br>
-
-  <label for="mobileNumber">Mobile Number </label>
-  <input formControlName="mobileNumber" id="mobileNumber" placeholder="+639123456789">
-  <app-form-control-errors [control]="rxform.get('mobileNumber')" [customMessage]="'Use only digits after +63 (e.g. +639123456789).'"></app-form-control-errors>
-  <br>
-
-  <label for="emailAddress">Email Address </label>
-  <input formControlName="emailAddress" id="emailAddress">
-  <app-form-control-errors [control]="rxform.get('emailAddress')"></app-form-control-errors>
-  <br>
-
-  <div formArrayName="operatingHours">
-    @for (hour of this.operatingHours.controls; track $index) {
-      <div [formGroupName]="$index">
-        <span>Day </span> 
-        <select [id]="'day' + $index" [name]="'day' + $index" formControlName="day">
-          @for (day of getDayOptions($index); track day.code) {
-            <option [value]="day.code">{{ day.label }}</option>
-          }
-        </select>
-        <span> Hours </span>
-        <input type="time" formControlName="startTime" [id]="'startTime' + $index">
-        <span>-</span>
-        <input type="time" formControlName="endTime" [id]="'endTime' + $index">
-
-        @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
-          <div class="error">
-            Time must be between the start and end time.
+<h2 class="page-title">Clinic</h2>
+<app-form
+  [form]="rxform"
+  [fields]="clinicFields" 
+  [isLoading]="isLoading"
+  (onSubmitEvent)="onSubmit()"
+>
+  <form [formGroup]="rxform">  
+    <span class="hours">Clinic Hours:</span>
+    <div formArrayName="operatingHours" class="operating-hours">
+      @for (hour of this.operatingHours.controls; track $index) {
+        <div [formGroupName]="$index">
+          <div class="form-with-error">
+            <div class="form-grid">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Day</mat-label>
+                <mat-select formControlName="day" [id]="'day' + $index">
+                  @for (day of getDayOptions($index); track day.code) {
+                    <mat-option [value]="day.code">{{ day.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Start Time</mat-label>
+                <input matInput type="time" formControlName="startTime" [id]="'startTime' + $index">
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>End Time</mat-label>
+                <input matInput type="time" formControlName="endTime" [id]="'endTime' + $index">
+              </mat-form-field>
+            </div>
+            @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
+              <div class="error">
+                Time must be between the start and end time.
+              </div>
+            }
           </div>
-        }
-      </div> <br>
-    }
-  </div>
+        </div> <br>
+      }
+    </div>
+  </form>
+</app-form>
 
-  <button [disabled]="isLoading || !rxform.valid">Save</button>
-</form>
+
+
