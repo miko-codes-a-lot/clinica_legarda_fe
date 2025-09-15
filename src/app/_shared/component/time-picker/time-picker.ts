@@ -35,7 +35,7 @@ interface TimeSlot {
     }
   ],
   template: `
-    <mat-form-field [appearance]="appearance">
+    <mat-form-field [appearance]="appearance" style="display: block;">
       <mat-label *ngIf="label">{{ label }}</mat-label>
       <mat-select
         [value]="value"

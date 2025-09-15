@@ -10,4 +10,5 @@ export interface FormField {
   validators?: ValidatorFn[];
   customError?: string;    // optional custom error message
   selectionChange?: (event: any) => void;
+  multiple: boolean;       // multiple select
 }

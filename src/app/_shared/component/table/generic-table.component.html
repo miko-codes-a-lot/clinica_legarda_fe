@@ -9,14 +9,18 @@
       </button>
     </div>
   }
-
+  <mat-form-field appearance="fill">
+    <mat-label>Search</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Type to search">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
   <div class="user-table-container">
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 custom-table">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 custom-table" matSort (matSortChange)="announceSortChange($event)">
 
       <!-- Dynamic columns -->
       @for (col of columnDefs; track col.key) {
         <ng-container [matColumnDef]="col.key">
-          <th mat-header-cell *matHeaderCellDef>{{ col.label }}</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header [attr.sortActionDescription]="'Sort by '+ col.key">{{ col.label }}</th>
           <td mat-cell *matCellDef="let element">
             {{ getCellValue(col, element) }}
           </td>

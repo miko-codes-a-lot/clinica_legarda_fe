@@ -38,3 +38,7 @@ mat-form-field {
   color: #f44336; /* Angular Material default error red */
 }
 
+.summary p {
+  font-size: 18px;
+}
+

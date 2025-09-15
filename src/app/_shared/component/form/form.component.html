@@ -13,7 +13,7 @@
         }
 
         @if (field.type === 'select') {
-          <mat-select [formControlName]="field.name" (selectionChange)="field.selectionChange ? field.selectionChange($event) : null">
+          <mat-select [formControlName]="field.name" (selectionChange)="field.selectionChange ? field.selectionChange($event) : null"  [multiple]="field?.multiple">
             @for (opt of field.options; track opt.value) {
               <mat-option [value]="opt.value">
                 {{ opt.label }}

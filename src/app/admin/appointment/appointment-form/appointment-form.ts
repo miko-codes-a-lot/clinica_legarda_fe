@@ -5,7 +5,6 @@ import { Appointment, AppointmentStatus } from '../../../_shared/model/appointme
 import { User } from '../../../_shared/model/user';
 import { RxAppointmentForm } from './rx-appointment-form';
 import { DentalService } from '../../../_shared/model/dental-service';
-import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
 import { Clinic } from '../../../_shared/model/clinic';
 import { DatePicker } from '../../../_shared/component/date-picker/date-picker';
 import { TimePicker } from '../../../_shared/component/time-picker/time-picker';
@@ -18,7 +17,6 @@ import { FormComponent } from '../../../_shared/component/form/form.component';
   selector: 'app-appointment-form',
   imports: [
     ReactiveFormsModule,
-    FormControlErrorsComponent,
     TimePicker,
     DatePicker,
     FormComponent
@@ -55,6 +53,7 @@ export class AppointmentForm {
     if (!clinic) return
 
     this.dentists = clinic.dentists
+    console.log('this.date.value: ', this.date.value)
     this.builAppointmentFields();
   }
 
@@ -63,6 +62,7 @@ export class AppointmentForm {
     if (!dentist) return
 
     this.selectedDentist = dentist
+    console.log('selectedDentist', this.selectedDentist)
   }
 
   ngOnInit(): void {
@@ -106,9 +106,13 @@ export class AppointmentForm {
     const selectClinic = this.maptoOptions(this.clinics)
     const selectDentist = this.maptoOptions(customSelectDentist)
     const selectPatient = this.maptoOptions(customeSelectPatient)
+    const selectDentalService = this.maptoOptions(this.dentalServices)
+
     this.appointmentFields = [
       { name: 'clinic', label: 'Clinic', type: 'select', options: selectClinic},
       { name: 'patient', label: 'Patient', type: 'select', options: selectPatient},
+      { name: 'services', label: 'Services', type: 'select', options: selectDentalService, multiple: true},
+      // { name: 'patient', label: 'Patient', type: 'select', options: selectPatient},
     ];
     // push the object inside the array if the clinic is selected
     if (this.dentists.length !== 0) {
@@ -135,6 +139,10 @@ export class AppointmentForm {
 
 
   serviceDuration() {
+    // Ongoing
+    // problem is here
+    // the service is not populating?
+    console.log('this.services: ', this.services);
     const totalDuration = this.services.value.reduce((p, c) => {
       const service = this.dentalServices.find(d => d._id == c)!
       return p + service.duration
