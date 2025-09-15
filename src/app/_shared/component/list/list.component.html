@@ -1,0 +1,11 @@
+<div class="list">
+  <mat-list role="list">
+    <mat-list-item *ngFor="let key of data | keyvalue">
+      <span class="item-title" matListItemTitle>{{ data[key.key] }}</span>
+      <span class="item-line" matListItemLine>
+        {{ labelMap[key.key] || formatKey(key.key) }}
+      </span>
+    </mat-list-item>
+    <ng-content></ng-content>
+  </mat-list>
+</div>

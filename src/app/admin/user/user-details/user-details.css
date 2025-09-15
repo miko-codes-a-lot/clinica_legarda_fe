@@ -1,0 +1,17 @@
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.view-header {
+  margin: 2% 8% 2% 8%;
+  margin-bottom: 16px;
+}
+
+.item-title{
+    font-size: 19px;
+}
+
+.item-line{
+    font-size: 16px;
+}

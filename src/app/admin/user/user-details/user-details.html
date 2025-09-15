@@ -1,25 +1,27 @@
 @if (user) {
-  <button (click)="onUpdate()">Edit</button> <br>
-  <ul>
-    <li><b>First Name</b>: {{ user.firstName }}</li>
-    <li><b>Middle Name</b>: {{ user.middleName }}</li>
-    <li><b>Last Name</b>: {{ user.lastName }}</li>
-    <li><b>Email Address</b>: {{ user.emailAddress }}</li>
-    <li><b>Mobile Number</b>: {{ user.mobileNumber }}</li>
-    <li><b>Address</b>: {{ user.address }}</li>
-    <li><b>Role</b>: {{ user.role }}</li>
+  <div class="view-header">
+    <h2 class="page-title">User</h2>
+    <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
+  </div>
+
+  <app-list [data]="filteredUser">
+
+    <!-- custom -->
     @if (user.role === 'dentist') {
-      <li><b>Clinic</b>: {{ user.clinic?.name }}</li>
-      <li>
-        <b>Schedule</b>
-          <ul>
-            @for (oh of user.operatingHours; track oh.day) {
-              <li>{{ oh.day }} - {{ oh.startTime }} - {{ oh.endTime }}</li>
-            }
-          </ul>
-      </li>
+      <mat-list-item>
+        <span class="item-title" matListItemTitle>{{ user.clinic?.name }}</span>
+        <span class="item-line" matListItemLine>Clinic</span>
+      </mat-list-item>
+      <b></b>
+      <mat-list-item>
+        <span class="item-title" matListItemTitle><b>Schedule:</b></span>
+        @for (oh of user.operatingHours; track oh.day) {
+          <span class="item-line" matListItemLine>{{ oh.day }} - {{ oh.startTime }} - {{ oh.endTime }}</span>
+        }
+      </mat-list-item>
     }
-  </ul>
+  </app-list>
+
 } @else {
   <p>Fetching details...</p>
 }
