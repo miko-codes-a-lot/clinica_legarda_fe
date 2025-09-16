@@ -6,6 +6,8 @@ import { User } from '../../../_shared/model/user';
 import { Router } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
 
 
 @Component({
@@ -14,6 +16,8 @@ import { GenericTableComponent } from '../../../_shared/component/table/generic-
   templateUrl: './notification-list.html',
   styleUrl: './notification-list.css'
 })
+
+
 export class NotificationList {
   isLoading = false
   moduleUrl = '/admin/notification/'
@@ -24,13 +28,17 @@ export class NotificationList {
   columnDefs = [
     { key: 'type', label: 'Type', cell: (notification: Notification) => notification.type ?? '' },
     { key: 'message', label: 'Message', cell: (notification: Notification) => notification.message},
-    { key: 'user', label: 'User', cell: (notification: Notification) =>  this.getFullName(notification.createdBy)},
+    { key: 'user', label: 'User', cell: (notification: Notification): SafeHtml => {
+      const fullName = this.getFullName(notification.createdBy)
+      return this.sanitizer.bypassSecurityTrustHtml(`<a href="admin/user/details/${notification.createdBy._id}">${fullName}</a>`);
+    }},
     { key: 'date', label: 'Date', cell: (notification: Notification) =>  notification.timestamp},
   ];
   
   constructor(
     private readonly notificationService: NotificationService,
     private readonly router: Router,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {

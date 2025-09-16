@@ -22,7 +22,8 @@
         <ng-container [matColumnDef]="col.key">
           <th mat-header-cell *matHeaderCellDef mat-sort-header [attr.sortActionDescription]="'Sort by '+ col.key">{{ col.label }}</th>
           <td mat-cell *matCellDef="let element">
-            {{ getCellValue(col, element) }}
+            <span [innerHTML]="getCellValue(col, element)"></span> 
+            <!-- {{ getCellValue(col, element) }} -->
           </td>
         </ng-container>
       }
