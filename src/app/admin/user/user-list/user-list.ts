@@ -35,7 +35,6 @@ export class UserList implements OnInit {
 
     this.userService.getAll().subscribe({
       next: (users) => {
-        console.log('users: ', users)
         this.dataSource.data = users;
       },
       error: (e) => alert(`Something went wrong ${e}`)

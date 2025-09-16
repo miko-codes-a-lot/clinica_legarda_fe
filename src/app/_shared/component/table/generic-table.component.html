@@ -22,8 +22,12 @@
         <ng-container [matColumnDef]="col.key">
           <th mat-header-cell *matHeaderCellDef mat-sort-header [attr.sortActionDescription]="'Sort by '+ col.key">{{ col.label }}</th>
           <td mat-cell *matCellDef="let element">
-            <span [innerHTML]="getCellValue(col, element)"></span> 
-            <!-- {{ getCellValue(col, element) }} -->
+            @if (getCellValue(col, element)?.dataLink) {
+              <!-- enable data link -->
+              <a [routerLink]="getCellValue(col, element).dataLink">{{ getCellValue(col, element).display }}</a>
+            } @else {
+              {{ getCellValue(col, element) }}
+            }
           </td>
         </ng-container>
       }

@@ -9,13 +9,13 @@ import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
-
+import { RouterLink } from '@angular/router';
 
 
 @Component({
   selector: 'app-generic-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatPaginatorModule, MatProgressSpinnerModule, MatButtonModule, MatSort, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule ],
+  imports: [CommonModule, MatTableModule, MatPaginatorModule, MatProgressSpinnerModule, MatButtonModule, MatSort, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule, RouterLink ],
   templateUrl: './generic-table.component.html',
   styleUrls: ['./generic-table.component.css']
 })

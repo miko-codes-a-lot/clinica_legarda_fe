@@ -53,7 +53,6 @@ export class AppointmentForm {
     if (!clinic) return
 
     this.dentists = clinic.dentists
-    console.log('this.date.value: ', this.date.value)
     this.builAppointmentFields();
   }
 
@@ -62,7 +61,6 @@ export class AppointmentForm {
     if (!dentist) return
 
     this.selectedDentist = dentist
-    console.log('selectedDentist', this.selectedDentist)
   }
 
   ngOnInit(): void {

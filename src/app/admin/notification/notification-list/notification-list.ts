@@ -30,7 +30,11 @@ export class NotificationList {
     { key: 'message', label: 'Message', cell: (notification: Notification) => notification.message},
     { key: 'user', label: 'User', cell: (notification: Notification): SafeHtml => {
       const fullName = this.getFullName(notification.createdBy)
-      return this.sanitizer.bypassSecurityTrustHtml(`<a href="admin/user/details/${notification.createdBy._id}">${fullName}</a>`);
+      // when enabling data link 
+      return {
+        display: fullName,
+        dataLink: ['/admin/user/details', notification.createdBy._id],
+      }
     }},
     { key: 'date', label: 'Date', cell: (notification: Notification) =>  notification.timestamp},
   ];
