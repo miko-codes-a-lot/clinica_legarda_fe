@@ -139,10 +139,6 @@ export class AppointmentForm {
 
 
   serviceDuration() {
-    // Ongoing
-    // problem is here
-    // the service is not populating?
-    console.log('this.services: ', this.services);
     const totalDuration = this.services.value.reduce((p, c) => {
       const service = this.dentalServices.find(d => d._id == c)!
       return p + service.duration

@@ -32,21 +32,14 @@ export class AppointmentDetails {
     this.appointmentService.getOne(this.id).subscribe({
       next: (a) => {
         const { status, date, startTime, endTime, clinic: clinicData, dentist: dentistData, patient: patientData } = a
-        const time = startTime + ' - ' + endTime
-        const clinic = clinicData.name
-        const clinicAddress = clinicData.address
-        const dentist = dentistData.firstName + ' ' + dentistData.lastName
-        const patient = patientData.firstName + ' ' + patientData.lastName
-        // service is custom
-        // Notes is custom
         this.displayAppointment = {
           status,
           date,
-          time,
-          clinic,
-          clinicAddress,
-          dentist,
-          patient,
+          time: startTime + ' - ' + endTime,
+          clinic: clinicData.name,
+          clinicAddress: clinicData.address,
+          dentist: dentistData.firstName + ' ' + dentistData.lastName,
+          patient: patientData.firstName + ' ' + patientData.lastName,
         }
         this.appointment = a
       },
