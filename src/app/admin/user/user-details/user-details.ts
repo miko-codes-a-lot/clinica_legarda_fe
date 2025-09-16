@@ -17,7 +17,7 @@ export class UserDetails implements OnInit {
   isLoading = false
   id!: string
   user?: User
-  filteredUser: Record<string, any> = {};
+  displayUser: Record<string, any> = {};
 
   constructor(
     private readonly userService: UserService,
@@ -32,8 +32,18 @@ export class UserDetails implements OnInit {
     
     this.userService.getOne(this.id).subscribe({
       next: (u) => {
+        // set the data to display
         const { firstName, middleName, lastName, emailAddress, mobileNumber, address, role } = u;
-        this.filteredUser = {firstName, middleName, lastName, emailAddress, mobileNumber, address, role}
+
+        this.displayUser = {
+          firstName,
+          middleName,
+          lastName,
+          emailAddress,
+          mobileNumber,
+          address,
+          role
+        }
         this.user = u
       },
       error: (e) => alert(`Something went wrong ${e}`)

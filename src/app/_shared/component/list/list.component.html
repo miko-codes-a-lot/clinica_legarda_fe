@@ -1,11 +1,12 @@
 <div class="list">
-  <mat-list role="list">
-    <mat-list-item *ngFor="let key of data | keyvalue">
-      <span class="item-title" matListItemTitle>{{ data[key.key] }}</span>
-      <span class="item-line" matListItemLine>
-        {{ labelMap[key.key] || formatKey(key.key) }}
-      </span>
-    </mat-list-item>
+  <div *ngFor="let row of dataInRows; let last = last" class="list-row">
+    <div *ngFor="let pair of row" class="list-item">
+      <span class="item-title">{{ formatValue(pair[1], pair[0]) }}</span>
+      <span class="item-line">{{ labelMap[pair[0]] || formatKey(pair[0]) }}</span>
+    </div>
+
+    <!-- Divider -->
+    <div class="row-divider" *ngIf="!last"></div>
     <ng-content></ng-content>
-  </mat-list>
+  </div>
 </div>

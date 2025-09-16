@@ -15,3 +15,14 @@
 .item-line{
     font-size: 16px;
 }
+
+.custom-list {
+    margin-left: -19px !important;
+}
+
+.row-divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background-color: #ddd;
+  margin-top: 0.5rem;
+}

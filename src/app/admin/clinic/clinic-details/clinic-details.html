@@ -1,27 +1,19 @@
 @if (clinic) {
-  <button (click)="onUpdate()">Edit</button> <br>
-  <ul>
-    <li>Name: {{ clinic.name }}</li>
-    <li>Address: {{ clinic.address }}</li>
-    <li>Mobile Number: {{ clinic.mobileNumber }}</li>
-    <li>Email Address: {{ clinic.emailAddress }}</li>
-    <li>
-      <ul>
-        @for (hour of clinic.operatingHours; track hour.day) {
-          <li>{{ hour.day }}: {{ hour.startTime }}-{{ hour.endTime }}</li>
+  <div class="view-header">
+    <h2 class="page-title">Clinic</h2>
+    <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
+  </div>
+  <app-list [data]="displayClinic">
+    <div class="row-divider"></div>
+    <div class="custom-list">
+      <mat-list-item >
+        <span class="item-title" matListItemTitle>Clinic Schedule:</span>
+        @for (oh of clinic.operatingHours; track oh.day) {
+          <span class="item-line" matListItemLine>{{ oh.day }} - {{ oh.startTime }} - {{ oh.endTime }}</span>
         }
-      </ul>
-    </li>
-    <!-- <li>
-      <b>Branches</b> <span> - </span>
-      <button (click)="onAddBranch()">New Branch</button>
-      <ul>
-        @for(branch of clinic.branches; track branch._id) {
-          <li><a [routerLink]="['/admin/branch/details', branch._id]">{{ branch.name }}</a></li>
-        }
-      </ul>
-    </li> -->
-  </ul>
+      </mat-list-item>
+    </div>
+  </app-list>
 } @else {
   <p>Fetching details...</p>
 }

@@ -1,31 +1,30 @@
 @if (appointment) {
-  <button (click)="onUpdate()">Edit</button> <br>
-  <ul>
-    <li><b>Status</b>: {{ appointment.status }}</li>
-    <li><b>Date</b>: {{ appointment.date | date: 'mediumDate' }}</li>
-    <li><b>Time</b>: {{ appointment.startTime }} - {{ appointment.endTime }}</li>
-    <li>
-      <b>Clinic</b>: {{ appointment.clinic.name }}
-      <p>{{ appointment.clinic.address }}</p>
-    </li>
-    <li><b>Dentist</b>: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</li>
-    <li><b>Patient</b>: {{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</li>
-    <li>
-      <b>Services</b>
-        <ul>
-          @for (service of appointment.services; track service._id) {
-            <li>{{ service.name }}</li>
-          }
-        </ul>
-    </li>
-    <li>
-      <b>Notes</b>
-      <ul>
-        <li><b>Clinic Notes</b>: {{ appointment.notes.clinicNotes }}</li>
-        <li><b>Patient Notes</b>: {{ appointment.notes.patientNotes }}</li>
-      </ul>
-    </li>
-  </ul>
+  <div class="view-header">
+    <h2 class="page-title">Appointment</h2>
+    <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
+  </div>
+  <app-list [data]="displayAppointment">
+    <div class="custom-list">
+      <mat-list-item>
+        <span class="item-title" matListItemTitle><strong>Service/s:</strong></span>
+        @for (service of appointment.services; track service._id) {
+          <span class="item-line" matListItemLine>{{ service.name }}</span>
+        }
+      </mat-list-item>
+    </div>
+    <div class="row-divider"></div>
+    <div class="custom-list">
+      <mat-list-item>
+        <span class="item-title" matListItemTitle>Notes:</span>
+          <span class="item-line" matListItemLine>
+            Clinic Notes: {{ appointment.notes.clinicNotes }} <br>
+          </span>
+          <span class="item-line" matListItemLine>
+            Patient Notes: {{ appointment.notes.patientNotes }}
+          </span>
+      </mat-list-item>
+    </div>
+  </app-list>
 } @else {
   <p>Fetching details...</p>
 }
