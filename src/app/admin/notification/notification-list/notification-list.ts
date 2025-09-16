@@ -1,20 +1,32 @@
 import { Component } from '@angular/core';
 import { NotificationService } from '../../../_shared/service/notification-service';
 import { Notification } from '../../../_shared/model/notification';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { TypeUtil } from '../../../utils/type-util';
 import { User } from '../../../_shared/model/user';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
+import { MatTableDataSource } from '@angular/material/table';
+import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
+
 
 @Component({
   selector: 'app-notification-list',
-  imports: [MatProgressSpinner, RouterLink],
+  imports: [GenericTableComponent],
   templateUrl: './notification-list.html',
   styleUrl: './notification-list.css'
 })
 export class NotificationList {
   isLoading = false
+  moduleUrl = '/admin/notification/'
+  title = 'Notification'
+  dataSource = new MatTableDataSource<Notification>();
   notifications: Notification[] = []
+  displayedColumns: string[] = ['type', 'message', 'user', 'date', 'actions'];
+  columnDefs = [
+    { key: 'type', label: 'Type', cell: (notification: Notification) => notification.type ?? '' },
+    { key: 'message', label: 'Message', cell: (notification: Notification) => notification.message},
+    { key: 'user', label: 'User', cell: (notification: Notification) =>  this.getFullName(notification.createdBy)},
+    { key: 'date', label: 'Date', cell: (notification: Notification) =>  notification.timestamp},
+  ];
   
   constructor(
     private readonly notificationService: NotificationService,
@@ -25,7 +37,9 @@ export class NotificationList {
     this.isLoading = true
 
     this.notificationService.getAll().subscribe({
-      next: (n) => this.notifications = n,
+      next: (notifications) => {
+        this.dataSource.data = notifications
+      },
       error: (err) => alert(`Something went wrong ${err}`),
     }).add(() => this.isLoading = false);
   }
@@ -42,9 +56,10 @@ export class NotificationList {
     this.router.navigate([`/admin/notification/details`, id])
   }
 
-  markAsRead(docId: string) {
+  onMarkAsRead(docId: string) {
     this.isLoading = true
 
+    // for now it should load
     this.notificationService.markAsRead(docId).subscribe({
       error: (err) => alert(`Something went wrong: ${err}`),
     }).add(() => this.isLoading = false)

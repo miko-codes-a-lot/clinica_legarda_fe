@@ -1,28 +1,9 @@
-@if (isLoading) {
-  <mat-spinner></mat-spinner>
-}
-
-<table>
-  <thead>
-    <tr>
-      <th>Type</th>
-      <th>Message</th>
-      <th>User</th>
-      <th>Date</th>
-    </tr>
-  </thead>
-  <tbody>
-    @for (doc of notifications; track doc._id) {
-      <tr>
-        <td>{{ getTypeLabel(doc.type) }}</td>
-        <td>{{ doc.message }}</td>
-        <td><a [routerLink]="['/admin/user/details', doc.createdBy._id]">{{ getFullName(doc.createdBy) }}</a></td>
-        <td>{{ doc.timestamp }}</td>
-        <td>
-          <button (click)="onDetails(doc._id)">Details</button>
-          <button (click)="markAsRead(doc._id)">Mark as Read</button>
-        </td>
-      </tr>
-    }
-  </tbody>
-</table>
+<app-generic-table
+  [title]="title"
+  [displayedColumns]="displayedColumns"
+  [columnDefs]="columnDefs"
+  [dataSource]="dataSource"
+  [isLoading]="isLoading"
+  (details)="onDetails($event)"
+  (markAsRead)="onMarkAsRead($event)"
+></app-generic-table>

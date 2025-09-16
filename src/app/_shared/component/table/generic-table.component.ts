@@ -31,6 +31,8 @@ export class GenericTableComponent<T> implements AfterViewInit {
   @Output() details = new EventEmitter<any>();
   @Output() update = new EventEmitter<any>();
   @Output() create = new EventEmitter<any>();
+  @Output() markAsRead = new EventEmitter<any>();
+
 
   private _liveAnnouncer = inject(LiveAnnouncer);
 
@@ -57,6 +59,10 @@ export class GenericTableComponent<T> implements AfterViewInit {
     this.update.emit(id);
   }
 
+  onMarkAsRead(id: any) {
+    this.update.emit(id);
+  }
+
   onDetailsClick(element: any) {
     this.details.emit((element as any)._id);
   }
@@ -67,6 +73,10 @@ export class GenericTableComponent<T> implements AfterViewInit {
 
   onCreateClick() {
     this.create.emit();
+  }
+
+  onMarkAsReadClick(element: any) {
+    this.markAsRead.emit((element as any)._id);
   }
 
   getCellValue(col: any, element: any) {

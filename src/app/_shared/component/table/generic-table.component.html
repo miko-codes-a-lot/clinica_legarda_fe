@@ -34,9 +34,17 @@
           <button mat-raised-button color="primary" (click)="onDetailsClick(element)">
             Details
           </button>
-          <button mat-raised-button color="accent" (click)="onUpdateClick(element)">
-            Update
-          </button>
+          @if (update.observers.length > 0) {
+            <button mat-raised-button color="accent" (click)="onUpdateClick(element)">
+              Update
+            </button>
+          }
+
+          @if (markAsRead.observers.length > 0) {
+            <button mat-raised-button color="accent" (click)="onMarkAsReadClick(element)">
+              Mark as Read
+            </button>
+          }
         </td>
       </ng-container>
 
