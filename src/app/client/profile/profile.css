@@ -1,0 +1,99 @@
+.profile-container {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  padding: 2rem;
+  color: #333;
+}
+
+/* Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.profile-header img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid white;
+  object-fit: cover;
+}
+
+.profile-info h2 {
+  font-size: 2rem;
+  margin-bottom: 0.3rem;
+}
+
+.profile-info p {
+  font-size: 1rem;
+  margin: 0.2rem 0;
+}
+
+/* Personal Details */
+.profile-details h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #007bff;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.detail-item {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-item .label {
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  color: #555;
+}
+
+.detail-item .value {
+  font-size: 1rem;
+}
+
+/* Actions */
+.profile-actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.profile-actions button {
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.profile-actions button:hover {
+  opacity: 0.9;
+}
+
+.profile-actions .logout {
+  background: #dc3545;
+  color: white;
+}
+
+.profile-actions button:not(.logout) {
+  background: #007bff;
+  color: white;
+}

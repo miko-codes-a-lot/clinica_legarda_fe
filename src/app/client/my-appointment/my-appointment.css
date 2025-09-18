@@ -1,0 +1,118 @@
+.appointments-page {
+  padding: 2rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Hero */
+.appointments-hero {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.appointments-hero h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.appointments-hero p {
+  font-size: 1.2rem;
+}
+
+/* Section Titles */
+.upcoming-appointments h2,
+.past-appointments h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #007bff;
+}
+
+/* Cards */
+.appointment-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.appointment-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.appointment-date {
+  flex: 0 0 150px;
+  text-align: left;
+}
+
+.appointment-date .date {
+  font-weight: 600;
+}
+
+.appointment-date .time {
+  display: block;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.appointment-details {
+  flex: 1;
+  padding: 0 1rem;
+}
+
+.status.upcoming {
+  color: #007bff;
+  font-weight: 600;
+}
+
+.status.past {
+  color: #888;
+  font-weight: 500;
+}
+
+.appointment-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.appointment-actions button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.appointment-actions button:hover {
+  opacity: 0.9;
+}
+
+.appointment-actions .cancel {
+  background: #d32f2f;
+  color: white;
+}
+
+.appointment-actions button:not(.cancel) {
+  background: #007bff;
+  color: white;
+}
+
+.no-appointments {
+  color: #555;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem 0;
+}

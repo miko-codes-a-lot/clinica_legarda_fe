@@ -1,1 +1,62 @@
-<p>contact-us works!</p>
+<div class="contact-page">
+  <h1>Contact Us</h1>
+  <p>
+    Have a question or want to book an appointment? We’d love to hear from you!
+  </p>
+
+  <div class="contact-container">
+    <!-- Contact Form -->
+    <div class="contact-form">
+      <h2>Send Us a Message</h2>
+      <form (ngSubmit)="onSubmit()">
+        <label for="name">Full Name</label>
+        <input id="name" name="name" [(ngModel)]="contact.name" required />
+
+        <label for="email">Email</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          [(ngModel)]="contact.email"
+          required
+        />
+
+        <label for="message">Message</label>
+        <textarea
+          id="message"
+          name="message"
+          rows="4"
+          [(ngModel)]="contact.message"
+          required
+        ></textarea>
+
+        <button type="submit" [disabled]="isLoading">
+          {{ isLoading ? 'Sending...' : 'Send Message' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="contact-info">
+      <h2>Clinic Information</h2>
+      <p>
+        <span class="material-icons">location_on</span>
+        123 Legarda Street, Manila, Philippines
+      </p>
+      <p>
+        <span class="material-icons">phone</span>
+        (02) 123-4567
+      </p>
+      <p>
+        <span class="material-icons">email</span>
+        info@clinicalegarda.com
+      </p>
+
+      <h3>Find Us</h3>
+      <div class="map-placeholder">
+        <!-- Replace with actual Google Maps embed later -->
+        <p>📍 Google Map Placeholder</p>
+      </div>
+    </div>
+  </div>
+</div>

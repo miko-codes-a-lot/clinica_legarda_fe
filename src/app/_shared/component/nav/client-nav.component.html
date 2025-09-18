@@ -1,0 +1,25 @@
+<div class="nav-container">
+  <!-- Logo / Brand -->
+  <a routerLink="/" class="nav-logo">
+    <span>Clinica Legarda</span>
+  </a>
+
+  <!-- Main navigation links -->
+  <div class="nav-menu">
+    <a
+      *ngFor="let item of menuItems"
+      [routerLink]="!item.link || disabled ? null : item.link"
+      routerLinkActive="active"
+      (click)="item.onClick ? item.onClick() : null"
+      class="nav-link"
+    >
+      <span class="material-icons nav-icon">{{ item.icon }}</span>
+      <span>{{ item.label }}</span>
+    </a>
+  </div>
+
+  <!-- Right slot (Login / Logout / Profile) -->
+  <div class="nav-right">
+    <ng-content></ng-content>
+  </div>
+</div>

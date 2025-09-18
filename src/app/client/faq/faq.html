@@ -1,1 +1,16 @@
-<p>faq works!</p>
+<div class="faq-page">
+  <h1>Frequently Asked Questions</h1>
+  <p>Here are some common questions from our patients.</p>
+
+  <div class="faq-list">
+    <div class="faq-item" *ngFor="let faq of faqs; let i = index">
+      <button class="faq-question" (click)="toggleFaq(i)">
+        {{ faq.question }}
+        <span class="icon">{{ faq.open ? '−' : '+' }}</span>
+      </button>
+      <div class="faq-answer" *ngIf="faq.open">
+        <p>{{ faq.answer }}</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -3,16 +3,19 @@ import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { User } from '../_shared/model/user';
 import { AuthService } from '../_shared/service/auth-service';
 import { UiStateService } from '../_shared/service/ui-state-service';
+import { ClientNavComponent } from '../_shared/component/nav/client-nav.component';
+import { Chatbot } from './chatbot/chatbot';
 
 @Component({
   selector: 'app-client',
-  imports: [RouterLink, RouterOutlet],
+  imports: [RouterLink, RouterOutlet, ClientNavComponent, Chatbot],
   templateUrl: './client.html',
   styleUrl: './client.css'
 })
 export class Client {
   user: User | null = null
   isLoading = false
+  isChatOpen = false;
 
   navigations = [
     {
@@ -45,6 +48,11 @@ export class Client {
       icon: 'help',
       link: '/app/faq'
     },
+    // {
+    //   label: 'Logout',
+    //   icon: 'logout',
+    //   onClick: () => this.onClickLogout()
+    // }
   ]
 
   constructor(

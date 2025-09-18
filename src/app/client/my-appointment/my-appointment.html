@@ -1,1 +1,32 @@
-<p>my-appointment works!</p>
+<div class="appointments-page">
+
+  <!-- Hero Section -->
+  <section class="appointments-hero">
+    <h1>My Appointments</h1>
+    <p>Keep track of your upcoming and past appointments with Clinica Legarda.</p>
+  </section>
+
+  <!-- Upcoming Appointments -->
+  <section class="upcoming-appointments">
+    <h2>Upcoming Appointments</h2>
+    <div *ngIf="upcomingAppointments.length > 0; else noUpcoming">
+      <div *ngFor="let appointment of upcomingAppointments" class="appointment-card upcoming">
+        <div class="appointment-date">
+          <span class="date">{{ appointment.date | date:'mediumDate' }}</span>
+          <span class="time">{{ appointment.time }}</span>
+        </div>
+        <div class="appointment-details">
+          <h3>{{ appointment.service }}</h3>
+          <p>Dentist: {{ appointment.dentist }}</p>
+          <p>Status: <span class="status upcoming">{{ appointment.status }}</span></p>
+        </div>
+        <div class="appointment-actions">
+          <button (click)="rescheduleAppointment(appointment)">Reschedule</button>
+          <button class="cancel" (click)="cancelAppointment(appointment)">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <ng-template #noUpcoming>
+      <p class="no-appointments">No upcoming appointments.</p>
+    </ng-template>
+  </section>

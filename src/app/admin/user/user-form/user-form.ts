@@ -157,7 +157,7 @@ export class UserForm implements OnInit, OnChanges {
       { name: 'middleName', label: 'Middle Name', type: 'text' },
       { name: 'lastName', label: 'Last Name', type: 'text' },
       { name: 'emailAddress', label: 'Email Address', type: 'email' },
-      { name: 'mobileNumber', label: 'Mobile Number', type: 'text', customError: 'Use +639 format only' },
+      { name: 'mobileNumber', label: 'Mobile Number', type: 'text', customError: 'Use +639 format and must be a valid Number' },
       { name: 'address', label: 'Address', type: 'text' },
       { name: 'password', label: 'Password', type: 'password' },
       { name: 'passwordConfirm', label: 'Confirm Password', type: 'password', customError: 'Passwords must match.' },

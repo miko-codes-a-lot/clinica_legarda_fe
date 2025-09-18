@@ -1,7 +1,53 @@
-<p>home works!</p>
+<div class="home-page">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Welcome to Clinica Legarda</h1>
+      <p>Your trusted healthcare partner for quality and compassionate care.</p>
+      <a routerLink="/app/appointment" class="btn-primary">Book an Appointment</a>
+    </div>
+  </section>
 
-@if (isChatOpen) {
-  <app-chatbot (chatClosed)="isChatOpen = false"></app-chatbot>
-} @else {
-  <button (click)="isChatOpen = true">ChatBot</button>
-}
+  <!-- About Section -->
+  <section class="about">
+    <h2>About Us</h2>
+    <p>
+      Clinica Legarda has been serving the community with excellence in medical
+      and dental care. We are dedicated to providing personalized treatment in a
+      safe and welcoming environment.
+    </p>
+  </section>
+
+  <!-- Services Section -->
+  <section class="services">
+    <h2>Our Services</h2>
+    <div class="services-grid">
+      <div class="service-card">
+        <span class="material-icons">medical_services</span>
+        <h3>General Consultation</h3>
+        <p>Comprehensive check-ups for your health and well-being.</p>
+      </div>
+      <div class="service-card">
+        <span class="material-icons">science</span>
+        <h3>Laboratory Tests</h3>
+        <p>Accurate diagnostic tests to guide your treatment.</p>
+      </div>
+      <div class="service-card">
+        <span class="material-icons">health_and_safety</span>
+        <h3>Dental Care</h3>
+        <p>From cleaning to braces, we keep your smile healthy.</p>
+      </div>
+      <div class="service-card">
+        <span class="material-icons">child_friendly</span>
+        <h3>Pediatrics</h3>
+        <p>Gentle and expert care for your little ones.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2>Ready to take charge of your health?</h2>
+    <a routerLink="/app/appointment" class="btn-primary">Book Your Appointment Now</a>
+  </section>
+</div>

@@ -51,6 +51,10 @@ export const CLIENT_ROUTES: Routes = [
         loadComponent: () => import('./profile/profile').then(m => m.Profile),
       },
       {
+        path: 'my-appointment',
+        loadComponent: () => import('./my-appointment/my-appointment').then(m => m.MyAppointment),
+      },
+      {
         path: 'login',
         component: LoginPatient,
       }

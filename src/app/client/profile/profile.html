@@ -1,1 +1,33 @@
-<p>profile works!</p>
+<div class="profile-container">
+
+  <!-- Profile Header -->
+  <section class="profile-header">
+    <img [src]="user.profileImage" alt="{{ user.firstName }} {{ user.lastName }}">
+    <div class="profile-info">
+      <h2>{{ user.firstName }} {{ user.lastName }}</h2>
+      <p>{{ user.email }}</p>
+      <p>Member since: {{ user.memberSince | date:'longDate' }}</p>
+    </div>
+  </section>
+
+  <!-- Personal Details -->
+  <section class="profile-details">
+    <h3>Personal Details</h3>
+    <div class="details-grid">
+      <div class="detail-item">
+        <span class="label">Phone:</span>
+        <span class="value">{{ user.mobileNumber }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="label">Email:</span>
+        <span class="value">{{ user.email }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Actions -->
+  <section class="profile-actions">
+    <button (click)="editProfile()">Edit Profile</button>
+  </section>
+
+</div>

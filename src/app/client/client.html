@@ -1,30 +1,65 @@
-<ul>
-  @for (nav of navigations; track nav.label) {
-    <li>
-      <a [routerLink]="nav.link && !isLoading ? nav.link : null">
-        <span class="material-icons nav-icon">{{ nav.icon }}</span>
-        {{ nav.label }}
-      </a>
-    </li>
-  }
-</ul>
+<!-- create a module - client nav -->
+<!-- add here the component -->
 
-<ul>
-  @if (!user) {
-    <li>
-      <a [routerLink]="!isLoading ? '/app/login' : null">
-        <span class="material-icons nav-icon">login</span>
-        Login
-      </a>
-    </li>
-  } @else {
-    <li>
-      <a [routerLink]="null" (click)="onClickLogout()">
-        <span class="material-icons nav-icon">logout</span>
-        Logout
-      </a>
-    </li>
-  }
-</ul>
+<!-- the nav -->
+<app-client-nav
+  [disabled]="isLoading"
+  [menuItems]="navigations"
+>
 
+  @if (user) {
+    <ul class="nav-user-inline">
+      <li>
+        <a routerLink="/app/dashboard" class="nav-link-inline">
+          <span class="material-icons nav-icon-inline">dashboard</span>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a routerLink="/app/profile" class="nav-link-inline">
+          <span class="material-icons nav-icon-inline">person</span>
+          Profile
+        </a>
+      </li>
+      <li>
+        <a routerLink="/app/my-appointment" class="nav-link-inline">
+          <span class="material-icons nav-icon-inline">schedule</span>
+          My Appointment
+        </a>
+      </li>
+    </ul>
+  }
+  <ul class="nav-auth">
+    @if (!user) {
+      <li>
+        <a [routerLink]="!isLoading ? '/app/login' : null" class="nav-link-auth">
+          <span class="material-icons nav-icon-auth">login</span>
+          Login
+        </a>
+      </li>
+    } @else {
+      <li>
+        <a [routerLink]="null" (click)="onClickLogout()" class="nav-link-auth">
+          <span class="material-icons nav-icon-auth">logout</span>
+          Logout
+        </a>
+      </li>
+    }
+  </ul>
+</app-client-nav>
+
+<!-- the page -->
 <router-outlet />
+
+
+<!-- chatbot floating -->
+<div class="chatbot-container">
+  @if (isChatOpen) {
+    <app-chatbot (chatClosed)="isChatOpen = false"></app-chatbot>
+  } @else {
+    <button class="chatbot-button" (click)="isChatOpen = true" title="Chat with us">
+      <span class="material-icons">chat</span>
+    </button>
+  }
+</div>
+

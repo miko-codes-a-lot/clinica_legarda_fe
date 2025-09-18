@@ -1,1 +1,141 @@
-<p>appointment works!</p>
+<div class="appointment-page">
+  <div class="appointment-hero">
+    <h1>Book an Appointment</h1>
+    <p>Schedule your visit at <strong>Clinica Legarda</strong>.</p>
+  </div>
+
+  <div class="appointment-card mat-elevation-z4">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="appointment-form">
+      <!-- Personal Info -->
+      <div class="form-section">
+        <h2 class="section-title">Your Information</h2>
+
+        <!-- First Name -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>First Name</mat-label>
+          <input matInput type="text" formControlName="firstName" placeholder="Enter your first name" />
+
+          @if (form.get('firstName')?.hasError('required')) {
+            <mat-error>First Name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Middle Name -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Middle Name</mat-label>
+          <input matInput type="text" formControlName="middleName" placeholder="Enter your middle name" />
+        </mat-form-field>
+
+        <!-- Last Name -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Last Name</mat-label>
+          <input matInput type="text" formControlName="lastName" placeholder="Enter your last name" />
+          @if (form.get('lastName')?.hasError('required')) {
+            <mat-error>Last Name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Email -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="Enter your email" />
+          @if (form.get('email')?.hasError('required')) {
+            <mat-error>Email is required</mat-error>
+          }
+          @if (form.get('email')?.hasError('email')) {
+            <mat-error>Enter a valid email</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Phone -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Phone</mat-label>
+          <input matInput type="tel" formControlName="mobileNumber" placeholder="Enter your phone number" />
+          @if (form.get('mobileNumber')?.hasError('required')) {
+            <mat-error>Phone is required</mat-error>
+          }
+          @if (form.get('mobileNumber')?.hasError('pattern')) {
+            <mat-error>Use +639 format and must be a valid Number</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Service & Dentist -->
+      <div class="form-section">
+        <h2 class="section-title">Service & Dentist</h2>
+
+        <!-- Service -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Service</mat-label>
+          <mat-select formControlName="service">
+            @for (s of dentalServices; track s._id) {
+              <mat-option [value]="s._id">{{ s.name }}</mat-option>
+            }
+          </mat-select>
+          @if (form.get('service')?.hasError('required')) {
+            <mat-error>Service is required</mat-error>
+          }
+  
+        </mat-form-field>
+
+        <!-- Dentist -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Dentist</mat-label>
+          <mat-select formControlName="dentist" (selectionChange)="onDentistChange($event.value)">
+            @for (d of dentists; track d._id) {
+              <mat-option [value]="d._id">
+                {{ d.firstName }} {{ d.lastName }}
+              </mat-option>
+            }
+          </mat-select>
+          @if (form.get('dentist')?.hasError('required')) {
+            <mat-error>Dentist is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Date & Time -->
+       @if (selectedDentist) {
+        <div class="form-section">
+          <h2 class="section-title">Date and Time</h2>
+          
+            <!-- Date -->
+            <app-date-picker 
+              formControlName="date"
+              label="Appointment Day"
+              placeholder="Choose a date"
+              [dentist]="selectedDentist"
+              >
+            </app-date-picker>
+
+            <app-time-picker
+              label="Appointment Time"
+              [dentist]="selectedDentist"
+              [selectedDate]="form.get('date')?.value"
+              [serviceDuration]="60"
+              [timeSlotInterval]="30"
+              [required]="true"
+              formControlName="time"
+            >
+            </app-time-picker>
+          
+
+          <!-- Time -->
+          <!-- <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Time</mat-label>
+            <input matInput type="time" formControlName="time" />
+            @if (form.get('time')?.hasError('required')) {
+              <mat-error>Time is required</mat-error>
+            }
+          </mat-form-field> -->
+        </div>
+      }
+      <!-- Submit -->
+      <div class="form-actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || isLoading">
+          {{ isLoading ? 'Submitting...' : 'Book Appointment' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

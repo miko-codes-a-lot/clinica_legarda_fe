@@ -1,0 +1,132 @@
+.about-container {
+  padding: 2rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #333;
+  line-height: 1.7;
+}
+
+/* Hero */
+.about-hero {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.about-hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.about-hero p {
+  font-size: 1.4rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Story */
+.about-story {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.about-story .about-text {
+  flex: 1;
+}
+
+.about-story .about-image {
+  flex: 1;
+}
+
+.about-story img {
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.about-story img:hover {
+  transform: scale(1.03);
+}
+
+/* Mission */
+.about-mission {
+  text-align: center;
+  margin: 3rem 0;
+  background: #f8f9fa;
+  padding: 2.5rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+}
+
+.about-mission h2 {
+  margin-bottom: 1rem;
+  color: #007bff;
+  font-size: 2rem;
+}
+
+.about-mission p {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: #444;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Team */
+.about-team {
+  text-align: center;
+}
+
+.about-team h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #007bff;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+}
+
+.team-member {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.team-member:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+.team-member img {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  border: 3px solid #007bff;
+}
+
+.team-member h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.3rem;
+  color: #0056b3;
+}
+
+.team-member p {
+  font-size: 1.05rem;
+  color: #555;
+  line-height: 1.6;
+}

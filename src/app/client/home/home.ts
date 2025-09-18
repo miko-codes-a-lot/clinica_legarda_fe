@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { Chatbot } from '../chatbot/chatbot';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-home',
-  imports: [Chatbot],
+  imports: [CommonModule, RouterModule],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })

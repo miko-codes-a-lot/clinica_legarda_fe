@@ -1,1 +1,22 @@
-<p>dental-service works!</p>
+<div class="services-page">
+  <!-- Hero -->
+  <section class="services-hero">
+    <h1>Our Services</h1>
+    <p>
+      At <strong>Clinica Legarda</strong>, we provide a wide range of medical and dental services
+      to keep you and your family healthy.
+    </p>
+  </section>
+
+  <!-- Services Grid -->
+  <section class="services-grid">
+    <div class="service-card" *ngFor="let service of services">
+      <div class="service-icon-wrapper">
+        <span class="material-icons service-icon">{{ service.icon }}</span>
+      </div>
+      <h3>{{ service.title }}</h3>
+      <p>{{ service.description }}</p>
+      <a [routerLink]="'/app/appointment'" class="btn-service">Book Now</a>
+    </div>
+  </section>
+</div>
