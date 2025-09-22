@@ -11,4 +11,6 @@ export interface FormField {
   customError?: string;    // optional custom error message
   selectionChange?: (event: any) => void;
   multiple: boolean;       // multiple select
+  disabled?: boolean;
+  readonly?: boolean;
 }

@@ -1,114 +1,233 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common'; // ✅ import this
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { DatePicker } from '../../_shared/component/date-picker/date-picker';
-import { TimePicker } from '../../_shared/component/time-picker/time-picker';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AppointmentPayload } from '../../admin/appointment/appointment-payload';
+import { Appointment, AppointmentStatus } from '../../_shared/model/appointment';
 import { User } from '../../_shared/model/user';
+import { RxAppointmentForm } from '../../admin/appointment/appointment-form/rx-appointment-form';
 import { DentalService } from '../../_shared/model/dental-service';
 import { Clinic } from '../../_shared/model/clinic';
-import { MockService } from '../../_shared/service/mock-service';
-import { applyPHMobilePrefix } from '../../utils/forms/form-custom-format';
+import { DatePicker } from '../../_shared/component/date-picker/date-picker';
+import { TimePicker } from '../../_shared/component/time-picker/time-picker';
+import { TimeUtil } from '../../utils/time-util';
+import { AuthService } from '../../_shared/service/auth-service';
+import { FormComponent } from '../../_shared/component/form/form.component';
 
-
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-appointment',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    MatInputModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatButtonModule,
+    TimePicker,
     DatePicker,
-    TimePicker
+    FormComponent,
+    RouterLink
   ],
   templateUrl: './appointment.html',
   styleUrls: ['./appointment.css']
 })
-export class Appointment {
+export class AppointmentPage {
   @Output() onSubmitEvent = new EventEmitter<AppointmentPayload>()
-  isLoading = false;
-  form: FormGroup;
+  @Input() isLoading = false
+  @Input() clinics: Clinic[] = []
+  @Input() appointment!: Appointment
+  @Input() dentalServices: DentalService[] = []
+  @Input() patients: User[] = []
+  // @Input() loggedInUser?: User[] = []
+  user: User | null = null
+
   dentists: User[] = []
   selectedDentist?: User
-  @Input() clinics: Clinic[] = []
-  @Input() dentalServices: DentalService[] = []
-  appointment = {
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    email: '',
-    mobileNumber: '',
-    service: '',
-    dentist: '',
-    date: '',
-    time: ''
-  };
 
-  constructor(private fb: FormBuilder, private mockService: MockService) {
-    this.form = this.fb.group({
-      firstName: ['', Validators.required],
-      middleName: [''],
-      lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      mobileNumber: ['', [Validators.required, Validators.pattern(/^\+639\d{9}$/)]],
-      service: ['', Validators.required],
-      dentist: ['', Validators.required],
-      date: ['', Validators.required],
-      time: ['', Validators.required],
-    });
+  rxform!: FormGroup<RxAppointmentForm>
+  appointmentFields: any[] = [];
+
+  minDate = new Date()
+  maxDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 90 days from now only
+
+  constructor(
+    private readonly fb: FormBuilder,
+    private readonly authService: AuthService,
+  ) {}
+
+  private clearDateTime() {
+    this.date.setValue(new Date())
+    this.time.setValue('')
   }
 
-  onDentistChange (dentistId: String) {
-    // should be all the data of selected dentist
-    this.selectedDentist = this.dentists.find(d => d._id === dentistId);
+  private changeDentists(clinicId: string) {
+    const clinic = this.clinics.find(c => c._id == clinicId)
+    if (!clinic) return
+
+    this.dentists = clinic.dentists
+    this.builAppointmentFields();
   }
 
-  ngOnInit() {
-    const clinic = this.mockService.mockClinic();
-    const dentalServices = this.mockService.mockDentalService();
-    // there is no data in here
-    this.dentalServices.push(dentalServices)
-    this.dentists = clinic.dentists; // now has the mocked dentist
+  private setDentist(dentistId: string) {
+    const dentist = this.dentists.find(d => d._id == dentistId)
+    if (!dentist) return
 
-    const mobileNumber = this.form.get('mobileNumber');
-    if (mobileNumber) {
-      applyPHMobilePrefix(mobileNumber)
+    this.selectedDentist = dentist
+  }
+
+  ngOnInit(): void {
+    this.authService.currentUser$.subscribe({
+      next: (u) => this.user = u
+    })
+    const clinicId = this.appointment.clinic._id || ''
+    const dentistId = this.appointment.dentist._id || ''
+    const user = this.user
+    this.rxform = this.fb.nonNullable.group({
+      clinic: [clinicId, Validators.required],
+      dentist: [dentistId, Validators.required],
+      patient: [user? `${user?.firstName} ${user?.lastName} `: '', Validators.required],
+      services: [this.appointment.services.map(s => s._id || ''), Validators.required],
+      date: [this.appointment.date, Validators.required],
+      time: [this.appointment.startTime, Validators.required]
+    })
+    this.changeDentists(clinicId)
+    this.setDentist(dentistId)
+    this.clinic.valueChanges.subscribe({
+      next: (v) => {
+        this.changeDentists(v)
+        this.clearDateTime()
+      }
+    })
+    this.dentist.valueChanges.subscribe({
+      next: (d) => {
+        this.setDentist(d)
+        this.clearDateTime()
+      }
+    })
+    this.date.valueChanges.subscribe({
+      next: (v) => {
+        this.time.setValue('')
+      }
+    })
+    this.builAppointmentFields();
+  }
+
+  private builAppointmentFields() {
+    const customSelectDentist = this.setUsersKey(this.dentists)
+
+    const selectClinic = this.maptoOptions(this.clinics)
+    const selectDentist = this.maptoOptions(customSelectDentist)
+    const selectDentalService = this.maptoOptions(this.dentalServices)
+
+    this.appointmentFields = [
+      { name: 'clinic', label: 'Clinic', type: 'select', options: selectClinic},
+      { name: 'patient', label: 'Patient', type: 'text', readonly: true},
+      { name: 'services', label: 'Services', type: 'select', options: selectDentalService, multiple: true},
+      // { name: 'patient', label: 'Patient', type: 'select', options: selectPatient},
+    ];
+    // push the object inside the array if the clinic is selected
+    if (this.dentists.length !== 0) {
+      this.appointmentFields.splice(1, 0, { 
+        name: 'dentist', label: 'Dentist', type: 'select', options: selectDentist
+      })
+    }
+  }
+
+  setUsersKey (items: {firstName: string; lastName: string}[]) {
+      return items.map((item) => ({
+      ...item,
+      name: item.firstName + ' ' + item.lastName
+    }))
+  }
+
+  maptoOptions (items: {_id?: string; name: string}[]): {value: string; label: string}[] {
+
+    return items.map(item => ({
+      value: item._id ?? '',
+      label: item.name,
+    }))
+  }
+
+  serviceDuration() {
+    const totalDuration = this.services.value.reduce((p, c) => {
+      const service = this.dentalServices.find(d => d._id == c)!
+      return p + service.duration
+    }, 0)
+    return Math.max(30, totalDuration)
+  }
+
+  /** Total duration: 30 minutes */
+  getFormattedDuration(): string {
+    const totalMinutes = this.serviceDuration();
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    
+    if (hours === 0) {
+      return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+    } else if (minutes === 0) {
+      return `${hours} hour${hours !== 1 ? 's' : ''}`;
+    } else {
+      return `${hours} hour${hours !== 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+    }
+  }
+
+  getAppointmentTimeRange(): string {
+    if (!this.time.value) return '';
+    
+    const startTime = this.time.value;
+    const endTime = TimeUtil.calculateEndTime(startTime, this.serviceDuration());
+    
+    return `${this.formatTimeDisplay(startTime)} - ${this.formatTimeDisplay(endTime)}`;
+  }
+
+  private formatTimeDisplay(timeString: string): string {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  }
+
+  onSubmit() {
+    const duration = this.serviceDuration();
+    const startTime = this.time.value;
+    const endTime = TimeUtil.calculateEndTime(startTime, duration);
+
+    const appointment: AppointmentPayload = {
+      dentist: this.dentist.value,
+      patient: this.user?._id || '',
+      services: this.services.value,
+      date: this.date.value,
+      startTime: this.time.value, // 11:00 for example
+      endTime: endTime, // here we need to add all the total duration and it will become the end time
+      status: AppointmentStatus.PENDING,
+      notes: {
+        clinicNotes: '',
+        patientNotes: '',
+      },
+      history: []
     }
 
+    this.onSubmitEvent.emit(appointment)
   }
-  onSubmit() {
-    if (this.isLoading) return;
-    this.isLoading = true;
 
-    setTimeout(() => {
-      alert(
-        `✅ Appointment Requested!\n\n` +
-        `Thank you Appointment requested`
-      );
-      this.isLoading = false;
-
-      // Reset form
-      this.appointment = {
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        email: '',
-        mobileNumber: '',
-        service: '',
-        dentist: '',
-        date: '',
-        time: ''
-      };
-      this.form.reset();
-    }, 1000);
+  get clinic() {
+    return this.rxform.controls.clinic
   }
+
+  get dentist() {
+    return this.rxform.controls.dentist
+  }
+
+  get patient() {
+    return this.rxform.controls.patient
+  }
+
+  get services() {
+    return this.rxform.controls.services
+  }
+
+  get date() {
+    return this.rxform.controls.date
+  }
+
+  get time() {
+    return this.rxform.controls.time
+  }
+  
 }
