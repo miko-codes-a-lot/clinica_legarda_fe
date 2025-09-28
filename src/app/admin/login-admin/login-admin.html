@@ -1,8 +1,18 @@
-<h2>Clinica Legarda - Admin Panel</h2>
-<form [formGroup]="rxform" (ngSubmit)="onSubmit()">
-  <label for="username">Username </label>
-  <input type="text" placeholder="Enter username" formControlName="username"> <br>
-  <label for="password">Password </label>
-  <input type="password" placeholder="Enter password" formControlName="password"> <br>
-  <button [disabled]="!rxform.valid">Login</button>
-</form>
+<div class="login-container">
+  <div class="login-card">
+    <h2>Clinica Legarda - Admin Panel</h2>
+    <form [formGroup]="rxform" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" placeholder="Enter username" formControlName="username">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" placeholder="Enter password" formControlName="password">
+      </div>
+
+      <button type="submit" [disabled]="!rxform.valid">Login</button>
+    </form>
+  </div>
+</div>
