@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { v4 as uuidv4 } from 'uuid';
@@ -33,6 +33,17 @@ export interface DialogNode {
 })
 export class Chatbot {
   @Output() chatClosed = new EventEmitter<void>()
+  @ViewChild('chatMessages') private chatMessages!: ElementRef;
+
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
+
+  private scrollToBottom(): void {
+    try {
+      this.chatMessages.nativeElement.scrollTop = this.chatMessages.nativeElement.scrollHeight;
+    } catch (err) {}
+  }
 
   dialogueTree: { [key: string]: DialogNode } = {
     start: {
@@ -48,7 +59,7 @@ export class Chatbot {
       ]
     },
     appointment_start: {
-      text: `Sure! Please provide your preferred date and time, or <a routerLink="/app/appointment">click here to schedule online</a>`,
+      text: `Sure! Please provide your preferred date and time, or <a href="/app/appointment">click here</a> to schedule online`,
       options: [
         { id: uuidv4(), text: 'Go back', nextNode: 'start' }
       ]
