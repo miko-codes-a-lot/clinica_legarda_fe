@@ -1,0 +1,63 @@
+<h2 class="page-title">User</h2>
+<app-form
+  [form]="rxform"
+  [fields]="userFields" 
+  [isLoading]="isLoading"
+  (onSubmitEvent)="onSubmit()">
+
+  <form [formGroup]="rxform">
+    @if (rxform.get('role')?.value === 'dentist') {
+   
+      @if (!this.rxform.get('clinic')?.value) {
+        <p><i>Please select a clinic</i></p>
+      } @else {
+        <button type="button" (click)="onAddSchedule()" [disabled]="operatingHours.length >= (selectedClinic?.operatingHours?.length || 0)" matButton="outlined">Add Schedule</button>
+
+        <!-- adjust the design of this -->
+        <div formArrayName="operatingHours" class="schedule">
+          @for (hour of this.operatingHours.controls; track $index) {
+            <div [formGroupName]="$index">
+              <!-- make this card instead of form-grid -->
+              <div class="form-with-error">
+                <div class="form-grid">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Day</mat-label>
+                    <mat-select formControlName="day" [id]="'day' + $index">
+                      @for (day of getAvailableDays($index); track day.code) {
+                        <mat-option [value]="day.code">{{ day.label }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>From</mat-label>
+                    <input matInput type="time" formControlName="startTime" [id]="'startTime' + $index">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>To</mat-label>
+                    <input matInput type="time" formControlName="endTime" [id]="'endTime' + $index">
+                  </mat-form-field>
+                </div>
+                @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
+                  <div class="error">
+                    Time must be between the start and end time.
+                  </div>
+                }
+                @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) {
+                  <div class="error">
+                    Time must be within the clinic's operating hours.
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (operatingHours.length === 0) {
+          <p><i>Please add a schedule</i></p>
+        }
+      }
+    }
+  </form>
+</app-form>

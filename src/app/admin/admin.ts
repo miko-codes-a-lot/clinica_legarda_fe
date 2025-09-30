@@ -23,12 +23,12 @@ import { AuthService } from '../_shared/service/auth-service';
 export class Admin {
   isLoading = false
   isLoggedIn = false
+  user = {}
 
   menuItems = [
     { label: 'Dashboard', icon: 'dashboard', link: '/admin/dashboard' },
     { label: 'User', icon: 'group', link: '/admin/user' },
     { label: 'Clinic', icon: 'local_hospital', link: '/admin/clinic' },
-    // { label: 'Branch', icon: 'domain', link: '/admin/branch' },
     { label: 'Service', icon: 'medical_services', link: '/admin/service' },
     { label: 'Appointments', icon: 'event', link: '/admin/appointment' },
     { label: 'Notifications', icon: 'notifications', link: '/admin/notification' },
@@ -47,7 +47,13 @@ export class Admin {
   ngOnInit() {
     this.authService.currentUser$.subscribe({
       next: (user) => {
-        this.isLoggedIn = user !== null
+        if (user) {
+          this.user = user
+          console.log('this.user', this.user)
+          this.isLoggedIn = true
+        } else {
+          this.isLoggedIn = false
+        }
       }
     })
   }

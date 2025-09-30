@@ -1,0 +1,9 @@
+<app-generic-table
+  [title]="title"
+  [displayedColumns]="displayedColumns"
+  [columnDefs]="columnDefs"
+  [dataSource]="dataSource"
+  [isLoading]="isLoading"
+  (details)="onDetails($event)"
+  (markAsRead)="onMarkAsRead($event)"
+></app-generic-table>

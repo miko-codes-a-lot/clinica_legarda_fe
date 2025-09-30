@@ -1,0 +1,53 @@
+
+<h2 class="page-title">Appointment</h2>
+  @if (clinics.length === 0) {
+    <p>Fetching clinics...</p>
+  } @else if (patients.length === 0) {
+    <p>Fetching patients...</p>
+  } @else {
+      <app-form
+        [form]="rxform"
+        [fields]="appointmentFields" 
+        [isLoading]="isLoading"
+        (onSubmitEvent)="onSubmit()"
+      >
+        <form [formGroup]="rxform">
+            @if (selectedDentist) {
+              <app-date-picker 
+                formControlName="date"
+                label="Appointment Day"
+                placeholder="Choose a date"
+                [dentist]="selectedDentist">
+              </app-date-picker> <br>
+
+              <app-time-picker
+                label="Appointment Time"
+                [dentist]="selectedDentist"
+                [selectedDate]="date.value"
+                [serviceDuration]="60"
+                [timeSlotInterval]="30"
+                [required]="true"
+                formControlName="time"
+              >
+              </app-time-picker>
+              <div class="summary">
+                <p><strong>Total Duration:</strong> {{ getFormattedDuration() }}</p>
+                <p><strong>Time:</strong> {{ getAppointmentTimeRange() }}</p>
+              </div>
+            }
+          </form>
+      </app-form>
+  }
+
+  <!-- @if (dentists.length === 0) {
+      <p>Please select a clinic</p>
+    } else {
+      // display the dentist
+    } -->
+ 
+  <!-- @if (patients.length === 0) {
+    <p>Fetching patients...</p>
+  } -->
+
+  <!-- date picker should be here -->
+

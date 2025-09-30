@@ -1,0 +1,15 @@
+@if (isLoading) {
+  <mat-spinner></mat-spinner>
+}
+
+@if (notification) {
+  <button [disabled]="isLoading" (click)="markAsRead()">Mark as Read</button> <br>
+  <ul>
+    <li><b>Type</b>: {{ getTypeLabel(notification.type) }}</li>
+    <li><b>Message</b>: {{ notification.message }}</li>
+    <li><b>User</b>: <a [routerLink]="['/admin/user/details', notification.createdBy._id]">{{ getFullName(notification.createdBy) }}</a></li>
+    <li><b>Is Read</b>: {{ notification.isRead }}</li>
+  </ul>
+} @else {
+  <p>Fetching data...</p>
+}

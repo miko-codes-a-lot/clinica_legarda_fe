@@ -1,0 +1,12 @@
+@if (clinics.length !== 0) {
+  <app-appointment-form
+    [isLoading]="isLoading"
+    [dentalServices]="dentalServices"
+    [clinics]="clinics"
+    [patients]="patients"
+    [appointment]="initDoc"
+    (onSubmitEvent)="onSubmit($event)">
+  </app-appointment-form>
+} @else {
+  <p>Fetching data...</p>
+}

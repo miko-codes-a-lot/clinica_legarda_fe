@@ -1,0 +1,19 @@
+@if (clinic) {
+  <div class="view-header">
+    <h2 class="page-title">Clinic</h2>
+    <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
+  </div>
+  <app-list [data]="displayClinic">
+    <div class="row-divider"></div>
+    <div class="custom-list">
+      <mat-list-item >
+        <span class="item-title" matListItemTitle>Clinic Schedule:</span>
+        @for (oh of clinic.operatingHours; track oh.day) {
+          <span class="item-line" matListItemLine>{{ oh.day }} - {{ oh.startTime }} - {{ oh.endTime }}</span>
+        }
+      </mat-list-item>
+    </div>
+  </app-list>
+} @else {
+  <p>Fetching details...</p>
+}

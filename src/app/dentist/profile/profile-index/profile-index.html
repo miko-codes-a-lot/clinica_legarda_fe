@@ -1,0 +1,163 @@
+<mat-card class="account-card">
+  <mat-card-content>
+    <form [formGroup]="profileForm" (ngSubmit)="onSave()" class="account-form">
+
+      <!-- Profile Picture -->
+      <section class="section profile-section">
+        <h2 class="section-title">Account</h2>
+        <p class="section-subtitle">Manage your profile details and preferences.</p>
+
+        <div class="profile-picture">
+          <img [src]="avatarUrl" alt="Profile Picture" class="avatar">
+
+          <div class="actions">
+            <!-- Upload Button -->
+            <button mat-raised-button color="primary" (click)="fileInput.click()">
+              <mat-icon>upload</mat-icon> Upload
+            </button>
+
+            <!-- Delete Button -->
+            <button mat-stroked-button color="warn" type="button">
+              <mat-icon>delete</mat-icon> Delete
+            </button>
+
+            <input type="file" #fileInput hidden (change)="onAvatarChange($event)">
+          </div>
+        </div>
+      </section>
+
+      <mat-divider></mat-divider>
+
+      <!-- Full Name -->
+      <section class="section">
+        <h2 class="section-title">Full Name</h2>
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="field">
+            <mat-label>First name</mat-label>
+            <input matInput formControlName="firstName" />
+            <mat-error>
+              <app-form-control-errors [control]="profileForm.get('firstName')"></app-form-control-errors>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field">
+            <mat-label>Middle name</mat-label>
+            <input matInput formControlName="middleName" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field">
+            <mat-label>Last name</mat-label>
+            <input matInput formControlName="lastName" />
+            <mat-error>
+              <app-form-control-errors [control]="profileForm.get('lastName')"></app-form-control-errors>
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </section>
+
+      <mat-divider></mat-divider>
+
+      <!-- Contact Info -->
+      <section class="section">
+        <h2 class="section-title">Contact Information</h2>
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="field full-width">
+            <mat-label>Email address</mat-label>
+            <input matInput type="email" formControlName="emailAddress" />
+            <mat-error>
+              <app-form-control-errors [control]="profileForm.get('emailAddress')"></app-form-control-errors>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field">
+            <mat-label>Mobile number</mat-label>
+            <input matInput type="tel" formControlName="mobileNumber" />
+            <mat-error>
+              <app-form-control-errors [control]="profileForm.get('mobileNumber')"></app-form-control-errors>
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </section>
+
+      <mat-divider></mat-divider>
+
+      <!-- Role -->
+      <section class="section">
+        <h2 class="section-title">Role</h2>
+        <mat-form-field appearance="outline" class="field full-width">
+          <mat-label>Role</mat-label>
+          <input matInput formControlName="role" placeholder="Ex. Dentist, Admin" readonly />
+        </mat-form-field>
+      </section>
+
+      <mat-divider></mat-divider>
+
+      <!-- Operating Hours -->
+      <section class="section">
+        <div class="header-row">
+          <h2 class="section-title">Operating Hours</h2>
+
+          <!-- Add Schedule -->
+          <button mat-flat-button color="accent" type="button" (click)="onAddSchedule()"
+            [disabled]="operatingHours.length >= (clinicOperatingHours.value?.length || 0)">
+            <mat-icon>add</mat-icon> Add Schedule
+          </button>
+        </div>
+
+        <div formArrayName="operatingHours" class="schedule">
+          @for (hour of operatingHours.controls; track hour.value.day; let i = $index) {
+            <mat-card class="hour-card" [formGroupName]="i">
+              <div class="hour-grid">
+                <mat-form-field appearance="outline" class="field full-width">
+                  <mat-label>Day</mat-label>
+                  <mat-select formControlName="day">
+                    @for (day of days; track day.code) {
+                      <mat-option [value]="day.code" [disabled]="getSelectedDays(i).includes(day.code)">
+                        {{ day.label }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="field half-width">
+                  <mat-label>From</mat-label>
+                  <input matInput type="time" formControlName="startTime" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="field half-width">
+                  <mat-label>To</mat-label>
+                  <input matInput type="time" formControlName="endTime" />
+                </mat-form-field>
+              </div>
+
+              <div class="schedule-errors">
+                @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
+                  <mat-error>End time must be after start time.</mat-error>
+                }
+                @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) {
+                  <mat-error>Time must be within the clinic's operating hours.</mat-error>
+                }
+              </div>
+
+              <!-- Remove Operating Hour -->
+              <button mat-stroked-button color="warn" type="button" (click)="removeOperatingHour(i)">
+                <mat-icon>delete</mat-icon> Remove
+              </button>
+            </mat-card>
+          }
+        </div>
+      </section>
+
+      <!-- Save / Logout Buttons -->
+      <div class="button-group">
+        <!-- disabled -->
+        <button [disabled]="!profileForm.valid" mat-raised-button color="primary" type="submit">
+          <mat-icon>save</mat-icon> Save Changes
+        </button>
+        <button mat-stroked-button color="warn" type="button">
+          <mat-icon>logout</mat-icon> Logout
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

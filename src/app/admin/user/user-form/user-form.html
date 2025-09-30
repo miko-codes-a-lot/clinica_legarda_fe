@@ -39,16 +39,16 @@
                     <input matInput type="time" formControlName="endTime" [id]="'endTime' + $index">
                   </mat-form-field>
                 </div>
-                @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
-                  <div class="error">
-                    Time must be between the start and end time.
-                  </div>
-                }
-                @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) {
-                  <div class="error">
-                    Time must be within the clinic's operating hours.
-                  </div>
-                }
+                  @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
+                    <div class="error">
+                      Time must be between the start and end time.
+                    </div>
+                  }
+                  @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) {
+                    <div class="error">
+                      Time must be within the clinic's operating hours.
+                    </div>
+                  }
               </div>
             </div>
           }

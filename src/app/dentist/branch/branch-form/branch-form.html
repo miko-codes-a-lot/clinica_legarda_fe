@@ -1,0 +1,35 @@
+<form [formGroup]="rxform" (ngSubmit)="onSubmit()">  
+  <label for="name">Name </label>
+  <input formControlName="name" id="name">
+  <app-form-control-errors [control]="rxform.get('name')"></app-form-control-errors>
+  <br>
+  
+  <label for="address">Address</label>
+  <input formControlName="address" id="address">
+  <app-form-control-errors [control]="rxform.get('address')"></app-form-control-errors>
+  <br>
+  
+  <label for="mobileNumber">Mobile Number </label>
+  <input formControlName="mobileNumber" id="mobileNumber">
+  <app-form-control-errors [control]="rxform.get('mobileNumber')"></app-form-control-errors>
+  <br>
+  
+  <label for="emailAddress">Email Address </label>
+  <input formControlName="emailAddress" id="emailAddress">
+  <app-form-control-errors [control]="rxform.get('emailAddress')"></app-form-control-errors>
+  <br>
+
+  @if (clinics.length === 0) {
+    <p>Fetching clinics...</p>
+  }
+  <label for="clinic">Clinic </label>
+  <select name="clinic" id="clinic" formControlName="clinic">
+    @for(clinic of clinics; track clinic._id) {
+      <option [value]="clinic._id">{{ clinic.name }}</option>
+    }
+  </select> <br>
+  <app-form-control-errors [control]="rxform.get('clinic')"></app-form-control-errors>
+  <br>
+
+  <button [disabled]="isLoading || !rxform.valid">Save</button>
+</form>
