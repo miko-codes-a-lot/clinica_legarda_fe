@@ -9,6 +9,10 @@ export const ADMIN_ROUTES: Routes = [
     component: Admin,
     children: [
       {
+        path: 'login',
+        component: LoginAdmin
+      },
+      {
         path: '',
         redirectTo: '/admin/dashboard',
         pathMatch: 'full'
@@ -54,10 +58,6 @@ export const ADMIN_ROUTES: Routes = [
         data: { role: 'admin' },
         loadChildren: () => import('./notification/notification.route').then(m => m.NOTIFICATION_ROUTES)
       },
-      {
-        path: 'login',
-        component: LoginAdmin
-      }
     ]
   }
 ];

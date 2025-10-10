@@ -32,6 +32,8 @@ export class AuthGuard implements CanActivate {
             this.router.navigate(['/dentist/profile']);
           } else if (user?.role === 'admin') {
             this.router.navigate(['/admin/dashboard']);
+          }else if (user?.role === 'user') {
+            this.router.navigate(['/app/my-appointment']);
           } else {
             this.router.navigate(['/login']);
           }
