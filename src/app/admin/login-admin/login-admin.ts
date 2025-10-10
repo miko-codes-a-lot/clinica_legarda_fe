@@ -46,7 +46,7 @@ export class LoginAdmin {
           this.router.navigate(['/admin/dashboard'])
         }
       },
-      error: (err) => alert(`Something went wrong: ${err}`)
+      error: (err) => alert(err.message)
     }).add(() => this.isLoading = false)
   }
 

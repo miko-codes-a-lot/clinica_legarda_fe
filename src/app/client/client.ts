@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
-import { User } from '../_shared/model/user';
 import { AuthService } from '../_shared/service/auth-service';
 import { UiStateService } from '../_shared/service/ui-state-service';
 import { ClientNavComponent } from '../_shared/component/nav/client-nav.component';
 import { Chatbot } from './chatbot/chatbot';
+import { UserSimple } from '../_shared/model/user-simple';
 
 @Component({
   selector: 'app-client',
@@ -13,7 +13,7 @@ import { Chatbot } from './chatbot/chatbot';
   styleUrl: './client.css'
 })
 export class Client {
-  user: User | null = null
+  user: UserSimple | null = null
   isLoading = false
   isChatOpen = false;
 

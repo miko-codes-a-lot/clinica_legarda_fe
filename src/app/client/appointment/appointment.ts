@@ -13,6 +13,7 @@ import { AuthService } from '../../_shared/service/auth-service';
 import { FormComponent } from '../../_shared/component/form/form.component';
 
 import { RouterLink } from '@angular/router';
+import { UserSimple } from '../../_shared/model/user-simple';
 
 @Component({
   selector: 'app-appointment',
@@ -35,7 +36,7 @@ export class AppointmentPage {
   @Input() dentalServices: DentalService[] = []
   @Input() patients: User[] = []
   // @Input() loggedInUser?: User[] = []
-  user: User | null = null
+  user: UserSimple | null = null
 
   dentists: User[] = []
   selectedDentist?: User
