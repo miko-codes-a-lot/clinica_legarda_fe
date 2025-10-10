@@ -19,7 +19,7 @@ export class MockService {
         emailAddress: 'juan@gmail.com',
         mobileNumber: '09394252236',
         address: 'blk 2 lot 75',
-        role: 'dentist',
+        role: 'admin',
         appointments: [],
         operatingHours: [
           { day: 'monday', startTime: '09:00', endTime: '18:00' },
