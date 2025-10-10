@@ -39,7 +39,12 @@ export class LoginAdmin {
     this.isLoading = true
     this.authService.login(this.username.value, this.password.value).subscribe({
       next: (r) => {
-        this.router.navigate(['/admin/dashboard'])
+        console.log('r', r)
+        if (r.user.role === 'dentist') {
+          this.router.navigate(['/dentist/profile'])
+        } else {
+          this.router.navigate(['/admin/dashboard'])
+        }
       },
       error: (err) => alert(`Something went wrong: ${err}`)
     }).add(() => this.isLoading = false)

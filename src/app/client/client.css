@@ -136,6 +136,13 @@
   transform: translateY(-1px);
 }
 
+.nav-link-auth:hover {
+  background: #bbdefb;
+  cursor: pointer;
+  transform: translateY(-1px);
+}
+
+
 /* Icon */
 .nav-icon-inline {
   font-size: 20px;

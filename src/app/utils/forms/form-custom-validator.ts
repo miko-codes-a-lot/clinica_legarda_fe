@@ -1,6 +1,7 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 export const timeRangeValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
+  console.log('group', group)
   const start = group.get('startTime')?.value;
   const end = group.get('endTime')?.value;
 

@@ -7,14 +7,14 @@
       &times;
     </button>
   </div>
-  <div class="chat-messages">
+  <div class="chat-messages" #chatMessages>
     @for (message of messages; track message) {
       <div class="message-row" [ngClass]="{'user-row': message.sender === 'user', 'bot-row': message.sender === 'bot'}">
         @if (message.sender === 'bot') {
           <img src="chatbot.png" alt="Bot Icon" class="message-avatar bot-avatar">
         }
         <div class="message-bubble" [ngClass]="{'user-bubble': message.sender === 'user', 'bot-bubble': message.sender === 'bot'}">
-          {{ message.text }}
+          <div [innerHTML]="message.text"></div>
         </div>
         @if (message.sender === 'user') {
           <!-- <img src="user-icon.png" alt="User Icon" class="message-avatar user-avatar"> -->

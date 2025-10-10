@@ -1,0 +1,36 @@
+.page-container {
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.page-title {
+  margin-bottom: 16px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.actions {
+  margin-bottom: 16px;
+}
+
+.user-table-container {
+  overflow-x: auto;
+}
+
+.custom-table {
+  width: 100%;
+  min-width: 600px;
+}
+
+button {
+  margin-right: 8px;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* margin-top: 2rem; adjust as needed */
+  background-color: #FFF8F8;
+}

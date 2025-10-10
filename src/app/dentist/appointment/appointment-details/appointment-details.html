@@ -1,0 +1,30 @@
+@if (appointment) {
+  <div class="view-header">
+    <h2 class="page-title">Appointment</h2>
+    <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
+  </div>
+  <app-list [data]="displayAppointment">
+    <div class="custom-list">
+      <mat-list-item>
+        <span class="item-title" matListItemTitle><strong>Service/s:</strong></span>
+        @for (service of appointment.services; track service._id) {
+          <span class="item-line" matListItemLine>{{ service.name }}</span>
+        }
+      </mat-list-item>
+    </div>
+    <div class="row-divider"></div>
+    <div class="custom-list">
+      <mat-list-item>
+        <span class="item-title" matListItemTitle>Notes:</span>
+          <span class="item-line" matListItemLine>
+            Clinic Notes: {{ appointment.notes.clinicNotes }} <br>
+          </span>
+          <span class="item-line" matListItemLine>
+            Patient Notes: {{ appointment.notes.patientNotes }}
+          </span>
+      </mat-list-item>
+    </div>
+  </app-list>
+} @else {
+  <p>Fetching details...</p>
+}

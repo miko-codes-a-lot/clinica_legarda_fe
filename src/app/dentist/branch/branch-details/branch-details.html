@@ -1,0 +1,12 @@
+@if (branch) {
+  <button (click)="onUpdate()">Edit</button> <br>
+  <ul>
+    <li>Name: {{ branch.name }}</li>
+    <li>Address: {{ branch.address }}</li>
+    <li>Mobile Number: {{ branch.mobileNumber }}</li>
+    <li>Email Address: {{ branch.emailAddress }}</li>
+    <li><a [routerLink]="['/admin/clinic/details', branch.clinic._id]">{{ branch.clinic.name }}</a></li>
+  </ul>
+} @else {
+  <p>Fetching details...</p>
+}

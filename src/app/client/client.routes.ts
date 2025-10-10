@@ -4,7 +4,6 @@ import { Home } from './home/home';
 import { LoginPatient } from './login-patient/login-patient';
 import { About } from './about/about';
 import { ContactUs } from './contact-us/contact-us';
-import { Appointment } from './appointment/appointment';
 import { Faq } from './faq/faq';
 import { DentalService } from './dental-service/dental-service';
 
@@ -28,7 +27,8 @@ export const CLIENT_ROUTES: Routes = [
       },
       {
         path: 'appointment',
-        component: Appointment,
+        loadComponent: () => import('./appointment/appointment-create/appointment-create')
+          .then(m => m.AppointmentCreate),
       },
       {
         path: 'about-us',

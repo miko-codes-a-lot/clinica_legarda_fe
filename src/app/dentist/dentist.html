@@ -1,0 +1,17 @@
+
+<mat-drawer-container class="example-container">
+  @if (isLoggedIn) {
+    <mat-drawer mode="side" opened>
+      <mat-toolbar color="primary">
+        <span class="system-title">Clinica Legarda </span>
+      </mat-toolbar>
+      <mat-list role="list">
+        <app-nav [disabled]="isLoading" [menuItems]="menuItems"></app-nav>
+      </mat-list>
+    </mat-drawer>
+  }
+
+  <mat-drawer-content>
+    <router-outlet></router-outlet>
+  </mat-drawer-content>
+</mat-drawer-container>

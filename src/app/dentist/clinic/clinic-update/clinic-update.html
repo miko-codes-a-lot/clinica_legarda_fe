@@ -1,0 +1,10 @@
+@if (clinic) {
+  <app-clinic-form
+    [isLoading]="isLoading"
+    [clinic]="clinic"
+    [days]="days"
+    (onSubmitEvent)="onSubmit($event)"
+  ></app-clinic-form>
+} @else {
+  <p>Fetching details...</p>
+}

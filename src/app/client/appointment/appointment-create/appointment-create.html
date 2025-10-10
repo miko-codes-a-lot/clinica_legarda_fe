@@ -1,0 +1,19 @@
+@if (clinics.length !== 0) {
+  <app-appointment
+    [isLoading]="isLoading"
+    [dentalServices]="dentalServices"
+    [clinics]="clinics"
+    [patients]="patients"
+    [appointment]="initDoc"
+    (onSubmitEvent)="onSubmit($event)">
+  </app-appointment>
+} @else {
+  <div class="loading-container">
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="40"
+      strokeWidth="4">
+    </mat-progress-spinner>
+    <p>Fetching data...</p>
+  </div>
+}
