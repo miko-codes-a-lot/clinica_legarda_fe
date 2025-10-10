@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,6 +8,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { map, Observable } from 'rxjs';
+import { NotificationService } from '../../../_shared/service/notification-service';
+import { Notification, NotificationType } from '../../../_shared/model/notification';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -23,12 +26,16 @@ Chart.register(...registerables);
     MatChipsModule,
     MatButtonModule
   ],
+  providers: [DatePipe],
   templateUrl: './dashboard-index.html',
   styleUrl: './dashboard-index.css'
 })
 export class DashboardIndex {
   @ViewChild('servicesChart', { static: false }) servicesChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('appointmentTrendChart', { static: false }) appointmentTrendRef!: ElementRef<HTMLCanvasElement>;
+
+  notifications$!: Observable<Notification[]>;
+  unreadNotificationsCount$!: Observable<number>;
 
   // Dashboard data
   dashboardData = {
@@ -75,6 +82,9 @@ export class DashboardIndex {
   // UI State
   showNotifications = false;
 
+  displayedColumns: string[] = ['time', 'patientName', 'service'];
+  notificationColumns: string[] = ['type', 'message', 'timestamp', 'status'];
+
   // Computed properties
   get weeklyReport() {
     return this.dashboardData.adminDashboard.weeklyReport;
@@ -92,11 +102,21 @@ export class DashboardIndex {
     return this.notifications.filter(n => !n.isRead).length;
   }
 
-  displayedColumns: string[] = ['time', 'patientName', 'service'];
-  notificationColumns: string[] = ['type', 'message', 'timestamp', 'status'];
+  constructor(
+    private notificationService: NotificationService,
+    private datePipe: DatePipe
+  ) {}
 
   ngOnInit(): void {
-    // Component initialization
+    this.notifications$ = this.notificationService.notifications$;
+    this.unreadNotificationsCount$ = this.notifications$.pipe(
+      map(notifications => notifications.filter(n => !n.read).length)
+    );
+
+    // load initial notifications
+    this.notificationService.getAllNotifications().subscribe({
+      error: (err) => console.error('Failed to fetch initial notifications', err)
+    });
   }
 
   ngAfterViewInit(): void {
@@ -211,11 +231,30 @@ export class DashboardIndex {
     return new Date(timestamp).toLocaleString();
   }
 
-  markAsRead(notificationId: string): void {
-    const notification = this.notifications.find(n => n.notificationId === notificationId);
-    if (notification) {
-      notification.isRead = true;
+  // Helper function to make the notification type user-friendly
+  formatNotificationType(type: NotificationType): string {
+    switch (type) {
+      case NotificationType.APPOINTMENT_CREATED:
+        return 'New Booking';
+      case NotificationType.APPOINTMENT_STATUS_UPDATED:
+        return 'Status Update';
+      case NotificationType.APPOINTMENT_REMINDER:
+        return 'Reminder';
+      default:
+        return 'Notification';
     }
+  }
+
+  // Map the notification type to a CSS class for styling the chip
+  getNotificationTypeClass(type: NotificationType): string {
+    return type === NotificationType.APPOINTMENT_CREATED ? 'booking' : 'cancellation';
+  }
+
+  markAsRead(notificationId: string): void {
+    // Call the service to mark the notification as read
+    this.notificationService.markAsRead(notificationId).subscribe({
+      error: (err) => console.error(`Failed to mark notification ${notificationId} as read`, err)
+    });
   }
 
   toggleNotifications(): void {

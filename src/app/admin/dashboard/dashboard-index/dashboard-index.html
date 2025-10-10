@@ -9,9 +9,12 @@
             <p class="week-info">Week of {{ weeklyReport.weekOf | date:'mediumDate' }}</p>
           </div>
           <div class="notification-badge">
+            <!-- UPDATED: Using the async pipe for the unread count observable -->
             <button mat-icon-button (click)="toggleNotifications()" class="notification-btn">
-              <mat-icon [matBadge]="unreadNotificationsCount" matBadgeColor="warn" 
-                       [matBadgeHidden]="unreadNotificationsCount === 0">
+              <mat-icon 
+                [matBadge]="unreadNotificationsCount$ | async" 
+                matBadgeColor="warn" 
+                [matBadgeHidden]="(unreadNotificationsCount$ | async) === 0">
                 notifications
               </mat-icon>
             </button>
@@ -24,30 +27,30 @@
                   <mat-icon>close</mat-icon>
                 </button>
               </div>
-              <div class="notification-list">
-                <div *ngFor="let notification of notifications" 
-                     class="notification-item" 
-                     [class.unread]="!notification.isRead">
+              <!-- UPDATED: Using async pipe to unwrap the notifications$ observable -->
+              <div class="notification-list" *ngIf="notifications$ | async as notifications">
+                <!-- UPDATED: Looping over the unwrapped 'notifications' array -->
+                <div *ngFor="let notification of notifications" class="notification-item" [class.unread]="!notification.read">
                   <div class="notification-content">
                     <div class="notification-type">
-                      <mat-chip [class]="'type-chip ' + (notification.type === 'New Booking' ? 'booking' : 'cancellation')">
-                        {{ notification.type }}
+                      <!-- UPDATED: Using helper functions for dynamic class and text -->
+                      <mat-chip [class]="'type-chip ' + getNotificationTypeClass(notification.type)">
+                        {{ formatNotificationType(notification.type) }}
                       </mat-chip>
                     </div>
                     <div class="notification-message">{{ notification.message }}</div>
-                    <div class="notification-time">{{ formatTimestamp(notification.timestamp) }}</div>
+                    <!-- UPDATED: Using 'createdAt' instead of 'timestamp' -->
+                    <div class="notification-time">{{ formatTimestamp(notification.createdAt) }}</div>
                   </div>
                   <div class="notification-actions">
-                    <button *ngIf="!notification.isRead"
-                            mat-button 
-                            color="primary"
-                            (click)="markAsRead(notification.notificationId)"
-                            class="mark-read-btn">
+                    <!-- UPDATED: Checking 'notification.read' and passing 'notification._id' -->
+                    <button *ngIf="!notification.read" mat-button color="primary" (click)="markAsRead(notification._id)" class="mark-read-btn">
                       Mark as Read
                     </button>
-                    <mat-icon *ngIf="notification.isRead" class="read-icon">check_circle</mat-icon>
+                    <mat-icon *ngIf="notification.read" class="read-icon">check_circle</mat-icon>
                   </div>
                 </div>
+                <!-- UPDATED: Checking length of the unwrapped 'notifications' array -->
                 <div *ngIf="notifications.length === 0" class="no-notifications">
                   <mat-icon>notifications_none</mat-icon>
                   <p>No notifications</p>
@@ -60,7 +63,7 @@
     </mat-card>
   </div>
 
-  <!-- Key Metrics Section -->
+  <!-- Key Metrics Section (No changes here) -->
   <div class="metrics-section">
     <div class="metrics-grid">
       <mat-card class="metric-card">
@@ -74,7 +77,6 @@
           </div>
         </mat-card-content>
       </mat-card>
-
       <mat-card class="metric-card">
         <mat-card-content>
           <div class="metric-content">
@@ -86,7 +88,6 @@
           </div>
         </mat-card-content>
       </mat-card>
-
       <mat-card class="metric-card">
         <mat-card-content>
           <div class="metric-content">
@@ -101,10 +102,9 @@
     </div>
   </div>
 
-  <!-- Charts Section -->
+  <!-- Charts Section (No changes here) -->
   <div class="charts-section">
     <div class="charts-grid">
-      <!-- Preferred Services Chart -->
       <mat-card class="chart-card">
         <mat-card-header>
           <mat-card-title>Preferred Services Distribution</mat-card-title>
@@ -115,8 +115,6 @@
           </div>
         </mat-card-content>
       </mat-card>
-
-      <!-- Weekly Appointment Trend -->
       <mat-card class="chart-card">
         <mat-card-header>
           <mat-card-title>Weekly Appointment Trend</mat-card-title>
@@ -133,7 +131,7 @@
   <!-- Data Tables Section -->
   <div class="tables-section">
     <div class="tables-grid">
-      <!-- Daily Appointment Queue -->
+      <!-- Daily Appointment Queue (No changes here) -->
       <mat-card class="table-card">
         <mat-card-header>
           <mat-card-title>Today's Appointment Queue</mat-card-title>
@@ -147,7 +145,6 @@
                 {{ appointment.time }}
               </mat-cell>
             </ng-container>
-
             <ng-container matColumnDef="patientName">
               <mat-header-cell *matHeaderCellDef>Patient Name</mat-header-cell>
               <mat-cell *matCellDef="let appointment">
@@ -155,74 +152,70 @@
                 {{ appointment.patientName }}
               </mat-cell>
             </ng-container>
-
             <ng-container matColumnDef="service">
               <mat-header-cell *matHeaderCellDef>Service</mat-header-cell>
               <mat-cell *matCellDef="let appointment">
                 <mat-chip class="service-chip">{{ appointment.service }}</mat-chip>
               </mat-cell>
             </ng-container>
-
             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
             <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
           </mat-table>
         </mat-card-content>
       </mat-card>
 
-      <!-- Notifications Table - Only show if dropdown is closed -->
-      <mat-card class="table-card" *ngIf="!showNotifications">
-        <mat-card-header>
-          <mat-card-title>Recent Notifications</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-table [dataSource]="notifications" class="notifications-table">
-            <ng-container matColumnDef="type">
-              <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
-              <mat-cell *matCellDef="let notification">
-                <mat-chip 
-                  [class]="'type-chip ' + (notification.type === 'New Booking' ? 'booking' : 'cancellation')">
-                  {{ notification.type }}
-                </mat-chip>
-              </mat-cell>
-            </ng-container>
+      <!-- 
+        UPDATED: This is the fix for the parser error.
+        We use an <ng-container> to safely unwrap the observable.
+        The mat-card is now inside this container.
+      -->
+      <ng-container *ngIf="notifications$ | async as notifications">
+        <mat-card class="table-card" *ngIf="!showNotifications">
+          <mat-card-header>
+            <mat-card-title>Recent Notifications</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <!-- UPDATED: dataSource now binds to the 'notifications' variable from the ng-container -->
+            <mat-table [dataSource]="notifications" class="notifications-table">
+              <ng-container matColumnDef="type">
+                <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+                <mat-cell *matCellDef="let notification">
+                  <mat-chip [class]="'type-chip ' + getNotificationTypeClass(notification.type)">
+                    {{ formatNotificationType(notification.type) }}
+                  </mat-chip>
+                </mat-cell>
+              </ng-container>
 
-            <ng-container matColumnDef="message">
-              <mat-header-cell *matHeaderCellDef>Message</mat-header-cell>
-              <mat-cell *matCellDef="let notification">
-                {{ notification.message }}
-              </mat-cell>
-            </ng-container>
+              <ng-container matColumnDef="message">
+                <mat-header-cell *matHeaderCellDef>Message</mat-header-cell>
+                <mat-cell *matCellDef="let notification">{{ notification.message }}</mat-cell>
+              </ng-container>
 
-            <ng-container matColumnDef="timestamp">
-              <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
-              <mat-cell *matCellDef="let notification">
-                {{ formatTimestamp(notification.timestamp) }}
-              </mat-cell>
-            </ng-container>
+              <ng-container matColumnDef="timestamp">
+                <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
+                <!-- UPDATED: Using 'createdAt' -->
+                <mat-cell *matCellDef="let notification">{{ formatTimestamp(notification.createdAt) }}</mat-cell>
+              </ng-container>
 
-            <ng-container matColumnDef="status">
-              <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
-              <mat-cell *matCellDef="let notification">
-                <button 
-                  *ngIf="!notification.isRead"
-                  mat-button 
-                  color="primary"
-                  (click)="markAsRead(notification.notificationId)"
-                  class="mark-read-btn">
-                  Mark as Read
-                </button>
-                <mat-icon *ngIf="notification.isRead" class="read-icon">check_circle</mat-icon>
-              </mat-cell>
-            </ng-container>
+              <ng-container matColumnDef="status">
+                <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+                <mat-cell *matCellDef="let notification">
+                  <!-- UPDATED: Checking 'read' and passing '_id' -->
+                  <button *ngIf="!notification.read" mat-button color="primary" (click)="markAsRead(notification._id)" class="mark-read-btn">
+                    Mark as Read
+                  </button>
+                  <mat-icon *ngIf="notification.read" class="read-icon">check_circle</mat-icon>
+                </mat-cell>
+              </ng-container>
 
-            <mat-header-row *matHeaderRowDef="notificationColumns"></mat-header-row>
-            <mat-row 
-              *matRowDef="let row; columns: notificationColumns;"
-              [class.unread-row]="!row.isRead">
-            </mat-row>
-          </mat-table>
-        </mat-card-content>
-      </mat-card>
+              <mat-header-row *matHeaderRowDef="notificationColumns"></mat-header-row>
+              <!-- UPDATED: Row class is bound to 'row.read' -->
+              <mat-row *matRowDef="let row; columns: notificationColumns;" [class.unread-row]="!row.read"></mat-row>
+            </mat-table>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
+
     </div>
   </div>
 </div>

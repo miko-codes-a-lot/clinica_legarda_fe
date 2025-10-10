@@ -26,17 +26,17 @@ export class NotificationList {
   notifications: Notification[] = []
   displayedColumns: string[] = ['type', 'message', 'user', 'date', 'actions'];
   columnDefs = [
-    { key: 'type', label: 'Type', cell: (notification: Notification) => notification.type ?? '' },
-    { key: 'message', label: 'Message', cell: (notification: Notification) => notification.message},
-    { key: 'user', label: 'User', cell: (notification: Notification): SafeHtml => {
-      const fullName = this.getFullName(notification.createdBy)
-      // when enabling data link 
-      return {
-        display: fullName,
-        dataLink: ['/admin/user/details', notification.createdBy._id],
-      }
-    }},
-    { key: 'date', label: 'Date', cell: (notification: Notification) =>  notification.timestamp},
+    // { key: 'type', label: 'Type', cell: (notification: Notification) => notification.type ?? '' },
+    // { key: 'message', label: 'Message', cell: (notification: Notification) => notification.message},
+    // { key: 'user', label: 'User', cell: (notification: Notification): SafeHtml => {
+    //   const fullName = this.getFullName(notification.createdBy)
+    //   // when enabling data link 
+    //   return {
+    //     display: fullName,
+    //     dataLink: ['/admin/user/details', notification.createdBy._id],
+    //   }
+    // }},
+    // { key: 'date', label: 'Date', cell: (notification: Notification) =>  notification.timestamp},
   ];
   
   constructor(

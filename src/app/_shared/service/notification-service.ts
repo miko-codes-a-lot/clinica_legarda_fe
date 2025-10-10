@@ -1,29 +1,27 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { MockService } from './mock-service';
 import { io, Socket } from 'socket.io-client';
 import { Notification } from '../model/notification';
 import { environment } from '../../../environments/environment';
-
-export interface NotificationV2 {
-  _id: string;
-  recipient: string;
-  message: string;
-  read: boolean;
-  type: string;
-  link?: string;
-  createdAt: Date;
-}
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
   private socket?: Socket
-  private notifications$$ = new BehaviorSubject<NotificationV2[]>([])
-  public notifications$: Observable<NotificationV2[]> = this.notifications$$.asObservable()
+  private notifications$$ = new BehaviorSubject<Notification[]>([])
 
-  constructor(private readonly mockService: MockService) {}
+  public notifications$: Observable<Notification[]> = this.notifications$$.asObservable()
+
+
+  private readonly apiUrl = `${environment.apiUrl}/notifications`;
+
+  constructor(
+    private readonly mockService: MockService,
+    private readonly http: HttpClient,
+  ) {}
 
   // call on login
   connect() {
@@ -43,7 +41,7 @@ export class NotificationService {
       console.log('Disconnected from WebSocket server. Reason:', reason);
     });
 
-    this.socket.on('new_notification', (notification: NotificationV2) => {
+    this.socket.on('new_notification', (notification: Notification) => {
       console.log('New notification received:', notification);
 
       // Get the current list of notifications and add the new one to the top
@@ -70,6 +68,15 @@ export class NotificationService {
     })
   }
 
+  getAllNotifications(): Observable<Notification[]> {
+    return this.http.get<Notification[]>('/notifications').pipe(
+      tap(notifications => {
+        // Once fetched, update the BehaviorSubject with the full list
+        this.notifications$$.next(notifications);
+      })
+    );
+  }
+
   getOne(id: string): Observable<Notification> {
     return new Observable((s) => {
       setTimeout(() => {
@@ -81,16 +88,18 @@ export class NotificationService {
     })
   }
 
-  markAsRead(docId: string): Observable<Notification> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const notification = this.mockService.mockNotification()
-        notification.isRead = true
-
-        s.next(notification)
-        s.complete()
-      }, 1000);
-    })
+  markAsRead(id: string): Observable<Notification> {
+    return this.http.patch<Notification>(`/notifications/${id}/read`, {}).pipe(
+      tap(updatedNotification => {
+        // For a snappier UI, we update the local state immediately
+        // instead of re-fetching the entire list.
+        const currentNotifications = this.notifications$$.getValue();
+        const updatedList = currentNotifications.map(n =>
+          n._id === id ? { ...n, read: true } : n
+        );
+        this.notifications$$.next(updatedList);
+      })
+    );
   }
 
   create(createdBy: string, targetUser: string): Observable<Notification> {

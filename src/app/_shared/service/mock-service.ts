@@ -4,7 +4,7 @@ import { DentalService } from '../model/dental-service';
 import { Appointment, AppointmentStatus } from '../model/appointment';
 import { User } from '../model/user';
 import { Branch } from '../model/branch';
-import { Notification } from '../model/notification';
+import { Notification, NotificationType } from '../model/notification';
 
 @Injectable({
   providedIn: 'root'
@@ -136,14 +136,18 @@ export class MockService {
   }
 
   mockNotification(): Notification {
+    const now = new Date().toISOString(); 
+    
     return {
-      _id: '1',
-      type: 'new_booking',
-      timestamp: new Date(),
-      message: 'Patient Juan Della Cruz booked a new appointment',
-      isRead: false,
-      targetUser: '1',
-      createdBy: this.mockUser(),
-    }
+      _id: '635f8e5b9f7a4b1c8e8f8b8a', // Example of a MongoDB ObjectId string
+      recipient: '1', // Corresponds to the recipient user's ID
+      message: 'Patient Juan Dela Cruz booked a new appointment.',
+      read: false,
+      type: NotificationType.APPOINTMENT_CREATED, // Use the enum for type safety
+      link: '/appointments/507f1f77bcf86cd799439011', // Optional link
+      triggeredBy: '1', // Corresponds to the old 'createdBy', now a user ID string
+      createdAt: now,
+      updatedAt: now,
+    };
   }
 }
