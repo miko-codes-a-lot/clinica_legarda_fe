@@ -14,6 +14,7 @@ import { FormComponent } from '../../_shared/component/form/form.component';
 
 import { RouterLink } from '@angular/router';
 import { UserSimple } from '../../_shared/model/user-simple';
+import { UserService } from '../../_shared/service/user-service';
 
 @Component({
   selector: 'app-appointment',
@@ -50,6 +51,7 @@ export class AppointmentPage {
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
+    private readonly userService: UserService // inject here
   ) {}
 
   private clearDateTime() {
@@ -61,6 +63,12 @@ export class AppointmentPage {
     const clinic = this.clinics.find(c => c._id == clinicId)
     if (!clinic) return
 
+    
+    this.userService.getAll().subscribe(users => {
+      // filter dentists by clinic
+      this.dentists = users.filter(u => u.clinic === clinic?._id)
+      this.builAppointmentFields();
+    })
     this.dentists = clinic.dentists
     this.builAppointmentFields();
   }
@@ -190,6 +198,7 @@ export class AppointmentPage {
     const endTime = TimeUtil.calculateEndTime(startTime, duration);
 
     const appointment: AppointmentPayload = {
+      clinic: this.clinic.value ?? '',
       dentist: this.dentist.value,
       patient: this.user?._id || '',
       services: this.services.value,
@@ -201,7 +210,7 @@ export class AppointmentPage {
         clinicNotes: '',
         patientNotes: '',
       },
-      history: []
+      // history: []
     }
 
     this.onSubmitEvent.emit(appointment)
