@@ -2,6 +2,7 @@ import { FormArray, FormControl, FormGroup } from "@angular/forms";
 import { RxOperatingHour } from "../../../_shared/model/reactive/rx-operating-hours";
 
 export interface RxUserForm {
+  username: FormControl<string>
   firstName: FormControl<string>
   middleName: FormControl<string>
   lastName: FormControl<string>

@@ -9,6 +9,8 @@ import { Clinic } from '../../../_shared/model/clinic';
 import { DatePicker } from '../../../_shared/component/date-picker/date-picker';
 import { TimePicker } from '../../../_shared/component/time-picker/time-picker';
 import { TimeUtil } from '../../../utils/time-util';
+import { UserService } from '../../../_shared/service/user-service';
+
 
 import { FormComponent } from '../../../_shared/component/form/form.component';
 
@@ -41,7 +43,10 @@ export class AppointmentForm {
   minDate = new Date()
   maxDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 90 days from now only
 
-  constructor(private readonly fb: FormBuilder) {}
+  constructor(
+    private readonly fb: FormBuilder,
+    private readonly userService: UserService // inject here
+  ) {}
 
   private clearDateTime() {
     this.date.setValue(new Date())
@@ -50,10 +55,15 @@ export class AppointmentForm {
 
   private changeDentists(clinicId: string) {
     const clinic = this.clinics.find(c => c._id == clinicId)
+ 
     if (!clinic) return
 
-    this.dentists = clinic.dentists
-    this.builAppointmentFields();
+    this.userService.getAll().subscribe(users => {
+      // filter dentists by clinic
+      this.dentists = users.filter(u => u.clinic === clinic?._id)
+      this.builAppointmentFields();
+    })
+
   }
 
   private setDentist(dentistId: string) {
@@ -100,12 +110,10 @@ export class AppointmentForm {
   private builAppointmentFields() {
     const customeSelectPatient = this.setUsersKey(this.patients)
     const customSelectDentist = this.setUsersKey(this.dentists)
-
     const selectClinic = this.maptoOptions(this.clinics)
     const selectDentist = this.maptoOptions(customSelectDentist)
     const selectPatient = this.maptoOptions(customeSelectPatient)
     const selectDentalService = this.maptoOptions(this.dentalServices)
-
     this.appointmentFields = [
       { name: 'clinic', label: 'Clinic', type: 'select', options: selectClinic},
       { name: 'patient', label: 'Patient', type: 'select', options: selectPatient},
@@ -128,7 +136,6 @@ export class AppointmentForm {
     }))
   }
   maptoOptions (items: {_id?: string; name: string}[]): {value: string; label: string}[] {
-
     return items.map(item => ({
       value: item._id ?? '',
       label: item.name,
@@ -181,7 +188,9 @@ export class AppointmentForm {
     const startTime = this.time.value;
     const endTime = TimeUtil.calculateEndTime(startTime, duration);
 
-    const appointment: AppointmentPayload = {
+
+    const appointmentData = {
+      clinic: this.clinic.value ?? '',
       dentist: this.dentist.value,
       patient: this.patient.value,
       services: this.services.value,
@@ -193,9 +202,9 @@ export class AppointmentForm {
         clinicNotes: '',
         patientNotes: '',
       },
-      history: []
+      // history: []
     }
-
+    const appointment: AppointmentPayload = appointmentData;
     this.onSubmitEvent.emit(appointment)
   }
 

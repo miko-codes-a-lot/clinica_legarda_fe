@@ -7,7 +7,7 @@
 
   <form [formGroup]="rxform">
     @if (rxform.get('role')?.value === 'dentist') {
-   
+      <!-- the clinic value in rx has no data on update-->
       @if (!this.rxform.get('clinic')?.value) {
         <p><i>Please select a clinic</i></p>
       } @else {

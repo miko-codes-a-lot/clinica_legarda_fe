@@ -1,65 +1,33 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../model/user';
-import { MockService } from './mock-service';
 import { UserPayload } from '../../admin/user/user-form/user-payload';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  constructor(private readonly mockService: MockService) {}
+  private readonly baseUrl = '/users'; // adjust if your backend has a different base path
+  constructor(private readonly http: HttpClient) {}
 
-  getAll(): Observable<User[]> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const items = [
-          this.mockService.mockUser()
-        ]
-
-        s.next(items)
-        s.complete()
-      }, 1000);
-    })
+  getAll(): Observable<User[]> { 
+    return this.http.get<User[]>(this.baseUrl, { withCredentials: true });
   }
 
   getOne(id: string): Observable<User> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const user = this.mockService.mockUser()
-
-        s.next(user)
-        s.complete()
-      }, 1000);
-    })
+    return this.http.get<User>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 
   create(user: UserPayload): Observable<User> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const mockUser = this.mockService.mockUser()
-        s.next(mockUser)
-        s.complete()
-      }, 1000);
-    })
+    return this.http.post<User>(this.baseUrl, user, { withCredentials: true });
   }
 
   update(id: string, user: UserPayload): Observable<User> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const mockUser = this.mockService.mockUser()
-        s.next(mockUser)
-        s.complete()
-      }, 1000);
-    })
+    return this.http.put<User>(`${this.baseUrl}/${id}`, user, { withCredentials: true });
   }
 
-  delete(): Observable<void> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        s.next()
-        s.complete()
-      }, 1000);
-    })
+  delete(id: string): Observable<void> {
+     return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 }
