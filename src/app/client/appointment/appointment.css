@@ -34,13 +34,13 @@ mat-form-field {
   font-size: 18px;
 }
 
-
 .container {
   padding: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .login-required {
   text-align: center;
   border: 1px solid #ddd;
@@ -48,6 +48,7 @@ mat-form-field {
   padding: 2rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+
 button {
   margin-top: 1rem;
   padding: 0.75rem 1.5rem;
