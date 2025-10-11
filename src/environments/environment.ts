@@ -1,4 +1,4 @@
 export const environment = {
   build: 'prod',
-  apiUrl: ''
+  apiUrl: 'https://clinica-legarda.cloudants.dev/api'
 };
