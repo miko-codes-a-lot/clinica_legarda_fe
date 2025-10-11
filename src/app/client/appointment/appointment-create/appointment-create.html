@@ -1,4 +1,4 @@
-@if (clinics.length !== 0) {
+@if (clinics.length !== 0 && user) {
   <app-appointment
     [isLoading]="isLoading"
     [dentalServices]="dentalServices"
@@ -8,12 +8,11 @@
     (onSubmitEvent)="onSubmit($event)">
   </app-appointment>
 } @else {
-  <div class="loading-container">
-    <mat-progress-spinner
-      mode="indeterminate"
-      diameter="40"
-      strokeWidth="4">
-    </mat-progress-spinner>
-    <p>Fetching data...</p>
+  <div class="container">
+    <div class="login-required">
+      <h2>You must log in to book an appointment</h2>
+      <p>Please sign in to continue.</p>
+      <a [routerLink]="'/app/login'" class="btn-service">Proceed to Login</a>
+    </div>
   </div>
 }

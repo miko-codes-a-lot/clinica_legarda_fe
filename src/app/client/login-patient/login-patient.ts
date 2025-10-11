@@ -31,7 +31,7 @@ export class LoginPatient {
     this.authService.currentUser$.subscribe({
       next: (u) => {
         if (u) {
-          this.router.navigate(['/app/dashboard'])
+          this.router.navigate(['/app/my-appointment'])
         }
       }
     })
@@ -46,7 +46,7 @@ export class LoginPatient {
 
     this.authService.login(this.username.value, this.password.value).subscribe({
       next: (r) => {
-        this.router.navigate(['/app/dashboard'])
+        this.router.navigate(['/app/my-appointment'])
       },
       error: (err) => alert(`Something went wrong: ${err}`)
     }).add(() => this.uiStateService.setLoading(false))
