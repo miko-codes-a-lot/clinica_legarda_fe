@@ -58,14 +58,8 @@ export class NotificationService {
   }
 
   getAll(): Observable<Notification[]> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const notification = this.mockService.mockNotification()
-
-        s.next([notification])
-        s.complete()
-      }, 1000);
-    })
+    // should be the body not ID
+    return this.http.get<Notification[]>(this.apiUrl, { withCredentials: true });
   }
 
   getAllNotifications(): Observable<Notification[]> {
@@ -78,14 +72,7 @@ export class NotificationService {
   }
 
   getOne(id: string): Observable<Notification> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const notification = this.mockService.mockNotification()
-
-        s.next(notification)
-        s.complete()
-      }, 1000);
-    })
+    return this.http.get<Notification>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
 
   markAsRead(id: string): Observable<Notification> {

@@ -32,7 +32,6 @@ export class DentalServiceList implements OnInit {
 
   ngOnInit(): void {
     this.isLoading = true
-
     this.dentalServicesService.getAll().subscribe({
       next: (data) => {
         this.dataSource.data = data;

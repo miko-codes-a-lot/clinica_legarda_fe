@@ -1,13 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NotificationService } from '../../../_shared/service/notification-service';
 import { Notification } from '../../../_shared/model/notification';
 import { TypeUtil } from '../../../utils/type-util';
 import { User } from '../../../_shared/model/user';
+import { UserService } from '../../../_shared/service/user-service';
 import { Router } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-
+import { forkJoin } from 'rxjs';
 
 
 @Component({
@@ -18,43 +19,71 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 })
 
 
-export class NotificationList {
+export class NotificationList implements OnInit {
   isLoading = false
   moduleUrl = '/admin/notification/'
   title = 'Notification'
   dataSource = new MatTableDataSource<Notification>();
   notifications: Notification[] = []
-  displayedColumns: string[] = ['type', 'message', 'user', 'date', 'actions'];
-  columnDefs = [
-    // { key: 'type', label: 'Type', cell: (notification: Notification) => notification.type ?? '' },
-    // { key: 'message', label: 'Message', cell: (notification: Notification) => notification.message},
-    // { key: 'user', label: 'User', cell: (notification: Notification): SafeHtml => {
-    //   const fullName = this.getFullName(notification.createdBy)
-    //   // when enabling data link 
-    //   return {
-    //     display: fullName,
-    //     dataLink: ['/admin/user/details', notification.createdBy._id],
-    //   }
-    // }},
-    // { key: 'date', label: 'Date', cell: (notification: Notification) =>  notification.timestamp},
-  ];
-  
+  displayedColumns: string[] = ['type', 'message', 'user', 'date' ];
+  usersMap = new Map<string, string>(); // recipientId → fullName
+  // 'read', 'message', 'recipient', 'actions'
+
   constructor(
     private readonly notificationService: NotificationService,
+    private readonly userService: UserService,
     private readonly router: Router,
     private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
-    this.isLoading = true
+    this.isLoading = true;
 
-    this.notificationService.getAll().subscribe({
+    this.notificationService.getAllNotifications().subscribe({
       next: (notifications) => {
-        this.dataSource.data = notifications
+        this.notifications = notifications;
+        this.dataSource.data = notifications; // ✅ assign to the table
+
+        const uniqueUserIds = [...new Set(notifications.map(n => n.recipient))];
+
+        if (uniqueUserIds.length === 0) {
+          this.isLoading = false;
+          return;
+        }
+
+        forkJoin(
+          uniqueUserIds.map(id => this.userService.getOne(id))
+        ).subscribe({
+          next: (users) => {
+            users.forEach(u => {
+              const id = u._id ?? '';
+              const name = u.username ?? '(No Name)';
+              if (id) this.usersMap.set(id, name);
+            });
+          },
+          complete: () => this.isLoading = false,
+          error: () => this.isLoading = false
+        });
       },
-      error: (err) => alert(`Something went wrong ${err}`),
-    }).add(() => this.isLoading = false);
+      error: (err) => {
+        alert(`Something went wrong: ${err}`);
+        this.isLoading = false;
+      }
+    });
   }
+
+  columnDefs = [
+      { key: 'type', label: 'Type', cell: (n: Notification) => n.type ?? '' },
+      { key: 'message', label: 'Message', cell: (n: Notification) => n.message },
+      {
+        key: 'user',
+        label: 'User',
+        cell: (n: Notification) =>
+          this.usersMap.get(n.recipient) ?? '(loading...)'
+      },
+      { key: 'date', label: 'Date', cell: (n: Notification) => n.createdAt }
+    ];
+  
 
   getTypeLabel(type: string) {
     return TypeUtil.appointmentType(type)
