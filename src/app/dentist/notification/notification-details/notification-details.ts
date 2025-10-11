@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import { Notification } from '../../../_shared/model/notification';
 import { NotificationService } from '../../../_shared/service/notification-service';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TypeUtil } from '../../../utils/type-util';
 import { User } from '../../../_shared/model/user';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-notification-details',
-  imports: [RouterLink, MatProgressSpinner],
+  imports: [MatProgressSpinner],
   templateUrl: './notification-details.html',
   styleUrl: './notification-details.css'
 })

@@ -13,6 +13,8 @@ import { MatFormFieldModule } from '@angular/material/form-field'; // to remove
 import { MatSelectModule, MatSelectChange } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { FormComponent } from '../../../_shared/component/form/form.component';
+import { ClinicService } from '../../../_shared/service/clinic-service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-user-form',
@@ -32,7 +34,10 @@ export class UserForm implements OnInit, OnChanges {
 
   @Input() days: Day[] = []
 
-  constructor(private readonly fb: FormBuilder) {}
+  constructor(
+    private readonly fb: FormBuilder,
+    private readonly clinicService: ClinicService,
+  ) {}
 
   // Global Variable
   selectedClinic: Clinic | undefined;
@@ -44,10 +49,11 @@ export class UserForm implements OnInit, OnChanges {
     event.stopPropagation();
   }
 
-  initialUser = { firstName: '', lastName: '', emailAddress: '', mobileNumber: '', role: 'patient' };
+  // initialUser = { firstName: '', lastName: '', emailAddress: '', mobileNumber: '', role: 'patient' };
 
   getDefaultUser(): User {
     return {
+      username: '',
       firstName: '',
       middleName: '',
       lastName: '',
@@ -63,7 +69,7 @@ export class UserForm implements OnInit, OnChanges {
         operatingHours: [],
         dentists: [],
       },
-      role: 'patient',
+      role: 'user',
       appointments: [],
       operatingHours: [
         // { day: 'monday', startTime: '09:00', endTime: '18:00' },
@@ -79,12 +85,30 @@ export class UserForm implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.buildUserFields();
+    (async () => {
+      if (this.user.clinic) {
+        const id = typeof this.user.clinic === 'string'
+          ? this.user.clinic
+          : this.user.clinic._id;
+
+        if (id) {
+          const clinic = await firstValueFrom(this.clinicService.getOne(id));
+          this.user.clinic = clinic;
+          this.rxform.get('clinic')?.setValue(clinic._id);
+        }
+      }
+
+    })();
+
+    // fetch clinic here
+
     this.rxform = this.fb.nonNullable.group({
       firstName: [this.user.firstName, Validators.required],
       middleName: [this.user.middleName],
       lastName: [this.user.lastName, Validators.required],
       emailAddress: [this.user.emailAddress, [Validators.required, Validators.email]],
       mobileNumber: [this.user.mobileNumber, [Validators.required, Validators.pattern(/^\+639\d{9}$/)]],
+      username: [this.user.username ?? '', Validators.required],
       address: [this.user.address, Validators.required],
       password: [this.user.password ?? '', Validators.required],
       passwordConfirm: [''],
@@ -159,10 +183,11 @@ export class UserForm implements OnInit, OnChanges {
       { name: 'emailAddress', label: 'Email Address', type: 'email' },
       { name: 'mobileNumber', label: 'Mobile Number', type: 'text', customError: 'Use +639 format and must be a valid Number' },
       { name: 'address', label: 'Address', type: 'text' },
+      { name: 'username', label: 'Username', type: 'text' },
       { name: 'password', label: 'Password', type: 'password' },
       { name: 'passwordConfirm', label: 'Confirm Password', type: 'password', customError: 'Passwords must match.' },
       { name: 'role', label: 'Role', type: 'select', options: [
-          { value: 'patient', label: 'Patient' },
+          { value: 'user', label: 'Patient' },
           { value: 'dentist', label: 'Dentist' },
           { value: 'admin', label: 'Admin' }
         ],
@@ -245,11 +270,13 @@ export class UserForm implements OnInit, OnChanges {
       emailAddress: this.emailAddress.value,
       mobileNumber: this.mobileNumber.value,
       address: this.address.value,
+      username: this.username?.value,
       password: this.password?.value,
-      clinic: this.clinic.value,
+      clinic: this.clinic?.value,
       operatingHours: this.role.value === 'dentist' ? operatingHours : [],
       role: this.role.value,
     }
+
 
     if(!this.password?.value){
       delete (userData as any).password; // This removes the password field from the object on update
@@ -282,6 +309,10 @@ export class UserForm implements OnInit, OnChanges {
 
   get address() {
     return this.rxform.controls.address
+  }
+
+  get username() {
+    return this.rxform.controls.username
   }
 
   get password() {

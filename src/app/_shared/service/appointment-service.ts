@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
-import { MockService } from './mock-service';
 import { Appointment, AppointmentStatus } from '../model/appointment';
 import { Observable } from 'rxjs';
 import { AppointmentPayload } from '../../admin/appointment/appointment-payload';
+import { HttpClient } from '@angular/common/http';
+import { MockService } from './mock-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppointmentService {
-  constructor(private readonly mockService: MockService) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly mockService: MockService
+  ) {}
 
   getEmptyNonNullDoc(): Appointment {
     const user = {
@@ -49,73 +53,50 @@ export class AppointmentService {
       history: [],
     }
   }
+  
+  private readonly baseUrl = '/appointments'; // adjust if your backend has a different base path
 
   getAll(): Observable<Appointment[]> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const items = [
-          this.mockService.mockAppointment()
-        ]
-
-        s.next(items)
-        s.complete()
-      }, 1000);
-    })
+    return this.http.get<Appointment[]>(this.baseUrl, { withCredentials: true });
   }
 
   getOne(id: string): Observable<Appointment> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const appointment: Appointment = this.mockService.mockAppointment()
-
-        s.next(appointment)
-        s.complete()
-      }, 1000);
-    })
+    return this.http.get<Appointment>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 
   create(appointment: AppointmentPayload): Observable<Appointment> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const a: Appointment = {
-          _id: '5',
-          clinic: this.mockService.mockClinic(),
-          dentist: this.mockService.mockUser(),
-          patient: this.mockService.mockUser(),
-          history: [],
-          services: [this.mockService.mockDentalService()],
-          date: appointment.date,
-          startTime: '09:00',
-          endTime: '10:00',
-          status: AppointmentStatus.PENDING,
-          notes: {
-            clinicNotes: '',
-            patientNotes: ''
-          }
-        }
-        s.next(a)
-        s.complete()
-      }, 1000);
-    })
+    return this.http.post<Appointment>(this.baseUrl, appointment, { withCredentials: true });
+    // return new Observable((s) => {
+    //   setTimeout(() => {
+    //     const a: Appointment = {
+    //       _id: '5',
+    //       clinic: this.mockService.mockClinic(), // has to be the selected clinic
+    //       dentist: this.mockService.mockUser(), // has to be the selected user (that is dentist)
+    //       patient: this.mockService.mockUser(),// has to be the selected user (that is patient)
+    //       history: [],
+    //       services: [this.mockService.mockDentalService()],
+    //       date: appointment.date,
+    //       startTime: '09:00',
+    //       endTime: '10:00',
+    //       status: AppointmentStatus.PENDING,
+    //       notes: {
+    //         clinicNotes: '',
+    //         patientNotes: ''
+    //       }
+    //     }
+    //     s.next(a)
+    //     s.complete()
+    //   }, 1000);
+    // })
   }
 
   update(id: string, appointment: AppointmentPayload): Observable<Appointment> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const appointment = this.mockService.mockAppointment()
-
-        s.next(appointment)
-        s.complete()
-      }, 1000);
-    })
+      console.log('appointment', appointment)
+      console.log('id', id)
+      return this.http.put<Appointment>(`${this.baseUrl}/${id}`, appointment, { withCredentials: true });
   }
 
-  delete(): Observable<void> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        s.next()
-        s.complete()
-      }, 1000);
-    })
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 }

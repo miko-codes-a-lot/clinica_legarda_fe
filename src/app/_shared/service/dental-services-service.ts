@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
-import { MockService } from './mock-service';
 import { DentalService } from '../model/dental-service';
 import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DentalServicesService {
-    constructor(private readonly mockService: MockService) {}
+    constructor(private readonly http: HttpClient) {}
+    private readonly baseUrl = '/dental-catalog'; // adjust if your backend has a different base path
 
     getEmptyOrNullDoc(): DentalService {
       return {
@@ -17,55 +18,22 @@ export class DentalServicesService {
     }
   
     getAll(): Observable<DentalService[]> {
-      return new Observable((s) => {
-        setTimeout(() => {
-          const items = [
-            this.mockService.mockDentalService(),
-          ]
-  
-          s.next(items)
-          s.complete()
-        }, 1000);
-      })
+      return this.http.get<DentalService[]>(this.baseUrl, { withCredentials: true });
     }
   
     getOne(id: string): Observable<DentalService> {
-      return new Observable((s) => {
-        setTimeout(() => {
-          const dentalService: DentalService = this.mockService.mockDentalService()
-  
-          s.next(dentalService)
-          s.complete()
-        }, 1000);
-      })
+      return this.http.get<DentalService>(`${this.baseUrl}/${id}`, { withCredentials: true });
     }
   
     create(dentalService: DentalService): Observable<DentalService> {
-      return new Observable((s) => {
-        setTimeout(() => {
-          dentalService._id = '5'
-          s.next(dentalService)
-          s.complete()
-        }, 1000);
-      })
+      return this.http.post<DentalService>(this.baseUrl, dentalService, { withCredentials: true });
     }
   
     update(id: string, dentalService: DentalService): Observable<DentalService> {
-      return new Observable((s) => {
-        setTimeout(() => {
-          dentalService._id = 'id'
-          s.next(dentalService)
-          s.complete()
-        }, 1000);
-      })
+      return this.http.put<DentalService>(`${this.baseUrl}/${id}`, dentalService, { withCredentials: true });
     }
   
-    delete(): Observable<void> {
-      return new Observable((s) => {
-        setTimeout(() => {
-          s.next()
-          s.complete()
-        }, 1000);
-      })
+    delete(id: string): Observable<void> {
+      return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
     }
 }

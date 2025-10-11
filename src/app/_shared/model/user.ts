@@ -10,6 +10,7 @@ export interface User {
   emailAddress: string
   mobileNumber: string
   address: string
+  username?: string
   password?: string
   clinic?: Clinic
   operatingHours: OperatingHour[]

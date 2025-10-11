@@ -1,64 +1,34 @@
 import { Injectable } from '@angular/core';
 import { Clinic } from '../model/clinic';
 import { Observable } from 'rxjs';
-import { MockService } from './mock-service';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClinicService {
-  constructor(private readonly mockService: MockService) {}
+  constructor(
+    private readonly http: HttpClient
+  ) {}
+  private readonly baseUrl = '/clinics'; // adjust if your backend has a different base path
 
   getAll(): Observable<Clinic[]> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const items = [
-          this.mockService.mockClinic(),
-        ]
-
-        s.next(items)
-        s.complete()
-      }, 1000);
-    })
+    return this.http.get<Clinic[]>(this.baseUrl, { withCredentials: true });
   }
 
   getOne(id: string): Observable<Clinic> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        const clinic: Clinic = this.mockService.mockClinic()
-
-        s.next(clinic)
-        s.complete()
-      }, 1000);
-    })
+    return this.http.get<Clinic>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 
   create(clinic: Clinic): Observable<Clinic> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        clinic._id = '5'
-        s.next(clinic)
-        s.complete()
-      }, 1000);
-    })
+    return this.http.post<Clinic>(this.baseUrl, clinic, { withCredentials: true });
   }
 
   update(id: string, clinic: Clinic): Observable<Clinic> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        clinic._id = 'id'
-        s.next(clinic)
-        s.complete()
-      }, 1000);
-    })
+      return this.http.put<Clinic>(`${this.baseUrl}/${id}`, clinic, { withCredentials: true });
   }
 
-  delete(): Observable<void> {
-    return new Observable((s) => {
-      setTimeout(() => {
-        s.next()
-        s.complete()
-      }, 1000);
-    })
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 }
