@@ -1,40 +1,54 @@
 <div class="contact-page">
   <h1>Contact Us</h1>
-  <p>
-    Have a question or want to book an appointment? We’d love to hear from you!
-  </p>
+  <p>Have a question or want to book an appointment? We’d love to hear from you!</p>
 
   <div class="contact-container">
-    <!-- Contact Form -->
+    <!-- Contact Form (commented for now, enable later if needed) -->
+    <!--
     <div class="contact-form">
       <h2>Send Us a Message</h2>
-      <form (ngSubmit)="onSubmit()">
-        <label for="name">Full Name</label>
-        <input id="name" name="name" [(ngModel)]="contact.name" required />
+      <form (ngSubmit)="onSubmit()" #contactForm="ngForm">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input
+            id="name"
+            name="name"
+            [(ngModel)]="contact.name"
+            required
+            placeholder="Enter your full name"
+          />
+        </div>
 
-        <label for="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          [(ngModel)]="contact.email"
-          required
-        />
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            [(ngModel)]="contact.email"
+            required
+            placeholder="Enter your email address"
+          />
+        </div>
 
-        <label for="message">Message</label>
-        <textarea
-          id="message"
-          name="message"
-          rows="4"
-          [(ngModel)]="contact.message"
-          required
-        ></textarea>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea
+            id="message"
+            name="message"
+            rows="5"
+            [(ngModel)]="contact.message"
+            required
+            placeholder="Type your message here..."
+          ></textarea>
+        </div>
 
-        <button type="submit" [disabled]="isLoading">
+        <button type="submit" [disabled]="isLoading || !contactForm.valid">
           {{ isLoading ? 'Sending...' : 'Send Message' }}
         </button>
       </form>
     </div>
+    -->
 
     <!-- Contact Info -->
     <div class="contact-info">
@@ -54,7 +68,6 @@
 
       <h3>Find Us</h3>
       <div class="map-placeholder">
-        <!-- Replace with actual Google Maps embed later -->
         <p>📍 Google Map Placeholder</p>
       </div>
     </div>

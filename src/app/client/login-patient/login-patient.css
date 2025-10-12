@@ -103,6 +103,31 @@ button:hover:not(:disabled) {
   text-decoration: underline;
 }
 
+/* Registration prompt */
+.register-prompt {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+  text-align: center;
+}
+
+.register-btn {
+  background-color: #28a745; /* green for register */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: background 0.2s ease-in-out;
+}
+
+.register-btn:hover {
+  background-color: #1e7e34;
+}
+
+
 /* Responsive */
 @media (max-width: 480px) {
   .login-card {

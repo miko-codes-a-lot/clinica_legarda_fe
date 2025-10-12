@@ -116,3 +116,19 @@
   text-align: center;
   padding: 1rem 0;
 }
+
+.appointment-details ul {
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+}
+
+.appointment-details ul li {
+  list-style: disc;
+  margin-left: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.status.upcoming {
+  color: #28a745;
+  font-weight: 600;
+}

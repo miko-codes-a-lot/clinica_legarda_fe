@@ -31,6 +31,11 @@ export const CLIENT_ROUTES: Routes = [
           .then(m => m.AppointmentCreate),
       },
       {
+        path: 'registration',
+        loadComponent: () => import('./registration/registration-create/registration-create')
+          .then(m => m.RegistrationCreate),
+      },
+      {
         path: 'about-us',
         component: About,
       },

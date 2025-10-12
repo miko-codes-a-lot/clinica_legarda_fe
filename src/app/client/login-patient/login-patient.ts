@@ -2,12 +2,12 @@ import { Component, Input } from '@angular/core';
 import { RxLogin } from '../../_shared/model/reactive/rx-login';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../_shared/service/auth-service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { UiStateService } from '../../_shared/service/ui-state-service';
 
 @Component({
   selector: 'app-login-patient',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: './login-patient.html',
   styleUrl: './login-patient.css'
 })
@@ -50,6 +50,11 @@ export class LoginPatient {
       },
       error: (err) => alert(`Something went wrong: ${err}`)
     }).add(() => this.uiStateService.setLoading(false))
+  }
+
+  goToRegister() {
+    // Navigate to registration page, e.g., using Angular Router
+    this.router.navigate(['/app/registration']);
   }
 
   get username () {

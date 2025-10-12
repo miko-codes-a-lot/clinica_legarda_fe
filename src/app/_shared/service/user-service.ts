@@ -30,4 +30,9 @@ export class UserService {
   delete(id: string): Observable<void> {
      return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
+
+  createPublic(user: UserPayload): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/register`, user);
+  }
+
 }

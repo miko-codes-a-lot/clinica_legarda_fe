@@ -48,6 +48,12 @@ export class Client {
       icon: 'help',
       link: '/app/faq'
     },
+    // do we need to include this in the navigation?
+    // {
+    //   label: 'Registration',
+    //   icon: 'event',
+    //   link: '/app/registration'
+    // },
     // {
     //   label: 'Logout',
     //   icon: 'logout',
@@ -63,7 +69,12 @@ export class Client {
 
   ngOnInit() {
     this.authService.currentUser$.subscribe({
-      next: (u) => this.user = u
+      next: (u) => {
+        this.user = u
+        if (u) {
+          this.navigations.push()
+        }
+      }
     })
 
     this.uiStateService.isLoading$.subscribe({

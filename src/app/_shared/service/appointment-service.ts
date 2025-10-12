@@ -56,8 +56,17 @@ export class AppointmentService {
   
   private readonly baseUrl = '/appointments'; // adjust if your backend has a different base path
 
-  getAll(): Observable<Appointment[]> {
-    return this.http.get<Appointment[]>(this.baseUrl, { withCredentials: true });
+  // getAll(): Observable<Appointment[]> {
+  //   return this.http.get<Appointment[]>(this.baseUrl, { withCredentials: true });
+  // }
+
+  getAll(patientId?: string): Observable<Appointment[]> {
+    const options = {
+      withCredentials: true,
+      params: patientId ? { patient: patientId } : undefined
+    };
+
+    return this.http.get<Appointment[]>(this.baseUrl, options);
   }
 
   getOne(id: string): Observable<Appointment> {
@@ -91,8 +100,6 @@ export class AppointmentService {
   }
 
   update(id: string, appointment: AppointmentPayload): Observable<Appointment> {
-      console.log('appointment', appointment)
-      console.log('id', id)
       return this.http.put<Appointment>(`${this.baseUrl}/${id}`, appointment, { withCredentials: true });
   }
 

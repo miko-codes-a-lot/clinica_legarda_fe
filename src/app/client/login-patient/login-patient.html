@@ -27,6 +27,12 @@
       <button type="submit" [disabled]="!rxform.valid">Login</button>
     </form>
 
+    <!-- Registration -->
+    <p class="register-prompt">
+      Don't have an account?
+      <button class="register-btn" (click)="goToRegister()">Register</button>
+    </p>
+
     <p class="login-footer">
       Forgot your password? <a href="#">Reset here</a>
     </p>
