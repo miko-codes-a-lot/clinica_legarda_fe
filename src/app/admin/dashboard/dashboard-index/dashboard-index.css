@@ -322,6 +322,11 @@
   font-weight: 500;
 }
 
+.limit-height-card-content {
+  max-height: 400px; /* limit height */
+  overflow-y: auto;  /* add vertical scroll */
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .admin-dashboard {

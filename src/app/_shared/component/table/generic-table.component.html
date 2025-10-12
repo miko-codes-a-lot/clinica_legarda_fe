@@ -1,5 +1,4 @@
 <div class="page-container">
-  <h1 class="page-title">{{ title }}</h1>
 
   @if (createButtonLabel && create) {
     <div class="actions">
@@ -36,18 +35,18 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef> Actions </th>
         <td mat-cell *matCellDef="let element">
-          <button mat-raised-button color="primary" (click)="onDetailsClick(element)">
-            Details
+          <button mat-icon-button  color="primary" (click)="onDetailsClick(element)">
+            <mat-icon>visibility</mat-icon>
           </button>
           @if (update.observers.length > 0) {
-            <button mat-raised-button color="accent" (click)="onUpdateClick(element)">
-              Update
+            <button mat-icon-button color="accent" (click)="onUpdateClick(element)">
+              <mat-icon>edit</mat-icon>
             </button>
           }
 
           @if (markAsRead.observers.length > 0) {
-            <button mat-raised-button color="accent" (click)="onMarkAsReadClick(element)">
-              Mark as Read
+            <button mat-icon-button color="accent" (click)="onMarkAsReadClick(element)">
+              <mat-icon>done_all</mat-icon>
             </button>
           }
         </td>

@@ -108,7 +108,12 @@ export class DashboardIndex {
   ) {}
 
   ngOnInit(): void {
-    this.notifications$ = this.notificationService.notifications$;
+    this.notifications$ = this.notificationService.notifications$.pipe(
+      map(notifications => notifications
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // latest first
+        .slice(0, 10) // take only 10
+      )
+    );
     this.unreadNotificationsCount$ = this.notifications$.pipe(
       map(notifications => notifications.filter(n => !n.read).length)
     );

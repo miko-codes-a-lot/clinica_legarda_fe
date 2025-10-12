@@ -1,20 +1,28 @@
 import { Component } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { NavComponent } from '../_shared/component/nav/nav.component';
 import { AuthService } from '../_shared/service/auth-service';
-
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
   imports: [
+    CommonModule,
     RouterOutlet,
     MatSidenavModule,
     MatListModule,
     MatToolbarModule,
+    MatMenuModule,
+    MatIconModule,
+    MatButtonModule,
     NavComponent,
   ],
   templateUrl: './admin.html',
@@ -24,6 +32,9 @@ export class Admin {
   isLoading = false
   isLoggedIn = false
   user = {}
+  activeTitle = 'Dashboard'; // default title
+  activeIcon = 'dashboard';  // default icon
+  showTopNav = false;
 
   menuItems = [
     { label: 'Dashboard', icon: 'dashboard', link: '/admin/dashboard' },
@@ -32,11 +43,6 @@ export class Admin {
     { label: 'Service', icon: 'medical_services', link: '/admin/service' },
     { label: 'Appointments', icon: 'event', link: '/admin/appointment' },
     { label: 'Notifications', icon: 'notifications', link: '/admin/notification' },
-    {
-      label: 'Logout',
-      icon: 'logout',
-      onClick: () => this.onClickLogout()
-    }
   ];
 
   constructor(
@@ -47,15 +53,28 @@ export class Admin {
   ngOnInit() {
     this.authService.currentUser$.subscribe({
       next: (user) => {
-        if (user) {
-          this.user = user
-          console.log('this.user', this.user)
-          this.isLoggedIn = true
-        } else {
-          this.isLoggedIn = false
-        }
+          this.user = user || {};
+          this.isLoggedIn = !!user;
+          this.updateTopNavVisibility();
       }
     })
+
+        // Update activeTitle based on current route
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        const currentRoute = this.menuItems.find(item => event.urlAfterRedirects.startsWith(item.link));
+        this.activeTitle = currentRoute ? currentRoute.label : 'Dashboard';
+        this.activeIcon = currentRoute ? currentRoute.icon : 'dashboard';
+        this.updateTopNavVisibility(event.urlAfterRedirects);
+    });
+  }
+
+  // Utility to decide whether top nav should show
+  updateTopNavVisibility(url?: string) {
+    const currentUrl = url || this.router.url;
+    // Hide on login page or if not logged in
+    this.showTopNav = this.isLoggedIn && !currentUrl.includes('/admin/login');
   }
 
   onClickLogout() {

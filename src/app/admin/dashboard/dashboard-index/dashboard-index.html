@@ -136,7 +136,7 @@
         <mat-card-header>
           <mat-card-title>Today's Appointment Queue</mat-card-title>
         </mat-card-header>
-        <mat-card-content>
+        <mat-card-content class="limit-height-card-content">
           <mat-table [dataSource]="appointmentQueue" class="appointment-table">
             <ng-container matColumnDef="time">
               <mat-header-cell *matHeaderCellDef>Time</mat-header-cell>
@@ -174,7 +174,7 @@
           <mat-card-header>
             <mat-card-title>Recent Notifications</mat-card-title>
           </mat-card-header>
-          <mat-card-content>
+          <mat-card-content class="limit-height-card-content">
             <!-- UPDATED: dataSource now binds to the 'notifications' variable from the ng-container -->
             <mat-table [dataSource]="notifications" class="notifications-table">
               <ng-container matColumnDef="type">

@@ -1,17 +1,50 @@
-
 <mat-drawer-container class="example-container">
-  @if (isLoggedIn) {
-    <mat-drawer mode="side" opened>
-      <mat-toolbar color="primary">
-        <span class="system-title">Clinica Legarda</span>
-      </mat-toolbar>
-      <mat-list role="list">
-        <app-nav [disabled]="isLoading" [menuItems]="menuItems"></app-nav>
-      </mat-list>
-    </mat-drawer>
-  }
 
+  <!-- Sidebar -->
+  <mat-drawer mode="side" opened *ngIf="isLoggedIn">
+    <mat-toolbar color="primary">
+      <span class="system-title">Clinica Legarda</span>
+    </mat-toolbar>
+    <mat-list role="list">
+      <app-nav [disabled]="isLoading" [menuItems]="menuItems"></app-nav>
+    </mat-list>
+  </mat-drawer>
+
+  <!-- Main content -->
   <mat-drawer-content>
-    <router-outlet></router-outlet>
+
+    <!-- Top Navigation Bar -->
+    <mat-toolbar color="primary" class="top-nav" *ngIf="showTopNav">
+      <span class="dashboard-title">
+        <mat-icon class="title-icon">{{ activeIcon }}</mat-icon>
+        <span class="title-text">{{ activeTitle }}</span>
+      </span>
+      <span class="spacer"></span>
+
+      <!-- User Dropdown -->
+      <button mat-button [matMenuTriggerFor]="userMenu">
+        <mat-icon aria-hidden="false">account_circle</mat-icon>
+        <!-- {{ user.fullName || 'User' }} -->
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item routerLink="/admin/user-settings">
+          <mat-icon>person</mat-icon>
+          My Account
+        </button>
+        <button mat-menu-item (click)="onClickLogout()">
+          <mat-icon>logout</mat-icon>
+          Logout
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <!-- Page Content -->
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
+
   </mat-drawer-content>
+
 </mat-drawer-container>

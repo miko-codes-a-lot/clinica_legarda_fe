@@ -1,6 +1,62 @@
+/* Full height container for drawer + content */
 .example-container {
-  width: auto;
   height: 100vh;
-  background: #eee;
+  width: 100%;
+  /* background: #eee; */
 }
 
+
+/* Top navigation */
+.top-nav {
+  position: sticky;     
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  height: 64px;          
+  font-family: 'Roboto', sans-serif;
+  background-color: #1976d2;
+}
+
+/* Dashboard / module title */
+.dashboard-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+.dashboard-title .title-icon {
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.dashboard-title .title-text {
+  text-transform: capitalize;
+}
+
+/* Optional hover effect */
+.dashboard-title:hover {
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+
+/* Push user dropdown to the right */
+.spacer {
+  flex: 1 1 auto;
+}
+
+/* Page content below top nav */
+.main-content {
+  /* padding: 1rem; */
+  min-height: calc(100vh - 64px); /* ensures content fills remaining space */
+  background-color: #f5f5f5;     /* light gray background */
+}
+
+/* Sidebar fixes if needed */
+mat-drawer {
+  width: 250px; /* fixed sidebar width */
+}
