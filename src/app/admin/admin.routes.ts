@@ -58,6 +58,12 @@ export const ADMIN_ROUTES: Routes = [
         data: { role: 'admin' },
         loadChildren: () => import('./notification/notification.route').then(m => m.NOTIFICATION_ROUTES)
       },
+      {
+        path: 'user-settings',
+        canActivate: [AuthGuard],
+        data: { role: 'admin' },
+        loadChildren: () => import('./user-settings/user-settings.route').then(m => m.USER_SETTINGS_ROUTES)
+      },
     ]
   }
 ];

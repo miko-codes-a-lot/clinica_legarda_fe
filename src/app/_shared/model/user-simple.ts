@@ -13,4 +13,8 @@ export interface UserSimple {
     clinic?: Clinic
     operatingHours: OperatingHour[]
     role: string
+    username: string
+    profilePicture?: string
+    createdAt: string 
+    updatedAt: string 
 }

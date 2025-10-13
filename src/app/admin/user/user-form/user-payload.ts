@@ -12,4 +12,5 @@ export interface UserPayload {
   clinic?: string
   operatingHours: OperatingHour[]
   role: string
+  username?: string
 }

@@ -35,6 +35,7 @@ export class Admin {
   activeTitle = 'Dashboard'; // default title
   activeIcon = 'dashboard';  // default icon
   showTopNav = false;
+  showSideNav = true;
 
   menuItems = [
     { label: 'Dashboard', icon: 'dashboard', link: '/admin/dashboard' },
@@ -66,6 +67,10 @@ export class Admin {
         const currentRoute = this.menuItems.find(item => event.urlAfterRedirects.startsWith(item.link));
         this.activeTitle = currentRoute ? currentRoute.label : 'Dashboard';
         this.activeIcon = currentRoute ? currentRoute.icon : 'dashboard';
+        // get back in this later
+        // hide side nave when user settings
+        const url = event.urlAfterRedirects;
+        this.showSideNav = !url.startsWith('/admin/user-settings');
         this.updateTopNavVisibility(event.urlAfterRedirects);
     });
   }
@@ -75,6 +80,10 @@ export class Admin {
     const currentUrl = url || this.router.url;
     // Hide on login page or if not logged in
     this.showTopNav = this.isLoggedIn && !currentUrl.includes('/admin/login');
+  }
+
+  goToUserSettings() {
+    this.router.navigate(['/admin/user-settings/index'])
   }
 
   onClickLogout() {

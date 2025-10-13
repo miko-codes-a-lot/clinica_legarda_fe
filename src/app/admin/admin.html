@@ -1,7 +1,7 @@
 <mat-drawer-container class="example-container">
 
   <!-- Sidebar -->
-  <mat-drawer mode="side" opened *ngIf="isLoggedIn">
+  <mat-drawer mode="side" opened *ngIf="isLoggedIn && showSideNav">
     <mat-toolbar color="primary">
       <span class="system-title">Clinica Legarda</span>
     </mat-toolbar>
@@ -14,7 +14,7 @@
   <mat-drawer-content>
 
     <!-- Top Navigation Bar -->
-    <mat-toolbar color="primary" class="top-nav" *ngIf="showTopNav">
+    <mat-toolbar color="primary" class="top-nav" *ngIf="showTopNav && showSideNav">
       <span class="dashboard-title">
         <mat-icon class="title-icon">{{ activeIcon }}</mat-icon>
         <span class="title-text">{{ activeTitle }}</span>
@@ -22,22 +22,41 @@
       <span class="spacer"></span>
 
       <!-- User Dropdown -->
-      <button mat-button [matMenuTriggerFor]="userMenu">
-        <mat-icon aria-hidden="false">account_circle</mat-icon>
-        <!-- {{ user.fullName || 'User' }} -->
-        <mat-icon>arrow_drop_down</mat-icon>
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+        <div class="user-avatar">
+          <mat-icon>account_circle</mat-icon>
+        </div>
+        <mat-icon class="dropdown-arrow">arrow_drop_down</mat-icon>
       </button>
 
-      <mat-menu #userMenu="matMenu">
-        <button mat-menu-item routerLink="/admin/user-settings">
-          <mat-icon>person</mat-icon>
-          My Account
+      <mat-menu #userMenu="matMenu" class="user-menu">
+        <!-- Header Section -->
+        <div class="menu-header">
+          <div class="menu-avatar">
+             <!-- to display -->
+            <!-- <mat-icon>account_circle</mat-icon> -->
+          </div>
+          <div class="menu-info">
+            <!-- to display -->
+            <span class="menu-name">Juan Dela Cruz</span>
+            <!-- <span class="menu-role">Administrator</span> -->
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Menu Items -->
+        <button mat-menu-item (click)="goToUserSettings()">
+          <mat-icon>settings</mat-icon>
+          <span>My Account</span>
         </button>
+
         <button mat-menu-item (click)="onClickLogout()">
-          <mat-icon>logout</mat-icon>
-          Logout
+          <mat-icon color="warn">logout</mat-icon>
+          <span>Logout</span>
         </button>
       </mat-menu>
+
     </mat-toolbar>
 
     <!-- Page Content -->

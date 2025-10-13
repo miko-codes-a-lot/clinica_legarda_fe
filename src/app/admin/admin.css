@@ -1,23 +1,22 @@
-/* Full height container for drawer + content */
+/* === LAYOUT === */
 .example-container {
   height: 100vh;
   width: 100%;
-  /* background: #eee; */
 }
 
-
-/* Top navigation */
+/* === TOP NAVIGATION === */
 .top-nav {
-  position: sticky;     
+  position: sticky;
   top: 0;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 1rem;
-  height: 64px;          
+  height: 64px;
   font-family: 'Roboto', sans-serif;
   background-color: #1976d2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* Dashboard / module title */
@@ -27,21 +26,20 @@
   font-size: 1.25rem;
   font-weight: 500;
   color: #fff;
+  transition: opacity 0.3s ease;
 }
 
 .dashboard-title .title-icon {
   margin-right: 0.5rem;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
+}
+
+.dashboard-title:hover {
+  opacity: 0.85;
 }
 
 .dashboard-title .title-text {
   text-transform: capitalize;
-}
-
-/* Optional hover effect */
-.dashboard-title:hover {
-  opacity: 0.85;
-  transition: opacity 0.2s;
 }
 
 /* Push user dropdown to the right */
@@ -49,14 +47,109 @@
   flex: 1 1 auto;
 }
 
-/* Page content below top nav */
+/* === MAIN CONTENT === */
 .main-content {
-  /* padding: 1rem; */
-  min-height: calc(100vh - 64px); /* ensures content fills remaining space */
-  background-color: #f5f5f5;     /* light gray background */
+  min-height: calc(100vh - 64px);
+  background-color: #f5f5f5;
 }
 
-/* Sidebar fixes if needed */
+/* === SIDEBAR === */
 mat-drawer {
-  width: 250px; /* fixed sidebar width */
+  width: 250px;
+}
+
+/* === USER DROPDOWN BUTTON === */
+.user-button {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  text-transform: none;
+  border-radius: 50px;
+  padding: 0.25rem 0.75rem;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.user-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  margin-right: 4px;
+}
+
+.user-avatar mat-icon {
+  color: #fff;
+  font-size: 26px;
+}
+
+.dropdown-arrow {
+  font-size: 22px;
+  color: #fff;
+  margin-left: 2px;
+}
+
+/* === USER MENU === */
+.user-menu {
+  min-width: 240px;
+  border-radius: 10px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  background-color: #fff !important;
+  transform-origin: top right !important;
+  animation: fadeInMenu 0.2s ease-in-out;
+}
+
+/* Fade-in animation for menu */
+@keyframes fadeInMenu {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.user-menu .menu-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #1976d2, #2196f3);
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.user-menu .menu-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  transition: transform 0.3s ease;
+}
+
+.user-menu .menu-avatar:hover {
+  transform: scale(1.05);
+}
+
+.user-menu .menu-avatar mat-icon {
+  font-size: 26px;
+  color: #fff;
+}
+
+.user-menu .menu-info {
+  display: flex;
 }
