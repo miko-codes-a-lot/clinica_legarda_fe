@@ -64,6 +64,11 @@ export const CLIENT_ROUTES: Routes = [
         loadComponent: () => import('./appointment-details/appointment-details').then(m => m.AppointmentDetails),
       },
       {
+        path: 'user-settings',
+        // canActivate: [AuthGuard],
+        loadChildren: () => import('./user-settings/user-settings.route').then(m => m.USER_SETTINGS_ROUTES)
+      },
+      {
         path: 'login',
         component: LoginPatient,
       }
