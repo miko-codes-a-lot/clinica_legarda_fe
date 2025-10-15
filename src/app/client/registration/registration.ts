@@ -155,7 +155,7 @@ export class RegistrationPage implements OnInit, OnChanges {
       username: this.username?.value,
       password: this.password?.value,
       operatingHours: [],
-      role: 'user',
+      role: '',
     }
 
 
