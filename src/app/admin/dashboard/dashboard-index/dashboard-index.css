@@ -327,6 +327,29 @@
   overflow-y: auto;  /* add vertical scroll */
 }
 
+.services-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px; /* spacing between chips */
+}
+
+.service-chip {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  font-size: 0.75rem;
+  height: 28px;
+  line-height: 28px;
+  padding: 0 8px;
+  border-radius: 16px;
+}
+
+.clinic-selector {
+  margin-top: 12px;
+  width: 250px;
+}
+
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .admin-dashboard {
@@ -349,6 +372,10 @@
     flex-direction: column;
     align-items: flex-start !important;
     gap: 16px;
+  }
+
+  .clinic-selector {
+    width: 100%;
   }
 }
 

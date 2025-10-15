@@ -80,6 +80,7 @@ export class GenericTableComponent<T> implements AfterViewInit {
   }
 
   getCellValue(col: any, element: any) {
+    // specialize for notifications
     return col.cell ? col.cell(element) : (element as any)[col.key];
   }
 

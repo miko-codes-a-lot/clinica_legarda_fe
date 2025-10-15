@@ -30,5 +30,7 @@ export interface Appointment {
   endTime: string
   status: AppointmentStatus
   notes: AppointmentNote
-  history: AppointmentHistory[]
+  history: AppointmentHistory[],
+  createdAt?: string;
+  updatedAt?: string;
 }

@@ -34,7 +34,9 @@
                   <div class="notification-content">
                     <div class="notification-type">
                       <!-- UPDATED: Using helper functions for dynamic class and text -->
-                      <mat-chip [class]="'type-chip ' + getNotificationTypeClass(notification.type)">
+                      <mat-chip [class]="'type-chip ' + getNotificationTypeClass(notification.type)"
+                        (click)="redirectToDetails(notification.link)"
+                      >
                         {{ formatNotificationType(notification.type) }}
                       </mat-chip>
                     </div>
@@ -65,6 +67,16 @@
 
   <!-- Key Metrics Section (No changes here) -->
   <div class="metrics-section">
+    <div class="clinic-selector">
+      <mat-form-field appearance="outline">
+        <mat-label>Select Clinic</mat-label>
+        <mat-select [(value)]="selectedClinic" (selectionChange)="onClinicChange($event.value)">
+          <mat-option *ngFor="let clinic of clinics" [value]="clinic._id">
+            {{ clinic.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
     <div class="metrics-grid">
       <mat-card class="metric-card">
         <mat-card-content>
@@ -93,7 +105,7 @@
           <div class="metric-content">
             <mat-icon class="metric-icon queue">schedule</mat-icon>
             <div class="metric-info">
-              <h3>{{ appointmentQueue.length }}</h3>
+              <h3>{{ getTodaysQueue().length }}</h3>
               <p>Today's Queue</p>
             </div>
           </div>
@@ -142,20 +154,24 @@
               <mat-header-cell *matHeaderCellDef>Time</mat-header-cell>
               <mat-cell *matCellDef="let appointment">
                 <mat-icon class="time-icon">access_time</mat-icon>
-                {{ appointment.time }}
+                {{ appointment.startTime }}
               </mat-cell>
             </ng-container>
             <ng-container matColumnDef="patientName">
               <mat-header-cell *matHeaderCellDef>Patient Name</mat-header-cell>
               <mat-cell *matCellDef="let appointment">
                 <mat-icon class="patient-icon">person</mat-icon>
-                {{ appointment.patientName }}
+                {{ appointment.patient.firstName }} {{ appointment.patient.lastName }}
               </mat-cell>
             </ng-container>
             <ng-container matColumnDef="service">
               <mat-header-cell *matHeaderCellDef>Service</mat-header-cell>
               <mat-cell *matCellDef="let appointment">
-                <mat-chip class="service-chip">{{ appointment.service }}</mat-chip>
+                <div class="services-wrapper">
+                  <mat-chip *ngFor="let service of appointment.services" class="service-chip">
+                    {{ service.name }}
+                  </mat-chip>
+                </div>
               </mat-cell>
             </ng-container>
             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
@@ -176,11 +192,15 @@
           </mat-card-header>
           <mat-card-content class="limit-height-card-content">
             <!-- UPDATED: dataSource now binds to the 'notifications' variable from the ng-container -->
+             <!-- get back here -->
             <mat-table [dataSource]="notifications" class="notifications-table">
               <ng-container matColumnDef="type">
                 <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
                 <mat-cell *matCellDef="let notification">
-                  <mat-chip [class]="'type-chip ' + getNotificationTypeClass(notification.type)">
+                  <mat-chip
+                    [class]="'type-chip ' + getNotificationTypeClass(notification.type)"
+                    (click)="redirectToDetails(notification.link)"
+                  >
                     {{ formatNotificationType(notification.type) }}
                   </mat-chip>
                 </mat-cell>

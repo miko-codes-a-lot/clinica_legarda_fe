@@ -6,13 +6,20 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { map, Observable } from 'rxjs';
 import { NotificationService } from '../../../_shared/service/notification-service';
+import { ClinicService } from '../../../_shared/service/clinic-service';
 import { Notification, NotificationType } from '../../../_shared/model/notification';
+import { Appointment } from '../../../_shared/model/appointment';
+import { AppointmentService } from '../../../_shared/service/appointment-service';
+import { Router } from '@angular/router';
 
-// Register Chart.js components
 Chart.register(...registerables);
 
 @Component({
@@ -24,11 +31,15 @@ Chart.register(...registerables);
     MatBadgeModule,
     MatTableModule,
     MatChipsModule,
-    MatButtonModule
+    MatButtonModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatOptionModule,
+    ReactiveFormsModule
   ],
   providers: [DatePipe],
   templateUrl: './dashboard-index.html',
-  styleUrl: './dashboard-index.css'
+  styleUrls: ['./dashboard-index.css']
 })
 export class DashboardIndex {
   @ViewChild('servicesChart', { static: false }) servicesChartRef!: ElementRef<HTMLCanvasElement>;
@@ -37,115 +48,153 @@ export class DashboardIndex {
   notifications$!: Observable<Notification[]>;
   unreadNotificationsCount$!: Observable<number>;
 
-  // Dashboard data
+  /** 🔹 Separate all appointments vs filtered ones */
+  allAppointments: Appointment[] = [];
+  appointmentData: Appointment[] = [];
+
+  clinics: any[] = [];
+  selectedClinic: string = '';
+
   dashboardData = {
     adminDashboard: {
       weeklyReport: {
-        weekOf: '2025-08-04',
-        totalAppointments: 55,
-        patientRecordsChanged: 12,
-        preferredServices: {
-          'Dental Cleaning': 25,
-          'Pasta (Filling)': 15,
-          'Tooth Extraction': 10,
-          'Braces Consultation': 5
-        }
+        weekOf: '',
+        totalAppointments: 0,
+        patientRecordsChanged: 0,
+        preferredServices: {} as Record<string, number>
       },
-      dailyAppointmentQueue: [
-        {time: '09:00', patientName: 'Maria Dela Cruz', service: 'Pasta (Filling)'},
-        {time: '10:00', patientName: 'Ivan Christian Abuyog', service: 'Dental Cleaning'},
-        {time: '11:00', patientName: 'Juan Santos', service: 'Tooth Extraction'}
-      ],
-      notifications: [
-        {
-          notificationId: 'N001',
-          type: 'New Booking',
-          message: 'Patient John Benedict Baguyo booked a new appointment.',
-          timestamp: '2025-08-02T11:00:00Z',
-          isRead: false
-        },
-        {
-          notificationId: 'N002',
-          type: 'Cancellation',
-          message: 'Patient Ana Gomez cancelled her appointment for Aug 12.',
-          timestamp: '2025-08-01T18:00:00Z',
-          isRead: true
-        }
-      ]
+      dailyAppointmentQueue: [],
+      notifications: []
     }
   };
 
-  // Chart instances
   servicesChart!: Chart;
   appointmentTrendChart!: Chart;
 
-  // UI State
   showNotifications = false;
-
   displayedColumns: string[] = ['time', 'patientName', 'service'];
   notificationColumns: string[] = ['type', 'message', 'timestamp', 'status'];
 
-  // Computed properties
+  constructor(
+    private notificationService: NotificationService,
+    private appointmentService: AppointmentService,
+    private clinicService: ClinicService,
+    private datePipe: DatePipe,
+    private router: Router
+  ) {}
+
   get weeklyReport() {
     return this.dashboardData.adminDashboard.weeklyReport;
   }
 
   get appointmentQueue() {
-    return this.dashboardData.adminDashboard.dailyAppointmentQueue;
+    return this.getTodaysQueue();
   }
 
   get notifications() {
     return this.dashboardData.adminDashboard.notifications;
   }
 
-  get unreadNotificationsCount() {
-    return this.notifications.filter(n => !n.isRead).length;
-  }
-
-  constructor(
-    private notificationService: NotificationService,
-    private datePipe: DatePipe
-  ) {}
-
+  // ----------------- INIT -----------------
   ngOnInit(): void {
-    this.notifications$ = this.notificationService.notifications$.pipe(
-      map(notifications => notifications
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // latest first
-        .slice(0, 10) // take only 10
-      )
-    );
-    this.unreadNotificationsCount$ = this.notifications$.pipe(
-      map(notifications => notifications.filter(n => !n.read).length)
-    );
+    this.loadClinics();
+    this.loadAppointmentData();
 
-    // load initial notifications
+    this.notifications$ = this.notificationService.notifications$.pipe(
+      map(n => n.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 10))
+    );
+    this.unreadNotificationsCount$ = this.notifications$.pipe(map(n => n.filter(x => !x.read).length));
+
     this.notificationService.getAllNotifications().subscribe({
       error: (err) => console.error('Failed to fetch initial notifications', err)
     });
   }
 
-  ngAfterViewInit(): void {
-    this.createServicesChart();
+  // ----------------- LOAD DATA -----------------
+  private loadAppointmentData(): void {
+    this.appointmentService.getAll().subscribe({
+      next: (data: Appointment[]) => {
+        this.allAppointments = data;
+        this.applyClinicFilter(); // 🔹 filter data after loading
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  loadClinics() {
+    this.clinicService.getAll().subscribe({
+      next: (data) => {
+      this.clinics = [{ _id: 'all', name: 'All Clinics' }, ...data];
+      this.selectedClinic = 'all'; // default selection
+      },
+      error: (err) => console.error('Error loading clinics:', err),
+    });
+  }
+
+  // ----------------- CLINIC CHANGE HANDLER -----------------
+  onClinicChange(clinicId: string) {
+    this.selectedClinic = clinicId;
+    this.applyClinicFilter(); // 🔹 reload filtered metrics and charts
+  }
+
+  // ----------------- APPLY CLINIC FILTER -----------------
+  applyClinicFilter(): void {
+    if (this.selectedClinic && this.selectedClinic !== 'all') {
+      this.appointmentData = this.allAppointments.filter(a => a.clinic?._id === this.selectedClinic);
+    } else {
+      this.appointmentData = [...this.allAppointments];
+    }
+
+    this.updateDashboardMetrics();
+    this.createOrUpdateServicesChart();
     this.createAppointmentTrendChart();
   }
 
-  private createServicesChart(): void {
-    const services = this.weeklyReport.preferredServices;
-    const labels = Object.keys(services);
-    const data = Object.values(services);
+  // ----------------- METRICS CALCULATION -----------------
+  updateDashboardMetrics(): void {
+    const startOfWeek = this.getStartOfWeek();
+    const confirmedAppointments = this.appointmentData.filter(a => a.status === 'confirmed');
+    const updatedWeekly = this.appointmentData.filter(a => {
+      const dateStr = a.updatedAt || a.createdAt;
+      if (!dateStr) return false;
+      const date = new Date(dateStr);
+      return date >= startOfWeek;
+    });
+
+    const preferredServices: Record<string, number> = {};
+    confirmedAppointments.forEach(a => {
+      a.services.forEach(s => {
+        preferredServices[s.name] = (preferredServices[s.name] || 0) + 1;
+      });
+    });
+
+    this.dashboardData.adminDashboard.weeklyReport = {
+      weekOf: startOfWeek.toISOString().split('T')[0],
+      totalAppointments: confirmedAppointments.length,
+      patientRecordsChanged: updatedWeekly.length,
+      preferredServices
+    };
+  }
+
+  // ----------------- SERVICES CHART -----------------
+  private createOrUpdateServicesChart(): void {
+    const services = Object.keys(this.weeklyReport.preferredServices);
+    const counts = Object.values(this.weeklyReport.preferredServices);
+
+    if (this.servicesChart) {
+      this.servicesChart.data.labels = services;
+      this.servicesChart.data.datasets[0].data = counts;
+      this.servicesChart.update();
+      return;
+    }
 
     const config: ChartConfiguration = {
       type: 'doughnut',
       data: {
-        labels: labels,
+        labels: services,
         datasets: [{
-          data: data,
-          backgroundColor: [
-            '#3f51b5', // Primary
-            '#ff4081', // Accent
-            '#4caf50', // Success
-            '#ff9800'  // Warning
-          ],
+          data: counts,
+          backgroundColor: ['#3f51b5', '#ff4081', '#4caf50', '#ff9800'],
           borderWidth: 2,
           borderColor: '#ffffff'
         }]
@@ -154,13 +203,7 @@ export class DashboardIndex {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              padding: 20,
-              usePointStyle: true
-            }
-          },
+          legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } },
           tooltip: {
             callbacks: {
               label: (context) => {
@@ -179,22 +222,56 @@ export class DashboardIndex {
     this.servicesChart = new Chart(this.servicesChartRef.nativeElement, config);
   }
 
+  // ----------------- WEEKLY APPOINTMENT TREND -----------------
+  private getWeeklyTrendData(): { labels: string[], scheduled: number[], completed: number[] } {
+    const startOfWeek = this.getStartOfWeek();
+    const labels: string[] = [];
+    const scheduled: number[] = [];
+    const completed: number[] = [];
+
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+
+      // 🔹 Filipino weekday labels
+      const dayStr = day.toLocaleDateString('fil-PH', { weekday: 'short' });
+      labels.push(dayStr);
+
+      const dayAppointments = this.appointmentData.filter(a => {
+        const appointmentDate = new Date(a.date);
+        return (
+          appointmentDate.getFullYear() === day.getFullYear() &&
+          appointmentDate.getMonth() === day.getMonth() &&
+          appointmentDate.getDate() === day.getDate()
+        );
+      });
+
+      scheduled.push(dayAppointments.length);
+      completed.push(dayAppointments.filter(a => a.status === 'confirmed').length);
+    }
+
+    return { labels, scheduled, completed };
+  }
+
   private createAppointmentTrendChart(): void {
-    // Mock data for demonstration - in real app, this would come from API
-    const mockWeeklyData = {
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      appointments: [8, 12, 10, 15, 9, 6, 5],
-      completed: [7, 11, 9, 13, 8, 5, 4]
-    };
+    const trendData = this.getWeeklyTrendData();
+
+    if (this.appointmentTrendChart) {
+      this.appointmentTrendChart.data.labels = trendData.labels;
+      this.appointmentTrendChart.data.datasets[0].data = trendData.scheduled;
+      this.appointmentTrendChart.data.datasets[1].data = trendData.completed;
+      this.appointmentTrendChart.update();
+      return;
+    }
 
     const config: ChartConfiguration = {
       type: 'line',
       data: {
-        labels: mockWeeklyData.labels,
+        labels: trendData.labels,
         datasets: [
           {
             label: 'Scheduled Appointments',
-            data: mockWeeklyData.appointments,
+            data: trendData.scheduled,
             borderColor: '#3f51b5',
             backgroundColor: 'rgba(63, 81, 181, 0.1)',
             tension: 0.4,
@@ -202,7 +279,7 @@ export class DashboardIndex {
           },
           {
             label: 'Completed Appointments',
-            data: mockWeeklyData.completed,
+            data: trendData.completed,
             borderColor: '#4caf50',
             backgroundColor: 'rgba(76, 175, 80, 0.1)',
             tension: 0.4,
@@ -213,50 +290,55 @@ export class DashboardIndex {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'top'
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              stepSize: 1
-            }
-          }
-        }
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
       }
     };
 
     this.appointmentTrendChart = new Chart(this.appointmentTrendRef.nativeElement, config);
   }
 
+  // ----------------- HELPERS -----------------
+  getStartOfWeek(): Date {
+    const today = new Date();
+    const day = today.getDay();
+    const diffToMonday = day === 0 ? 6 : day - 1;
+    const startOfWeek = new Date(today);
+    startOfWeek.setHours(0, 0, 0, 0);
+    startOfWeek.setDate(today.getDate() - diffToMonday);
+    return startOfWeek;
+  }
+
+  getTodaysQueue(): Appointment[] {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    return this.appointmentData.filter(a => {
+      const appointmentDate = new Date(a.date);
+      return appointmentDate >= today && appointmentDate < tomorrow && a.status === 'confirmed';
+    });
+  }
+
   formatTimestamp(timestamp: string): string {
     return new Date(timestamp).toLocaleString();
   }
 
-  // Helper function to make the notification type user-friendly
   formatNotificationType(type: NotificationType): string {
     switch (type) {
-      case NotificationType.APPOINTMENT_CREATED:
-        return 'New Booking';
-      case NotificationType.APPOINTMENT_STATUS_UPDATED:
-        return 'Status Update';
-      case NotificationType.APPOINTMENT_REMINDER:
-        return 'Reminder';
-      default:
-        return 'Notification';
+      case NotificationType.APPOINTMENT_CREATED: return 'New Booking';
+      case NotificationType.APPOINTMENT_STATUS_UPDATED: return 'Status Update';
+      case NotificationType.APPOINTMENT_REMINDER: return 'Reminder';
+      default: return 'Notification';
     }
   }
 
-  // Map the notification type to a CSS class for styling the chip
   getNotificationTypeClass(type: NotificationType): string {
     return type === NotificationType.APPOINTMENT_CREATED ? 'booking' : 'cancellation';
   }
 
   markAsRead(notificationId: string): void {
-    // Call the service to mark the notification as read
     this.notificationService.markAsRead(notificationId).subscribe({
       error: (err) => console.error(`Failed to mark notification ${notificationId} as read`, err)
     });
@@ -267,11 +349,11 @@ export class DashboardIndex {
   }
 
   ngOnDestroy(): void {
-    if (this.servicesChart) {
-      this.servicesChart.destroy();
-    }
-    if (this.appointmentTrendChart) {
-      this.appointmentTrendChart.destroy();
-    }
+    if (this.servicesChart) this.servicesChart.destroy();
+    if (this.appointmentTrendChart) this.appointmentTrendChart.destroy();
+  }
+
+  redirectToDetails(link: string | undefined) {
+    if (link) this.router.navigate([link]);
   }
 }
