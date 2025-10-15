@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { User } from '../model/user';
 import { UserPayload } from '../../admin/user/user-form/user-payload';
 
@@ -34,5 +34,22 @@ export class UserService {
   createPublic(user: UserPayload): Observable<User> {
     return this.http.post<User>(`${this.baseUrl}/register`, user);
   }
+  
+  uploadProfilePicture(userId: string, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
 
+    const url = `${this.baseUrl}/${userId}/pictures`;
+
+    return this.http.put(url, formData, { withCredentials: true });
+  }
+
+
+  getProfilePicture(userId: string): Observable<string> {
+    const url = `${this.baseUrl}/${userId}/picture`;
+
+    return this.http.get(url, { responseType: 'blob', withCredentials: true }).pipe(
+      map(blob => URL.createObjectURL(blob))
+    );
+  }
 }
