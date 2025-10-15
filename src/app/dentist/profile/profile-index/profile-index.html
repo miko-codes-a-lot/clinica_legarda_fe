@@ -1,34 +1,39 @@
 <mat-card class="account-card">
+  <mat-card-header class="account-header">
+    <div>
+      <h1 class="page-title">Account Settings</h1>
+      <p class="page-subtitle">Update your profile, contact details, and working hours.</p>
+    </div>
+  </mat-card-header>
+
+  <mat-divider></mat-divider>
+
   <mat-card-content>
     <form [formGroup]="profileForm" (ngSubmit)="onSave()" class="account-form">
 
-      <!-- Profile Picture -->
+      <!-- === PROFILE SECTION === -->
       <section class="section profile-section">
-        <h2 class="section-title">Account</h2>
-        <p class="section-subtitle">Manage your profile details and preferences.</p>
-
-        <div class="profile-picture">
-          <img [src]="avatarUrl" alt="Profile Picture" class="avatar">
-
-          <div class="actions">
-            <!-- Upload Button -->
-            <button mat-raised-button color="primary" (click)="fileInput.click()">
-              <mat-icon>upload</mat-icon> Upload
-            </button>
-
-            <!-- Delete Button -->
-            <button mat-stroked-button color="warn" type="button">
-              <mat-icon>delete</mat-icon> Delete
-            </button>
-
-            <input type="file" #fileInput hidden (change)="onAvatarChange($event)">
+        <div class="profile-wrapper">
+          <div class="profile-picture-container">
+            <img [src]="avatarUrl" alt="Profile Picture" class="avatar shadow-md" />
+            <div class="avatar-overlay">
+              <button mat-mini-fab color="primary" (click)="fileInput.click()" type="button">
+                <mat-icon>photo_camera</mat-icon>
+              </button>
+            </div>
+            <input type="file" #fileInput hidden (change)="onAvatarChange($event)" />
+          </div>
+          <div class="profile-info">
+            <h2>{{ profileForm.value.firstName }} {{ profileForm.value.lastName }}</h2>
+            <p>{{ profileForm.value.emailAddress }}</p>
+            <p *ngIf="profileForm.value.address">{{ profileForm.value.address }}</p> <!-- Added address -->
           </div>
         </div>
       </section>
 
       <mat-divider></mat-divider>
 
-      <!-- Full Name -->
+      <!-- === PERSONAL DETAILS === -->
       <section class="section">
         <h2 class="section-title">Full Name</h2>
         <div class="form-grid">
@@ -57,7 +62,7 @@
 
       <mat-divider></mat-divider>
 
-      <!-- Contact Info -->
+      <!-- === CONTACT INFO === -->
       <section class="section">
         <h2 class="section-title">Contact Information</h2>
         <div class="form-grid">
@@ -76,28 +81,31 @@
               <app-form-control-errors [control]="profileForm.get('mobileNumber')"></app-form-control-errors>
             </mat-error>
           </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field full-width">
+            <mat-label>Address</mat-label>
+            <input matInput formControlName="address" placeholder="Enter your address" />
+          </mat-form-field>
         </div>
       </section>
 
       <mat-divider></mat-divider>
 
-      <!-- Role -->
+      <!-- === ROLE === -->
       <section class="section">
         <h2 class="section-title">Role</h2>
         <mat-form-field appearance="outline" class="field full-width">
           <mat-label>Role</mat-label>
-          <input matInput formControlName="role" placeholder="Ex. Dentist, Admin" readonly />
+          <input matInput formControlName="role" readonly placeholder="Ex. Dentist, Admin" />
         </mat-form-field>
       </section>
 
       <mat-divider></mat-divider>
 
-      <!-- Operating Hours -->
+      <!-- === OPERATING HOURS === -->
       <section class="section">
         <div class="header-row">
           <h2 class="section-title">Operating Hours</h2>
-
-          <!-- Add Schedule -->
           <button mat-flat-button color="accent" type="button" (click)="onAddSchedule()"
             [disabled]="operatingHours.length >= (clinicOperatingHours.value?.length || 0)">
             <mat-icon>add</mat-icon> Add Schedule
@@ -135,11 +143,10 @@
                   <mat-error>End time must be after start time.</mat-error>
                 }
                 @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) {
-                  <mat-error>Time must be within the clinic's operating hours.</mat-error>
+                  <mat-error>Time must be within clinic hours.</mat-error>
                 }
               </div>
 
-              <!-- Remove Operating Hour -->
               <button mat-stroked-button color="warn" type="button" (click)="removeOperatingHour(i)">
                 <mat-icon>delete</mat-icon> Remove
               </button>
@@ -148,9 +155,8 @@
         </div>
       </section>
 
-      <!-- Save / Logout Buttons -->
+      <!-- === BUTTONS === -->
       <div class="button-group">
-        <!-- disabled -->
         <button [disabled]="!profileForm.valid" mat-raised-button color="primary" type="submit">
           <mat-icon>save</mat-icon> Save Changes
         </button>

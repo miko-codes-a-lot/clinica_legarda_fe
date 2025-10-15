@@ -36,6 +36,7 @@ export class MyAppointment {
             next: (data: Appointment[]) => {
               this.upcomingAppointmentsData = data.filter(a => a.status === 'confirmed');
               console.log('this.upcomingAppointmentsData', this.upcomingAppointmentsData)
+              this.isLoading = false
             },
             error: (err) => console.error(err)
           });

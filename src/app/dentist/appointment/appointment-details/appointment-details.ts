@@ -5,10 +5,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ListComponent } from '../../../_shared/component/list/list.component';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
 selector: 'app-appointment-details',
-  imports: [ListComponent, MatListModule, MatButtonModule],
+  imports: [ListComponent, MatListModule, MatButtonModule, MatIconModule],
   templateUrl: './appointment-details.html',
   styleUrl: './appointment-details.css'
 })
@@ -50,4 +51,49 @@ export class AppointmentDetails {
   onUpdate() {
     this.router.navigate(['/admin/appointment/update', this.id])
   }
+
+  approveAppointment() {
+    if (!this.appointment?._id) return;
+
+    this.isLoading = true;
+
+    this.appointmentService.approveAppointment(this.appointment._id).subscribe({
+      next: (updatedAppointment: Appointment) => {
+        // Update local object
+        this.appointment = updatedAppointment;
+        this.displayAppointment['status'] = updatedAppointment.status;
+
+        this.isLoading = false;
+        alert('Appointment approved successfully!');
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.isLoading = false;
+        alert('Failed to approve appointment.');
+      }
+    });
+  }
+
+  declineAppointment() {
+    if (!this.appointment?._id) return;
+
+    this.isLoading = true;
+
+    this.appointmentService.rejectAppointment(this.appointment._id).subscribe({
+      next: (updatedAppointment: Appointment) => {
+        // Update local object
+        this.appointment = updatedAppointment;
+        this.displayAppointment['status'] = updatedAppointment.status;
+
+        this.isLoading = false;
+        alert('Appointment rejected successfully!');
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.isLoading = false;
+        alert('Failed to reject appointment.');
+      }
+    });
+  }
+
 }

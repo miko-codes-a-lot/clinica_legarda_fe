@@ -1,11 +1,11 @@
+<div class="table-title">
+  <h2>Appointments</h2>
+</div>
+
 <app-generic-table
-  [title]="title"
-  [createButtonLabel]="createLabel"
   [displayedColumns]="displayedColumns"
   [columnDefs]="columnDefs"
   [dataSource]="dataSource"
   [isLoading]="isLoading"
   (details)="onDetails($event)"
-  (update)="onUpdate($event)"
-  (create)="onCreate()"
 ></app-generic-table>

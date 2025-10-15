@@ -27,8 +27,8 @@ export class Dentist {
 
   menuItems = [
     { label: 'Profile', icon: 'person', link: '/dentist/profile' },
-    { label: 'Appointments', icon: 'event', link: '/admin/appointment' },
-    { label: 'Notifications', icon: 'notifications', link: '/admin/notification' },
+    { label: 'Appointments', icon: 'event', link: '/dentist/appointment' },
+    { label: 'Notifications', icon: 'notifications', link: '/dentist/notification' },
     {
       label: 'Logout',
       icon: 'logout',

@@ -69,6 +69,11 @@ export class AppointmentService {
     return this.http.get<Appointment[]>(this.baseUrl, options);
   }
 
+  getAllByDentist(dentistId: string): Observable<Appointment[]> {
+    const url = `${this.baseUrl}/by-dentist/${dentistId}`;
+    return this.http.get<Appointment[]>(url, { withCredentials: true });
+  }
+
   getOne(id: string): Observable<Appointment> {
     return this.http.get<Appointment>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
@@ -105,5 +110,13 @@ export class AppointmentService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
+  }
+
+  approveAppointment(appointmentId: string) {
+    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/approve`, {}, { withCredentials: true });
+  }
+
+  rejectAppointment(appointmentId: string) {
+    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/reject`, {}, { withCredentials: true });
   }
 }

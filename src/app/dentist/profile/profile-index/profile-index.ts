@@ -1,36 +1,62 @@
-import { Component, OnInit, ChangeDetectorRef   } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon'; // ✅ for mat-icon
-import { AuthService } from '../../../_shared/service/auth-service';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 
-import { Chart, registerables } from 'chart.js';
-
+import { AuthService } from '../../../_shared/service/auth-service';
+import { UserService } from '../../../_shared/service/user-service';
 import { FormControlErrorsComponent } from '../../../_shared/component/form-control-errors/form-control-errors.component';
 
 import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
 import { timeRangeValidator, withinClinicHoursValidator } from '../../../utils/forms/form-custom-validator';
 
+import { CommonModule } from '@angular/common';
 
-
-// Register Chart.js components
+import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
+
+// ✅ Proper User interface
+interface User {
+  _id: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  emailAddress: string;
+  mobileNumber: string;
+  role: string;
+  address: string;
+  username: string;
+  operatingHours: { day: string; startTime: string; endTime: string }[];
+  clinic?: {
+    _id?: string;
+    operatingHours?: { day: string; startTime: string; endTime: string }[];
+  };
+}
 
 @Component({
   selector: 'app-profile-index',
   templateUrl: './profile-index.html',
-  styleUrl: './profile-index.css',
-  imports: [MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatIconModule, MatSelectModule, FormControlErrorsComponent],
+  styleUrls: ['./profile-index.css'],
+  imports: [
+    MatCardModule,
+    MatDividerModule,
+    ReactiveFormsModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatSelectModule,
+    FormControlErrorsComponent,
+    CommonModule
+  ],
 })
 export class ProfileIndex implements OnInit {
   profileForm!: FormGroup;
-  avatarUrl: string = 'assets/images/default-dentist.png'; // default profile pic
-
-  user = {}
+  avatarUrl: string = 'assets/images/default-dentist.png';
+  user: User | null = null;
 
   days = [
     { code: 'monday', label: 'Monday' },
@@ -47,61 +73,54 @@ export class ProfileIndex implements OnInit {
   constructor(
     private fb: FormBuilder,
     private readonly authService: AuthService,
+    private readonly userService: UserService,
   ) {}
 
-  // figure out getting the user existing data
-  // populate the form by retreiving the data
-  // use validations (refer to the user update)
-
   ngOnInit(): void {
-
     this.profileForm = this.fb.group({
       firstName: ['', Validators.required],
       middleName: [''],
       lastName: ['', Validators.required],
-      emailAddress: ['', [Validators.required, Validators.email]], // <-- changed
+      emailAddress: ['', [Validators.required, Validators.email]],
       mobileNumber: ['', [Validators.required, Validators.pattern(/^\+639\d{9}$/)]],
+      address: ['', Validators.required],
       role: [''],
       operatingHours: this.fb.array([]),
       clinic: this.fb.group({
         value: this.fb.group({
-          operatingHours: this.fb.array([]) 
+          operatingHours: this.fb.array([])
         })
       })
     });
 
-    // change the format to E.164
+    // Format mobile number
     const mobileNumber = this.profileForm.get('mobileNumber');
-    if (mobileNumber) {
-      applyPHMobilePrefix(mobileNumber)
-    }
+    if (mobileNumber) applyPHMobilePrefix(mobileNumber);
 
+    // Load current user
     this.authService.currentUser$.subscribe({
       next: (user) => {
         if (user) {
           this.user = user;
           this.profileForm.patchValue(user);
-          console.log('this.user', this.user);
 
-          // dentist available days/hours
+          // Dentist operating hours
           const operatingHoursArray = this.fb.array(
-            user.operatingHours.map(o =>
+            (user.operatingHours || []).map(o =>
               this.fb.group({
                 day: [o.day, Validators.required],
                 startTime: [o.startTime, Validators.required],
                 endTime: [o.endTime, Validators.required],
-              },
-                {
-                  validators: [
-                    timeRangeValidator,
-                    withinClinicHoursValidator(user.clinic?.operatingHours || [])
-                  ]
-                }
-              )
+              }, {
+                validators: [
+                  timeRangeValidator,
+                  withinClinicHoursValidator(user.clinic?.operatingHours || [])
+                ]
+              })
             )
           );
 
-          // clinic operating day/hours
+          // Clinic operating hours
           const clinicOperatingHoursArray = this.fb.array(
             (user.clinic?.operatingHours || []).map(o =>
               this.fb.group({
@@ -112,27 +131,24 @@ export class ProfileIndex implements OnInit {
             )
           );
 
-          // ✅ Replace operatingHours inside clinic.value
           const clinicValueGroup = this.profileForm.get('clinic.value') as FormGroup;
           if (clinicValueGroup) {
             clinicValueGroup.setControl('operatingHours', clinicOperatingHoursArray);
           }
 
-          // ✅ Replace top-level operatingHours
           this.profileForm.setControl('operatingHours', operatingHoursArray);
 
-          // ✅ Track selected days
-          this.selectedDays = new Set(user.operatingHours.map(o => o.day));
+          // Track selected days
+          this.selectedDays = new Set((user.operatingHours || []).map(o => o.day));
           this.operatingHours.valueChanges.subscribe((hours) => {
             this.selectedDays = new Set(hours.map((h: any) => h.day).filter(Boolean));
           });
         }
       }
     });
-
-
   }
 
+  // --- Getters ---
   get operatingHours(): FormArray {
     return this.profileForm.get('operatingHours') as FormArray;
   }
@@ -141,17 +157,16 @@ export class ProfileIndex implements OnInit {
     return this.profileForm.get('clinic.value.operatingHours') as FormArray;
   }
 
-  onAddSchedule () {
+  // --- Schedule Manipulation ---
+  onAddSchedule(): void {
     const usedDays = this.operatingHours.controls.map(group => group.get('day')?.value);
-    console.log('clinicOperatingHours values:', this.clinicOperatingHours.value.length);
 
     if (this.clinicOperatingHours.value) {
       const nextSchedule = this.clinicOperatingHours.value.find(
-        (sched: { day: string; startTime: string; endTime: string }) =>
-          !usedDays.includes(sched.day)
+        (sched: { day: string; startTime: string; endTime: string }) => !usedDays.includes(sched.day)
       );
-      
-      if( nextSchedule ) {
+
+      if (nextSchedule) {
         const newGroup = this.fb.nonNullable.group({
           day: [{ value: nextSchedule.day, disabled: usedDays.includes(nextSchedule.day) }],
           startTime: [nextSchedule.startTime],
@@ -159,18 +174,17 @@ export class ProfileIndex implements OnInit {
         }, { validators: [
           timeRangeValidator,
           withinClinicHoursValidator(this.clinicOperatingHours.value)
-        ] });
+        ]});
 
-        // Subscribe to day changes for dynamic updates
+        // Update times when day changes
         newGroup.get('day')?.valueChanges.subscribe((selectedDay: string) => {
-          const defaultSchedule = (this.clinicOperatingHours?.value as { day: string; startTime: string; endTime: string }[])
-            .find((d) => d.day === selectedDay);
-
+          const defaultSchedule = (this.clinicOperatingHours.value as any[]).find(d => d.day === selectedDay);
           if (defaultSchedule) {
             newGroup.get('startTime')?.setValue(defaultSchedule.startTime);
             newGroup.get('endTime')?.setValue(defaultSchedule.endTime);
           }
         });
+
         this.operatingHours.push(newGroup);
       }
     }
@@ -183,7 +197,7 @@ export class ProfileIndex implements OnInit {
   getSelectedDays(currentIndex: number): string[] {
     return this.operatingHours.controls
       .map((group, i) => i !== currentIndex ? group.get('day')?.value : null)
-      .filter(day => !!day) as string[];
+      .filter(Boolean) as string[];
   }
 
   onAvatarChange(event: any): void {
@@ -195,10 +209,22 @@ export class ProfileIndex implements OnInit {
     }
   }
 
+  // --- Save Profile ---
   onSave(): void {
+    if (!this.user) return; // Safety check
+
     if (this.profileForm.valid) {
-      console.log('Profile Saved:', this.profileForm.value);
-      // 🔗 API call here
+      // Prepare payload
+      const payload = {
+        ...this.profileForm.value,            // all form fields
+        clinic: this.user.clinic?._id,       // send only clinic ID
+        username: this.user.username          // ensure username included
+      };
+
+      this.userService.update(this.user._id, payload).subscribe({
+        next: (res) => alert('Profile updated successfully!'),
+        error: (err) => alert(`Failed to save profile: ${err}`)
+      });
     }
   }
 }

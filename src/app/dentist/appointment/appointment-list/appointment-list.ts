@@ -4,6 +4,7 @@ import { Appointment } from '../../../_shared/model/appointment';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
 import { MatTableDataSource } from '@angular/material/table';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
+import { AuthService } from '../../../_shared/service/auth-service';
 
 @Component({
   selector: 'app-appointment-list',
@@ -14,7 +15,7 @@ import { GenericTableComponent } from '../../../_shared/component/table/generic-
 
 export class AppointmentList implements OnInit {
   isLoading = false
-  moduleUrl = '/admin/appointment/'
+  moduleUrl = '/dentist/appointment/'
   title = 'Appointment'
   createLabel = 'Create appointment'
   dataSource = new MatTableDataSource<Appointment>();
@@ -31,29 +32,36 @@ export class AppointmentList implements OnInit {
   constructor(
     private readonly appointmentService: AppointmentService,
     private readonly router: Router,
+    private readonly authService: AuthService,
   ) {}
 
   ngOnInit(): void {
     this.isLoading = true
 
-    this.appointmentService.getAll().subscribe({
-      next: (data) => {
-        this.dataSource.data = data;
-      },
-      error: (e) => alert(`Something went wrong ${e}`)
-    }).add(() => this.isLoading = false);
+    this.authService.currentUser$.subscribe({
+      next: (user) => {
+        if (user) {
+          this.appointmentService.getAllByDentist(user._id).subscribe({
+            next: (data: Appointment[]) => {
+              this.dataSource.data = data;
+              this.isLoading = false
+            },
+            error: (err) => console.error(err)
+          });
+        }
+      }
+
+    })
+
+    // this.appointmentService.getAll().subscribe({
+    //   next: (data) => {
+    //     this.dataSource.data = data;
+    //   },
+    //   error: (e) => alert(`Something went wrong ${e}`)
+    // }).add(() => this.isLoading = false);
   }
 
   onDetails(id: string) {
     this.router.navigate([`${this.moduleUrl}/details`, id])
   }
-
-  onUpdate(id: string) {
-    this.router.navigate([`${this.moduleUrl}/update`, id])
-  }
-
-  onCreate() {
-    this.router.navigate([`${this.moduleUrl}/create`])
-  }
-
 }

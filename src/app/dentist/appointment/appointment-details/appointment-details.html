@@ -1,8 +1,8 @@
 @if (appointment) {
   <div class="view-header">
     <h2 class="page-title">Appointment</h2>
-    <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
   </div>
+
   <app-list [data]="displayAppointment">
     <div class="custom-list">
       <mat-list-item>
@@ -12,19 +12,36 @@
         }
       </mat-list-item>
     </div>
+
     <div class="row-divider"></div>
+
     <div class="custom-list">
       <mat-list-item>
         <span class="item-title" matListItemTitle>Notes:</span>
-          <span class="item-line" matListItemLine>
-            Clinic Notes: {{ appointment.notes.clinicNotes }} <br>
-          </span>
-          <span class="item-line" matListItemLine>
-            Patient Notes: {{ appointment.notes.patientNotes }}
-          </span>
+        <span class="item-line" matListItemLine>
+          Clinic Notes: {{ appointment.notes.clinicNotes }} <br>
+        </span>
+        <span class="item-line" matListItemLine>
+          Patient Notes: {{ appointment.notes.patientNotes }}
+        </span>
       </mat-list-item>
     </div>
   </app-list>
+
+  <!-- Approve / Decline Buttons -->
+  <div class="action-buttons">
+    <button mat-flat-button color="primary" 
+            (click)="approveAppointment()" 
+            [disabled]="appointment.status === 'confirmed'">
+      <mat-icon>check</mat-icon> Approve
+    </button>
+
+    <button mat-stroked-button color="warn" 
+            (click)="declineAppointment()" 
+            [disabled]="appointment.status === 'rejected'">
+      <mat-icon>close</mat-icon> Reject
+    </button>
+  </div>
 } @else {
   <p>Fetching details...</p>
 }

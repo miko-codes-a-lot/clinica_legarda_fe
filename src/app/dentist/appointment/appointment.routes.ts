@@ -8,7 +8,7 @@ export const APPOINTMENT_ROUTES: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '/admin/appointment/list',
+        redirectTo: '/dentist/appointment/list',
         pathMatch: 'full'
       },
       {

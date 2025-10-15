@@ -8,7 +8,7 @@ export const NOTIFICATION_ROUTES: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '/admin/notification/list',
+        redirectTo: '/dentist/notification/list',
         pathMatch: 'full'
       },
       {
