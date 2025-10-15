@@ -1,0 +1,98 @@
+<div class="user-profile-container">
+  <h2>User Profile</h2>
+
+  <mat-card class="user-card">
+    <div class="user-card-content">
+
+    <!-- Profile Picture -->
+    <div class="profile-picture">
+      <img *ngIf="user.profilePicture; else defaultAvatar" [src]="getProfilePictureUrl()" alt="User Picture">
+
+      <ng-template #defaultAvatar>
+        <div class="default-avatar clickable" (click)="openAvatarModal()">
+          {{ (user.firstName.charAt(0) || '') + (user.lastName.charAt(0) || '') }}
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Avatar Upload Modal -->
+    <ng-template #avatarModal>
+      <h2 mat-dialog-title class="dialog-title">
+        Upload Profile Picture
+      </h2>
+
+      <mat-dialog-content class="dialog-content">
+        <!-- Drag & Drop / Preview Area -->
+        <div class="upload-container">
+          <label for="avatarInput" class="upload-label">
+            <mat-icon>cloud_upload</mat-icon>
+            <span>Click or drag to upload image</span>
+          </label>
+          <input
+            id="avatarInput"
+            type="file"
+            accept="image/*"
+            (change)="onAvatarChange($event)"
+            class="file-input"
+          >
+
+          <!-- Preview -->
+          <div *ngIf="avatarUrl" class="preview">
+            <img [src]="avatarUrl" alt="Avatar Preview">
+          </div>
+
+          <!-- Upload Button -->
+        </div>
+      </mat-dialog-content>
+
+      <mat-dialog-actions align="end" class="dialog-actions">
+        <button mat-stroked-button color="warn" class="cancel-btn" (click)="closeAvatarModal()">Cancel</button>
+        <button mat-raised-button color="primary" class="save-btn" (click)="saveAvatar()">Save</button>
+      </mat-dialog-actions>
+
+    </ng-template>
+
+      <!-- User Info -->
+      <div class="user-info">
+        <h3>{{ user.firstName }} {{ user.middleName || '' }} {{ user.lastName }}</h3>
+        <p class="email">{{ user.emailAddress }}</p>
+
+        <div class="user-details">
+          <div class="detail-item">
+            <mat-icon>phone</mat-icon>
+            <span>{{ user.mobileNumber || 'N/A' }}</span>
+          </div>
+          <div class="detail-item">
+            <mat-icon>place</mat-icon>
+            <span>{{ user.address || 'N/A' }}</span>
+          </div>
+          <div class="detail-item">
+            <mat-icon>badge</mat-icon>
+            <span>{{ user.role || 'N/A' }}</span>
+          </div>
+          <div class="detail-item">
+            <mat-icon>account_circle</mat-icon>
+            <span>{{ user.username || 'N/A' }}</span>
+          </div>
+          <div class="detail-item">
+            <mat-icon>calendar_today</mat-icon>
+            <span>Joined: {{ user.createdAt | date:'mediumDate' }}</span>
+          </div>
+          <div class="detail-item">
+            <mat-icon>update</mat-icon>
+            <span>Updated: {{ user.updatedAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button mat-raised-button color="primary" class="edit-btn" (click)="editUser()">
+            Edit Details
+          </button>
+          <!-- <button mat-stroked-button color="warn" class="logout-btn" (click)="logout()">
+            Logout
+          </button> -->
+        </div>
+      </div>
+    </div>
+  </mat-card>
+</div>

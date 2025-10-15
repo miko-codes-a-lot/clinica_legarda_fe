@@ -1,0 +1,167 @@
+.account-card {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 36px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 14px 32px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.account-card:hover {
+  box-shadow: 0 20px 48px rgba(0,0,0,0.12);
+}
+
+.section {
+  margin: 28px 0;
+}
+
+.section-title {
+  font-size: 21px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #3949ab;
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: #757575;
+  margin-bottom: 18px;
+}
+
+.profile-section {
+  text-align: center;
+}
+
+.profile-picture {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #3949ab;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.default-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #8e24aa, #d81b60);
+  color: #fff;
+  font-size: 38px;
+  font-weight: 700;
+}
+
+.role-label {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #616161;
+}
+
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.field {
+  flex: 1;
+}
+
+.full-width {
+  flex: 2;
+}
+
+.half-width {
+  flex: 0 0 calc(50% - 10px);
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hour-card {
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.06);
+  background: #f9f9f9;
+}
+
+.hour-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.schedule-errors mat-error {
+  display: block;
+  font-size: 12px;
+  color: #f44336;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #3949ab, #1a237e);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 10px 22px;
+  transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+  background: linear-gradient(135deg, #1a237e, #0d1033);
+}
+
+.logout-btn {
+  border: 2px solid #d32f2f;
+  color: #d32f2f;
+  background-color: transparent;
+  border-radius: 8px;
+  padding: 10px 22px;
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    flex-direction: column;
+  }
+  .hour-grid {
+    flex-direction: column;
+  }
+  .profile-picture {
+    flex-direction: column;
+  }
+}

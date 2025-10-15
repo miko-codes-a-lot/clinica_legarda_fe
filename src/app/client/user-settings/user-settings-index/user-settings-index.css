@@ -1,0 +1,309 @@
+/* Container */
+.user-profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Card */
+.user-card {
+  width: 100%;
+  max-width: 720px;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  background-color: #ffffff;
+  transition: box-shadow 0.25s ease;
+}
+
+.user-card:hover {
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2); /* only shadow, no movement */
+}
+
+/* Card Content */
+.user-card-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: center;
+}
+
+/* Profile Picture */
+.profile-picture {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-picture img,
+.default-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #3f51b5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-picture img:hover,
+.default-avatar.clickable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Default Avatar */
+.default-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #8e24aa, #d81b60);
+  color: #fff;
+  font-size: 48px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 50%;
+  width: 140px;
+  height: 140px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  user-select: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Make default avatar clickable */
+.default-avatar.clickable {
+  cursor: pointer;
+}
+
+/* User Info */
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-info h3 {
+  margin: 0;
+  margin-bottom: 0.3rem;
+  font-size: 1.75rem;
+  color: #222;
+}
+
+.user-info .email {
+  margin-bottom: 1rem;
+  color: #555;
+  font-style: italic;
+}
+
+/* Details with icons */
+.user-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #444;
+  font-weight: 500;
+}
+
+.detail-item mat-icon {
+  font-size: 20px;
+  color: #3f51b5;
+}
+
+/* Action buttons */
+.action-buttons {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Edit Details Button */
+.edit-btn {
+  background: linear-gradient(135deg, #3f51b5, #303f9f);
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+  padding: 0.6rem 1.4rem;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.edit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.18);
+  background: linear-gradient(135deg, #303f9f, #1a237e);
+}
+
+/* Logout Button */
+.action-buttons button[color="warn"] {
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  font-weight: 500;
+  color: #d32f2f;
+  border: 2px solid #d32f2f;
+  background-color: transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.action-buttons button[color="warn"]:hover {
+  background-color: #d32f2f;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.18);
+}
+
+/* Return Dashboard Link */
+.return-dashboard {
+  margin-top: 1.5rem;
+  color: #3f51b5;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.return-dashboard:hover {
+  color: #1a237e;
+}
+
+/* === Avatar Upload Modal === */
+.dialog-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #3f51b5;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.upload-container {
+  width: 100%;
+  max-width: 300px;
+  border: 2px dashed #3f51b5;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.upload-container:hover {
+  background-color: rgba(63, 81, 181, 0.05);
+  border-color: #303f9f;
+}
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #3f51b5;
+}
+
+.upload-label mat-icon {
+  font-size: 40px;
+}
+
+/* Hide default file input */
+.file-input {
+  display: none;
+}
+
+/* Preview */
+.preview img {
+  margin-top: 0.8rem;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #3f51b5;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Dialog Actions */
+.dialog-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Cancel Button (like Logout) */
+.cancel-btn {
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  font-weight: 500;
+  color: #d32f2f;
+  border: 2px solid #d32f2f;
+  background-color: transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background-color: #d32f2f;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.18);
+}
+
+/* Save Button (like Edit Details) */
+.save-btn {
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  font-weight: 500;
+  color: #fff;
+  background: linear-gradient(135deg, #3f51b5, #303f9f);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.18);
+  background: linear-gradient(135deg, #303f9f, #1a237e);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .user-card-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profile-picture img,
+  .default-avatar {
+    width: 120px;
+    height: 120px;
+    font-size: 36px;
+  }
+
+  .user-details {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .action-buttons {
+    justify-content: center;
+  }
+}
