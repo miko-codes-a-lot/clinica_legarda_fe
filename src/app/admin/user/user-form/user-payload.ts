@@ -13,4 +13,5 @@ export interface UserPayload {
   operatingHours: OperatingHour[]
   role: string
   username?: string
+  profilePicture?: string
 }

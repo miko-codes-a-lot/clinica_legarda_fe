@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { User } from '../model/user';
 import { UserPayload } from '../../admin/user/user-form/user-payload';
 
@@ -41,7 +42,12 @@ export class UserService {
 
     const url = `${this.baseUrl}/${userId}/pictures`;
 
-    return this.http.put(url, formData, { withCredentials: true });
+    return this.http.put(url, formData, { withCredentials: true }).pipe(
+      catchError((error) => {
+        console.error('Upload failed', error); // logs any failure
+        return throwError(() => error);        // rethrow to the component
+      })
+    );
   }
 
 

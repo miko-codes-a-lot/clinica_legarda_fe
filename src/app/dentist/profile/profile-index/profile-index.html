@@ -14,19 +14,80 @@
       <!-- === PROFILE SECTION === -->
       <section class="section profile-section">
         <div class="profile-wrapper">
+
           <div class="profile-picture-container">
-            <img [src]="avatarUrl" alt="Profile Picture" class="avatar shadow-md" />
-            <div class="avatar-overlay">
-              <button mat-mini-fab color="primary" (click)="fileInput.click()" type="button">
-                <mat-icon>photo_camera</mat-icon>
-              </button>
+            <!-- Profile Picture -->
+            <div class="profile-picture clickable" (click)="openAvatarModal()">
+              <!-- Show uploaded avatar if exists -->
+               @if (avatarUrl) {
+                <img  [src]="avatarUrl" alt="User Picture" />
+               } @else {
+                <div class="default-avatar">
+                  {{ (user?.firstName?.charAt(0) || '') + (user?.lastName?.charAt(0) || '') }}
+                </div>
+               }
+
+              <!-- Initials fallback like Gmail -->
+              <ng-template #initialsAvatar>
+                <div class="default-avatar">
+                  {{ (user?.firstName?.charAt(0) || '') + (user?.lastName?.charAt(0) || '') }}
+                </div>
+              </ng-template>
+
+              <!-- Optional edit overlay -->
+              <div class="avatar-overlay" (click)="fileInput.click()">
+                <mat-icon>edit</mat-icon>
+              </div>
+
+              <!-- Hidden file input for avatar upload -->
+              <input type="file" #fileInput hidden (change)="onAvatarChange($event)" />
             </div>
-            <input type="file" #fileInput hidden (change)="onAvatarChange($event)" />
+
           </div>
+
+          <!-- Avatar Upload Modal -->
+          <ng-template #avatarModal>
+            <h2 mat-dialog-title class="dialog-title">
+              Upload Profile Picture
+            </h2>
+
+            <mat-dialog-content class="dialog-content">
+              <div class="upload-container">
+                <!-- Drag & Drop / Click Upload Area -->
+                <label for="avatarInput" class="upload-label">
+                  <mat-icon class="upload-icon">cloud_upload</mat-icon>
+                  <span class="upload-text">Click or drag to upload image</span>
+                </label>
+                <input
+                  id="avatarInput"
+                  type="file"
+                  accept="image/*"
+                  (change)="onAvatarChange($event)"
+                  class="file-input"
+                >
+
+                <!-- Preview -->
+                <!-- <div *ngIf="avatarUrl" class="preview">
+                  <img [src]="avatarUrl" alt="Avatar Preview">
+                  <button mat-icon-button color="warn" class="remove-btn" (click)="removeAvatar()">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div> -->
+              </div>
+            </mat-dialog-content>
+
+            <mat-dialog-actions align="end" class="dialog-actions">
+              <button mat-stroked-button color="warn" class="cancel-btn" (click)="closeAvatarModal()">Cancel</button>
+              <button mat-raised-button color="primary" class="save-btn" [disabled]="!avatarUrl" (click)="onUpload()">Save</button>
+            </mat-dialog-actions>
+          </ng-template>
+
+
+
           <div class="profile-info">
             <h2>{{ profileForm.value.firstName }} {{ profileForm.value.lastName }}</h2>
             <p>{{ profileForm.value.emailAddress }}</p>
-            <p *ngIf="profileForm.value.address">{{ profileForm.value.address }}</p> <!-- Added address -->
+            <p *ngIf="profileForm.value.address">{{ profileForm.value.address }}</p>
           </div>
         </div>
       </section>
@@ -159,9 +220,6 @@
       <div class="button-group">
         <button [disabled]="!profileForm.valid" mat-raised-button color="primary" type="submit">
           <mat-icon>save</mat-icon> Save Changes
-        </button>
-        <button mat-stroked-button color="warn" type="button">
-          <mat-icon>logout</mat-icon> Logout
         </button>
       </div>
     </form>

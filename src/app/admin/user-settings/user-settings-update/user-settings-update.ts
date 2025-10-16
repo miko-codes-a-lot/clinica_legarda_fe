@@ -238,9 +238,10 @@ onSave() {
     this.userService.update(this.id, userData).subscribe({
       next: (res) => {
         console.log('Update successful:', res);
-        this.router.navigate(['/admin/user-settings']).then(() => {
-          window.location.reload();
-        });
+        alert('Successfully Updated!')
+        // this.router.navigate(['/admin/user-settings']).then(() => {
+        //   window.location.reload();
+        // });
       },
       error: (err) => {
         console.error(' Update failed:', err);

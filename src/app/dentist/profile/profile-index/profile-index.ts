@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -17,6 +17,10 @@ import { timeRangeValidator, withinClinicHoursValidator } from '../../../utils/f
 import { CommonModule } from '@angular/common';
 
 import { Chart, registerables } from 'chart.js';
+
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+
+
 Chart.register(...registerables);
 
 // ✅ Proper User interface
@@ -50,12 +54,14 @@ interface User {
     MatIconModule,
     MatSelectModule,
     FormControlErrorsComponent,
-    CommonModule
+    CommonModule,
+    MatDialogModule
   ],
 })
 export class ProfileIndex implements OnInit {
+  @ViewChild('avatarModal') avatarModal!: TemplateRef<any>;
   profileForm!: FormGroup;
-  avatarUrl: string = 'assets/images/default-dentist.png';
+  avatarUrl: string | null = null;
   user: User | null = null;
 
   days = [
@@ -69,11 +75,13 @@ export class ProfileIndex implements OnInit {
   ];
 
   selectedDays = new Set<string>();
+  selectedFile: File | null = null;
 
   constructor(
     private fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -103,7 +111,9 @@ export class ProfileIndex implements OnInit {
         if (user) {
           this.user = user;
           this.profileForm.patchValue(user);
-
+          if(user?.profilePicture) {
+            this.loadProfilePicture(user._id);
+          }
           // Dentist operating hours
           const operatingHoursArray = this.fb.array(
             (user.operatingHours || []).map(o =>
@@ -157,6 +167,45 @@ export class ProfileIndex implements OnInit {
     return this.profileForm.get('clinic.value.operatingHours') as FormArray;
   }
 
+  // added functions
+  
+  openAvatarModal() {
+    this.dialog.open(this.avatarModal);
+  }
+
+  closeAvatarModal() {
+    this.dialog.closeAll();
+    this.selectedFile = null;
+  }
+
+  onUpload() {
+    console.log('this.selectedFile ', this.selectedFile)
+  if (!this.selectedFile) return;
+
+  if(this.user) {
+    console.log('this.user._id: ', this.user._id)
+    console.log('this.selectedFile ', this.selectedFile)
+    this.userService.uploadProfilePicture(this.user._id, this.selectedFile)
+    .subscribe({
+      next: (res) => {
+        alert('Profile picture uploaded successfully!');
+        this.closeAvatarModal(); // close the dialog
+      },
+      error: (err) => {
+        console.error('Upload error', err);
+        alert('Failed to upload profile picture.');
+      }
+    });
+  }
+    // console.log('result index TS', result)
+    // TODO: call API to save file
+
+    // to activate/use
+    // this.closeAvatarModal();
+  }
+
+
+
   // --- Schedule Manipulation ---
   onAddSchedule(): void {
     const usedDays = this.operatingHours.controls.map(group => group.get('day')?.value);
@@ -203,10 +252,18 @@ export class ProfileIndex implements OnInit {
   onAvatarChange(event: any): void {
     const file = event.target.files[0];
     if (file) {
+      this.selectedFile = file;
       const reader = new FileReader();
       reader.onload = () => this.avatarUrl = reader.result as string;
       reader.readAsDataURL(file);
     }
+  }
+
+  loadProfilePicture(userId: string) {
+    this.userService.getProfilePicture(userId).subscribe({
+      next: (url) => this.avatarUrl = url,
+      error: () => this.avatarUrl = null
+    });
   }
 
   // --- Save Profile ---
