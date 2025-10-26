@@ -5,11 +5,12 @@
     <div class="user-card-content">
 
     <!-- Profile Picture -->
-    <div class="profile-picture">
-      <img *ngIf="user.profilePicture; else defaultAvatar" [src]="getProfilePictureUrl()" alt="User Picture">
+    <div class="profile-picture clickable" (click)="openAvatarModal()">
+      <!-- Show image if avatarUrl exists, else fallback to initials -->
+      <img *ngIf="avatarUrl; else defaultAvatar"  [src]="avatarUrl" alt="User Picture">
 
       <ng-template #defaultAvatar>
-        <div class="default-avatar clickable" (click)="openAvatarModal()">
+        <div class="default-avatar">
           {{ (user.firstName.charAt(0) || '') + (user.lastName.charAt(0) || '') }}
         </div>
       </ng-template>
@@ -37,9 +38,9 @@
           >
 
           <!-- Preview -->
-          <div *ngIf="avatarUrl" class="preview">
+          <!-- <div *ngIf="avatarUrl" class="preview">
             <img [src]="avatarUrl" alt="Avatar Preview">
-          </div>
+          </div> -->
 
           <!-- Upload Button -->
         </div>
@@ -47,7 +48,7 @@
 
       <mat-dialog-actions align="end" class="dialog-actions">
         <button mat-stroked-button color="warn" class="cancel-btn" (click)="closeAvatarModal()">Cancel</button>
-        <button mat-raised-button color="primary" class="save-btn" (click)="saveAvatar()">Save</button>
+        <button mat-raised-button color="primary" class="save-btn" (click)="onUpload()">Save</button>
       </mat-dialog-actions>
 
     </ng-template>
@@ -88,9 +89,9 @@
           <button mat-raised-button color="primary" class="edit-btn" (click)="editUser()">
             Edit Details
           </button>
-          <!-- <button mat-stroked-button color="warn" class="logout-btn" (click)="logout()">
+          <button mat-stroked-button color="warn" class="logout-btn" (click)="logout()">
             Logout
-          </button> -->
+          </button>
         </div>
       </div>
     </div>

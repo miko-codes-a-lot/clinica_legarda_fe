@@ -5,12 +5,16 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { AuthService } from '../../../_shared/service/auth-service';
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ChangeDetectorRef } from '@angular/core';
+
+import { AuthService } from '../../../_shared/service/auth-service';
+import { UserService } from '../../../_shared/service/user-service';
+
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -24,14 +28,15 @@ Chart.register(...registerables);
 export class UserSettingsIndex implements OnInit {
   @ViewChild('avatarModal') avatarModal!: TemplateRef<any>;
   profileForm!: FormGroup;
-  avatarUrl: string = 'assets/images/default-dentist.png'; // default profile pic
+  // avatarUrl: string = 'assets/images/default-dentist.png'; // default profile pic
+  avatarUrl: string | null = null;
 
   user = {
+    _id: '',
     firstName: '',
     middleName: '',
     lastName: '',
     emailAddress: '',
-    // profileImage: '',
     address: '',
     role: '',
     username: '',
@@ -45,13 +50,15 @@ export class UserSettingsIndex implements OnInit {
 
   selectedDays = new Set<string>();
 
-  selectedAvatarFile: File | null = null;
+  selectedFile: File | null = null;
 
   constructor(
     private fb: FormBuilder,
     private readonly authService: AuthService,
+    private readonly userService: UserService,
     private readonly router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef  // <-- inject
   ) {}
 
 
@@ -61,26 +68,28 @@ export class UserSettingsIndex implements OnInit {
 
   closeAvatarModal() {
     this.dialog.closeAll();
-    this.selectedAvatarFile = null;
+    this.selectedFile = null;
   }
 
-  onAvatarChange(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedAvatarFile = file;
-      const reader = new FileReader();
-      reader.onload = () => this.user.profilePicture = reader.result as string;
-      reader.readAsDataURL(file);
-    }
-  }
-
-  saveAvatar() {
-    if (!this.selectedAvatarFile) return;
-
+  onUpload() {
+  if (!this.selectedFile) return;
+  console.log('this.selectedFile', this.selectedFile)
+  this.userService.uploadProfilePicture(this.user._id, this.selectedFile)
+    .subscribe({
+      next: (res) => {
+        alert('Profile picture uploaded successfully!');
+        this.closeAvatarModal(); // close the dialog
+      },
+      error: (err) => {
+        console.error('Upload error', err);
+        alert('Failed to upload profile picture.');
+      }
+    });
+    // console.log('result index TS', result)
     // TODO: call API to save file
-    console.log('Uploading file:', this.selectedAvatarFile);
 
-    this.closeAvatarModal();
+    // to activate/use
+    // this.closeAvatarModal();
   }
 
   ngOnInit(): void {
@@ -90,12 +99,15 @@ export class UserSettingsIndex implements OnInit {
     // if (mobileNumber) {
     //   applyPHMobilePrefix(mobileNumber)
     // }
-
     this.authService.currentUser$.subscribe({
       next: (user) => {
         console.log('current user: ', user)
         if(user) {
+          if(user?.profilePicture) {
+            this.loadProfilePicture(user._id);
+          }
           this.user = {
+            _id: user._id,
             firstName: user.firstName,
             middleName: user.middleName,
             lastName: user.lastName,
@@ -106,15 +118,13 @@ export class UserSettingsIndex implements OnInit {
             username: user.username,
             // memberSince: new Date('2023-01-15'),
             mobileNumber: user.mobileNumber,
-            profilePicture: '',
+            profilePicture: user.profilePicture || '',
             createdAt: user.createdAt,
             updatedAt: user.updatedAt
           }
-          console.log('this.user settings ', this.user);
         }
       }
     });
-
   }
 
   editUser () {
@@ -122,39 +132,36 @@ export class UserSettingsIndex implements OnInit {
     this.router.navigate(['/app/user-settings/update'])
   }
 
-  getProfilePictureUrl(): string {
-    // replace with your actual file path / API
-    return this.user.profilePicture 
-      ? `/assets/profile-pictures/${this.user.profilePicture}` 
-      : '';
+
+  logout() {
+    this.isLoading = true
+    this.authService.logout()
+      .subscribe({
+        next: () => this.router.navigate(['/app/login']),
+        error: (err) => alert(`Something went wrong: ${err}`)
+      })
+      .add(() => this.isLoading = false)
   }
-
-  changeProfilePicture () {
-    console.log('test upload')
-  }
-
-
-  // logout() {
-  //   this.isLoading = true
-
-  //   this.authService.logout()
-  //     .subscribe({
-  //       next: () => this.router.navigate(['/admin/login']),
-  //       error: (err) => alert(`Something went wrong: ${err}`)
-  //     })
-  //     .add(() => this.isLoading = false)
-  // }
 
   triggerFileInput() {
     console.log('trigger file input')
   }
+
+  // Load the actual profile picture from backend
+  loadProfilePicture(userId: string) {
+    this.userService.getProfilePicture(userId).subscribe({
+      next: (url) => this.avatarUrl = url,
+      error: () => this.avatarUrl = null
+    });
+  }
   // original
-  // onAvatarChange(event: any): void {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onload = () => this.avatarUrl = reader.result as string;
-  //     reader.readAsDataURL(file);
-  //   }
-  // }
+  onAvatarChange(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => this.avatarUrl = reader.result as string;
+      reader.readAsDataURL(file);
+    }
+  }
 }
