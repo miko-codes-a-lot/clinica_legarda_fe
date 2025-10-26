@@ -6,6 +6,7 @@ import { About } from './about/about';
 import { ContactUs } from './contact-us/contact-us';
 import { Faq } from './faq/faq';
 import { DentalService } from './dental-service/dental-service';
+import { AuthGuard } from '../_shared/guard/auth-guard';
 
 export const CLIENT_ROUTES: Routes = [
   {
@@ -49,23 +50,27 @@ export const CLIENT_ROUTES: Routes = [
       },
       {
         path: 'dashboard',
+        canActivate: [AuthGuard],
         loadComponent: () => import('./dashboard/dashboard').then(m => m.Dashboard),
       },
       {
         path: 'profile',
+        canActivate: [AuthGuard],
         loadComponent: () => import('./profile/profile').then(m => m.Profile),
       },
       {
         path: 'my-appointment',
+        canActivate: [AuthGuard],
         loadComponent: () => import('./my-appointment/my-appointment').then(m => m.MyAppointment),
       },
       {
         path: 'my-appointment/details/:id',
+        canActivate: [AuthGuard],
         loadComponent: () => import('./appointment-details/appointment-details').then(m => m.AppointmentDetails),
       },
       {
         path: 'user-settings',
-        // canActivate: [AuthGuard],
+        canActivate: [AuthGuard],
         loadChildren: () => import('./user-settings/user-settings.route').then(m => m.USER_SETTINGS_ROUTES)
       },
       {

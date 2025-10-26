@@ -19,6 +19,11 @@ export class AuthGuard implements CanActivate {
     const expectedRole = route.data['role'] as string; // e.g., 'dentist' or 'admin'
 
     if (!this.authService.isLoggedIn()) {
+      if (expectedRole === 'user') {
+        this.router.navigate(['/app/login']);
+        return of(false);
+      }
+
       this.router.navigate(['/admin/login']); // default login page
       return of(false);
     }
