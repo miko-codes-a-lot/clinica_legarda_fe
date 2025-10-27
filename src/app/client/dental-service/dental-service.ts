@@ -15,11 +15,11 @@ export class DentalService {
       title: 'General Consultation',
       description: 'Comprehensive medical check-ups and personalized advice.'
     },
-    {
-      icon: 'science',
-      title: 'Laboratory Tests',
-      description: 'Accurate diagnostic testing to guide effective treatment.'
-    },
+    // {
+    //   icon: 'science',
+    //   title: 'Laboratory Tests',
+    //   description: 'Accurate diagnostic testing to guide effective treatment.'
+    // },
     {
       icon: 'health_and_safety',
       title: 'Dental Care',

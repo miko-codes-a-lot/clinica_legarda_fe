@@ -12,7 +12,8 @@ export class Faq {
     {
       question: 'What services does Clinica Legarda offer?',
       answer:
-        'We provide general consultations, laboratory tests, dental care, and pediatrics. More services will be added soon!',
+        // 'We provide general consultations, laboratory tests, dental care, and pediatrics. More services will be added soon!',
+        'We provide general consultations, dental care, and pediatrics. More services will be added soon!',
       open: false
     },
     {
