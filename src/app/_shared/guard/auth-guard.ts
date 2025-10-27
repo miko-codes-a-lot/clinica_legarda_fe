@@ -10,7 +10,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
     private router: Router,
-  ) {}
+  ) { }
 
   canActivate(
     route: ActivatedRouteSnapshot,
@@ -18,49 +18,26 @@ export class AuthGuard implements CanActivate {
   ): Observable<boolean> {
     const expectedRole = route.data['role'] as string; // e.g., 'dentist' or 'admin'
 
-    if (!this.authService.isLoggedIn()) {
-      if (expectedRole === 'user') {
-        this.router.navigate(['/app/login']);
-        return of(false);
-      }
-
-      this.router.navigate(['/admin/login']); // default login page
-      return of(false);
-    }
-  return this.authService.currentUser$.pipe(
+    return this.authService.currentUser$.pipe(
       map(user => {
+        if (!expectedRole) return true
+
         if (user?.role === expectedRole) {
-          return true; // user has the required role
+          return true
         } else {
-          // redirect to their default page based on role
           if (user?.role === 'dentist') {
             this.router.navigate(['/dentist/profile']);
           } else if (user?.role === 'admin') {
             this.router.navigate(['/admin/dashboard']);
-          }else if (user?.role === 'user') {
+          } else if (user?.role === 'user') {
             this.router.navigate(['/app/my-appointment']);
           } else {
-            this.router.navigate(['/login']);
+            this.router.navigate(['/admin/login']);
           }
-          return false;
         }
+
+        return false
       })
     );
-    // if (this.authService.isLoggedIn()) {
-    //   this.authService.currentUser$.subscribe({
-    //     next: (user) => {
-    //       if (user?.role === 'dentist') {
-    //         // then this should only activate all the link to dentist page
-    //         console.log('user auth guard', user)
-    //       } else {
-    //         // then this should only activate all the link to admin page
-    //       }
-    //     }
-    //   })
-    //   return true
-    // } else {
-    //   this.router.navigate(['/admin/login'])
-    //   return false
-    // }
   }
 }
