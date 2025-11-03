@@ -55,6 +55,14 @@ export class AppointmentDetails {
     this.router.navigate(['/admin/appointment/update', this.id])
   }
 
+  isClinicNotesDisabled() {
+    return this.appointment && ['rejected', 'cancelled'].includes(this.appointment.status);
+  }
+
+  isClinicEditDisabled() {
+    return this.appointment && ['rejected', 'cancelled', 'confirmed'].includes(this.appointment.status);
+  }
+
   openNotesDialog() {
     if (!this.appointment) return;
 

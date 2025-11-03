@@ -19,7 +19,7 @@
       <div class="note-item clinic-notes">
         <div class="note-header">
           <strong>Clinic Notes:</strong>
-          <button mat-icon-button color="primary" (click)="openNotesDialog()">
+          <button mat-icon-button color="primary" (click)="openNotesDialog()" [disabled]="isClinicNotesDisabled()">
             <mat-icon>edit</mat-icon>
           </button>
         </div>

@@ -1,6 +1,6 @@
 @if (appointment) {
   <div class="view-header">
-    <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
+    <button mat-raised-button color="primary" (click)="onUpdate()" [disabled]="isClinicEditDisabled()">Edit</button>
   </div>
   <app-list [data]="displayAppointment">
     <div class="custom-list">
@@ -16,7 +16,7 @@
       <div class="note-item clinic-notes">
         <div class="note-header">
           <strong>Clinic Notes:</strong>
-          <button mat-icon-button color="primary" (click)="openNotesDialog()">
+          <button mat-icon-button color="primary" (click)="openNotesDialog()" [disabled]="isClinicNotesDisabled()">
             <mat-icon>edit</mat-icon>
           </button>
         </div>

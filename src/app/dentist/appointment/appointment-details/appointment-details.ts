@@ -137,6 +137,10 @@ export class AppointmentDetails {
     return this.appointment && ['confirmed', 'rejected', 'cancelled'].includes(this.appointment.status);
   }
 
+  isClinicNotesDisabled() {
+    return this.appointment && ['rejected', 'cancelled'].includes(this.appointment.status);
+  }
+
   cancelAppointment() {
     // logic to cancel the appointment
     if(this.appointment?._id) {
