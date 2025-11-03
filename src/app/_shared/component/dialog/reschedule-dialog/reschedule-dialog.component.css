@@ -1,0 +1,62 @@
+/* === Dialog Header === */
+h2[mat-dialog-title] {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+/* === Dialog Body === */
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+/* === Input Fields (DatePicker + TimePicker) === */
+app-date-picker,
+app-time-picker {
+  width: 100%;
+  display: block;
+}
+
+/* === Buttons Area === */
+[mat-dialog-actions] {
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* === Buttons === */
+button[mat-button],
+button[mat-raised-button] {
+  min-width: 100px;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+button[mat-raised-button][color="primary"] {
+  background-color: #1976d2;
+  color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+button[mat-raised-button][color="primary"]:hover {
+  background-color: #1565c0;
+}
+
+/* === Responsive === */
+@media (max-width: 480px) {
+  .dialog-body {
+    gap: 0.75rem;
+  }
+
+  button[mat-button],
+  button[mat-raised-button] {
+    min-width: 80px;
+    font-size: 0.9rem;
+  }
+}

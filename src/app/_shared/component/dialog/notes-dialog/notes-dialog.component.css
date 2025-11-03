@@ -1,0 +1,28 @@
+.full-width {
+  width: 100%;
+}
+
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 10px;
+}
+
+.dialog-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  padding: 10px;
+}
+
+.dialog-actions {
+  gap: 0.75rem;
+}
+
+textarea[matInput] {
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 0.5rem;
+  min-height: 120px;
+}

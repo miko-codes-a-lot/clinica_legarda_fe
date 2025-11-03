@@ -58,7 +58,7 @@ export class AppointmentCreate {
     this.isLoading = true
     this.appointmentService.create(appointment).subscribe({
       next: (c) => this.router.navigate(['admin/appointment/details', c._id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => alert(e.error?.message || 'Something went wrong')
     }).add(() => this.isLoading = false)
   }
 }

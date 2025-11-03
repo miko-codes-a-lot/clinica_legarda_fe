@@ -50,15 +50,34 @@ export class DatePicker implements ControlValueAccessor, Validator, OnDestroy, O
   // @Input() dateFilter: DateFilterFn<Date | null> = () => true;
   @Input() required: boolean = false;
   @Input() errorMessage: string = 'Please select a valid date';
-  @Input() dentist!: User
+  @Input() _dentist!: User
+
+  @Input()
+  set dentist(value: User) {
+    // always ensure arrays exist
+    this._dentist = {
+      ...value,
+      operatingHours: value?.operatingHours || [],
+      appointments: value?.appointments || []
+    };
+
+    // if you need to recalc available dates
+    if (this._dentist) {
+      // trigger date/time recalculation if necessary
+      this.onDentistChanged();
+    }
+  }
 
   value: Date | null = null;
   disabled: boolean = false;
   showError: boolean = false;
 
+
   private destroy$ = new Subject<void>();
   private onChange = (value: Date | null) => {};
   private onTouched = () => {};
+
+
 
   ngOnInit(): void {
     // // { day: 'friday', startTime: '09:00', endTime: '18:00' },
@@ -145,9 +164,9 @@ export class DatePicker implements ControlValueAccessor, Validator, OnDestroy, O
 
     // // mock available days of the dentist
     // const operatingHours = this.dentist.operatingHours.filter((_, i) => i < 5)
-    const operatingHours = this.dentist.operatingHours
+    const operatingHours = this._dentist.operatingHours
     const days = operatingHours.map(o => this.dayNameToNumber[o.day])
-  
+    
     // disable if dentist does not operate on this day
     if (!days.includes(day)) return false
 
@@ -164,12 +183,12 @@ export class DatePicker implements ControlValueAccessor, Validator, OnDestroy, O
 
   private isFullyBooked(date: Date): boolean {
     const dayName = this.getDayNameFromDate(date)
-    const daySchedule = this.dentist.operatingHours.find(oh => oh.day === dayName)
+    const daySchedule = this._dentist.operatingHours.find(oh => oh.day === dayName)
 
     if (!daySchedule) return true // if no schedule, consider it fully booked
 
     // get all the appointment for this specific date
-    const appointments = this.dentist.appointments.filter(appointment => {
+    const appointments = this._dentist.appointments.filter(appointment => {
       const appointmentDate = new Date(appointment.date)
       return this.isSameDate(appointmentDate, date) &&
         (appointment.status !== AppointmentStatus.CANCELLED &&
@@ -217,5 +236,21 @@ export class DatePicker implements ControlValueAccessor, Validator, OnDestroy, O
     const todayOnly = toDateOnly(today);
     // Return true if the date s before today (i.e., a past date)
     return checkDateOnly < todayOnly;
+  }
+
+  private onDentistChanged() {
+    // reset current value if the new dentist doesn't work on the previously selected day
+    if (this.value) {
+      const day = this.value.getDay();
+      const operatingDays = this._dentist.operatingHours.map(h => this.dayNameToNumber[h.day]);
+      if (!operatingDays.includes(day)) {
+        this.writeValue(null);
+        this.onChange(null);
+      }
+    }
+  }
+
+  get dentist(): User {
+    return this._dentist;
   }
 }

@@ -1,48 +1,155 @@
 <div class="appointments-page">
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <section class="appointments-hero">
     <h1>My Appointments</h1>
-    <p>Keep track of your upcoming confirmed appointments with Clinica Legarda.</p>
+    <p>View and manage your dental appointments with Clinica Legarda.</p>
   </section>
 
-  <!-- Upcoming Appointments -->
-  <section class="upcoming-appointments">
-    <h2>Upcoming Confirmed Appointments</h2>
+  <section class="appointments-section">
 
-    <div *ngIf="upcomingAppointmentsData.length > 0; else noUpcoming">
-      <div *ngFor="let appointment of upcomingAppointmentsData" class="appointment-card upcoming">
-        
-        <!-- Date & Time -->
-        <div class="appointment-date">
-          <span class="date">{{ appointment.date | date:'mediumDate' }}</span>
-          <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
+    <!-- Confirmed -->
+    <div class="appointment-group">
+      <h2 class="group-title confirmed-title">
+        <mat-icon>check_circle</mat-icon> Confirmed Appointments
+      </h2>
+
+      <div *ngIf="hasConfirmedAppointments; else noConfirmed">
+        <div *ngFor="let appointment of confirmedAppointments" class="appointment-card confirmed">
+
+          <div class="appointment-date">
+            <span class="date">{{ appointment.date | date:'mediumDate' }}</span>
+            <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
+          </div>
+
+          <div class="appointment-details">
+            <h3>Services:</h3>
+            <ul>
+              <li *ngFor="let s of appointment.services">{{ s.name }}</li>
+            </ul>
+            <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
+            <p>Clinic: {{ appointment.clinic.address }}</p>
+            <p *ngIf="appointment.notes?.patientNotes">Notes: {{ appointment.notes.patientNotes }}</p>
+          </div>
+
+          <div class="appointment-status">
+            <span class="status-badge confirmed">
+              <mat-icon>check_circle</mat-icon> Confirmed
+            </span>
+            <div class="actions">
+              <button class="btn-reschedule" (click)="onReschedule(appointment)">
+                <mat-icon>event_repeat</mat-icon> Reschedule
+              </button>
+              <button class="btn-cancel" (click)="onCancel(appointment)">
+                <mat-icon>cancel</mat-icon> Cancel
+              </button>
+            </div>
+          </div>
+
         </div>
-
-        <!-- Details -->
-        <div class="appointment-details">
-          <h3>Services:</h3>
-          <ul>
-            <li *ngFor="let s of appointment.services">{{ s.name }}</li>
-          </ul>
-          <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
-          <p>Clinic: {{ appointment.clinic.address }}</p>
-          <p *ngIf="appointment.notes?.patientNotes">Notes: {{ appointment.notes.patientNotes }}</p>
-          <p>Status: <span class="status upcoming">{{ appointment.status }}</span></p>
-        </div>
-
-        <!-- Actions -->
-        <!-- <div class="appointment-actions">
-          <button (click)="rescheduleAppointment(appointment)">Reschedule</button>
-          <button class="cancel" (click)="cancelAppointment(appointment)">Cancel</button>
-        </div> -->
-
       </div>
+
+      <ng-template #noConfirmed>
+        <p class="no-appointments">No confirmed appointments yet.</p>
+      </ng-template>
     </div>
 
-    <ng-template #noUpcoming>
-      <p class="no-appointments">No upcoming confirmed appointments.</p>
-    </ng-template>
+    <!-- Pending -->
+    <div class="appointment-group">
+      <h2 class="group-title pending-title">
+        <mat-icon>hourglass_empty</mat-icon> Pending Appointments
+      </h2>
+
+      <div *ngIf="hasPendingAppointments; else noPending">
+        <div *ngFor="let appointment of pendingAppointments" class="appointment-card pending">
+          <div class="appointment-date">
+            <span class="date">{{ appointment.date | date:'mediumDate' }}</span>
+            <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
+          </div>
+          <div class="appointment-details">
+            <h3>Services:</h3>
+            <ul>
+              <li *ngFor="let s of appointment.services">{{ s.name }}</li>
+            </ul>
+            <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
+            <p>Clinic: {{ appointment.clinic.address }}</p>
+            <p *ngIf="appointment.notes?.patientNotes">Notes: {{ appointment.notes.patientNotes }}</p>
+          </div>
+          <div class="appointment-status">
+            <span class="status-badge pending">
+              <mat-icon>hourglass_empty</mat-icon> Pending
+            </span>
+            <div class="actions">
+              <button class="btn-cancel" (click)="onCancel(appointment)">
+                <mat-icon>cancel</mat-icon> Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noPending>
+        <p class="no-appointments">No pending appointments yet.</p>
+      </ng-template>
+    </div>
+
+    <!-- Rejected -->
+    <div class="appointment-group">
+      <h2 class="group-title rejected-title">
+        <mat-icon>cancel</mat-icon> Rejected Appointments
+      </h2>
+      <div *ngIf="hasRejectedAppointments; else noRejected">
+        <div *ngFor="let appointment of rejectedAppointments" class="appointment-card rejected">
+          <div class="appointment-date">
+            <span class="date">{{ appointment.date | date:'mediumDate' }}</span>
+            <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
+          </div>
+          <div class="appointment-details">
+            <h3>Services:</h3>
+            <ul>
+              <li *ngFor="let s of appointment.services">{{ s.name }}</li>
+            </ul>
+            <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
+            <p>Clinic: {{ appointment.clinic.address }}</p>
+          </div>
+          <div class="appointment-status">
+            <span class="status-badge rejected">
+              <mat-icon>cancel</mat-icon> Rejected
+            </span>
+          </div>
+        </div>
+      </div>
+      <ng-template #noRejected><p class="no-appointments">No rejected appointments.</p></ng-template>
+    </div>
+
+    <!-- Cancelled -->
+    <div class="appointment-group">
+      <h2 class="group-title cancelled-title">
+        <mat-icon>block</mat-icon> Cancelled Appointments
+      </h2>
+      <div *ngIf="hasCancelledAppointments; else noCancelled">
+        <div *ngFor="let appointment of cancelledAppointments" class="appointment-card cancelled">
+          <div class="appointment-date">
+            <span class="date">{{ appointment.date | date:'mediumDate' }}</span>
+            <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
+          </div>
+          <div class="appointment-details">
+            <h3>Services:</h3>
+            <ul>
+              <li *ngFor="let s of appointment.services">{{ s.name }}</li>
+            </ul>
+            <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
+            <p>Clinic: {{ appointment.clinic.address }}</p>
+          </div>
+          <div class="appointment-status">
+            <span class="status-badge cancelled">
+              <mat-icon>block</mat-icon> Cancelled
+            </span>
+          </div>
+        </div>
+      </div>
+      <ng-template #noCancelled><p class="no-appointments">No cancelled appointments.</p></ng-template>
+    </div>
 
   </section>
 </div>

@@ -15,33 +15,57 @@
 
     <div class="row-divider"></div>
 
-    <div class="custom-list">
-      <mat-list-item>
-        <span class="item-title" matListItemTitle>Notes:</span>
-        <span class="item-line" matListItemLine>
-          Clinic Notes: {{ appointment.notes.clinicNotes }} <br>
-        </span>
-        <span class="item-line" matListItemLine>
-          Patient Notes: {{ appointment.notes.patientNotes }}
-        </span>
-      </mat-list-item>
+    <div class="notes-section">
+      <div class="note-item clinic-notes">
+        <div class="note-header">
+          <strong>Clinic Notes:</strong>
+          <button mat-icon-button color="primary" (click)="openNotesDialog()">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+        <div class="note-body">
+          {{ appointment.notes.clinicNotes || 'No notes yet' }}
+        </div>
+      </div>
+
+      <div class="note-item patient-notes">
+        <div class="note-header">
+          <strong>Patient Notes:</strong>
+        </div>
+        <div class="note-body">
+          {{ appointment.notes.patientNotes || 'No notes yet' }}
+        </div>
+      </div>
     </div>
+
+
   </app-list>
 
   <!-- Approve / Decline Buttons -->
-  <div class="action-buttons">
-    <button mat-flat-button color="primary" 
-            (click)="approveAppointment()" 
-            [disabled]="appointment.status === 'confirmed'">
-      <mat-icon>check</mat-icon> Approve
-    </button>
 
+  <div class="action-buttons">
     <button mat-stroked-button color="warn" 
-            (click)="declineAppointment()" 
-            [disabled]="appointment.status === 'rejected'">
-      <mat-icon>close</mat-icon> Reject
+            (click)="cancelAppointment()" 
+            *ngIf="appointment.status === 'confirmed' else notConfirmed">
+      <mat-icon>cancel</mat-icon> Cancel
     </button>
   </div>
+  <ng-template #notConfirmed>
+    <div class="action-buttons" >
+      <button mat-flat-button color="primary" 
+              (click)="approveAppointment()" 
+              [disabled]="isActionDisabled()">
+        <mat-icon>check</mat-icon> Approve
+      </button>
+
+      <button mat-stroked-button color="warn" 
+              (click)="declineAppointment()" 
+              [disabled]="isActionDisabled()">
+        <mat-icon>close</mat-icon> Reject
+      </button>
+    </div>
+  </ng-template>
+
 } @else {
   <p>Fetching details...</p>
 }

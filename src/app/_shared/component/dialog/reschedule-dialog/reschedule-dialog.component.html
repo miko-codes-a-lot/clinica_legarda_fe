@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>Reschedule Appointment</h2>
+
+<!-- Wait until form is initialized -->
+<div *ngIf="form" mat-dialog-content [formGroup]="form" class="dialog-body">
+
+  <!-- Show current appointment details -->
+  <div class="current-appointment-info" style="margin-bottom: 1rem;">
+    <strong>Current Appointment:</strong><br />
+    Date: {{ data.date | date: 'fullDate' }}<br />
+    Time: {{ data.startTime }} - {{ data.endTime }}
+  </div>
+
+  <!-- Date picker -->
+  <app-date-picker
+    formControlName="date"
+    label="New Appointment Day"
+    placeholder="Choose a date"
+    [dentist]="fakeDentist"
+  ></app-date-picker>
+
+  <br />
+
+  <!-- Time picker -->
+  <app-time-picker
+    formControlName="time"
+    label="New Appointment Time"
+    [dentist]="fakeDentist"
+    [selectedDate]="form.get('date')?.value"
+    [serviceDuration]="60"
+    [timeSlotInterval]="30"
+    [required]="true"
+  ></app-time-picker>
+
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()">Save</button>
+</div>

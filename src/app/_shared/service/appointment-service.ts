@@ -79,6 +79,11 @@ export class AppointmentService {
   }
 
   create(appointment: AppointmentPayload): Observable<Appointment> {
+    
+    if(appointment.date) {
+      const d = new Date(appointment.date);
+      appointment.date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    }
     return this.http.post<Appointment>(this.baseUrl, appointment, { withCredentials: true });
     // return new Observable((s) => {
     //   setTimeout(() => {
@@ -105,7 +110,11 @@ export class AppointmentService {
   }
 
   update(id: string, appointment: AppointmentPayload): Observable<Appointment> {
-      return this.http.put<Appointment>(`${this.baseUrl}/${id}`, appointment, { withCredentials: true });
+    if(appointment.date) {
+      const d = new Date(appointment.date);
+      appointment.date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    }
+    return this.http.put<Appointment>(`${this.baseUrl}/${id}`, appointment, { withCredentials: true });
   }
 
   delete(id: string): Observable<void> {
@@ -118,5 +127,28 @@ export class AppointmentService {
 
   rejectAppointment(appointmentId: string) {
     return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/reject`, {}, { withCredentials: true });
+  }
+
+  cancelAppointment(appointmentId: string) {
+    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/cancel`, {}, { withCredentials: true });
+  }
+
+  rescheduleAppointment(appointmentId: string, payload: { date: Date; startTime: string; endTime: string }) {
+
+    if(payload.date) {
+      const d = new Date(payload.date);
+      payload.date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    }
+    return this.http.patch<Appointment>(
+      `${this.baseUrl}/${appointmentId}/reschedule`,
+      payload,
+      { withCredentials: true }
+    );
+  }
+  updateDentistNotes(appointmentId: string, notes: string): Observable<Appointment> {
+    console.log('notes', notes)
+    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/notes`, {
+      clinicNotes: notes
+    });
   }
 }

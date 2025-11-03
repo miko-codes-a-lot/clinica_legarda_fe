@@ -24,12 +24,12 @@
                 formControlName="date"
                 label="Appointment Day"
                 placeholder="Choose a date"
-                [dentist]="selectedDentist">
+                [dentist]="safeSelectedDentist">
               </app-date-picker> <br>
 
               <app-time-picker
                 label="Appointment Time"
-                [dentist]="selectedDentist"
+                [dentist]="safeSelectedDentist"
                 [selectedDate]="date.value"
                 [serviceDuration]="60"
                 [timeSlotInterval]="30"

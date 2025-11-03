@@ -5,7 +5,7 @@
   line-height: 1.6;
 }
 
-/* Hero */
+/* Hero Section */
 .appointments-hero {
   text-align: center;
   margin-bottom: 3rem;
@@ -17,21 +17,20 @@
 }
 
 .appointments-hero h1 {
-  font-size: 2.8rem;
+  font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
 }
 
 .appointments-hero p {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
-/* Section Titles */
-.upcoming-appointments h2,
-.past-appointments h2 {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
+/* Section Title */
+.appointments-section h2 {
+  font-size: 1.8rem;
   color: #007bff;
+  margin-bottom: 1.5rem;
 }
 
 /* Cards */
@@ -43,7 +42,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -53,7 +52,7 @@
 }
 
 .appointment-date {
-  flex: 0 0 150px;
+  flex: 0 0 160px;
   text-align: left;
 }
 
@@ -63,8 +62,8 @@
 
 .appointment-date .time {
   display: block;
-  font-size: 0.95rem;
-  color: #555;
+  font-size: 0.9rem;
+  color: #666;
 }
 
 .appointment-details {
@@ -72,44 +71,51 @@
   padding: 0 1rem;
 }
 
-.status.upcoming {
-  color: #007bff;
+.appointment-details h3 {
+  margin: 0 0 0.5rem;
+  color: #333;
+}
+
+.appointment-details ul {
+  padding-left: 1.2rem;
+  margin: 0.3rem 0 1rem;
+}
+
+.appointment-details li {
+  list-style: disc;
+  margin-left: 0.5rem;
+  font-size: 0.95rem;
+}
+
+/* Status Badge */
+.appointment-status {
+  text-align: right;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
   font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: capitalize;
 }
 
-.status.past {
-  color: #888;
-  font-weight: 500;
+.status-badge.confirmed {
+  background-color: #e6f4ea;
+  color: #28a745;
+  border: 1px solid #b3e2c0;
 }
 
-.appointment-actions {
-  display: flex;
-  gap: 0.5rem;
+.status-badge.pending {
+  background-color: #fff3cd;
+  color: #d39e00;
+  border: 1px solid #ffeeba;
 }
 
-.appointment-actions button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.3s ease;
-}
-
-.appointment-actions button:hover {
-  opacity: 0.9;
-}
-
-.appointment-actions .cancel {
-  background: #d32f2f;
-  color: white;
-}
-
-.appointment-actions button:not(.cancel) {
-  background: #007bff;
-  color: white;
-}
-
+/* Empty Message */
 .no-appointments {
   color: #555;
   font-style: italic;
@@ -117,18 +123,51 @@
   padding: 1rem 0;
 }
 
-.appointment-details ul {
-  padding-left: 1rem;
-  margin: 0.5rem 0;
+.actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
-.appointment-details ul li {
-  list-style: disc;
-  margin-left: 0.5rem;
-  font-size: 0.95rem;
+button {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
 }
 
-.status.upcoming {
-  color: #28a745;
-  font-weight: 600;
+/* Reschedule Button */
+.btn-reschedule {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #1976d2;
+
+  &:hover {
+    background-color: #bbdefb;
+    box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3);
+  }
+}
+
+/* Cancel Button */
+.btn-cancel {
+  background-color: #e53935;
+  color: #fff;
+
+  &:hover {
+    background-color: #c62828;
+    box-shadow: 0 2px 6px rgba(198, 40, 40, 0.4);
+  }
+}
+
+/* Optional: Make icons smaller & aligned */
+button mat-icon {
+  font-size: 18px;
+  vertical-align: middle;
 }

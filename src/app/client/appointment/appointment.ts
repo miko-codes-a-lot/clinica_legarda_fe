@@ -54,6 +54,19 @@ export class AppointmentPage {
     private readonly userService: UserService // inject here
   ) {}
 
+  private emptyDentist: User = {
+    _id: '',
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    emailAddress: '',
+    mobileNumber: '',
+    address: '',
+    role: 'dentist',
+    operatingHours: [],
+    appointments: []
+  };
+
   private clearDateTime() {
     this.date.setValue(new Date())
     this.time.setValue('')
@@ -63,21 +76,26 @@ export class AppointmentPage {
     const clinic = this.clinics.find(c => c._id == clinicId)
     if (!clinic) return
 
-    
     this.userService.getAll().subscribe(users => {
       // filter dentists by clinic
-      this.dentists = users.filter(u => u.clinic === clinic?._id)
+      this.dentists = users.filter(u => u.clinic === clinic._id) || []
       this.builAppointmentFields();
+
+      if (!this.dentists.find(d => d._id === this.selectedDentist?._id)) {
+        this.selectedDentist = undefined
+        this.time.setValue('')
+      }
     })
-    this.dentists = clinic.dentists
-    this.builAppointmentFields();
+    // this.dentists = clinic.dentists
+    // this.builAppointmentFields();
   }
 
   private setDentist(dentistId: string) {
+    if (!this.dentists) return
     const dentist = this.dentists.find(d => d._id == dentistId)
-    if (!dentist) return
-
+    // the problem might be here
     this.selectedDentist = dentist
+    console.log('setDentist', this.selectedDentist)
   }
 
   ngOnInit(): void {
@@ -104,11 +122,22 @@ export class AppointmentPage {
       }
     })
     this.dentist.valueChanges.subscribe({
-      next: (d) => {
-        this.setDentist(d)
-        this.clearDateTime()
+      next: (dentistId) => {
+        this.setDentist(dentistId);
+
+        // reset date and time
+        this.date.setValue(null as any);
+        this.time.setValue('');
+
+        if (!this.selectedDentist) return;
+
+        // ensure arrays exist to prevent runtime errors
+        this.selectedDentist.operatingHours = this.selectedDentist.operatingHours || [];
+        this.selectedDentist.appointments = this.selectedDentist.appointments || [];
       }
-    })
+    });
+
+
     this.date.valueChanges.subscribe({
       next: (v) => {
         this.time.setValue('')
@@ -123,7 +152,6 @@ export class AppointmentPage {
     const selectClinic = this.maptoOptions(this.clinics)
     const selectDentist = this.maptoOptions(customSelectDentist)
     const selectDentalService = this.maptoOptions(this.dentalServices)
-
     this.appointmentFields = [
       { name: 'clinic', label: 'Clinic', type: 'select', options: selectClinic},
       { name: 'patient', label: 'Patient', type: 'text', readonly: true},
@@ -214,6 +242,10 @@ export class AppointmentPage {
     }
 
     this.onSubmitEvent.emit(appointment)
+  }
+
+  get safeSelectedDentist(): User {
+    return this.selectedDentist || this.emptyDentist;
   }
 
   get clinic() {
