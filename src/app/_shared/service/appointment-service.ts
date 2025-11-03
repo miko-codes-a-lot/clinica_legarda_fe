@@ -134,7 +134,6 @@ export class AppointmentService {
   }
 
   rescheduleAppointment(appointmentId: string, payload: { date: Date; startTime: string; endTime: string }) {
-
     if(payload.date) {
       const d = new Date(payload.date);
       payload.date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));

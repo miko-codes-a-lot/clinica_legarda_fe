@@ -5,10 +5,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ListComponent } from '../../../_shared/component/list/list.component';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { NotesDialogComponent } from '../../../_shared/component/dialog/notes-dialog/notes-dialog.component';
 
 @Component({
 selector: 'app-appointment-details',
-  imports: [ListComponent, MatListModule, MatButtonModule],
+  imports: [ListComponent, MatListModule, MatButtonModule, MatIconModule],
   templateUrl: './appointment-details.html',
   styleUrl: './appointment-details.css'
 })
@@ -22,6 +25,7 @@ export class AppointmentDetails {
     private readonly appointmentService: AppointmentService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -49,5 +53,34 @@ export class AppointmentDetails {
 
   onUpdate() {
     this.router.navigate(['/admin/appointment/update', this.id])
+  }
+
+  openNotesDialog() {
+    if (!this.appointment) return;
+
+    const dialogRef = this.dialog.open(NotesDialogComponent, {
+      data: { clinicNotes: this.appointment.notes.clinicNotes }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== undefined) {
+        this.isLoading = true;
+        if(this.appointment?._id) {
+          this.appointmentService.updateDentistNotes(this.appointment._id, result)
+            .subscribe({
+              next: (updatedAppointment) => {
+                this.appointment = updatedAppointment;
+                alert('Clinic notes updated successfully!');
+                this.isLoading = false;
+              },
+              error: (err) => {
+                console.error(err);
+                alert('Failed to update clinic notes');
+                this.isLoading = false;
+              }
+          });
+        }
+      }
+    });
   }
 }

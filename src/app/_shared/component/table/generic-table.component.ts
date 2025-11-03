@@ -24,7 +24,14 @@ export class GenericTableComponent<T> implements AfterViewInit {
   @Input() createButtonLabel = '';
   @Input() createButtonLink = '';
   @Input() displayedColumns: string[] = [];
-  @Input() columnDefs: { key: string; label: string; cell?: (element: T) => any }[] = [];
+  @Input() columnDefs: {
+    key: string;
+    label: string;
+    cell?: (element: T) => any;
+    disableEdit?: (element: T) => boolean;
+  }[] = [];
+  @Input() disableEditFn?: (element: T) => boolean;
+
   @Input() dataSource = new MatTableDataSource<T>();
   @Input() isLoading = false;
 
@@ -95,5 +102,9 @@ export class GenericTableComponent<T> implements AfterViewInit {
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  getEditDisabled(element: T): boolean {
+    return this.disableEditFn ? this.disableEditFn(element) : false;
   }
 }

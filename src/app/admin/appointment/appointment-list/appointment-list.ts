@@ -28,6 +28,8 @@ export class AppointmentList implements OnInit {
     { key: 'time', label: 'Time', cell: (appointment: Appointment) =>  `${appointment.startTime} - ${appointment.endTime}` },
   ];
 
+  disableEdit = (appointment: Appointment) => appointment.status !== 'pending';
+
   constructor(
     private readonly appointmentService: AppointmentService,
     private readonly router: Router,

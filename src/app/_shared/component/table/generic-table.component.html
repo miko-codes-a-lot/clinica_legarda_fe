@@ -47,7 +47,7 @@
             <mat-icon>visibility</mat-icon>
           </button>
           @if (update.observers.length > 0) {
-            <button mat-icon-button color="accent" (click)="onUpdateClick(element)">
+            <button mat-icon-button color="accent" (click)="onUpdateClick(element)" [disabled]="getEditDisabled(element)">
               <mat-icon>edit</mat-icon>
             </button>
           }

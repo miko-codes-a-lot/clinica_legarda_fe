@@ -12,16 +12,27 @@
       </mat-list-item>
     </div>
     <div class="row-divider"></div>
-    <div class="custom-list">
-      <mat-list-item>
-        <span class="item-title" matListItemTitle>Notes:</span>
-          <span class="item-line" matListItemLine>
-            Clinic Notes: {{ appointment.notes.clinicNotes }} <br>
-          </span>
-          <span class="item-line" matListItemLine>
-            Patient Notes: {{ appointment.notes.patientNotes }}
-          </span>
-      </mat-list-item>
+    <div class="notes-section">
+      <div class="note-item clinic-notes">
+        <div class="note-header">
+          <strong>Clinic Notes:</strong>
+          <button mat-icon-button color="primary" (click)="openNotesDialog()">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+        <div class="note-body">
+          {{ appointment.notes.clinicNotes || 'No notes yet' }}
+        </div>
+      </div>
+
+      <div class="note-item patient-notes">
+        <div class="note-header">
+          <strong>Patient Notes:</strong>
+        </div>
+        <div class="note-body">
+          {{ appointment.notes.patientNotes || 'No notes yet' }}
+        </div>
+      </div>
     </div>
   </app-list>
 } @else {

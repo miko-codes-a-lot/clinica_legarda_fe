@@ -83,7 +83,8 @@ export class AppointmentForm {
       patient: [this.appointment.patient._id || '', Validators.required],
       services: [this.appointment.services.map(s => s._id || ''), Validators.required],
       date: [this.appointment.date, Validators.required],
-      time: [this.appointment.startTime, Validators.required]
+      time: [this.appointment.startTime, Validators.required],
+      patientNotes: [this.appointment.notes?.patientNotes || '']
     })
     this.changeDentists(clinicId)
     this.setDentist(dentistId)
@@ -108,6 +109,7 @@ export class AppointmentForm {
   }
 
   private builAppointmentFields() {
+    this.patients = this.patients.filter((p) => p.role === 'user');
     const customeSelectPatient = this.setUsersKey(this.patients)
     const customSelectDentist = this.setUsersKey(this.dentists)
     const selectClinic = this.maptoOptions(this.clinics)
@@ -125,6 +127,13 @@ export class AppointmentForm {
       this.appointmentFields.splice(1, 0, { 
         name: 'dentist', label: 'Dentist', type: 'select', options: selectDentist
       })
+
+      this.appointmentFields.splice(6, 0, {
+        name: 'patientNotes',
+        label: 'Notes for Dentist',
+        type: 'textarea',
+        placeholder: 'Write any notes or concerns for your dentist here...',
+      });
     }
 
   }
@@ -200,7 +209,7 @@ export class AppointmentForm {
       status: AppointmentStatus.PENDING,
       notes: {
         clinicNotes: '',
-        patientNotes: '',
+        patientNotes: this.rxform.controls.patientNotes.value || '',
       },
       // history: []
     }

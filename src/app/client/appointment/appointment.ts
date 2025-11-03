@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AppointmentPayload } from '../../admin/appointment/appointment-payload';
 import { Appointment, AppointmentStatus } from '../../_shared/model/appointment';
 import { User } from '../../_shared/model/user';
-import { RxAppointmentForm } from '../../admin/appointment/appointment-form/rx-appointment-form';
+import { RxAppointmentForm } from './rx-appointment-form';
 import { DentalService } from '../../_shared/model/dental-service';
 import { Clinic } from '../../_shared/model/clinic';
 import { DatePicker } from '../../_shared/component/date-picker/date-picker';
@@ -95,7 +95,6 @@ export class AppointmentPage {
     const dentist = this.dentists.find(d => d._id == dentistId)
     // the problem might be here
     this.selectedDentist = dentist
-    console.log('setDentist', this.selectedDentist)
   }
 
   ngOnInit(): void {
@@ -111,7 +110,8 @@ export class AppointmentPage {
       patient: [user? `${user?.firstName} ${user?.lastName} `: '', Validators.required],
       services: [this.appointment.services.map(s => s._id || ''), Validators.required],
       date: [this.appointment.date, Validators.required],
-      time: [this.appointment.startTime, Validators.required]
+      time: [this.appointment.startTime, Validators.required],
+      patientNotes: [this.appointment.notes?.patientNotes || '']
     })
     this.changeDentists(clinicId)
     this.setDentist(dentistId)
@@ -163,6 +163,13 @@ export class AppointmentPage {
       this.appointmentFields.splice(1, 0, { 
         name: 'dentist', label: 'Dentist', type: 'select', options: selectDentist
       })
+
+      this.appointmentFields.splice(6, 0, {
+        name: 'patientNotes',
+        label: 'Notes for Dentist',
+        type: 'textarea',
+        placeholder: 'Write any notes or concerns for your dentist here...',
+      });
     }
   }
 
@@ -236,7 +243,7 @@ export class AppointmentPage {
       status: AppointmentStatus.PENDING,
       notes: {
         clinicNotes: '',
-        patientNotes: '',
+        patientNotes: this.rxform.controls.patientNotes.value || '',
       },
       // history: []
     }
