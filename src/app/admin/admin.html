@@ -29,34 +29,20 @@
         <mat-icon class="dropdown-arrow">arrow_drop_down</mat-icon>
       </button>
 
-      <mat-menu #userMenu="matMenu" class="user-menu">
-        <!-- Header Section -->
-        <div class="menu-header">
-          <div class="menu-avatar">
-             <!-- to display -->
-            <!-- <mat-icon>account_circle</mat-icon> -->
-             <!-- {{ user.firstname }} -->
-          </div>
-          <div class="menu-info">
-            <!-- to display -->
-            <!-- <span class="menu-name">Juan Dela Cruz</span> -->
-            <!-- <span class="menu-role">Administrator</span> -->
-          </div>
-        </div>
+    <mat-menu #userMenu="matMenu" class="user-menu custom-menu">
+      <!-- Header Section -->
 
-        <!-- <mat-divider></mat-divider> -->
+      <!-- Menu Items -->
+      <button mat-menu-item (click)="goToUserSettings()">
+        <mat-icon>settings</mat-icon>
+        <span>My Account</span>
+      </button>
 
-        <!-- Menu Items -->
-        <button mat-menu-item (click)="goToUserSettings()">
-          <mat-icon>settings</mat-icon>
-          <span>My Account</span>
-        </button>
-
-        <button mat-menu-item (click)="onClickLogout()">
-          <mat-icon color="warn">logout</mat-icon>
-          <span>Logout</span>
-        </button>
-      </mat-menu>
+      <button mat-menu-item (click)="onClickLogout()">
+        <mat-icon color="warn">logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
 
     </mat-toolbar>
 
