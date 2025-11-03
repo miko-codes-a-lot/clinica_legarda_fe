@@ -14,14 +14,16 @@ import { MatInputModule } from '@angular/material/input';
 })
 export class NotesDialogComponent {
   form: FormGroup;
+  initialNotes: string;
 
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<NotesDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { clinicNotes: string }
   ) {
+    this.initialNotes = data.clinicNotes || '';
     this.form = this.fb.group({
-      clinicNotes: [data.clinicNotes || '']
+      clinicNotes: [this.initialNotes]
     });
   }
 
@@ -30,6 +32,12 @@ export class NotesDialogComponent {
   }
 
   onSave() {
-    this.dialogRef.close(this.form.value.clinicNotes);
+    if (this.form.valid && this.form.dirty && this.form.value.clinicNotes !== this.initialNotes) {
+      this.dialogRef.close(this.form.value.clinicNotes);
+    }
+  }
+
+  get clinicNotesControl() {
+    return this.form.get('clinicNotes');
   }
 }

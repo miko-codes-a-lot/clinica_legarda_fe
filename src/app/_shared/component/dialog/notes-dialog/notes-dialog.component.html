@@ -3,11 +3,23 @@
 <form [formGroup]="form" class="dialog-body">
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>Clinic Notes</mat-label>
-    <textarea matInput formControlName="clinicNotes" rows="6" placeholder="Enter your findings here..."></textarea>
+    <textarea
+      matInput
+      formControlName="clinicNotes"
+      rows="6"
+      placeholder="Enter your findings here..."
+    ></textarea>
   </mat-form-field>
 
   <div mat-dialog-actions align="end" class="dialog-actions">
     <button mat-stroked-button color="warn" (click)="onCancel()">Cancel</button>
-    <button mat-flat-button color="primary" (click)="onSave()">Save</button>
+    <button
+      mat-flat-button
+      color="primary"
+      [disabled]="!form.dirty || form.controls['clinicNotes'].value === initialNotes"
+      (click)="onSave()"
+    >
+      Save
+    </button>
   </div>
 </form>
