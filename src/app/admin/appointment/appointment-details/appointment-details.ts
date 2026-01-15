@@ -46,6 +46,7 @@ export class AppointmentDetails {
           patient: patientData.firstName + ' ' + patientData.lastName,
         }
         this.appointment = a
+        console.log('this.displayAppointment', this.displayAppointment);
       },
       error: (e) => alert(`Something went wrong ${e}`)
     }).add(() => this.isLoading = false)

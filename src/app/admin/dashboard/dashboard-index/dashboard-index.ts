@@ -44,7 +44,9 @@ Chart.register(...registerables);
 export class DashboardIndex {
   @ViewChild('servicesChart', { static: false }) servicesChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('appointmentTrendChart', { static: false }) appointmentTrendRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('serviceTrendChart', { static: false }) serviceTrendChartRef!: ElementRef<HTMLCanvasElement>;
 
+  serviceTrendChart!: Chart;
   notifications$!: Observable<Notification[]>;
   unreadNotificationsCount$!: Observable<number>;
 
@@ -148,6 +150,7 @@ export class DashboardIndex {
     this.updateDashboardMetrics();
     this.createOrUpdateServicesChart();
     this.createAppointmentTrendChart();
+    this.createServiceTrendChart();
   }
 
   // ----------------- METRICS CALCULATION -----------------
@@ -355,5 +358,87 @@ export class DashboardIndex {
 
   redirectToDetails(link: string | undefined) {
     if (link) this.router.navigate([link]);
+  }
+
+  private createServiceTrendChart(): void {
+    const trendData = this.getServiceTrendData();
+
+    if (this.serviceTrendChart) {
+      this.serviceTrendChart.data.labels = trendData.labels;
+      this.serviceTrendChart.data.datasets = trendData.datasets;
+      this.serviceTrendChart.update();
+      return;
+    }
+
+    const config: ChartConfiguration = {
+      type: 'bar',
+      data: {
+        labels: trendData.labels,
+        datasets: trendData.datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: {
+            callbacks: {
+              label: (context) => `${context.dataset.label}: ${context.parsed.y}`
+            }
+          }
+        },
+        scales: {
+          x: { stacked: true },
+          y: {
+            beginAtZero: true,
+            stacked: true,
+            ticks: { stepSize: 1 }
+          }
+        }
+      }
+    };
+
+    this.serviceTrendChart = new Chart(this.serviceTrendChartRef.nativeElement, config);
+  }
+
+  private getServiceTrendData(): { labels: string[], datasets: { label: string, data: number[], backgroundColor: string }[] } {
+    const startOfWeek = this.getStartOfWeek();
+    const labels: string[] = [];
+    const dayAppointments: Appointment[][] = [[], [], [], [], [], [], []]; // 7 days
+
+    // Initialize weekday labels
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+      labels.push(day.toLocaleDateString('en-US', { weekday: 'short' }));
+
+      // Filter appointments per day
+      dayAppointments[i] = this.appointmentData.filter(a => {
+        const date = new Date(a.date);
+        return date.getFullYear() === day.getFullYear()
+          && date.getMonth() === day.getMonth()
+          && date.getDate() === day.getDate();
+      });
+    }
+
+    // Collect all unique services
+    const allServicesSet = new Set<string>();
+    this.appointmentData.forEach(a => a.services.forEach(s => allServicesSet.add(s.name)));
+    const allServices = Array.from(allServicesSet);
+
+    // Build datasets per service
+    const datasets = allServices.map((serviceName, idx) => {
+      const data = dayAppointments.map(dayApps => 
+        dayApps.filter(a => a.services.some(s => s.name === serviceName)).length
+      );
+      const colors = ['#3f51b5', '#ff4081', '#4caf50', '#ff9800', '#9c27b0', '#00bcd4', '#ffc107'];
+      return {
+        label: serviceName,
+        data,
+        backgroundColor: colors[idx % colors.length]
+      };
+    });
+
+    return { labels, datasets };
   }
 }

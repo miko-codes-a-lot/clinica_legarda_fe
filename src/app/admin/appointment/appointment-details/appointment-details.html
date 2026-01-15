@@ -34,6 +34,51 @@
         </div>
       </div>
     </div>
+
+  @if (appointment.referral) {
+    <div class="row-divider"></div>
+
+    <div class="referral-section">
+      <div class="referral-header">
+        <h3>Referral Details</h3>
+        <span class="referral-status"
+              [class.confirmed]="appointment.referral.status === 'confirmed'">
+          {{ appointment.referral.status }}
+        </span>
+      </div>
+
+      <div class="referral-card">
+        <div class="referral-row">
+          <span class="label">Reason</span>
+          <span class="value">
+            {{ appointment.referral.reason || 'No reason provided' }}
+          </span>
+        </div>
+
+        <div class="referral-row">
+          <span class="label">Referred From Clinic</span>
+          <span class="value">
+            {{ appointment.referral.fromClinicId.name }}
+          </span>
+        </div>
+
+        <div class="referral-row">
+          <span class="label">Clinic Address</span>
+          <span class="value">
+            {{ appointment.referral.fromClinicId.address }}
+          </span>
+        </div>
+
+        <div class="referral-row">
+          <span class="label">Referred By</span>
+          <span class="value">
+            {{ appointment.referral.fromDoctorId.firstName }}
+            {{ appointment.referral.fromDoctorId.lastName }}
+          </span>
+        </div>
+      </div>
+    </div>
+  }
   </app-list>
 } @else {
   <p>Fetching details...</p>

@@ -37,9 +37,120 @@
         </div>
       </div>
     </div>
+   <!-- Referral Section -->
+  @if (appointment.referral) {
+    <div class="row-divider"></div>
 
+    <div class="referral-section">
+      <div class="referral-header">
+        <h3>Referral Details</h3>
+        <span class="referral-status"
+              [class.confirmed]="appointment.referral.status === 'confirmed'">
+          {{ appointment.referral.status }}
+        </span>
+      </div>
+
+      <div class="referral-card">
+        <div class="referral-row">
+          <span class="label">Reason</span>
+          <span class="value">
+            {{ appointment.referral.reason || 'No reason provided' }}
+          </span>
+        </div>
+
+        <div class="referral-row">
+          <span class="label">Referred From Clinic</span>
+          <span class="value">
+            {{ appointment.referral.fromClinicId.name }}
+          </span>
+        </div>
+
+        <div class="referral-row">
+          <span class="label">Clinic Address</span>
+          <span class="value">
+            {{ appointment.referral.fromClinicId.address }}
+          </span>
+        </div>
+
+        <div class="referral-row">
+          <span class="label">Referred By</span>
+          <span class="value">
+            {{ appointment.referral.fromDoctorId.firstName }}
+            {{ appointment.referral.fromDoctorId.lastName }}
+          </span>
+        </div>
+      </div>
+    </div>
+  }
 
   </app-list>
+
+<!-- Previous Appointments History -->
+  <div class="row-divider"></div>
+  <div class="history-body">
+    <h3 class="history-title">Previous Appointments/History</h3>
+
+    <div *ngIf="appointmentHistory && appointmentHistory.length; else noHistory">
+      <div class="history-list">
+        <mat-accordion>
+          <mat-expansion-panel *ngFor="let h of appointmentHistory" [expanded]="false">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{ h.date | date:'fullDate' }} | {{ h.startTime }} - {{ h.endTime }}
+              </mat-panel-title>
+              <mat-panel-description>
+                <span class="history-status" [ngClass]="h.status">{{ h.status }}</span>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="history-card">
+              <div class="history-row">
+                <mat-icon class="history-icon">person</mat-icon>
+                <div>
+                  <strong>Dentist:</strong> Dr. {{ h.dentist.firstName }} {{ h.dentist.lastName }}
+                </div>
+              </div>
+
+              <div class="history-row">
+                <mat-icon class="history-icon">local_hospital</mat-icon>
+                <div>
+                  <strong>Clinic:</strong> {{ h.clinic.name }}
+                </div>
+              </div>
+
+              <div class="history-row">
+                <mat-icon class="history-icon">medication</mat-icon>
+                <div>
+                  <strong>Services:</strong>
+                  <span *ngFor="let s of h.services; let last = last">
+                    {{ s.name }}<span *ngIf="!last">, </span>
+                  </span>
+                </div>
+              </div>
+
+              <div class="history-row">
+                <mat-icon class="history-icon">history</mat-icon>
+                <div>
+                  <strong>Actions:</strong>
+                  <ul>
+                    <li *ngFor="let act of h.history">
+                      {{ act.action }} ({{ act.timestamp | date:'short' }})
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </div>
+
+    <ng-template #noHistory>
+      <p class="text-gray-500">No previous appointments found.</p>
+    </ng-template>
+  </div>
+
+
 
   <!-- Approve / Decline Buttons -->
 

@@ -1,0 +1,72 @@
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.view-header {
+  margin: 2% 8% 2% 8%;
+  margin-bottom: 16px;
+}
+
+.item-title{
+    font-size: 19px;
+}
+
+.item-line{
+    font-size: 16px;
+}
+
+.custom-list {
+    margin-top: -10px !important;
+    margin-left: -19px !important;
+}
+
+.row-divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background-color: #ddd;
+  margin-top: 0.5rem;
+}
+
+
+.action-buttons button mat-icon {
+  margin-right: 4px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center; /* centers horizontally */
+  gap: 16px; /* space between buttons */
+  margin-top: 24px;
+}
+
+.notes-section {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.note-item {
+  padding: 12px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.note-body {
+  font-size: 14px;
+  color: #333;
+}
+
+button[mat-icon-button] {
+  height: 32px;
+  width: 32px;
+}

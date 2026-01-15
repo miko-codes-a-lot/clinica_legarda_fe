@@ -19,6 +19,12 @@ export const DENTIST_ROUTES: Routes = [
         loadChildren: () => import('./profile/profile.route').then(m => m.PROFILE_ROUTES)
       },
       {
+        path: 'referral-request',
+        canActivate: [AuthGuard],
+        data: { role: 'dentist' },
+        loadChildren: () => import('./referral-request/referral-request.routes').then(m => m.REFERRAL_REQUEST_ROUTES)
+      },
+      {
         path: 'appointment',
         canActivate: [AuthGuard],
         data: { role: 'dentist' },

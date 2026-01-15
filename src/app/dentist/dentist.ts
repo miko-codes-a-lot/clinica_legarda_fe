@@ -28,6 +28,7 @@ export class Dentist {
   menuItems = [
     { label: 'Profile', icon: 'person', link: '/dentist/profile' },
     { label: 'Appointments', icon: 'event', link: '/dentist/appointment' },
+    { label: 'Referral Request', icon: 'event', link: '/dentist/referral-request' },
     { label: 'Notifications', icon: 'notifications', link: '/dentist/notification' },
     {
       label: 'Logout',

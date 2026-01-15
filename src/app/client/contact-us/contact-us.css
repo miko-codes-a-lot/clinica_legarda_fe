@@ -124,3 +124,70 @@
   color: #7f8c8d;
   font-style: italic;
 }
+
+
+.branches-container {
+  flex: 1;
+  min-width: 320px;
+}
+
+.branches-container h2 {
+  color: #16a085;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.branch-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.branch-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.branch-card h3 {
+  color: #16a085;
+  margin-bottom: 0.5rem;
+}
+
+.branch-card p {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.branch-card .material-icons {
+  margin-right: 0.5rem;
+  color: #16a085;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.schedule-table th,
+.schedule-table td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.95rem;
+}
+
+.schedule-table th {
+  background: #16a085;
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+.schedule-table tbody tr:hover {
+  background: #f0fdfd;
+}

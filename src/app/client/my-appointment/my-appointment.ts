@@ -49,6 +49,7 @@ export class MyAppointment {
         if (user) {
           this.appointmentService.getAll(user._id).subscribe({
             next: (data: Appointment[]) => {
+              console.log('data', data);
               this.upcomingAppointmentsData = data.sort((a, b) => {
                 // Prioritize confirmed over pending
                 if (a.status === AppointmentStatus.CONFIRMED && b.status !== AppointmentStatus.CONFIRMED) return -1;
@@ -132,6 +133,17 @@ export class MyAppointment {
       });
     });
 
+  }
+
+  isAppointmentPast(appointment: Appointment): boolean {
+    if (!appointment?.date || !appointment?.endTime) return false;
+
+    const appointmentDate = new Date(appointment.date);
+
+    const [hours, minutes] = appointment.endTime.split(':').map(Number);
+    appointmentDate.setHours(hours, minutes, 0, 0);
+
+    return appointmentDate.getTime() < new Date().getTime();
   }
 
   // ✅ Computed lists

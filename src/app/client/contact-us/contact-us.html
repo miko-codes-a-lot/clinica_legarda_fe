@@ -3,72 +3,42 @@
   <p>Have a question or want to book an appointment? We’d love to hear from you!</p>
 
   <div class="contact-container">
-    <!-- Contact Form (commented for now, enable later if needed) -->
-    <!--
-    <div class="contact-form">
-      <h2>Send Us a Message</h2>
-      <form (ngSubmit)="onSubmit()" #contactForm="ngForm">
-        <div class="form-group">
-          <label for="name">Full Name</label>
-          <input
-            id="name"
-            name="name"
-            [(ngModel)]="contact.name"
-            required
-            placeholder="Enter your full name"
-          />
-        </div>
 
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            [(ngModel)]="contact.email"
-            required
-            placeholder="Enter your email address"
-          />
-        </div>
+    <!-- Branches & Schedule -->
+    <div class="branches-container">
+      <h2>Our Branches & Schedule</h2>
 
-        <div class="form-group">
-          <label for="message">Message</label>
-          <textarea
-            id="message"
-            name="message"
-            rows="5"
-            [(ngModel)]="contact.message"
-            required
-            placeholder="Type your message here..."
-          ></textarea>
-        </div>
+      <div class="branch-card" *ngFor="let clinic of clinics">
+        <h3>{{ clinic.name }}</h3>
+        <p>
+          <span class="material-icons">location_on</span>
+          {{ clinic.address }}
+        </p>
+        <p>
+          <span class="material-icons">phone</span>
+          {{ clinic.mobileNumber }}
+        </p>
+        <p>
+          <span class="material-icons">email</span>
+          {{ clinic.emailAddress }}
+        </p>
 
-        <button type="submit" [disabled]="isLoading || !contactForm.valid">
-          {{ isLoading ? 'Sending...' : 'Send Message' }}
-        </button>
-      </form>
-    </div>
-    -->
-
-    <!-- Contact Info -->
-    <div class="contact-info">
-      <h2>Clinic Information</h2>
-      <p>
-        <span class="material-icons">location_on</span>
-        123 Legarda Street, Manila, Philippines
-      </p>
-      <p>
-        <span class="material-icons">phone</span>
-        (02) 123-4567
-      </p>
-      <p>
-        <span class="material-icons">email</span>
-        info@clinicalegarda.com
-      </p>
-
-      <h3>Find Us</h3>
-      <div class="map-placeholder">
-        <p>📍 Google Map Placeholder</p>
+        <table class="schedule-table">
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Open</th>
+              <th>Close</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let hour of clinic.operatingHours">
+              <td>{{ hour.day | titlecase }}</td>
+              <td>{{ formatTimeToAMPM(hour.startTime) }}</td>
+              <td>{{ formatTimeToAMPM(hour.endTime) }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

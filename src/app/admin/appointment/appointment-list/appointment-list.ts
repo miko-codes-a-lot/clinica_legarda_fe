@@ -41,6 +41,7 @@ export class AppointmentList implements OnInit {
     this.appointmentService.getAll().subscribe({
       next: (data) => {
         this.dataSource.data = data;
+        console.log('dataSource', this.dataSource.data);
       },
       error: (e) => alert(`Something went wrong ${e}`)
     }).add(() => this.isLoading = false);

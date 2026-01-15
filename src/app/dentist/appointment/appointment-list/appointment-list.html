@@ -1,3 +1,33 @@
+<!-- Daily Summary Card -->
+<mat-card class="daily-summary-card">
+
+  <mat-card-header class="summary-header">
+    <mat-card-title class="summary-title">
+      <mat-icon color="primary">calendar_today</mat-icon>
+      Doctor's Confirmed Schedules
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="daily-summary-container">
+      <div 
+        class="day-card" 
+        *ngFor="let date of dailyDates"
+        [class.today]="date === todayStr"
+      >
+        <div class="date">{{ date | date:'EEE, MMM d' }}</div>
+        <div class="count">
+          {{ dailyAppointments[date].length }} patient{{ dailyAppointments[date].length > 1 ? 's' : '' }}
+        </div>
+      </div>
+      <div *ngIf="dailyDates.length === 0" class="no-appointments">
+        No upcoming appointments
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+
 <div class="table-title">
   <h2>Appointments</h2>
 </div>

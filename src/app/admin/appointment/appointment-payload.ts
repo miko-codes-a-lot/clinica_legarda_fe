@@ -11,4 +11,5 @@ export interface AppointmentPayload {
     status: AppointmentStatus
     notes: AppointmentNote
     history?: AppointmentHistory[]
+    referral?: string
 }

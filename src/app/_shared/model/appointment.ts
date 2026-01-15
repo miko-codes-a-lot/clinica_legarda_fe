@@ -1,4 +1,5 @@
 import { Clinic } from "./clinic"
+import { Referral } from "./referral"
 import { DentalService } from "./dental-service"
 import { User } from "./user"
 
@@ -31,6 +32,7 @@ export interface Appointment {
   status: AppointmentStatus
   notes: AppointmentNote
   history: AppointmentHistory[],
-  createdAt?: string;
-  updatedAt?: string;
+  referral?: Referral
+  createdAt?: string,
+  updatedAt?: string
 }
