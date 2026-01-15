@@ -70,3 +70,144 @@ button[mat-icon-button] {
   height: 32px;
   width: 32px;
 }
+
+.referral-section {
+  margin-top: 16px;
+}
+
+.referral-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.referral-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.referral-status {
+  text-transform: capitalize;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.referral-status.confirmed {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.referral-card {
+  padding: 12px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.referral-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.referral-row:last-child {
+  margin-bottom: 0;
+}
+
+.referral-row .label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+.referral-row .value {
+  font-size: 15px;
+  color: #222;
+}
+
+.history-body {
+  background-color: white;
+  border: 1px solid rgb(207, 205, 205);
+  border-radius: 5px;
+  padding: 3%;
+  margin: 0 8%;
+  margin-bottom: -30px;
+}
+
+.history-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  color: #444;
+}
+
+.history-list mat-expansion-panel {
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background-color: #fff;
+}
+
+.history-card {
+  padding: 12px 16px;
+  background-color: #fefefe;
+  border-radius: 6px;
+  border-left: 3px solid #1976d2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.history-icon {
+  color: #1976d2;
+  font-size: 20px;
+  margin-top: 2px;
+}
+
+.history-status {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.history-status.confirmed {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.history-status.pending {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.history-body ul {
+  padding-left: 20px;
+  margin: 4px 0;
+}
+
+.history-body li {
+  font-size: 13px;
+  color: #555;
+}
+
+.action-buttons {
+  padding-bottom: 10px;
+}
+

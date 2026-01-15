@@ -9,10 +9,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { NotesDialogComponent } from '../../../_shared/component/dialog/notes-dialog/notes-dialog.component';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { NgIf } from '@angular/common'; // if using standalone imports
+
+
 
 @Component({
 selector: 'app-appointment-details',
-  imports: [ListComponent, MatListModule, MatButtonModule, MatIconModule, CommonModule],
+  imports: [ListComponent, MatListModule, MatButtonModule, MatIconModule, CommonModule, MatExpansionModule, NgIf],
   templateUrl: './appointment-details.html',
   styleUrl: './appointment-details.css'
 })
@@ -20,6 +24,7 @@ export class AppointmentDetails {
   isLoading = false
   id!: string
   appointment?: Appointment
+  appointmentHistory?: Appointment[] = [];
   displayAppointment: Record<string, any> = {};
 
   constructor(
@@ -49,9 +54,26 @@ export class AppointmentDetails {
           clinicAddress: clinicData.address,
           dentist: dentistData.firstName + ' ' + dentistData.lastName,
           patient: patientData.firstName + ' ' + patientData.lastName,
+          // referral: a.referral
         }
         this.appointment = a
-      },
+        this.appointmentService.getAll().subscribe({
+          next: (appointments) => {
+            const now = new Date();
+            this.appointmentHistory = appointments
+            .filter(
+              (apt) => apt.patient._id === a.patient._id
+              // && apt.status === 'confirmed'
+              && apt.status === 'confirmed'
+              && new Date(apt.date) < now
+            ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        
+        },
+        error: (e) => alert(`Something went wrong ${e}`),
+        complete: () => this.isLoading = false
+      });
+        // get the appointment history here
+    },
       error: (e) => alert(`Something went wrong ${e}`)
     }).add(() => this.isLoading = false)
   }
@@ -77,7 +99,7 @@ export class AppointmentDetails {
       error: (err: any) => {
         console.error(err);
         this.isLoading = false;
-        alert('Failed to approve appointment.');
+        alert(err.error.message);
       }
     });
   }

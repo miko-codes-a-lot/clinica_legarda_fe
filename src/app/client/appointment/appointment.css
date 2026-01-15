@@ -77,3 +77,57 @@ button:hover {
   font-size: 1.1rem;
   color: #555;
 }
+
+mat-form-field {
+  min-height: 72px;
+  display: block;
+}
+
+.referral-card {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.referral-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.referral-header mat-icon {
+  color: #2563eb;
+  font-size: 28px;
+}
+
+.referral-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.referral-header p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.referral-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.referral-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.referral-note mat-icon {
+  font-size: 18px;
+}

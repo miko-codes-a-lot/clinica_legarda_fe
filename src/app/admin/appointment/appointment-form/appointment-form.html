@@ -29,11 +29,109 @@
                 formControlName="time"
               >
               </app-time-picker>
-              <div class="summary">
-                <p><strong>Total Duration:</strong> {{ getFormattedDuration() }}</p>
-                <p><strong>Time:</strong> {{ getAppointmentTimeRange() }}</p>
+              <div class="summary-card">
+                <div class="summary-row">
+                  <span class="label">Total Duration</span>
+                  <span class="value">{{ getFormattedDuration() }}</span>
+                </div>
+
+                <div class="summary-row">
+                  <span class="label">Time</span>
+                  <span class="value">{{ getAppointmentTimeRange() }}</span>
+                </div>
               </div>
             }
           </form>
+
+          @if (isChangeBranch) {
+            <div class="referral-card">
+              <div class="referral-header">
+                <mat-icon>swap_horiz</mat-icon>
+                <div>
+                  <h3>Clinic Transfer Required</h3>
+                  <p>
+                    You are switching from
+                    <strong>{{ latestPatientAppointment?.clinic?.name }}</strong>.
+                    A referral is required to proceed.
+                  </p>
+                </div>
+              </div>
+
+              <form [formGroup]="rxReferralForm" class="referral-form">
+
+                <!-- Referring Dentist -->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Referring Dentist</mat-label>
+                  <mat-select formControlName="fromDoctorId" required>
+                    <mat-option value="" disabled>
+                      Select a referring dentist
+                    </mat-option>
+
+                    @for (opt of selectReferringDentist; track opt.value) {
+                      <mat-option [value]="opt.value">
+                        {{ opt.label }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-hint>
+                    From your previous clinic
+                  </mat-hint>
+                </mat-form-field>
+
+                <!-- Reason -->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Reason for Referral</mat-label>
+                  <textarea
+                    matInput
+                    formControlName="reason"
+                    rows="3"
+                    placeholder="e.g. Continuing treatment, specialist referral, preferred schedule"
+                  ></textarea>
+                </mat-form-field>
+
+                <div class="referral-note">
+                  <mat-icon>info</mat-icon>
+                  <span>
+                    The receiving clinic will review and confirm this referral.
+                  </span>
+                </div>
+
+              </form>
+            </div>
+          }
+
+        <div class="previous-branch" *ngIf="latestPatientAppointment as appt">
+          <div class="previous-header">
+            <span class="icon">🕘</span>
+            <span>Previous Visit</span>
+          </div>
+
+          <div class="previous-content">
+            <div class="info-row">
+              <span class="label">Clinic</span>
+              <span class="value">{{ appt.clinic.name }}</span>
+            </div>
+
+            <div class="info-row">
+              <span class="label">Date</span>
+              <span class="value">{{ appt.date | date:'mediumDate' }}</span>
+            </div>
+
+            <div class="info-row">
+              <span class="label">Dentist</span>
+              <span class="value">
+                {{ appt.dentist.firstName }} {{ appt.dentist.lastName }}
+              </span>
+            </div>
+
+            <div class="info-row">
+              <span class="label">Services</span>
+              <span class="value">
+                {{ getServiceNames(appt.services) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
       </app-form>
   }

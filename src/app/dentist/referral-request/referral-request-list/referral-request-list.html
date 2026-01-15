@@ -1,0 +1,11 @@
+<div class="table-title">
+  <h2>Request for Referral</h2>
+</div>
+
+<app-generic-table
+  [displayedColumns]="displayedColumns"
+  [columnDefs]="columnDefs"
+  [dataSource]="dataSource"
+  [isLoading]="isLoading"
+  (details)="onDetails($event)"
+></app-generic-table>

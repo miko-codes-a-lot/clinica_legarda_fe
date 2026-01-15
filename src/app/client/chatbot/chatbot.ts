@@ -50,16 +50,23 @@ export class Chatbot {
       text: 'Hi there! Welcome to our dental portal. What can I help you with today?',
       options: [
         { id: uuidv4(), text: 'Book an Appointment', nextNode: 'appointment_start' },
+        { id: uuidv4(), text: 'Provide Schedule', nextNode: 'provide_schedule' },
         { id: uuidv4(), text: 'I have a toothache', nextNode: 'toothache_tips' },
         { id: uuidv4(), text: 'How do I prevent cavities?', nextNode: 'cavity_prevention_tips' },
         { id: uuidv4(), text: 'When should my child have their first dental visit?', nextNode: 'child_first_visit' },
         { id: uuidv4(), text: 'What are my options for straightening my teeth?', nextNode: 'teeth_straightening_options' },
         { id: uuidv4(), text: 'What is a root canal?', nextNode: 'root_canal_info' },
-        { id: uuidv4(), text: 'See all FAQ topics', nextNode: 'faq_list' }
+        { id: uuidv4(), text: 'See all FAQ topics', nextNode: 'faq_list' },
       ]
     },
     appointment_start: {
       text: `Sure! Please provide your preferred date and time, or <a href="/app/appointment">click here</a> to schedule online`,
+      options: [
+        { id: uuidv4(), text: 'Go back', nextNode: 'start' }
+      ]
+    },
+    provide_schedule: {
+      text: 'You can view our full clinic schedule and operating hours here: <a href="/app/contact-us" target="_blank">View Schedule</a>',
       options: [
         { id: uuidv4(), text: 'Go back', nextNode: 'start' }
       ]

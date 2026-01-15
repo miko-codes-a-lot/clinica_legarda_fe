@@ -31,14 +31,17 @@
             <p>Clinic: {{ appointment.clinic.address }}</p>
 
             <!-- Patient Notes -->
-            <p *ngIf="appointment.notes?.patientNotes">
+            <p *ngIf="appointment.notes.patientNotes">
               <strong>Patient Notes:</strong> {{ appointment.notes.patientNotes }}
             </p>
 
             <!-- Dentist Notes -->
-            <p *ngIf="appointment.notes?.clinicNotes">
+            <p *ngIf="appointment.notes.clinicNotes">
               <strong>Dentist Notes:</strong> {{ appointment.notes.clinicNotes }}
             </p>
+            @if (appointment.referral?.status === 'pending') {
+              <p>Referral Status: <strong>{{ appointment.referral?.status }}</strong></p>
+            }
           </div>
 
           <div class="appointment-status">
@@ -46,12 +49,14 @@
               <mat-icon>check_circle</mat-icon> Confirmed
             </span>
             <div class="actions">
-              <button class="btn-reschedule" (click)="onReschedule(appointment)">
-                <mat-icon>event_repeat</mat-icon> Reschedule
-              </button>
-              <button class="btn-cancel" (click)="onCancel(appointment)">
-                <mat-icon>cancel</mat-icon> Cancel
-              </button>
+              @if(!isAppointmentPast(appointment)) {
+                <button class="btn-reschedule" (click)="onReschedule(appointment)">
+                  <mat-icon>event_repeat</mat-icon> Reschedule
+                </button>
+                <button class="btn-cancel" (click)="onCancel(appointment)">
+                  <mat-icon>cancel</mat-icon> Cancel
+                </button>
+              }
             </div>
           </div>
 
@@ -84,7 +89,7 @@
             <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
             <p>Clinic: {{ appointment.clinic.address }}</p>
             <!-- Patient Notes -->
-            <p *ngIf="appointment.notes?.patientNotes">
+            <p *ngIf="appointment.notes.patientNotes">
               <strong>Patient Notes:</strong> {{ appointment.notes.patientNotes }}
             </p>
           </div>

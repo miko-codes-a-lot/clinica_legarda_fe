@@ -52,6 +52,9 @@ export class GenericTableComponent<T> implements AfterViewInit {
     if (this.sort) {
       this.dataSource.sort = this.sort;
     }
+
+    this.setupSorting();
+    this.setupFiltering();
   }
 
   onDetails(id: any) {
@@ -107,4 +110,32 @@ export class GenericTableComponent<T> implements AfterViewInit {
   getEditDisabled(element: T): boolean {
     return this.disableEditFn ? this.disableEditFn(element) : false;
   }
+
+  private setupSorting() {
+    this.dataSource.sortingDataAccessor = (item: T, property: string) => {
+      const col = this.columnDefs.find(c => c.key === property);
+
+      if (!col) return '';
+
+      const value = col.cell ? col.cell(item) : (item as any)[property];
+
+      // normalize for strings & dates
+      if (typeof value === 'string') return value.toLowerCase();
+      if (value instanceof Date) return value.getTime();
+
+      return value ?? '';
+    };
+  }
+
+  private setupFiltering() {
+    this.dataSource.filterPredicate = (data: T, filter: string) => {
+      const search = filter.trim().toLowerCase();
+
+      return this.columnDefs.some(col => {
+        const value = col.cell ? col.cell(data) : (data as any)[col.key];
+        return String(value ?? '').toLowerCase().includes(search);
+      });
+    };
+  }
+
 }

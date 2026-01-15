@@ -1,9 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AppointmentPayload } from '../../admin/appointment/appointment-payload';
+import { ReferralPayload } from '../../admin/appointment/referral-payload';
 import { Appointment, AppointmentStatus } from '../../_shared/model/appointment';
 import { User } from '../../_shared/model/user';
 import { RxAppointmentForm } from './rx-appointment-form';
+import { RxReferralForm } from './rx-referral-form';
 import { DentalService } from '../../_shared/model/dental-service';
 import { Clinic } from '../../_shared/model/clinic';
 import { DatePicker } from '../../_shared/component/date-picker/date-picker';
@@ -15,6 +17,18 @@ import { FormComponent } from '../../_shared/component/form/form.component';
 import { RouterLink } from '@angular/router';
 import { UserSimple } from '../../_shared/model/user-simple';
 import { UserService } from '../../_shared/service/user-service';
+import { ReferralService } from '../../_shared/service/referral-service';
+import { AppointmentService } from '../../_shared/service/appointment-service';
+
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../_shared/component/dialog/confirm-dialog/confirm-dialog.component';
+import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { Referral, ReferralStatus } from '../../_shared/model/referral';
+import { switchMap } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-appointment',
@@ -24,7 +38,11 @@ import { UserService } from '../../_shared/service/user-service';
     TimePicker,
     DatePicker,
     FormComponent,
-    RouterLink
+    RouterLink,
+    MatSelectModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule
   ],
   templateUrl: './appointment.html',
   styleUrls: ['./appointment.css']
@@ -39,19 +57,33 @@ export class AppointmentPage {
   // @Input() loggedInUser?: User[] = []
   user: UserSimple | null = null
 
+  isChangeBranch: Boolean = false;
+
   dentists: User[] = []
   selectedDentist?: User
+  referralSavedData!: Referral;
+
+  referringDentist: { value: string; label: string }[] = []
 
   rxform!: FormGroup<RxAppointmentForm>
+  rxReferralForm!: FormGroup<RxReferralForm>
   appointmentFields: any[] = [];
+  users: User[] = []
+  selectReferringDentist: { value: string; label: string }[] = []
 
   minDate = new Date()
   maxDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 90 days from now only
 
+  patientAppointments: Appointment[] = [];
+  appointments: Appointment[] = [];
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
-    private readonly userService: UserService // inject here
+    private readonly userService: UserService,
+    private readonly appointmentService: AppointmentService,
+    private readonly referralService: ReferralService,
+    private dialog: MatDialog
   ) {}
 
   private emptyDentist: User = {
@@ -64,7 +96,7 @@ export class AppointmentPage {
     address: '',
     role: 'dentist',
     operatingHours: [],
-    appointments: []
+    appointments: [],
   };
 
   private clearDateTime() {
@@ -72,11 +104,12 @@ export class AppointmentPage {
     this.time.setValue('')
   }
 
-  private changeDentists(clinicId: string) {
+  private changeDentists(clinicId: string, callback?: () => void) {
     const clinic = this.clinics.find(c => c._id == clinicId)
     if (!clinic) return
 
     this.userService.getAll().subscribe(users => {
+      this.users = users;
       // filter dentists by clinic
       this.dentists = users.filter(u => u.clinic === clinic._id) || []
       this.builAppointmentFields();
@@ -85,6 +118,8 @@ export class AppointmentPage {
         this.selectedDentist = undefined
         this.time.setValue('')
       }
+
+      if (callback) callback();
     })
     // this.dentists = clinic.dentists
     // this.builAppointmentFields();
@@ -93,14 +128,17 @@ export class AppointmentPage {
   private setDentist(dentistId: string) {
     if (!this.dentists) return
     const dentist = this.dentists.find(d => d._id == dentistId)
-    // the problem might be here
     this.selectedDentist = dentist
   }
 
   ngOnInit(): void {
+    this.loadAppointments();
     this.authService.currentUser$.subscribe({
-      next: (u) => this.user = u
+      next: (u) => {
+        this.user = u
+      }
     })
+
     const clinicId = this.appointment.clinic._id || ''
     const dentistId = this.appointment.dentist._id || ''
     const user = this.user
@@ -113,10 +151,58 @@ export class AppointmentPage {
       time: [this.appointment.startTime, Validators.required],
       patientNotes: [this.appointment.notes?.patientNotes || '']
     })
+    this.rxReferralForm = this.fb.nonNullable.group({
+      fromDoctorId: ['', Validators.required],
+      fromClinicId: ['', Validators.required],
+      reason: [''],
+      appointment: [''],
+    })
     this.changeDentists(clinicId)
     this.setDentist(dentistId)
     this.clinic.valueChanges.subscribe({
       next: (v) => {
+          const previousAppointmentId = this.latestPatientAppointment?.clinic._id;
+          const selectedClinicId = this.rxform.get('clinic')?.value;
+
+          if (previousAppointmentId && (selectedClinicId != previousAppointmentId) ) {
+            const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+              disableClose: true,
+              width: '360px',
+              data: {
+                message: `You are about to change your clinic branch.
+
+                If you have existing scheduled appointment with your previous branch it will NOT be automatically cancelled.
+
+                Do you want to proceed?`
+              }
+            });
+
+            dialogRef.afterClosed().subscribe(confirm => {
+              // put it here
+              // it should be value and label
+              // this.referringDentist = 
+              this.isChangeBranch = confirm
+              if (confirm) {
+                const previousDentist = this.latestPatientAppointment?.dentist._id
+                const clinicId = this.latestPatientAppointment?.clinic._id
+                const getPreviousDentist = this.users.filter(u => u.clinic === clinicId) || []
+
+                const customSelectDentist = this.setUsersKey(getPreviousDentist)
+                this.selectReferringDentist = this.maptoOptions(customSelectDentist)
+
+                this.rxReferralForm.patchValue({
+                  fromDoctorId: previousDentist || ''
+                });
+           
+              } else {
+                this.loadAppointments();
+              }
+            });
+          } else {
+            this.isChangeBranch = false;
+            this.selectedDentist = this.latestPatientAppointment?.dentist
+          }
+        // this is not the fetching one
         this.changeDentists(v)
         this.clearDateTime()
       }
@@ -124,16 +210,7 @@ export class AppointmentPage {
     this.dentist.valueChanges.subscribe({
       next: (dentistId) => {
         this.setDentist(dentistId);
-
-        // reset date and time
-        this.date.setValue(null as any);
-        this.time.setValue('');
-
-        if (!this.selectedDentist) return;
-
-        // ensure arrays exist to prevent runtime errors
-        this.selectedDentist.operatingHours = this.selectedDentist.operatingHours || [];
-        this.selectedDentist.appointments = this.selectedDentist.appointments || [];
+        this.setDateAndTime()
       }
     });
 
@@ -146,11 +223,21 @@ export class AppointmentPage {
     this.builAppointmentFields();
   }
 
+  setDateAndTime() {
+    // reset date and time
+    this.date.setValue(null as any);
+    this.time.setValue('');
+
+    if (!this.selectedDentist) return;
+
+    // ensure arrays exist to prevent runtime errors
+    this.selectedDentist.operatingHours = this.selectedDentist.operatingHours || [];
+    this.selectedDentist.appointments = this.selectedDentist.appointments || [];
+  }
+
   private builAppointmentFields() {
-    const customSelectDentist = this.setUsersKey(this.dentists)
 
     const selectClinic = this.maptoOptions(this.clinics)
-    const selectDentist = this.maptoOptions(customSelectDentist)
     const selectDentalService = this.maptoOptions(this.dentalServices)
     this.appointmentFields = [
       { name: 'clinic', label: 'Clinic', type: 'select', options: selectClinic},
@@ -159,7 +246,14 @@ export class AppointmentPage {
       // { name: 'patient', label: 'Patient', type: 'select', options: selectPatient},
     ];
     // push the object inside the array if the clinic is selected
+    this.checkDentist();
+  }
+
+  checkDentist () {
     if (this.dentists.length !== 0) {
+      const customSelectDentist = this.setUsersKey(this.dentists)
+      const selectDentist = this.maptoOptions(customSelectDentist)
+
       this.appointmentFields.splice(1, 0, { 
         name: 'dentist', label: 'Dentist', type: 'select', options: selectDentist
       })
@@ -231,6 +325,8 @@ export class AppointmentPage {
     const duration = this.serviceDuration();
     const startTime = this.time.value;
     const endTime = TimeUtil.calculateEndTime(startTime, duration);
+    const previousClinicId = this.latestPatientAppointment?.clinic._id;
+
 
     const appointment: AppointmentPayload = {
       clinic: this.clinic.value ?? '',
@@ -238,17 +334,113 @@ export class AppointmentPage {
       patient: this.user?._id || '',
       services: this.services.value,
       date: this.date.value,
-      startTime: this.time.value, // 11:00 for example
-      endTime: endTime, // here we need to add all the total duration and it will become the end time
+      startTime: this.time.value,
+      endTime: endTime,
       status: AppointmentStatus.PENDING,
       notes: {
         clinicNotes: '',
         patientNotes: this.rxform.controls.patientNotes.value || '',
       },
+      // referral: ''
       // history: []
     }
+    
+    // NO referral → save appointment directly
+    if (!this.isChangeBranch) {
+      this.onSubmitEvent.emit(appointment)
+      return;
+    }
+    // WITH referral → create referral first
+    const referral: ReferralPayload = {
+      fromDoctorId: this.fromDoctorId.value!,
+      fromClinicId: previousClinicId ?? '',
+      reason: this.reason.value,
+      status: ReferralStatus.PENDING,
+    };
 
-    this.onSubmitEvent.emit(appointment)
+    // Create referral, then attach its ID to the appointment payload
+    this.referralService.create(referral).subscribe({
+      next: savedReferral => {
+        appointment.referral = savedReferral._id; // optional ID
+        // Emit the payload for the parent or whoever is listening
+        this.onSubmitEvent.emit(appointment);
+      },
+      error: err => {
+        console.log('error', err);
+        alert(`${err.error.message}`)
+      }
+    });
+
+
+  }
+
+  private loadAppointments() {
+    this.isLoading = true;
+    this.appointmentService.getAll().subscribe({
+      next: (data) => {
+        this.appointments = data;
+        // Now that appointments are loaded, filter patient appointments
+        if (this.user) {
+          const now = new Date();
+          this.patientAppointments = this.appointments
+            .filter(a =>
+              a.patient?._id === this.user?._id
+              && a.status === 'confirmed'
+              && new Date(a.date) < now
+            )
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+          this.applyPreviousAppointment();
+        }
+      },
+      error: (e) => alert(`Something went wrong ${e}`),
+      complete: () => this.isLoading = false
+    });
+  }
+
+
+  applyPreviousAppointment() {
+    const last = this.latestPatientAppointment;
+    if (last){
+
+      this.rxform.patchValue({
+        clinic: last.clinic._id,
+        services: last?.services
+        .map(s => s._id)
+        .filter((id): id is string => !!id) || [],
+      });
+
+      // load dentists and set dentist AFTER dentists are loaded
+      this.changeDentists(last.clinic._id || '', () => {
+        this.rxform.patchValue({
+          dentist: last.dentist?._id || ''
+        });
+        this.setDentist(last.dentist?._id || '');
+        this.setDateAndTime();
+      });
+
+    } else {
+      const dentistFieldIndex = this.appointmentFields.findIndex(f => f.name === 'dentist');
+      // No previous appointment → clear everything except patient
+      this.rxform.patchValue({
+        clinic: '',
+        dentist: '',
+        services: [],
+        time: ''
+      });
+      this.dentists = [];
+      if (dentistFieldIndex !== -1) {
+        this.appointmentFields.splice(dentistFieldIndex, 1);
+      }
+
+    }
+
+    this.checkDentist();
+  }
+
+  get latestPatientAppointment(): Appointment | undefined {
+    const currentAppointmentData = this.patientAppointments[0];
+    return currentAppointmentData;
   }
 
   get safeSelectedDentist(): User {
@@ -278,5 +470,12 @@ export class AppointmentPage {
   get time() {
     return this.rxform.controls.time
   }
-  
+
+  get fromDoctorId() {
+    return this.rxReferralForm.controls.fromDoctorId
+  }
+
+  get reason() {
+    return this.rxReferralForm.controls.reason
+  }
 }

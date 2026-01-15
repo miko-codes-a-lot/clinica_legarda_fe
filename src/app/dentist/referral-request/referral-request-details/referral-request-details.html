@@ -1,0 +1,57 @@
+<div *ngIf="displayReferral; else loading">
+  <div class="view-header">
+    <h2 class="page-title">Referral Details</h2>
+  </div>
+
+  <app-list [data]="displayReferral">
+    <!-- <div class="notes-section" *ngIf="appointment">
+      <div class="note-item clinic-notes">
+        <div class="note-header">
+          <strong>Clinic Notes:</strong>
+          <button mat-icon-button color="primary"
+                  (click)="openNotesDialog()"
+                  [disabled]="isClinicNotesDisabled()">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+        <div class="note-body">
+          {{ appointment.notes.clinicNotes || 'No notes yet' }}
+        </div>
+      </div>
+
+      <div class="note-item patient-notes">
+        <div class="note-header">
+          <strong>Patient Notes:</strong>
+        </div>
+        <div class="note-body">
+          {{ appointment.notes.patientNotes || 'No notes yet' }}
+        </div>
+      </div>
+    </div> -->
+  </app-list>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons" *ngIf="referral">
+    <button mat-flat-button color="primary"
+            (click)="approveReferral()"
+            [disabled]="isActionDisabled()">
+      <mat-icon>check</mat-icon> Approve
+    </button>
+
+    <button mat-stroked-button color="warn"
+            (click)="declineReferral()"
+            [disabled]="isActionDisabled()">
+      <mat-icon>close</mat-icon> Reject
+    </button>
+
+    <!-- <button mat-stroked-button color="warn"
+            (click)="cancelReferral()"
+            *ngIf="referral.status === 'confirmed'">
+      <mat-icon>cancel</mat-icon> Cancel
+    </button> -->
+  </div>
+</div>
+
+<ng-template #loading>
+  <p>Fetching details...</p>
+</ng-template>
