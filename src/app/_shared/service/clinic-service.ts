@@ -13,7 +13,7 @@ export class ClinicService {
   private readonly baseUrl = '/clinics'; // adjust if your backend has a different base path
 
   getAll(): Observable<Clinic[]> {
-    return this.http.get<Clinic[]>(this.baseUrl, { withCredentials: true });
+    return this.http.get<Clinic[]>(this.baseUrl);
   }
 
   getOne(id: string): Observable<Clinic> {

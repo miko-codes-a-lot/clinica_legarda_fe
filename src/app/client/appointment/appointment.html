@@ -58,7 +58,7 @@
           </div>
 
           <form [formGroup]="rxReferralForm" class="referral-form">
-
+            <!-- this part -->
             <!-- Referring Dentist -->
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Referring Dentist</mat-label>
@@ -81,12 +81,12 @@
             <!-- Reason -->
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Reason for Referral</mat-label>
-              <textarea
-                matInput
-                formControlName="reason"
-                rows="3"
-                placeholder="e.g. Continuing treatment, specialist referral, preferred schedule"
-              ></textarea>
+              <mat-select formControlName="reason" required>
+                <mat-option value="" disabled>Select a reason</mat-option>
+                <mat-option *ngFor="let r of reasons" [value]="r.value">
+                  {{ r.label }}
+                </mat-option>
+              </mat-select>
             </mat-form-field>
 
             <div class="referral-note">

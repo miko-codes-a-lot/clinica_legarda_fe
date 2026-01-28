@@ -1,6 +1,8 @@
 import { User } from "./user"
 import { Clinic } from './clinic'
 import { Appointment } from "./appointment"
+import { Reason } from "./reason"
+
 
 export enum ReferralStatus {
   PENDING = 'pending',
@@ -15,4 +17,5 @@ export interface Referral {
   reason?: string
   appointment: Appointment
   status: ReferralStatus
+  reasonOfDecline: string
 }

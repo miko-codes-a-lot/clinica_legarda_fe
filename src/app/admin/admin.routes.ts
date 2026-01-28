@@ -64,6 +64,12 @@ export const ADMIN_ROUTES: Routes = [
         data: { role: 'admin' },
         loadChildren: () => import('./user-settings/user-settings.route').then(m => m.USER_SETTINGS_ROUTES)
       },
+      {
+        path: 'reason',
+        canActivate: [AuthGuard],
+        data: { role: 'admin' },
+        loadChildren: () => import('./reason/reason.routes').then(m => m.REASON_ROUTES)
+      },
     ]
   }
 ];

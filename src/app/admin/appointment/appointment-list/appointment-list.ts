@@ -18,7 +18,7 @@ export class AppointmentList implements OnInit {
   title = 'Appointment'
   createLabel = 'Create appointment'
   dataSource = new MatTableDataSource<Appointment>();
-  displayedColumns: string[] = ['_id', 'clinic', 'patient', 'dentist', 'date', 'time', 'actions'];
+  displayedColumns: string[] = ['_id', 'clinic', 'patient', 'dentist', 'date', 'time', 'status', 'actions'];
   columnDefs = [
     { key: '_id', label: 'ID', cell: (appointment: Appointment) => appointment._id ?? '' },
     { key: 'clinic', label: 'Clinic', cell: (appointment: Appointment) => appointment.clinic.name},
@@ -26,6 +26,7 @@ export class AppointmentList implements OnInit {
     { key: 'dentist', label: 'Dentist', cell: (appointment: Appointment) =>  `${appointment.dentist.firstName} ${appointment.dentist.lastName}` },
     { key: 'date', label: 'Date', cell: (appointment: Appointment) => appointment.date },
     { key: 'time', label: 'Time', cell: (appointment: Appointment) =>  `${appointment.startTime} - ${appointment.endTime}` },
+    { key: 'status', label: 'Status', cell: (appointment: Appointment) =>  appointment.status },
   ];
 
   disableEdit = (appointment: Appointment) => appointment.status !== 'pending';

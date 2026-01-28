@@ -247,6 +247,7 @@
 .admin-dashboard .charts-section .charts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  margin-top: 10px;
   gap: 24px;
 }
 

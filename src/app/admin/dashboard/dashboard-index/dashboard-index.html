@@ -137,6 +137,8 @@
           </div>
         </mat-card-content>
       </mat-card>
+    </div>
+    <div class="charts-grid">
       <mat-card class="chart-card">
         <mat-card-header>
           <mat-card-title>Service Trend per Day</mat-card-title>
@@ -144,6 +146,16 @@
         <mat-card-content>
           <div class="chart-container">
             <canvas #serviceTrendChart></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>No. of Declined Service and Reasons</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas #declinedReferralChart></canvas>
           </div>
         </mat-card-content>
       </mat-card>

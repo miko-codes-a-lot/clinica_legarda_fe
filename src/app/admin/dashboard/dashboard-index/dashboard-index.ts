@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -19,6 +19,12 @@ import { Notification, NotificationType } from '../../../_shared/model/notificat
 import { Appointment } from '../../../_shared/model/appointment';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
 import { Router } from '@angular/router';
+import { Reason } from '../../../_shared/model/reason';
+import { ReasonService } from '../../../_shared/service/reason-service';
+
+import { Referral } from '../../../_shared/model/referral';
+import { ReferralService } from '../../../_shared/service/referral-service';
+
 
 Chart.register(...registerables);
 
@@ -45,14 +51,19 @@ export class DashboardIndex {
   @ViewChild('servicesChart', { static: false }) servicesChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('appointmentTrendChart', { static: false }) appointmentTrendRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('serviceTrendChart', { static: false }) serviceTrendChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('declinedReferralChart', { static: false }) declinedReferralChartRef!: ElementRef<HTMLCanvasElement>;
 
   serviceTrendChart!: Chart;
   notifications$!: Observable<Notification[]>;
   unreadNotificationsCount$!: Observable<number>;
+  declinedReferralChart!: Chart;
 
   /** 🔹 Separate all appointments vs filtered ones */
   allAppointments: Appointment[] = [];
   appointmentData: Appointment[] = [];
+
+  reasons: Reason[] = [];
+  referrals: Referral[] = [];
 
   clinics: any[] = [];
   selectedClinic: string = '';
@@ -82,7 +93,9 @@ export class DashboardIndex {
     private appointmentService: AppointmentService,
     private clinicService: ClinicService,
     private datePipe: DatePipe,
-    private router: Router
+    private router: Router,
+    private readonly reasonService: ReasonService,
+    private readonly referralService: ReferralService
   ) {}
 
   get weeklyReport() {
@@ -99,6 +112,14 @@ export class DashboardIndex {
 
   // ----------------- INIT -----------------
   ngOnInit(): void {
+    this.reasonService.getAll().subscribe(r => this.reasons = r);
+    this.referralService.getAll().subscribe(r => {
+      this.referrals = r;
+      // safe to create chart after data is ready and view is initialized
+      if (this.declinedReferralChartRef) {
+        this.createOrUpdateDeclinedReferralChart();
+      }
+    });
     this.loadClinics();
     this.loadAppointmentData();
 
@@ -111,6 +132,7 @@ export class DashboardIndex {
       error: (err) => console.error('Failed to fetch initial notifications', err)
     });
   }
+
 
   // ----------------- LOAD DATA -----------------
   private loadAppointmentData(): void {
@@ -441,4 +463,70 @@ export class DashboardIndex {
 
     return { labels, datasets };
   }
+
+  private getDeclinedReferralData(): { labels: string[], counts: number[] } {
+    // Filter only rejected referrals
+    const declined = this.referrals.filter(r => r.status === 'rejected');
+
+    const reasonCounts: Record<string, number> = {};
+    declined.forEach(r => {
+      const reason = r.reasonOfDecline || 'Unknown';
+      reasonCounts[reason] = (reasonCounts[reason] || 0) + 1;
+    });
+
+    // Map reason codes to labels if available
+    const labels = Object.keys(reasonCounts).map(code => {
+      const reasonObj = this.reasons?.find(r => r.code === code);
+      return reasonObj ? reasonObj.label : code;
+    });
+
+    const counts = Object.values(reasonCounts);
+
+    return { labels, counts };
+  }
+
+  private createOrUpdateDeclinedReferralChart(): void {
+    const { labels, counts } = this.getDeclinedReferralData();
+    console.log('this.declinedReferralChart', this.declinedReferralChart);
+    if (this.declinedReferralChart) {
+      this.declinedReferralChart.data.labels = labels;
+      this.declinedReferralChart.data.datasets[0].data = counts;
+      this.declinedReferralChart.update();
+      return;
+    }
+
+    const config: ChartConfiguration = {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data: counts,
+          backgroundColor: ['#f44336', '#ff9800', '#9c27b0', '#3f51b5', '#4caf50'],
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const label = context.label || '';
+                const value = context.parsed;
+                const total = (context.dataset.data as number[]).reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value} (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    this.declinedReferralChart = new Chart(this.declinedReferralChartRef.nativeElement, config);
+  }
+
 }

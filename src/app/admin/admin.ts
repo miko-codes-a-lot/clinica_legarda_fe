@@ -44,6 +44,7 @@ export class Admin {
     { label: 'Service', icon: 'medical_services', link: '/admin/service' },
     { label: 'Appointments', icon: 'event', link: '/admin/appointment' },
     { label: 'Notifications', icon: 'notifications', link: '/admin/notification' },
+    { label: 'Reason', icon: 'quickreply', link: '/admin/reason' },
   ];
 
   constructor(
