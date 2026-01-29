@@ -28,7 +28,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Referral, ReferralStatus } from '../../_shared/model/referral';
 import { switchMap } from 'rxjs/operators';
+import { ReasonService } from '../../_shared/service/reason-service';
 
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-appointment',
@@ -42,7 +44,8 @@ import { switchMap } from 'rxjs/operators';
     MatSelectModule,
     MatIconModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    CommonModule
   ],
   templateUrl: './appointment.html',
   styleUrls: ['./appointment.css']
@@ -77,12 +80,15 @@ export class AppointmentPage {
   patientAppointments: Appointment[] = [];
   appointments: Appointment[] = [];
 
+  reasons: { value: string; label: string }[] = [];
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly appointmentService: AppointmentService,
     private readonly referralService: ReferralService,
+    private readonly reasonService: ReasonService,
     private dialog: MatDialog
   ) {}
 
@@ -221,6 +227,17 @@ export class AppointmentPage {
       }
     })
     this.builAppointmentFields();
+
+    
+    this.reasonService.getAll().subscribe({
+      next: (data) => {
+        // Map your reasons to { value, label } format for mat-select
+        this.reasons = data
+          .filter(r => r.isActive && (r.usage === 'referral' || r.usage === 'both'))
+          .map(r => ({ value: r.code, label: r.label }));
+      },
+      error: (err) => console.error('Failed to load reasons', err)
+    });
   }
 
   setDateAndTime() {

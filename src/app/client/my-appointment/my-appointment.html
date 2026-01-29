@@ -129,6 +129,10 @@
             </ul>
             <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
             <p>Clinic: {{ appointment.clinic.address }}</p>
+            @if(appointment.referral?.status === 'rejected') {
+              <b>Rejected By the Referring Dentist</b>
+              <p>- Reason for Rejection: {{ getReasonLabel(appointment.referral?.reasonOfDecline) }}</p>
+            }
           </div>
           <div class="appointment-status">
             <span class="status-badge rejected">

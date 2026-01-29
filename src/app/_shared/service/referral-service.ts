@@ -42,12 +42,11 @@ export class ReferralService {
 
 
   approveReferral(referralId: string) {
-    console.log('referralId', referralId);
     return this.http.patch<Referral>(`${this.baseUrl}/${referralId}/approve`, {}, { withCredentials: true });
   }
 
-  rejectReferral(referralId: string) {
-    return this.http.patch<Referral>(`${this.baseUrl}/${referralId}/reject`, {}, { withCredentials: true });
+  rejectReferral(referralId: string, reasonOfDecline: string) {
+    return this.http.patch<Referral>(`${this.baseUrl}/${referralId}/reject`, { reasonOfDecline }, { withCredentials: true });
   }
 
   cancelReferral(referralId: string) {

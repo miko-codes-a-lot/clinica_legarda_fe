@@ -1,0 +1,8 @@
+@if (reason) {
+  <div class="view-header">
+    <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
+  </div>
+  <app-list [data]="displayReason"></app-list>
+} @else {
+  <p>Fetching details...</p>
+}

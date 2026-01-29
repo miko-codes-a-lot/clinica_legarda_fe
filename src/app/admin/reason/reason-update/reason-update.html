@@ -1,0 +1,9 @@
+@if (reason) {
+  <app-reason-form
+    [isLoading]="isLoading"
+    [reason]="reason"
+    (onSubmitEvent)="onSubmit($event)"
+  ></app-reason-form>
+} @else {
+  <p>Fetching details...</p>
+}

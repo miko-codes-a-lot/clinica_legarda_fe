@@ -14,6 +14,7 @@ import { ChangeDetectorRef } from '@angular/core';
 
 import { AuthService } from '../../../_shared/service/auth-service';
 import { UserService } from '../../../_shared/service/user-service';
+import { AppointmentService } from '../../../_shared/service/appointment-service';
 
 
 // Register Chart.js components
@@ -52,10 +53,17 @@ export class UserSettingsIndex implements OnInit {
 
   selectedFile: File | null = null;
 
+  activeTab: 'profile' | 'history' = 'profile';
+
+  latestAppointments: any[] = [];
+  appointments: any[] = [];
+  showAllHistory = false;
+
   constructor(
     private fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly appointmentService: AppointmentService,
     private readonly router: Router,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef  // <-- inject
@@ -93,7 +101,6 @@ export class UserSettingsIndex implements OnInit {
   }
 
   ngOnInit(): void {
-
     // change the format to E.164
     // const mobileNumber = this.profileForm.get('mobileNumber');
     // if (mobileNumber) {
@@ -101,7 +108,6 @@ export class UserSettingsIndex implements OnInit {
     // }
     this.authService.currentUser$.subscribe({
       next: (user) => {
-        console.log('current user: ', user)
         if(user) {
           if(user?.profilePicture) {
             this.loadProfilePicture(user._id);
@@ -125,10 +131,11 @@ export class UserSettingsIndex implements OnInit {
         }
       }
     });
+
+    this.loadAppointments();
   }
 
   editUser () {
-    console.log('edit page')
     this.router.navigate(['/app/user-settings/update'])
   }
 
@@ -163,5 +170,36 @@ export class UserSettingsIndex implements OnInit {
       reader.onload = () => this.avatarUrl = reader.result as string;
       reader.readAsDataURL(file);
     }
+  }
+
+  loadAppointments() {
+    // Replace with your actual API call
+    this.appointmentService.getAll(this.user._id)
+      .subscribe((res: any) => {
+        this.appointments = res;
+        this.latestAppointments = this.appointments
+          .slice()
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+          .slice(0, 10);
+    });
+  }
+
+  toggleHistory() {
+    this.showAllHistory = !this.showAllHistory;
+
+    if (this.showAllHistory) {
+      // show all
+      this.latestAppointments = this.appointments
+        .slice()
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    } else {
+      // show latest 10 only
+      this.loadAppointments();
+    }
+  }
+
+  getServiceNames(services: any[]) {
+    if (!services || services.length === 0) return 'N/A';
+    return services.map(s => s.name).join(', ');
   }
 }

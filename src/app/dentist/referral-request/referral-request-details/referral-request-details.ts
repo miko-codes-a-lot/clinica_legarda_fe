@@ -11,6 +11,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { NotesDialogComponent } from '../../../_shared/component/dialog/notes-dialog/notes-dialog.component';
 import { Referral } from '../../../_shared/model/referral';
 import { ReferralService } from '../../../_shared/service/referral-service';
+import { ConfirmDialogComponent } from '../../../_shared/component/dialog/confirm-dialog/confirm-dialog.component';
+import { FormDialogComponent } from '../../../_shared/component/dialog/form-dialog/form-dialog.component';
+import { Reason } from '../../../_shared/model/reason';
+import { ReasonService } from '../../../_shared/service/reason-service';
 
 @Component({
 selector: 'app-referral-request-details',
@@ -24,6 +28,8 @@ export class ReferralRequestDetails {
   appointment?: Appointment
   referral?: Referral
   displayReferral: Record<string, any> = {};
+  reasons: Reason[] = [];
+
 
   constructor(
     private readonly appointmentService: AppointmentService,
@@ -31,9 +37,11 @@ export class ReferralRequestDetails {
     private readonly router: Router,
     private readonly dialog: MatDialog,
     private readonly referralService: ReferralService,
+    private readonly reasonService: ReasonService
   ) {}
 
   ngOnInit(): void {
+    this.reasonService.getAll().subscribe(r => this.reasons = r);
     this.loadAppointment()
   }
 
@@ -44,35 +52,26 @@ export class ReferralRequestDetails {
     // do the same here
     this.referralService.getOne(this.id).subscribe({
       next: (a) => {
-        const { appointment, reason, status } = a;
-       
+        const { appointment, reason, reasonOfDecline, status } = a;
         this.displayReferral = {
           'Referred To': appointment?.dentist
             ? `${appointment.dentist.firstName} ${appointment.dentist.lastName}`
             : 'N/A',
           'Transfer Branch': appointment?.clinic?.name || 'N/A',
           'Status': status,
-          'Reason': reason || 'N/A',
+          ...(reasonOfDecline && {
+            'Reason for Rejection': this.getReasonLabel(reasonOfDecline)
+          }),
+          'Reason for Referral': this.getReasonLabel(reason) || 'N/A',
           'Appointment Date': appointment?.date ? new Date(appointment.date).toLocaleDateString() : 'N/A',
           'Start Time': appointment?.startTime || 'N/A',
           'End Time': appointment?.endTime || 'N/A',
           'Services': appointment?.services?.map(s => s.name).join(', ') || 'N/A'
         };
-        
+  
         this.referral = a;
         this.appointment = appointment;
 
-        // const { status, date, startTime, endTime, clinic: clinicData, dentist: dentistData, patient: patientData } = a
-        // this.displayAppointment = {
-        //   status,
-        //   date,
-        //   time: startTime + ' - ' + endTime,
-        //   clinic: clinicData.name,
-        //   clinicAddress: clinicData.address,
-        //   dentist: dentistData.firstName + ' ' + dentistData.lastName,
-        //   patient: patientData.firstName + ' ' + patientData.lastName,
-        // }
-        // this.appointment = a
       }
     }).add(() => this.isLoading = false)
     // to use later
@@ -87,22 +86,42 @@ export class ReferralRequestDetails {
 
     this.isLoading = true;
 
-    this.referralService.approveReferral(this.referral._id).subscribe({
-      next: (updatedReferral: Referral) => {
-        // Update local object
-        this.referral = updatedReferral;
-        // this.displayAppointment['status'] = updatedAppointment.status;
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+          disableClose: true,
+          width: '600px',
+          data: {
+            message: `By submitting this referral I am verifying that the patient has been properly educated on the sharing of their dental and medical records with another authorized dentist or an office, which are both part of the same clinic. Sharing will take place for the purpose of continuing care and coordinating treatment planning.
 
-        this.isLoading = false;
-        alert('Request approved successfully!');
-        this.loadAppointment();
-      },
-      error: (err: any) => {
-        console.error(err);
-        this.isLoading = false;
-        alert(err.error.message);
-      }
-    });
+            The shared records may contain all or part of the following: Patient Identity, Medical and Dental History, Treatment Records/Notes, Diagnostic Imaging, Prescription Information.
+
+            I confirm that any disclosures of these records will only contain the necessary information to provide proper treatment for the patient, and will be handled according to any data protection and patient privacy laws as well as the clinic’s own Data Security Policy.
+
+            By checking this box I am certifying that the patient has granted consent for their records to be shared automatically as part of the referral process.`,
+            showConsentCheckbox: true
+          }
+      });
+
+      dialogRef.afterClosed().subscribe(confirm => {
+        if(confirm){
+          this.referralService.approveReferral(this.referral?._id || '').subscribe({
+            next: (updatedReferral: Referral) => {
+              // Update local object
+              this.referral = updatedReferral;
+              // this.displayAppointment['status'] = updatedAppointment.status;
+
+              this.isLoading = false;
+              alert('Request approved successfully!');
+              this.loadAppointment();
+            },
+            error: (err: any) => {
+              console.error(err);
+              this.isLoading = false;
+              alert(err.error.message);
+            }
+          });
+        }
+      })
+
   }
 
   declineReferral() {
@@ -110,22 +129,57 @@ export class ReferralRequestDetails {
 
     this.isLoading = true;
 
-    this.referralService.rejectReferral(this.referral._id).subscribe({
-      next: (updatedReferral: Referral) => {
-        // Update local object
-        this.referral = updatedReferral;
-        // this.displayAppointment['status'] = updatedAppointment.status;
+    // const declineReasons = this.reasons
+    // .filter(r => r.usage === 'decline')
+    // .map(r => ({
+    //   value: r.code,
+    //   label: r.label
+    // }));
+    this.reasonService.getAll().subscribe((reasons) => {
+      const selectReason = reasons.filter((r) => r.usage === 'both' || r.usage === 'decline') .map(r => ({
+        value: r.code,
+        label: r.label
+      }));
+     
+      const dialogRef = this.dialog.open(FormDialogComponent, {
+        width: '500px',
+        data: {
+          title: 'Decline Referral',
+          fields: [
+            {
+              name: 'reason',
+              label: 'Reason for decline',
+              type: 'select',
+              required: true,
+              options: selectReason
+            }
+          ]
+        }
+      });
 
-        this.isLoading = false;
-        alert('Request rejected successfully!');
-        this.loadAppointment();
-      },
-      error: (err: any) => {
-        console.error(err);
-        this.isLoading = false;
-        alert('Failed to reject request.');
-      }
-    });
+      dialogRef.afterClosed().subscribe(res => {
+        if (res.result) {
+          const reason = res.data.reason;
+          console.log(reason);
+          this.referralService.rejectReferral(this.referral?._id || '', reason).subscribe({
+            next: (updatedReferral: Referral) => {
+              // Update local object
+              this.referral = updatedReferral;
+              // this.displayAppointment['status'] = updatedAppointment.status;
+              this.isLoading = false;
+              alert('Request rejected successfully!');
+              this.loadAppointment();
+            },
+            error: (err: any) => {
+              console.error(err);
+              this.isLoading = false;
+              alert('Failed to reject request.');
+            }
+          });
+        }
+      });
+    })
+
   }
 
   openNotesDialog() {
@@ -181,7 +235,13 @@ export class ReferralRequestDetails {
         }
       });
     }
+  }
 
+  private getReasonLabel(code?: string): string {
+    if (!code) return 'N/A';
+
+    const found = this.reasons.find(r => r.code === code);
+    return found?.label ?? code;
   }
 
 }

@@ -26,7 +26,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { ReferralPayload } from '../../../admin/appointment/referral-payload';
 import { Referral, ReferralStatus } from '../../../_shared/model/referral';
 import { ReferralService } from '../../../_shared/service/referral-service';
-
+import { ReasonService } from '../../../_shared/service/reason-service';
 
 @Component({
   selector: 'app-appointment-form',
@@ -75,6 +75,8 @@ export class AppointmentForm {
   users: User[] = []
   selectReferringDentist: { value: string; label: string }[] = [];
   rxReferralForm!: FormGroup<RxReferralForm>;
+  reasons: { value: string; label: string }[] = [];
+
 
   constructor(
     private readonly fb: FormBuilder,
@@ -83,7 +85,8 @@ export class AppointmentForm {
     private readonly appointmentService: AppointmentService,
     private dialog: MatDialog,
     private readonly authService: AuthService,
-    private readonly referralService: ReferralService
+    private readonly referralService: ReferralService,
+    private readonly reasonService: ReasonService,
   ) {}
 
   // private emptyDentist: User = {
@@ -248,6 +251,16 @@ export class AppointmentForm {
 
     this.buildAppointmentFields();
     this.loadAppointments();
+
+    this.reasonService.getAll().subscribe({
+      next: (data) => {
+        // Map your reasons to { value, label } format for mat-select
+        this.reasons = data
+          .filter(r => r.isActive && (r.usage === 'referral' || r.usage === 'both'))
+          .map(r => ({ value: r.code, label: r.label }));
+      },
+      error: (err) => console.error('Failed to load reasons', err)
+    });
 
     this.patient.valueChanges.subscribe(patientId => {
       if (!patientId) {

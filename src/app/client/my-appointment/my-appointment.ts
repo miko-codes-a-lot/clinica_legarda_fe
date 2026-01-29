@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../_shared/service/auth-service';
 import { AppointmentService } from '../../_shared/service/appointment-service';
+import { ReasonService } from '../../_shared/service/reason-service';
 import { Appointment, AppointmentStatus } from '../../_shared/model/appointment';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -10,6 +11,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RescheduleDialogComponent } from '../../_shared/component/dialog/reschedule-dialog/reschedule-dialog.component';
+import { Reason } from '../../_shared/model/reason';
 
 @Component({
   selector: 'app-my-appointment',
@@ -32,13 +34,16 @@ export class MyAppointment {
   constructor(
     private readonly authService: AuthService,
     private readonly appointmentService: AppointmentService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private readonly reasonService: ReasonService
   ) {}
 
   isLoading = false;
   upcomingAppointmentsData: Appointment[] = [];
+  reasons: Reason[] = [];
 
   ngOnInit(): void {
+    this.reasonService.getAll().subscribe(r => this.reasons = r);
     this.loadAppointments();
   }
 
@@ -49,7 +54,6 @@ export class MyAppointment {
         if (user) {
           this.appointmentService.getAll(user._id).subscribe({
             next: (data: Appointment[]) => {
-              console.log('data', data);
               this.upcomingAppointmentsData = data.sort((a, b) => {
                 // Prioritize confirmed over pending
                 if (a.status === AppointmentStatus.CONFIRMED && b.status !== AppointmentStatus.CONFIRMED) return -1;
@@ -165,4 +169,12 @@ export class MyAppointment {
   get hasPendingAppointments(): boolean { return this.pendingAppointments.length > 0; }
   get hasRejectedAppointments(): boolean { return this.rejectedAppointments.length > 0; }
   get hasCancelledAppointments(): boolean { return this.cancelledAppointments.length > 0; }
+
+  getReasonLabel(code?: string): string {
+    if (!code) return 'N/A';
+
+    const found = this.reasons.find(r => r.code === code);
+    return found?.label ?? code;
+  }
+
 }
