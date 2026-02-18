@@ -91,66 +91,18 @@
     <h3 class="history-title">Previous Appointments/History</h3>
 
     <div *ngIf="appointmentHistory && appointmentHistory.length; else noHistory">
-      <div class="history-list">
-        <mat-accordion>
-          <mat-expansion-panel *ngFor="let h of appointmentHistory" [expanded]="false">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                {{ h.date | date:'fullDate' }} | {{ h.startTime }} - {{ h.endTime }}
-              </mat-panel-title>
-              <mat-panel-description>
-                <span class="history-status" [ngClass]="h.status">{{ h.status }}</span>
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-
-            <div class="history-card">
-              <div class="history-row">
-                <mat-icon class="history-icon">person</mat-icon>
-                <div>
-                  <strong>Dentist:</strong> Dr. {{ h.dentist.firstName }} {{ h.dentist.lastName }}
-                </div>
-              </div>
-
-              <div class="history-row">
-                <mat-icon class="history-icon">local_hospital</mat-icon>
-                <div>
-                  <strong>Clinic:</strong> {{ h.clinic.name }}
-                </div>
-              </div>
-
-              <div class="history-row">
-                <mat-icon class="history-icon">medication</mat-icon>
-                <div>
-                  <strong>Services:</strong>
-                  <span *ngFor="let s of h.services; let last = last">
-                    {{ s.name }}<span *ngIf="!last">, </span>
-                  </span>
-                </div>
-              </div>
-
-              <div class="history-row">
-                <mat-icon class="history-icon">history</mat-icon>
-                <div>
-                  <strong>Actions:</strong>
-                  <ul>
-                    <li *ngFor="let act of h.history">
-                      {{ act.action }} ({{ act.timestamp | date:'short' }})
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </mat-expansion-panel>
-        </mat-accordion>
-      </div>
+      <app-generic-table
+        [displayedColumns]="displayedColumns"
+        [columnDefs]="columnDefs"
+        [dataSource]="dataSource"
+        [isLoading]="isLoading"
+      ></app-generic-table>
     </div>
 
     <ng-template #noHistory>
       <p class="text-gray-500">No previous appointments found.</p>
     </ng-template>
   </div>
-
-
 
   <!-- Approve / Decline Buttons -->
 

@@ -73,33 +73,19 @@
       <h3>Medical History</h3>
 
       <div *ngIf="appointments.length; else noHistory">
-        <div class="history-item" *ngFor="let appt of latestAppointments">
-          <div class="history-date">
-            {{ appt.date | date:'mediumDate' }} • {{ appt.startTime }} - {{ appt.endTime }}
-          </div>
-          <div class="history-details">
-            <div><strong>Dentist:</strong> {{ `${appt.dentist?.firstName} ${appt.dentist?.lastName}` || 'N/A' }}</div>
-            <div><strong>Clinic:</strong> {{ appt.clinic?.name || 'N/A' }}</div>
-            <div><strong>Services:</strong> {{ getServiceNames(appt.services) }}</div>
-            <div><strong>Status:</strong> {{ appt.status }}</div>
-            <div *ngIf="appt.notes?.clinicNotes"><strong>Notes:</strong> {{ appt.notes.clinicNotes }}</div>
-          </div>
-        </div>
-
-        <!-- SEE MORE / SEE LESS BUTTON -->
-        <div class="see-more" *ngIf="appointments.length > 10">
-          <button mat-stroked-button color="primary" (click)="toggleHistory()">
-            {{ showAllHistory ? 'See Less' : 'See More' }}
-            <mat-icon>{{ showAllHistory ? 'chevron_left' : 'chevron_right' }}</mat-icon>
-          </button>
-        </div>
-
+        <app-generic-table
+          [displayedColumns]="displayedColumns"
+          [columnDefs]="columnDefs"
+          [dataSource]="dataSource"
+          [isLoading]="isLoading"
+          [ngClass]="{'expanded-table': activeTab === 'history'}"
+        ></app-generic-table>
       </div>
 
       <ng-template #noHistory>
         <p>No medical history found.</p>
       </ng-template>
-    </div>
+</div>
 
   </mat-card>
 </div>

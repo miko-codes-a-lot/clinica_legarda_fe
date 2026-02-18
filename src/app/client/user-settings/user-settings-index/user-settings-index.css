@@ -12,7 +12,7 @@
 /* Card */
 .user-card {
   width: 100%;
-  max-width: 720px;
+  max-width: 1000px;
   padding: 2rem;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -393,4 +393,12 @@
 .see-more button:hover {
   transform: translateY(-2px);
   background: rgba(63, 81, 181, 0.08);
+}
+
+/* Expanded Table for Medical History */
+.expanded-table {
+  width: 100%;           /* Make table occupy full width */
+  max-width: 100%;       /* Remove any limit on max width */
+  padding-left: 2rem;    /* Optional: Add padding to the left for more spacing */
+  padding-right: 2rem;   /* Optional: Add padding to the right */
 }

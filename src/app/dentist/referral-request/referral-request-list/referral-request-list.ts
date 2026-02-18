@@ -22,7 +22,7 @@ export class ReferralRequestList implements OnInit {
   createLabel = 'Create appointment'
   appointments: Appointment[] = []
   dataSource = new MatTableDataSource<Referral>();
-  displayedColumns: string[] = [ 'referTo', 'toBranch', 'reason', 'date', 'startTime', 'status', 'actions'];
+  displayedColumns: string[] = [ 'referTo', 'toBranch', 'reason', 'date', 'startTime', 'status', 'updatedAt', 'actions'];
   columnDefs = [
 
     {
@@ -72,6 +72,11 @@ export class ReferralRequestList implements OnInit {
       key: 'status',
       label: 'Status',
       cell: (row: any) => row.status ?? ''
+    },
+    {
+      key: 'updatedAt',
+      label: 'Status Updated',
+      cell: (row: any) => new Date(row.updatedAt).toLocaleDateString() ?? ''
     },
   ];
 

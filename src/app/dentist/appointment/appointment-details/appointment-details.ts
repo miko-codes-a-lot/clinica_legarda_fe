@@ -11,12 +11,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { NotesDialogComponent } from '../../../_shared/component/dialog/notes-dialog/notes-dialog.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { NgIf } from '@angular/common'; // if using standalone imports
-
-
+import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
 selector: 'app-appointment-details',
-  imports: [ListComponent, MatListModule, MatButtonModule, MatIconModule, CommonModule, MatExpansionModule, NgIf],
+  imports: [ListComponent, MatListModule, MatButtonModule, MatIconModule, CommonModule, MatExpansionModule, NgIf, GenericTableComponent],
   templateUrl: './appointment-details.html',
   styleUrl: './appointment-details.css'
 })
@@ -26,6 +26,19 @@ export class AppointmentDetails {
   appointment?: Appointment
   appointmentHistory?: Appointment[] = [];
   displayAppointment: Record<string, any> = {};
+  dataSource = new MatTableDataSource<Appointment>();
+
+  displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date', 'time', 'status'];
+  columnDefs = [
+    { key: 'clinic', label: 'Clinic', cell: (appointmentHistory: Appointment) => appointmentHistory.clinic.name},
+    { key: 'services', label: 'Services',   cell: (appointmentHistory: Appointment) => appointmentHistory.services.map(service =>     service.name).join(', ')
+    },
+    { key: 'patient', label: 'Patient', cell: (appointmentHistory: Appointment) =>  `${appointmentHistory.patient.firstName} ${appointmentHistory.patient.lastName}` },
+    { key: 'dentist', label: 'Dentist', cell: (appointmentHistory: Appointment) =>  `${appointmentHistory.dentist.firstName} ${appointmentHistory.dentist.lastName}` },
+    { key: 'date', label: 'Date', cell: (appointmentHistory: Appointment) => appointmentHistory.date },
+    { key: 'time', label: 'Time', cell: (appointmentHistory: Appointment) =>  `${appointmentHistory.startTime} - ${appointmentHistory.endTime}` },
+    { key: 'status', label: 'Status', cell: (appointmentHistory: Appointment) => appointmentHistory.status },
+  ];
 
   constructor(
     private readonly appointmentService: AppointmentService,
@@ -67,7 +80,8 @@ export class AppointmentDetails {
               && apt.status === 'confirmed'
               && new Date(apt.date) < now
             ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        
+            this.dataSource.data = this.appointmentHistory;
+            console.log('this.dataSource.data', this.dataSource.data);
         },
         error: (e) => alert(`Something went wrong ${e}`),
         complete: () => this.isLoading = false
@@ -94,6 +108,7 @@ export class AppointmentDetails {
         this.displayAppointment['status'] = updatedAppointment.status;
 
         this.isLoading = false;
+        console.log('this.appointment', this.appointment);
         alert('Appointment approved successfully!');
       },
       error: (err: any) => {
