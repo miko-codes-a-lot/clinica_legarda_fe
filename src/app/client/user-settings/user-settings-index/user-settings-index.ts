@@ -15,7 +15,12 @@ import { ChangeDetectorRef } from '@angular/core';
 import { AuthService } from '../../../_shared/service/auth-service';
 import { UserService } from '../../../_shared/service/user-service';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
+import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
+import { MatTableDataSource } from '@angular/material/table';
 
+import { Appointment } from '../../../_shared/model/appointment';
+import { ClinicService } from '../../../_shared/service/clinic-service';
+import { Clinic } from '../../../_shared/model/clinic';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -24,13 +29,15 @@ Chart.register(...registerables);
   selector: 'app-user-settings-index',
   templateUrl: './user-settings-index.html',
   styleUrl: './user-settings-index.css',
-  imports: [MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatIconModule, MatSelectModule, CommonModule, MatDialogModule]
+  imports: [MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatIconModule, MatSelectModule, CommonModule, MatDialogModule, GenericTableComponent]
 })
 export class UserSettingsIndex implements OnInit {
   @ViewChild('avatarModal') avatarModal!: TemplateRef<any>;
   profileForm!: FormGroup;
   // avatarUrl: string = 'assets/images/default-dentist.png'; // default profile pic
   avatarUrl: string | null = null;
+  dataSource = new MatTableDataSource<Appointment>();
+  clinics?: Clinic[] = [];
 
   user = {
     _id: '',
@@ -55,14 +62,27 @@ export class UserSettingsIndex implements OnInit {
 
   activeTab: 'profile' | 'history' = 'profile';
 
-  latestAppointments: any[] = [];
+  latestAppointments?: Appointment[] = [];;
   appointments: any[] = [];
   showAllHistory = false;
 
+  displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date', 'time', 'status'];
+  columnDefs = [
+    { key: 'clinic', label: 'Clinic', cell: (latestAppointments: Appointment) => latestAppointments.clinic.name},
+    { key: 'services', label: 'Services',   cell: (latestAppointments: Appointment) => latestAppointments.services.map(service => service.name).join(', ')
+    },
+    { key: 'patient', label: 'Patient', cell: (latestAppointments: Appointment) =>  `${latestAppointments.patient.firstName} ${latestAppointments.patient.lastName}` },
+    { key: 'dentist', label: 'Dentist', cell: (latestAppointments: Appointment) =>  `${latestAppointments.dentist.firstName} ${latestAppointments.dentist.lastName}` },
+    { key: 'date', label: 'Date', cell: (latestAppointments: Appointment) => latestAppointments.date },
+    { key: 'time', label: 'Time', cell: (latestAppointments: Appointment) =>  `${latestAppointments.startTime} - ${latestAppointments.endTime}` },
+    { key: 'status', label: 'Status', cell: (latestAppointments: Appointment) => latestAppointments.status },
+  ];
+  
   constructor(
     private fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly clinicService: ClinicService,
     private readonly appointmentService: AppointmentService,
     private readonly router: Router,
     private dialog: MatDialog,
@@ -81,7 +101,6 @@ export class UserSettingsIndex implements OnInit {
 
   onUpload() {
   if (!this.selectedFile) return;
-  console.log('this.selectedFile', this.selectedFile)
   this.userService.uploadProfilePicture(this.user._id, this.selectedFile)
     .subscribe({
       next: (res) => {
@@ -106,6 +125,15 @@ export class UserSettingsIndex implements OnInit {
     // if (mobileNumber) {
     //   applyPHMobilePrefix(mobileNumber)
     // }
+
+    this.clinicService.getAll().subscribe({
+      next: (data) => {
+        this.clinics = data;  // Make sure clinics are loaded
+        this.loadAppointments(); // After clinics are loaded, then load appointments
+      },
+      error: (e) => alert(`Something went wrong ${e}`)
+    }).add(() => this.isLoading = false);
+
     this.authService.currentUser$.subscribe({
       next: (user) => {
         if(user) {
@@ -178,9 +206,13 @@ export class UserSettingsIndex implements OnInit {
       .subscribe((res: any) => {
         this.appointments = res;
         this.latestAppointments = this.appointments
+          .filter(appointment => appointment.status === 'confirmed')
           .slice()
           .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
           .slice(0, 10);
+
+        this.dataSource.data = this.latestAppointments;
+        console.log('this.dataSource.data', this.dataSource.data);
     });
   }
 
