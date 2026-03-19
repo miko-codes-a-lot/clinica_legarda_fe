@@ -28,7 +28,6 @@ export class AuthService {
       tap(({ user }) => this.currentUserSubject.next(user)),
       catchError((error: HttpErrorResponse) => {
         let userMessage = 'Something bad happened; please try again later.';
-
         if (error.status === 400) {
           userMessage = 'Username or password is incorrect.';
         } else {

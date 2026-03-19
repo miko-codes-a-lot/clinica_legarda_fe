@@ -2,6 +2,12 @@ import { Appointment } from "./appointment"
 import { Clinic } from "./clinic"
 import { OperatingHour } from "./operating-hour"
 
+export enum UserStatus {
+  PENDING = 'pending',
+  CONFIRMED = 'confirmed',
+  REJECTED = 'rejected',
+}
+
 export interface User {
   _id?: string
   firstName: string
@@ -16,4 +22,5 @@ export interface User {
   operatingHours: OperatingHour[]
   appointments: Appointment[]
   role: string
+  status?: UserStatus
 }

@@ -1,0 +1,108 @@
+import { Component, OnInit } from '@angular/core';
+import { UserService } from '../../../_shared/service/user-service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { User } from '../../../_shared/model/user';
+import { MatButtonModule } from '@angular/material/button';
+import { MatListModule } from '@angular/material/list';
+import { ListComponent } from '../../../_shared/component/list/list.component';
+import { MatIconModule } from '@angular/material/icon';
+
+
+@Component({
+  selector: 'app-user-details',
+  imports: [MatButtonModule, MatListModule, ListComponent, MatIconModule],
+  templateUrl: './user-details.html',
+  styleUrl: './user-details.css'
+})
+export class UserDetails implements OnInit {
+  isLoading = false
+  id!: string
+  user?: User
+  displayUser: Record<string, any> = {};
+
+  constructor(
+    private readonly userService: UserService,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+  ) {}
+
+  ngOnInit(): void {
+    this.isLoading = true
+
+    this.id = this.route.snapshot.params['id']
+    
+    this.userService.getOne(this.id).subscribe({
+      next: (u) => {
+        // set the data to display
+        const { firstName, middleName, lastName, emailAddress, mobileNumber, address, role, status } = u;
+
+        this.displayUser = {
+          firstName,
+          middleName,
+          lastName,
+          emailAddress,
+          mobileNumber,
+          address,
+          role,
+          status
+        }
+        this.user = u
+      },
+      error: (e) => alert(`Something went wrong ${e}`)
+    }).add(() => this.isLoading = false)
+  }
+
+  isActionDisabled() {
+    return this.user && this.user.status != null && ['confirmed', 'rejected'].includes(this.user.status);
+  }
+
+  onUpdate() {
+    this.router.navigate(['/super-admin/user/update', this.id])
+  }
+
+  approveUser() {
+    if (!this.user?._id) return;
+
+    this.isLoading = true;
+
+    this.userService.approveUser(this.user._id).subscribe({
+      next: (updatedUser: User) => {
+        // Update local object
+        this.user = updatedUser;
+        this.displayUser['status'] = updatedUser.status;
+        this.isLoading = false;
+        alert('User approved successfully!');
+        window.location.reload();
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.isLoading = false;
+        alert(err.error.message);
+      }
+    });
+  }
+
+  declineUser() {
+    if (!this.user?._id) return;
+
+    this.isLoading = true;
+
+    this.userService.rejectUser(this.user._id).subscribe({
+      next: (updatedUser: User) => {
+        // Update local object
+        this.user = updatedUser;
+        this.displayUser['status'] = updatedUser.status;
+        window.location.reload();
+        this.isLoading = false;
+        alert('User rejected successfully!');
+        window.location.reload();
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.isLoading = false;
+        alert('Failed to reject user.');
+      }
+    });
+  }
+  
+}

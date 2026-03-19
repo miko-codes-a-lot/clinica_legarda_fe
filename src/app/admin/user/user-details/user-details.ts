@@ -33,7 +33,7 @@ export class UserDetails implements OnInit {
     this.userService.getOne(this.id).subscribe({
       next: (u) => {
         // set the data to display
-        const { firstName, middleName, lastName, emailAddress, mobileNumber, address, role } = u;
+        const { firstName, middleName, lastName, emailAddress, mobileNumber, address, role, status } = u;
 
         this.displayUser = {
           firstName,
@@ -42,7 +42,8 @@ export class UserDetails implements OnInit {
           emailAddress,
           mobileNumber,
           address,
-          role
+          role,
+          status
         }
         this.user = u
       },

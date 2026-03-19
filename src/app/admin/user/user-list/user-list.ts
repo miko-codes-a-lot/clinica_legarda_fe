@@ -19,11 +19,12 @@ export class UserList implements OnInit {
   title = 'User Management'
   createLabel = 'Create User'
   dataSource = new MatTableDataSource<User>();
-  displayedColumns: string[] = ['_id', 'name', 'role', 'actions'];
+  displayedColumns: string[] = ['_id', 'name', 'role', 'status', 'actions'];
   columnDefs = [
     { key: '_id', label: 'ID', cell: (user: User) => user._id ?? '' },
     { key: 'name', label: 'Name', cell: (user: User) => `${user.firstName} ${user.lastName}` },
     { key: 'role', label: 'ROLE', cell: (user: User) => user.role ?? '' },
+    { key: 'status', label: 'STATUS', cell: (user: User) => user.status ?? '' },
   ];
 
   constructor(

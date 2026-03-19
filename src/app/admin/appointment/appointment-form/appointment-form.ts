@@ -290,7 +290,9 @@ export class AppointmentForm {
     this.userService.getAll().subscribe(users => {
       this.users = users;
       // filter dentists by clinic
-      this.dentists = users.filter(u => u.clinic === clinic._id) || []
+      this.dentists = users.filter(u => u.clinic === clinic._id
+        && u.status === 'confirmed'
+      ) || []
       this.buildAppointmentFields();
 
       if (!this.dentists.find(d => d._id === this.selectedDentist?._id)) {
@@ -346,7 +348,10 @@ export class AppointmentForm {
   }
 
   private buildAppointmentFields() {
-    const filteredPatients = this.patients?.filter(p => p.role === 'user');
+    const filteredPatients = this.patients?.filter(
+      p => p.role === 'user'
+      && p.status === 'confirmed'
+    );
     const customPatients = this.setUsersKey(filteredPatients);
 
     const selectClinic = this.mapToOptions(this.clinics);
@@ -493,7 +498,6 @@ export class AppointmentForm {
         this.onSubmitEvent.emit(appointmentData);
       },
       error: err => {
-        console.log('error', err);
         alert(`${err.error.message}`)
       }
     });

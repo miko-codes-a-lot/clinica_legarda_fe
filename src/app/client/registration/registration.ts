@@ -7,6 +7,7 @@ import { RxOperatingHour } from '../../_shared/model/reactive/rx-operating-hours
 import { Day } from '../../_shared/model/day';
 import { passwordMatchValidator } from '../../utils/forms/form-custom-validator';
 import { Clinic } from '../../_shared/model/clinic';
+import { UserStatus } from '../../_shared/model/user';
 import { UserPayload } from '../../admin/user/user-form/user-payload';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field'; // to remove
@@ -70,6 +71,7 @@ export class RegistrationPage implements OnInit, OnChanges {
       role: 'user',
       appointments: [],
       operatingHours: [],
+      status: UserStatus.PENDING
     }
   }
 
@@ -156,6 +158,7 @@ export class RegistrationPage implements OnInit, OnChanges {
       password: this.password?.value,
       operatingHours: [],
       role: '',
+      status: UserStatus.PENDING
     }
 
 

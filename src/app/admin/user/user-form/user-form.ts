@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, signal, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RxUserForm } from './rx-user-form.interface';
-import { User } from '../../../_shared/model/user';
+import { User, UserStatus } from '../../../_shared/model/user';
 import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
 import { RxOperatingHour } from '../../../_shared/model/reactive/rx-operating-hours';
 import { Day } from '../../../_shared/model/day';
@@ -80,6 +80,7 @@ export class UserForm implements OnInit, OnChanges {
         // { day: 'saturday', startTime: '10:00', endTime: '15:00' },
         // { day: 'sunday', startTime: '10:00', endTime: '15:00' },
       ],
+      status: UserStatus.PENDING,
     }
   }
 

@@ -66,7 +66,7 @@ export class UserSettingsIndex implements OnInit {
   appointments: any[] = [];
   showAllHistory = false;
 
-  displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date', 'time', 'status'];
+  displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date', 'time'];
   columnDefs = [
     { key: 'clinic', label: 'Clinic', cell: (latestAppointments: Appointment) => latestAppointments.clinic.name},
     { key: 'services', label: 'Services',   cell: (latestAppointments: Appointment) => latestAppointments.services.map(service => service.name).join(', ')
@@ -75,7 +75,6 @@ export class UserSettingsIndex implements OnInit {
     { key: 'dentist', label: 'Dentist', cell: (latestAppointments: Appointment) =>  `${latestAppointments.dentist.firstName} ${latestAppointments.dentist.lastName}` },
     { key: 'date', label: 'Date', cell: (latestAppointments: Appointment) => latestAppointments.date },
     { key: 'time', label: 'Time', cell: (latestAppointments: Appointment) =>  `${latestAppointments.startTime} - ${latestAppointments.endTime}` },
-    { key: 'status', label: 'Status', cell: (latestAppointments: Appointment) => latestAppointments.status },
   ];
   
   constructor(

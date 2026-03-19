@@ -1,0 +1,12 @@
+<app-generic-table
+  [title]="title"
+  [createButtonLabel]="createLabel"
+  [displayedColumns]="displayedColumns"
+  [columnDefs]="columnDefs"
+  [dataSource]="dataSource"
+  [isLoading]="isLoading"
+  (details)="onDetails($event)"
+  (update)="onUpdate($event)"
+  (create)="onCreate()"
+  [disableEditFn]="disableEdit"
+></app-generic-table>

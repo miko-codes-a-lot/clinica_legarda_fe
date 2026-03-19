@@ -1,0 +1,50 @@
+<mat-drawer-container class="example-container">
+
+  <!-- Sidebar -->
+  <mat-drawer mode="side" opened *ngIf="isLoggedIn && showSideNav">
+    <mat-toolbar color="primary">
+      <span class="system-title">Clinica Legarda</span>
+    </mat-toolbar>
+    <mat-list role="list">
+      <app-nav [disabled]="isLoading" [menuItems]="menuItems"></app-nav>
+    </mat-list>
+  </mat-drawer>
+
+  <!-- Main content -->
+  <mat-drawer-content>
+
+    <!-- Top Navigation Bar -->
+    <mat-toolbar color="primary" class="top-nav" *ngIf="showTopNav && showSideNav">
+      <span class="dashboard-title">
+        <!-- <mat-icon class="title-icon">{{ activeIcon }}</mat-icon>
+        <span class="title-text">{{ activeTitle }}</span> -->
+      </span>
+      <span class="spacer"></span>
+
+      <!-- User Dropdown -->
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+        <div class="user-avatar">
+          <mat-icon>account_circle</mat-icon>
+        </div>
+        <mat-icon class="dropdown-arrow">arrow_drop_down</mat-icon>
+      </button>
+
+    <mat-menu #userMenu="matMenu" class="user-menu custom-menu">
+      <!-- Header Section -->
+
+      <button mat-menu-item (click)="onClickLogout()">
+        <mat-icon color="warn">logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
+
+    </mat-toolbar>
+
+    <!-- Page Content -->
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
+
+  </mat-drawer-content>
+
+</mat-drawer-container>

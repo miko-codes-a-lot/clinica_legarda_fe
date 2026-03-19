@@ -1,0 +1,127 @@
+@if (appointment) {
+  <div class="view-header">
+    <button mat-raised-button color="primary" (click)="onUpdate()" [disabled]="isClinicEditDisabled()">Edit</button>
+  </div>
+  <app-list [data]="displayAppointment">
+    <div class="custom-list">
+      <mat-list-item>
+        <span class="item-title" matListItemTitle><strong>Service/s:</strong></span>
+        @for (service of appointment.services; track service._id) {
+          <span class="item-line" matListItemLine>{{ service.name }}</span>
+        }
+      </mat-list-item>
+    </div>
+    <div class="row-divider"></div>
+    <div class="notes-section">
+      <div class="note-item clinic-notes">
+        <div class="note-header">
+          <strong>Clinic Notes:</strong>
+          <button mat-icon-button color="primary" (click)="openNotesDialog()" [disabled]="isClinicNotesDisabled()">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+        <div class="note-body">
+          {{ appointment.notes.clinicNotes || 'No notes yet' }}
+        </div>
+      </div>
+
+      <div class="note-item patient-notes">
+        <div class="note-header">
+          <strong>Patient Notes:</strong>
+        </div>
+        <div class="note-body">
+          {{ appointment.notes.patientNotes || 'No notes yet' }}
+        </div>
+      </div>
+    </div>
+
+    @if (appointment.referral) {
+      <div class="row-divider"></div>
+
+      <div class="referral-section">
+        <div class="referral-header">
+          <h3>Referral Details</h3>
+          <span class="referral-status"
+                [class.confirmed]="appointment.referral.status === 'confirmed'">
+            {{ appointment.referral.status }}
+          </span>
+        </div>
+
+        <div class="referral-card">
+          <div class="referral-row">
+            <span class="label">Reason</span>
+            <span class="value">
+              {{ appointment.referral.reason || 'No reason provided' }}
+            </span>
+          </div>
+
+          <div class="referral-row">
+            <span class="label">Referred From Clinic</span>
+            <span class="value">
+              {{ appointment.referral.fromClinicId.name }}
+            </span>
+          </div>
+
+          <div class="referral-row">
+            <span class="label">Clinic Address</span>
+            <span class="value">
+              {{ appointment.referral.fromClinicId.address }}
+            </span>
+          </div>
+
+          <div class="referral-row">
+            <span class="label">Referred By</span>
+            <span class="value">
+              {{ appointment.referral.fromDoctorId.firstName }}
+              {{ appointment.referral.fromDoctorId.lastName }}
+            </span>
+          </div>
+        </div>
+      </div>
+    }
+  </app-list>
+    <div class="row-divider"></div>
+    <div class="history-section">
+      <h3>Appointment History</h3>
+
+      <div class="history-list" *ngIf="appointment.history.length; else noHistory">
+        <div class="history-item" *ngFor="let h of appointment.history">
+          <div class="history-action">
+            {{ h.action }}
+          </div>
+          <div class="history-time">
+            {{ h.timestamp | date: 'medium' }}
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noHistory>
+        <p>No history available.</p>
+      </ng-template>
+    </div>
+
+    <div class="action-buttons">
+      <button mat-stroked-button color="warn" 
+              (click)="cancelAppointment()" 
+              *ngIf="appointment.status === 'confirmed' else notConfirmed">
+        <mat-icon>cancel</mat-icon> Cancel
+      </button>
+    </div>
+    <ng-template #notConfirmed>
+      <div class="action-buttons" >
+        <button mat-flat-button color="primary" 
+                (click)="approveAppointment()" 
+                [disabled]="isActionDisabled()">
+          <mat-icon>check</mat-icon> Approve
+        </button>
+
+        <button mat-stroked-button color="warn" 
+                (click)="declineAppointment()" 
+                [disabled]="isActionDisabled()">
+          <mat-icon>close</mat-icon> Reject
+        </button>
+      </div>
+    </ng-template>
+} @else {
+  <p>Fetching details...</p>
+}
