@@ -80,48 +80,29 @@
       </div>
     }
   </app-list>
-    <div class="row-divider"></div>
-    <div class="history-section">
-      <h3>Appointment History</h3>
 
-      <div class="history-list" *ngIf="appointment.history.length; else noHistory">
-        <div class="history-item" *ngFor="let h of appointment.history">
-          <div class="history-action">
-            {{ h.action }}
-          </div>
-          <div class="history-time">
-            {{ h.timestamp | date: 'medium' }}
-          </div>
-        </div>
-      </div>
+  <div class="action-buttons">
+    <button mat-stroked-button color="warn" 
+            (click)="cancelAppointment()" 
+            *ngIf="appointment.status === 'confirmed' else notConfirmed">
+      <mat-icon>cancel</mat-icon> Cancel
+    </button>
+  </div>
+  <ng-template #notConfirmed>
+    <div class="action-buttons" >
+      <button mat-flat-button color="primary" 
+              (click)="approveAppointment()" 
+              [disabled]="isActionDisabled()">
+        <mat-icon>check</mat-icon> Approve
+      </button>
 
-      <ng-template #noHistory>
-        <p>No history available.</p>
-      </ng-template>
-    </div>
-
-    <div class="action-buttons">
       <button mat-stroked-button color="warn" 
-              (click)="cancelAppointment()" 
-              *ngIf="appointment.status === 'confirmed' else notConfirmed">
-        <mat-icon>cancel</mat-icon> Cancel
+              (click)="declineAppointment()" 
+              [disabled]="isActionDisabled()">
+        <mat-icon>close</mat-icon> Reject
       </button>
     </div>
-    <ng-template #notConfirmed>
-      <div class="action-buttons" >
-        <button mat-flat-button color="primary" 
-                (click)="approveAppointment()" 
-                [disabled]="isActionDisabled()">
-          <mat-icon>check</mat-icon> Approve
-        </button>
-
-        <button mat-stroked-button color="warn" 
-                (click)="declineAppointment()" 
-                [disabled]="isActionDisabled()">
-          <mat-icon>close</mat-icon> Reject
-        </button>
-      </div>
-    </ng-template>
+  </ng-template>
 } @else {
   <p>Fetching details...</p>
 }
