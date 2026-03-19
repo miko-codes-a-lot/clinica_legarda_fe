@@ -13,6 +13,16 @@ export const ADMIN_ROUTES: Routes = [
         component: LoginAdmin
       },
       {
+        path: 'verify-otp',
+        loadComponent: () => import('../_shared/component/verify-otp/verify-otp')
+          .then(m => m.VerifyOtp),
+        data: {
+          theme: 'admin',
+          redirectUrl: '/admin/dashboard',
+          loginUrl: '/admin/login'
+        }
+      },
+      {
         path: '',
         redirectTo: '/admin/dashboard',
         pathMatch: 'full'

@@ -46,10 +46,25 @@ export class LoginPatient {
 
     this.authService.login(this.username.value, this.password.value).subscribe({
       next: (r) => {
-        this.router.navigate(['/app/my-appointment'])
+        if (r.otpRequired) {
+          this.router.navigate(['/app/verify-otp'], {
+            state: { maskedEmail: this.maskEmail(r.user.emailAddress) }
+          })
+        } else {
+          this.router.navigate(['/app/my-appointment'])
+        }
       },
       error: (err) => alert(`Something went wrong: ${err}`)
     }).add(() => this.uiStateService.setLoading(false))
+  }
+
+  private maskEmail(email: string): string {
+    if (!email) return ''
+    const [local, domain] = email.split('@')
+    const masked = local.length <= 2
+      ? local[0] + '***'
+      : local[0] + '***' + local[local.length - 1]
+    return masked + '@' + domain
   }
 
   goToRegister() {

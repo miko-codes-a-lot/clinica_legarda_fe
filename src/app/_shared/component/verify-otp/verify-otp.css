@@ -1,0 +1,158 @@
+/* Default: patient theme (blue) */
+.otp-container {
+  --primary: #1976d2;
+  --primary-light: #63a4ff;
+  --primary-dark: #115293;
+  --primary-disabled: #90caf9;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 86.6vh;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  padding: 1rem;
+}
+
+/* Admin theme (indigo) */
+.otp-container.theme-admin {
+  --primary: #3f51b5;
+  --primary-light: #7986cb;
+  --primary-dark: #2c387e;
+  --primary-disabled: #9fa8da;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* Card */
+.otp-card {
+  background: #ffffff;
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.otp-card h2 {
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+}
+
+.otp-subtitle {
+  font-size: 0.95rem;
+  color: #555555;
+  margin-bottom: 1.5rem;
+}
+
+/* Form */
+.otp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.form-group label {
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  color: #333333;
+}
+
+.form-group input {
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #cccccc;
+  font-size: 1.5rem;
+  letter-spacing: 8px;
+  text-align: center;
+  transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.form-group input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+  outline: none;
+}
+
+.theme-admin .form-group input:focus {
+  box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+/* Button */
+button[type="submit"] {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--primary);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+button[type="submit"]:disabled {
+  background-color: var(--primary-disabled);
+  cursor: not-allowed;
+}
+
+button[type="submit"]:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+}
+
+/* Resend */
+.resend-prompt {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+  text-align: center;
+}
+
+.resend-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+}
+
+.resend-btn:disabled {
+  color: #999;
+  cursor: not-allowed;
+}
+
+.resend-btn:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+/* Back link */
+.back-link {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.back-link a {
+  color: var(--primary);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .otp-card {
+    padding: 1.5rem 2rem;
+  }
+}
