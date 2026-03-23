@@ -1,5 +1,6 @@
 import { Clinic } from "./clinic"
 import { OperatingHour } from "./operating-hour"
+import { UserStatus } from "../../_shared/model/user"
 
 export interface UserSimple {
     _id: string
@@ -16,5 +17,6 @@ export interface UserSimple {
     username: string
     profilePicture?: string
     createdAt: string 
-    updatedAt: string 
+    updatedAt: string
+    status?: UserStatus
 }

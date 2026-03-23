@@ -1,4 +1,5 @@
 import { OperatingHour } from "../../../_shared/model/operating-hour"
+import { UserStatus } from "../../../_shared/model/user"
 
 export interface UserPayload {
   _id?: string
@@ -14,4 +15,5 @@ export interface UserPayload {
   role: string
   username?: string
   profilePicture?: string
+  status?: UserStatus
 }

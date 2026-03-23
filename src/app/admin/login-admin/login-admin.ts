@@ -39,8 +39,11 @@ export class LoginAdmin {
     this.isLoading = true
     this.authService.login(this.username.value, this.password.value).subscribe({
       next: (r) => {
-        console.log('r', r)
-        if (r.user.role === 'dentist') {
+        if (r.otpRequired) {
+          this.router.navigate(['/admin/verify-otp'], {
+            state: { maskedEmail: this.maskEmail(r.user.emailAddress) }
+          })
+        } else if (r.user.role === 'dentist') {
           this.router.navigate(['/dentist/profile'])
         } else {
           this.router.navigate(['/admin/dashboard'])
@@ -48,6 +51,15 @@ export class LoginAdmin {
       },
       error: (err) => alert(err.message)
     }).add(() => this.isLoading = false)
+  }
+
+  private maskEmail(email: string): string {
+    if (!email) return ''
+    const [local, domain] = email.split('@')
+    const masked = local.length <= 2
+      ? local[0] + '***'
+      : local[0] + '***' + local[local.length - 1]
+    return masked + '@' + domain
   }
 
   get username () {

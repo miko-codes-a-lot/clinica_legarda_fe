@@ -21,7 +21,6 @@ export class AuthGuard implements CanActivate {
     return this.authService.currentUser$.pipe(
       map(user => {
         if (!expectedRole) return true
-
         if (user?.role === expectedRole) {
           return true
         } else {
@@ -31,6 +30,8 @@ export class AuthGuard implements CanActivate {
             this.router.navigate(['/admin/dashboard']);
           } else if (user?.role === 'user') {
             this.router.navigate(['/app/my-appointment']);
+          }else if (user?.role === 'super-admin') {
+            this.router.navigate(['/super-admin/dashboard']);
           } else {
             this.router.navigate(['/admin/login']);
           }

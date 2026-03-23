@@ -225,7 +225,7 @@ onSave() {
       clinic: this.user?.clinic?._id || undefined, 
       operatingHours: formValue.operatingHours || [],
       role: formValue.role || this.user.role,
-      username: this.user.username 
+      username: this.user.username,
     };
 
 

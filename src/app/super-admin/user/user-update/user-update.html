@@ -1,0 +1,11 @@
+@if (user && days.length > 0) {
+  <app-user-form
+    [isLoading]="isLoading"
+    [days]="days"
+    [user]="user"
+    [clinics]="clinics"
+    (onSubmitEvent)="onSubmit($event)"
+  ></app-user-form>
+} @else {
+  <p>Fetching details...</p>
+}

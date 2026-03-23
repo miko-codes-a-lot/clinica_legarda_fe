@@ -66,16 +66,28 @@ export class UserSettingsIndex implements OnInit {
   appointments: any[] = [];
   showAllHistory = false;
 
-  displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date', 'time', 'status'];
+  displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date'];
   columnDefs = [
     { key: 'clinic', label: 'Clinic', cell: (latestAppointments: Appointment) => latestAppointments.clinic.name},
     { key: 'services', label: 'Services',   cell: (latestAppointments: Appointment) => latestAppointments.services.map(service => service.name).join(', ')
     },
     { key: 'patient', label: 'Patient', cell: (latestAppointments: Appointment) =>  `${latestAppointments.patient.firstName} ${latestAppointments.patient.lastName}` },
     { key: 'dentist', label: 'Dentist', cell: (latestAppointments: Appointment) =>  `${latestAppointments.dentist.firstName} ${latestAppointments.dentist.lastName}` },
-    { key: 'date', label: 'Date', cell: (latestAppointments: Appointment) => latestAppointments.date },
-    { key: 'time', label: 'Time', cell: (latestAppointments: Appointment) =>  `${latestAppointments.startTime} - ${latestAppointments.endTime}` },
-    { key: 'status', label: 'Status', cell: (latestAppointments: Appointment) => latestAppointments.status },
+    // { key: 'date', label: 'Date', cell: (latestAppointments: Appointment) => latestAppointments.date },
+    {
+      key: 'date',
+      label: 'Date & Time',
+      cell: (a: Appointment) => {
+        const date = new Date(a.date).toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+
+        return `${date}, ${a.startTime} - ${a.endTime}`;
+      }
+    }
+    // { key: 'time', label: 'Time', cell: (latestAppointments: Appointment) =>  `${latestAppointments.startTime} - ${latestAppointments.endTime}` },
   ];
   
   constructor(

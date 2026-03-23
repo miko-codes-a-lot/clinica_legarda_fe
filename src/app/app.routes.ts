@@ -17,5 +17,9 @@ export const routes: Routes = [
   {
     path: 'dentist',
     loadChildren: () => import('./dentist/dentist.routes').then(m => m.DENTIST_ROUTES)
+  },
+  {
+    path: 'super-admin',
+    loadChildren: () => import('./super-admin/super-admin.routes').then(m => m.SUPER_ADMIN_ROUTES)
   }
 ];

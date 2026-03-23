@@ -34,7 +34,7 @@ export class UserSettingsUpdate implements OnInit {
   profileForm!: FormGroup;
   avatarUrl: string = 'assets/images/default-dentist.png'; // default profile pic
 
-  user: { _id?: string; clinic?: any; role?: string; username?: string; operatingHours?: any[] } = {};
+  user: { _id?: string; clinic?: any; role?: string; username?: string; operatingHours?: any[], status?: any } = {};
   isDentist = false
   isLoading = false
   id = ''
@@ -230,7 +230,8 @@ onSave() {
       clinic: this.user?.clinic?._id || undefined, 
       operatingHours: formValue.operatingHours || [],
       role: formValue.role || this.user.role,
-      username: this.user.username 
+      username: this.user.username,
+      status: this.user.status,
     };
 
     console.log('Submitting user update:', userData);

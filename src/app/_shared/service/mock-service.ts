@@ -5,6 +5,7 @@ import { Appointment, AppointmentStatus } from '../model/appointment';
 import { User } from '../model/user';
 import { Branch } from '../model/branch';
 import { Notification, NotificationType } from '../model/notification';
+import { UserStatus } from '../model/user';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +31,7 @@ export class MockService {
           { day: 'saturday', startTime: '10:00', endTime: '15:00' },
           { day: 'sunday', startTime: '10:00', endTime: '15:00' },
         ],
+        status: UserStatus.PENDING
     }
   }
 

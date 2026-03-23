@@ -128,3 +128,60 @@ app-list {
   font-size: 15px;
   color: #222;
 }
+
+.history-section {
+  margin-top: 16px;
+  margin: 2% 8% 2% 8%;
+  margin-bottom: 16px;
+  background-color: white;
+  border: 1px solid rgb(207, 205, 205);
+  padding: 3%;
+}
+
+.history-section h3 {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  max-height: 250px;   /* 👈 adjust this */
+  overflow-y: auto;    /* 👈 enables vertical scroll */
+  padding-right: 6px;  /* 👈 avoids scrollbar overlap */
+  scroll-behavior: smooth;
+}
+
+.history-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+  background-color: #c5cae9;
+  border-radius: 4px;
+}
+
+.history-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.history-item {
+  padding: 10px 14px;
+  border-left: 4px solid #3f51b5;
+  background-color: #f5f7ff;
+  border-radius: 6px;
+}
+
+.history-action {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.history-time {
+  font-size: 12px;
+  color: #777;
+}

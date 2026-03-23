@@ -58,4 +58,12 @@ export class UserService {
       map(blob => URL.createObjectURL(blob))
     );
   }
+
+  approveUser(userId: string) {
+    return this.http.patch<User>(`${this.baseUrl}/${userId}/approve`, {}, { withCredentials: true });
+  }
+
+  rejectUser(userId: string) {
+    return this.http.patch<User>(`${this.baseUrl}/${userId}/reject`, {}, { withCredentials: true });
+  }
 }

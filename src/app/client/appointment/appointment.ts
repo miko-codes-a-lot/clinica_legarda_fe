@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AppointmentPayload } from '../../admin/appointment/appointment-payload';
 import { ReferralPayload } from '../../admin/appointment/referral-payload';
 import { Appointment, AppointmentStatus } from '../../_shared/model/appointment';
-import { User } from '../../_shared/model/user';
+import { User, UserStatus } from '../../_shared/model/user';
 import { RxAppointmentForm } from './rx-appointment-form';
 import { RxReferralForm } from './rx-referral-form';
 import { DentalService } from '../../_shared/model/dental-service';
@@ -117,7 +117,7 @@ export class AppointmentPage {
     this.userService.getAll().subscribe(users => {
       this.users = users;
       // filter dentists by clinic
-      this.dentists = users.filter(u => u.clinic === clinic._id) || []
+      this.dentists = users.filter(u => u.clinic === clinic._id && u.status === 'confirmed') || []
       this.builAppointmentFields();
 
       if (!this.dentists.find(d => d._id === this.selectedDentist?._id)) {

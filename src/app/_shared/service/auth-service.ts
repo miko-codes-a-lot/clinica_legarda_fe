@@ -25,19 +25,48 @@ export class AuthService {
 
   login(username: string, password: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>('/auth/sign-in', { username, password }).pipe(
-      tap(({ user }) => this.currentUserSubject.next(user)),
+      tap((response) => {
+        if (!response.otpRequired) {
+          this.currentUserSubject.next(response.user)
+        }
+      }),
       catchError((error: HttpErrorResponse) => {
         let userMessage = 'Something bad happened; please try again later.';
-
         if (error.status === 400) {
-          userMessage = 'Username or password is incorrect.';
+          userMessage = error.error?.message || 'Username or password is incorrect.';
         } else {
-          // Generic fallback for other errors
           console.error(
             `Backend returned code ${error.status}, ` +
             `body was: ${JSON.stringify(error.error)}`);
         }
-        
+
+        return throwError(() => new Error(userMessage));
+      })
+    )
+  }
+
+  verifyOtp(code: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>('/auth/verify-otp', { code }).pipe(
+      tap(({ user }) => this.currentUserSubject.next(user)),
+      catchError((error: HttpErrorResponse) => {
+        let userMessage = 'Something went wrong. Please try again.';
+        if (error.status === 400) {
+          userMessage = error.error?.message || 'Invalid OTP code.';
+        } else if (error.status === 401) {
+          userMessage = 'Session expired. Please sign in again.';
+        }
+        return throwError(() => new Error(userMessage));
+      })
+    )
+  }
+
+  resendOtp(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>('/auth/resend-otp', {}).pipe(
+      catchError((error: HttpErrorResponse) => {
+        let userMessage = 'Could not resend OTP. Please try again.';
+        if (error.status === 401) {
+          userMessage = 'Session expired. Please sign in again.';
+        }
         return throwError(() => new Error(userMessage));
       })
     )

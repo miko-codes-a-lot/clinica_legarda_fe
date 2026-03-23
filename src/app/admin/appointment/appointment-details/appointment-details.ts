@@ -8,10 +8,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { NotesDialogComponent } from '../../../_shared/component/dialog/notes-dialog/notes-dialog.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
 selector: 'app-appointment-details',
-  imports: [ListComponent, MatListModule, MatButtonModule, MatIconModule],
+  imports: [ListComponent, MatListModule, MatButtonModule, MatIconModule, CommonModule],
   templateUrl: './appointment-details.html',
   styleUrl: './appointment-details.css'
 })

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Appointment, AppointmentStatus } from '../model/appointment';
+import { UserStatus } from '../model/user';
 import { Observable } from 'rxjs';
 import { AppointmentPayload } from '../../admin/appointment/appointment-payload';
 import { HttpClient } from '@angular/common/http';
@@ -75,6 +76,7 @@ export class AppointmentService {
   }
 
   getOne(id: string): Observable<Appointment> {
+    console.log('test id: ', id);
     return this.http.get<Appointment>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 

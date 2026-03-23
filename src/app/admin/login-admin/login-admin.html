@@ -12,7 +12,7 @@
         <input type="password" placeholder="Enter password" formControlName="password">
       </div>
 
-      <button type="submit" [disabled]="!rxform.valid">Login</button>
+      <button type="submit" [disabled]="!rxform.valid || isLoading">Login</button>
     </form>
   </div>
 </div>

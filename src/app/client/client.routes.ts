@@ -76,6 +76,16 @@ export const CLIENT_ROUTES: Routes = [
       {
         path: 'login',
         component: LoginPatient,
+      },
+      {
+        path: 'verify-otp',
+        loadComponent: () => import('../_shared/component/verify-otp/verify-otp')
+          .then(m => m.VerifyOtp),
+        data: {
+          theme: 'patient',
+          redirectUrl: '/app/my-appointment',
+          loginUrl: '/app/login'
+        }
       }
     ]
   }
