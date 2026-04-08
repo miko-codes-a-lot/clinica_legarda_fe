@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Appointment } from '../../../_shared/model/appointment';
+import { User } from '../../../_shared/model/user';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
+import { UserService } from '../../../_shared/service/user-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ListComponent } from '../../../_shared/component/list/list.component';
 import { MatListModule } from '@angular/material/list';
@@ -29,7 +31,7 @@ export class ReferralRequestDetails {
   referral?: Referral
   displayReferral: Record<string, any> = {};
   reasons: Reason[] = [];
-
+  patient!: User
 
   constructor(
     private readonly appointmentService: AppointmentService,
@@ -37,7 +39,8 @@ export class ReferralRequestDetails {
     private readonly router: Router,
     private readonly dialog: MatDialog,
     private readonly referralService: ReferralService,
-    private readonly reasonService: ReasonService
+    private readonly reasonService: ReasonService,
+    private readonly userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -49,25 +52,33 @@ export class ReferralRequestDetails {
    this.isLoading = true
 
     this.id = this.route.snapshot.params['id']
-    // do the same here
     this.referralService.getOne(this.id).subscribe({
       next: (a) => {
         const { appointment, reason, reasonOfDecline, status } = a;
-        this.displayReferral = {
+        const _id =
+          typeof appointment.patient === 'string'
+            ? appointment.patient
+            : appointment.patient._id;
+        this.userService.getOne(_id as string).subscribe((patient) => {
+          this.displayReferral = {
           'Referred To': appointment?.dentist
             ? `${appointment.dentist.firstName} ${appointment.dentist.lastName}`
             : 'N/A',
+          'Patient': `${patient.firstName} ${patient.lastName}`,
           'Transfer Branch': appointment?.clinic?.name || 'N/A',
           'Status': status,
           ...(reasonOfDecline && {
             'Reason for Rejection': this.getReasonLabel(reasonOfDecline)
           }),
           'Reason for Referral': this.getReasonLabel(reason) || 'N/A',
+          'Notes for Dentist': appointment.notes.patientNotes,
           'Appointment Date': appointment?.date ? new Date(appointment.date).toLocaleDateString() : 'N/A',
           'Start Time': appointment?.startTime || 'N/A',
           'End Time': appointment?.endTime || 'N/A',
-          'Services': appointment?.services?.map(s => s.name).join(', ') || 'N/A'
+          'Services': appointment?.services?.map(s => s.name).join(', ') || 'N/A',
         };
+        });
+
   
         this.referral = a;
         this.appointment = appointment;
@@ -160,7 +171,6 @@ export class ReferralRequestDetails {
       dialogRef.afterClosed().subscribe(res => {
         if (res.result) {
           const reason = res.data.reason;
-          console.log(reason);
           this.referralService.rejectReferral(this.referral?._id || '', reason).subscribe({
             next: (updatedReferral: Referral) => {
               // Update local object

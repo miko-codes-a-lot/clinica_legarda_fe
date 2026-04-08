@@ -22,7 +22,7 @@ export class ReferralRequestList implements OnInit {
   createLabel = 'Create appointment'
   appointments: Appointment[] = []
   dataSource = new MatTableDataSource<Referral>();
-  displayedColumns: string[] = [ 'referTo', 'toBranch', 'reason', 'date', 'startTime', 'status', 'updatedAt', 'actions'];
+  displayedColumns: string[] = [ 'referTo', 'toBranch', 'appointment.patient', 'reason', 'appointment.notes', 'date', 'startTime', 'status', 'updatedAt', 'actions'];
   columnDefs = [
 
     {
@@ -36,9 +36,19 @@ export class ReferralRequestList implements OnInit {
       cell: (row: any) => row.appointment?.clinic.name ?? ''
     },
     {
+      key: 'appointment.patient',
+      label: 'Patient',
+      cell: (row: any) => `${row.appointment?.patient.firstName ?? ''} ${row.appointment.patient.lastName ?? ''}`
+    },
+    {
       key: 'reason',
       label: 'Reason',
       cell: (row: any) => row.reason ?? ''
+    },
+    {
+      key: 'appointment.notes',
+      label: 'Note for Dentist',
+      cell: (row: any) => row.appointment?.notes.patientNotes ?? ''
     },
     // {
     //   key: 'appointmentStatus',

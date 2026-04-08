@@ -28,7 +28,7 @@ export class AppointmentDetails {
   displayAppointment: Record<string, any> = {};
   dataSource = new MatTableDataSource<Appointment>();
 
-  displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date', 'time', 'status'];
+  displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date', 'time', 'status', 'notes.clinicNotes', 'notes.patientNotes'];
   columnDefs = [
     { key: 'clinic', label: 'Clinic', cell: (appointmentHistory: Appointment) => appointmentHistory.clinic.name},
     { key: 'services', label: 'Services',   cell: (appointmentHistory: Appointment) => appointmentHistory.services.map(service =>     service.name).join(', ')
@@ -38,6 +38,8 @@ export class AppointmentDetails {
     { key: 'date', label: 'Date', cell: (appointmentHistory: Appointment) => appointmentHistory.date },
     { key: 'time', label: 'Time', cell: (appointmentHistory: Appointment) =>  `${appointmentHistory.startTime} - ${appointmentHistory.endTime}` },
     { key: 'status', label: 'Status', cell: (appointmentHistory: Appointment) => appointmentHistory.status },
+    { key: 'notes.clinicNotes', label: 'Clinic Notes', cell: (appointmentHistory: Appointment) => appointmentHistory.notes.clinicNotes },
+    { key: 'notes.patientNotes', label: 'Patient Notes', cell: (appointmentHistory: Appointment) => appointmentHistory.notes.patientNotes },
   ];
 
   constructor(
@@ -80,6 +82,7 @@ export class AppointmentDetails {
               && apt.status === 'confirmed'
               && new Date(apt.date) < now
             ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            console.log('this.appointmentHistory', this.appointmentHistory);
             this.dataSource.data = this.appointmentHistory;
             console.log('this.dataSource.data', this.dataSource.data);
         },
