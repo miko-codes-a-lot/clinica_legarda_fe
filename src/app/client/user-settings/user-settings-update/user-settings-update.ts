@@ -236,7 +236,7 @@ onSave() {
         });
       },
       error: (err) => {
-        alert(`Something went wrong: ${err?.message || err}`);
+        alert(err.error.message);
       },
       complete: () => {
         alert('Successfully Updated')

@@ -13,4 +13,5 @@ export interface FormField {
   multiple: boolean;       // multiple select
   disabled?: boolean;
   readonly?: boolean;
+  maxlength?: number;
 }

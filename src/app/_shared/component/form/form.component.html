@@ -10,6 +10,7 @@
             matInput
             [type]="field.type"
             [formControlName]="field.name"
+            [attr.maxlength]="field?.maxlength || null"
           />
         }
 

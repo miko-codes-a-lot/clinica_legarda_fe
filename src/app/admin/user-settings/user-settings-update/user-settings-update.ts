@@ -245,7 +245,7 @@ onSave() {
       },
       error: (err) => {
         console.error(' Update failed:', err);
-        alert(`Something went wrong: ${err?.message || err}`);
+        alert(`${err?.error.message || err}`);
       },
       complete: () => (this.isLoading = false)
     });

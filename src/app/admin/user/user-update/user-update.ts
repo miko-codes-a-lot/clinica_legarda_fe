@@ -55,7 +55,7 @@ export class UserUpdate implements OnInit {
     this.isLoading = true
     this.userService.update(this.id, user).subscribe({
       next: () => this.router.navigate(['admin/user/details', this.id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => alert(e.error.message)
     }).add(() => this.isLoading = false)
   }
 }

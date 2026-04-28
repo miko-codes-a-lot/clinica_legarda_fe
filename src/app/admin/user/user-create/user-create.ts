@@ -48,8 +48,7 @@ export class UserCreate implements OnInit {
     this.userService.create(user).subscribe({
       next: (u) => this.router.navigate(['admin/user/details', u._id], { replaceUrl: true }),
       error: (e) => {
-        console.log('e', e.error.message);
-        alert(`Something went wrong: ${e.error.message}`)
+        alert(e.error.message)
       },
     }).add(() => this.isLoading = false)
   }

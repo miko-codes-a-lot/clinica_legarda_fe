@@ -280,7 +280,7 @@ export class ProfileIndex implements OnInit {
 
       this.userService.update(this.user._id, payload).subscribe({
         next: (res) => alert('Profile updated successfully!'),
-        error: (err) => alert(`Failed to save profile: ${err}`)
+        error: (err) => alert(`Failed to save profile: ${err.error.message}`)
       });
     }
   }
