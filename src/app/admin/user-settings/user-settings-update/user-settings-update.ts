@@ -231,7 +231,6 @@ onSave() {
       operatingHours: formValue.operatingHours || [],
       role: formValue.role || this.user.role,
       username: this.user.username,
-      status: this.user.status,
     };
 
     console.log('Submitting user update:', userData);

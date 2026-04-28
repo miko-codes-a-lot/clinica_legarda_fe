@@ -15,5 +15,4 @@ export interface UserPayload {
   role: string
   username?: string
   profilePicture?: string
-  status?: UserStatus
 }

@@ -44,7 +44,7 @@ export class LoginAdmin {
             state: { maskedEmail: this.maskEmail(r.user.emailAddress) }
           })
         } else if (r.user.role === 'dentist') {
-          this.router.navigate(['/dentist/profile'])
+          this.router.navigate(['/dentist/homepage'])
         } else {
           this.router.navigate(['/admin/dashboard'])
         }

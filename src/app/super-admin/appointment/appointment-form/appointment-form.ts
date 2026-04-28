@@ -60,7 +60,12 @@ export class AppointmentForm {
   appointmentFields: any[] = [];
 
   minDate = new Date();
-  maxDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 days from now
+
+  // appointment limit to 3 months
+  maxDate = new Date(
+    new Date().setMonth(new Date().getMonth() + 3)
+  );
+
 
   isEditMode = false;
 
@@ -120,7 +125,13 @@ export class AppointmentForm {
       clinic: [clinicId, Validators.required],
       dentist: [dentistId, Validators.required],
       patient: [this.appointment?.patient?._id || '', Validators.required],
-      services: [this.appointment?.services.map(s => s._id || '') || [] as string[], Validators.required],
+      services: [
+        this.appointment?.services.map(s => s._id || '') || [] as string[],
+        [
+          Validators.required,
+          Validators.maxLength(3)
+        ]
+      ],
       date: [this.appointment?.date ? new Date(this.appointment.date) : new Date(), Validators.required],
       time: [this.appointment?.startTime || '', Validators.required],
       patientNotes: [this.appointment?.notes?.patientNotes || '']

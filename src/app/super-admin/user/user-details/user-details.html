@@ -21,21 +21,6 @@
       </div>
     }
   </app-list>
-
-  <div class="action-buttons" >
-    <button mat-flat-button color="primary" 
-            (click)="approveUser()" 
-            [disabled]="isActionDisabled()">
-      <mat-icon>check</mat-icon> Approve
-    </button>
-
-    <button mat-stroked-button color="warn" 
-            (click)="declineUser()" 
-            [disabled]="isActionDisabled()">
-      <mat-icon>close</mat-icon> Reject
-    </button>
-  </div>
-
 } @else {
   <p>Fetching details...</p>
 }

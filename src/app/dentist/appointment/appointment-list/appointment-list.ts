@@ -58,8 +58,18 @@ export class AppointmentList implements OnInit {
           this.appointmentService.getAllByDentist(user._id).subscribe({
             next: (data: Appointment[]) => {
 
-              const filteredAppointments = data.filter(a => {
-                return !a.referral || (a.referral && a.referral.status === 'confirmed');
+            const filteredAppointments = data
+              .filter(a => {
+                return !a.referral || a.referral.status === 'confirmed';
+              })
+              .sort((a, b) => {
+                const aRaw = a.updatedAt ?? a.createdAt;
+                const bRaw = b.updatedAt ?? b.createdAt;
+
+                const aDate = aRaw ? new Date(aRaw).getTime() : 0;
+                const bDate = bRaw ? new Date(bRaw).getTime() : 0;
+
+                return bDate - aDate; // latest first
               });
 
               this.dataSource.data = filteredAppointments;

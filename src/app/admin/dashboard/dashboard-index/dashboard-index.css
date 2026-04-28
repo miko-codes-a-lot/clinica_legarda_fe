@@ -14,6 +14,25 @@
   color: white;
 }
 
+.title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left h1 {
+  margin: 0;
+}
+
+.left {
+  margin-right: 15px;
+}
+
+.week-info {
+  margin: 4px 0 0 0;
+  opacity: 0.8;
+}
+
 .admin-dashboard .dashboard-header .header-card .header-content {
   display: flex;
   justify-content: space-between;
@@ -393,4 +412,9 @@
   .admin-dashboard mat-table mat-header-cell {
     padding: 8px 4px;
   }
+}
+
+.export-mode * {
+  animation: none !important;
+  transition: none !important;
 }

@@ -34,7 +34,7 @@ export class UserDetails implements OnInit {
     this.userService.getOne(this.id).subscribe({
       next: (u) => {
         // set the data to display
-        const { firstName, middleName, lastName, emailAddress, mobileNumber, address, role, status } = u;
+        const { firstName, middleName, lastName, emailAddress, mobileNumber, address, role } = u;
 
         this.displayUser = {
           firstName,
@@ -44,7 +44,6 @@ export class UserDetails implements OnInit {
           mobileNumber,
           address,
           role,
-          status
         }
         this.user = u
       },
@@ -59,50 +58,4 @@ export class UserDetails implements OnInit {
   onUpdate() {
     this.router.navigate(['/super-admin/user/update', this.id])
   }
-
-  approveUser() {
-    if (!this.user?._id) return;
-
-    this.isLoading = true;
-
-    this.userService.approveUser(this.user._id).subscribe({
-      next: (updatedUser: User) => {
-        // Update local object
-        this.user = updatedUser;
-        this.displayUser['status'] = updatedUser.status;
-        this.isLoading = false;
-        alert('User approved successfully!');
-        window.location.reload();
-      },
-      error: (err: any) => {
-        console.error(err);
-        this.isLoading = false;
-        alert(err.error.message);
-      }
-    });
-  }
-
-  declineUser() {
-    if (!this.user?._id) return;
-
-    this.isLoading = true;
-
-    this.userService.rejectUser(this.user._id).subscribe({
-      next: (updatedUser: User) => {
-        // Update local object
-        this.user = updatedUser;
-        this.displayUser['status'] = updatedUser.status;
-        window.location.reload();
-        this.isLoading = false;
-        alert('User rejected successfully!');
-        window.location.reload();
-      },
-      error: (err: any) => {
-        console.error(err);
-        this.isLoading = false;
-        alert('Failed to reject user.');
-      }
-    });
-  }
-  
 }

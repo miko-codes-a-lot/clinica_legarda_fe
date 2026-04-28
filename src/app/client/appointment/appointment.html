@@ -24,7 +24,10 @@
               formControlName="date"
               label="Appointment Day"
               placeholder="Choose a date"
-              [dentist]="safeSelectedDentist">
+              [dentist]="safeSelectedDentist"
+              [minDate]="minDate"
+              [maxDate]="maxDate"
+            >
             </app-date-picker> <br>
 
             <app-time-picker
@@ -97,6 +100,12 @@
             </div>
 
           </form>
+        </div>
+      }
+
+      @if (services.errors?.['maxlength']) {
+        <div class="error-text-maxvisit">
+          Maximum of 3 services per visit/consultation only.
         </div>
       }
 

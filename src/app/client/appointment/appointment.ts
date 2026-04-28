@@ -74,8 +74,12 @@ export class AppointmentPage {
   users: User[] = []
   selectReferringDentist: { value: string; label: string }[] = []
 
-  minDate = new Date()
-  maxDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 90 days from now only
+  minDate = new Date();
+
+  // appointment limit to 3 months
+  maxDate = new Date(
+    new Date().setMonth(new Date().getMonth() + 3)
+  );
 
   patientAppointments: Appointment[] = [];
   appointments: Appointment[] = [];
@@ -152,7 +156,13 @@ export class AppointmentPage {
       clinic: [clinicId, Validators.required],
       dentist: [dentistId, Validators.required],
       patient: [user? `${user?.firstName} ${user?.lastName} `: '', Validators.required],
-      services: [this.appointment.services.map(s => s._id || ''), Validators.required],
+      services: [
+        this.appointment?.services.map(s => s._id || '') || [] as string[],
+        [
+          Validators.required,
+          Validators.maxLength(3)
+        ]
+      ],
       date: [this.appointment.date, Validators.required],
       time: [this.appointment.startTime, Validators.required],
       patientNotes: [this.appointment.notes?.patientNotes || '']

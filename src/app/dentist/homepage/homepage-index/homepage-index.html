@@ -1,0 +1,133 @@
+<div class="home-page">
+
+  <h2 class="welcome">
+    Welcome back, Dr. {{ user?.firstName }}
+  </h2>
+
+  <!-- SUMMARY -->
+  <div class="summary-grid">
+
+    <div class="summary-card">
+      <h3>Today's Appointments</h3>
+      <p>{{ todayAppointments.length }}</p>
+    </div>
+
+    <div class="summary-card">
+      <h3>Upcoming</h3>
+      <p>{{ upcomingAppointments.length }}</p>
+    </div>
+
+    <div class="summary-card">
+      <h3>Pending Referrals</h3>
+      <p>{{ pendingReferralCount }}</p>
+    </div>
+
+  </div>
+
+  <!-- TODAY -->
+  <section class="section">
+
+    <div class="section-header">
+      <h3>Today's Schedule</h3>
+      <span>{{ todayAppointments.length }} appointments</span>
+    </div>
+
+    @if (todayAppointments.length === 0) {
+
+      <p class="empty">No appointments today.</p>
+
+    } @else {
+
+      <div class="appointment-list">
+
+        @for (appointment of todayAppointments; track appointment._id) {
+
+          <div class="appointment-item">
+
+            <div class="appointment-info">
+
+              <div class="avatar">
+                {{ appointment.patient.firstName.charAt(0) }}
+              </div>
+
+              <div>
+                <strong>
+                  {{ appointment.patient.firstName }}
+                  {{ appointment.patient.lastName }}
+                </strong>
+
+                <div class="meta">
+                  {{ appointment.startTime }}
+                  -
+                  {{ appointment.endTime }}
+                </div>
+              </div>
+
+            </div>
+
+            <span class="status">
+              {{ appointment.status }}
+            </span>
+
+          </div>
+
+        }
+
+      </div>
+
+    }
+
+  </section>
+
+  <!-- UPCOMING -->
+  <section class="section">
+
+    <div class="section-header">
+      <h3>Upcoming Appointments</h3>
+      <span>{{ upcomingAppointments.length }} upcoming</span>
+    </div>
+
+    @if (upcomingAppointments.length === 0) {
+
+      <p class="empty">No upcoming appointments.</p>
+
+    } @else {
+
+      <div class="appointment-list">
+
+        @for (appointment of upcomingAppointments; track appointment._id) {
+
+          <div class="appointment-item">
+
+            <div class="appointment-info">
+
+              <div class="avatar secondary">
+                {{ appointment.patient.firstName.charAt(0) }}
+              </div>
+
+              <div>
+                <strong>
+                  {{ appointment.patient.firstName }}
+                  {{ appointment.patient.lastName }}
+                </strong>
+
+                <div class="meta">
+                  {{ appointment.date | date:'mediumDate' }}
+                  •
+                  {{ appointment.startTime }}
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        }
+
+      </div>
+
+    }
+
+  </section>
+
+</div>

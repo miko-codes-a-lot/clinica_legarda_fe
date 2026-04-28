@@ -25,6 +25,8 @@ import { ReasonService } from '../../../_shared/service/reason-service';
 import { Referral } from '../../../_shared/model/referral';
 import { ReferralService } from '../../../_shared/service/referral-service';
 
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 Chart.register(...registerables);
 
@@ -52,6 +54,7 @@ export class DashboardIndex {
   @ViewChild('appointmentTrendChart', { static: false }) appointmentTrendRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('serviceTrendChart', { static: false }) serviceTrendChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('declinedReferralChart', { static: false }) declinedReferralChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('dashboardContent', { static: false }) dashboardContent!: ElementRef;
 
   serviceTrendChart!: Chart;
   notifications$!: Observable<Notification[]>;
@@ -67,6 +70,7 @@ export class DashboardIndex {
 
   clinics: any[] = [];
   selectedClinic: string = '';
+  isExporting = false;
 
   dashboardData = {
     adminDashboard: {
@@ -528,5 +532,41 @@ export class DashboardIndex {
 
     this.declinedReferralChart = new Chart(this.declinedReferralChartRef.nativeElement, config);
   }
+  exportToPDF() {
+    this.isExporting = true;
 
+    setTimeout(() => {
+      const element = this.dashboardContent.nativeElement;
+
+      html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      }).then(canvas => {
+
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+
+        const imgWidth = 210;
+        const pageHeight = 295;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while (heightLeft > 0) {
+          position -= pageHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        pdf.save(`admin-dashboard.pdf`);
+        this.isExporting = false;
+      });
+    }, 300); // allow DOM repaint
+  }
 }
