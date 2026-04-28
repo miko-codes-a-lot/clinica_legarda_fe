@@ -1,0 +1,38 @@
+<div class="otp-container">
+  <div class="otp-card">
+    <h2>Verify Reset Code</h2>
+    <p class="otp-subtitle">
+      We sent a 6-digit code to the phone number on file for <strong>{{ emailAddress }}</strong>.
+    </p>
+
+    <form [formGroup]="rxform" (ngSubmit)="onSubmit()" class="otp-form">
+      <div class="form-group">
+        <label for="code">Enter OTP Code</label>
+        <input
+          id="code"
+          type="text"
+          maxlength="6"
+          placeholder="000000"
+          formControlName="code"
+          autocomplete="one-time-code"
+          inputmode="numeric"
+        />
+      </div>
+
+      <button type="submit" [disabled]="!rxform.valid || isLoading">
+        {{ isLoading ? 'Verifying...' : 'Verify' }}
+      </button>
+    </form>
+
+    <p class="resend-prompt">
+      Didn't receive the code?
+      <button class="resend-btn" (click)="onResend()" [disabled]="resendCooldown > 0">
+        {{ resendCooldown > 0 ? 'Resend in ' + resendCooldown + 's' : 'Resend OTP' }}
+      </button>
+    </p>
+
+    <p class="back-link">
+      <a routerLink="/app/login">Back to Login</a>
+    </p>
+  </div>
+</div>
