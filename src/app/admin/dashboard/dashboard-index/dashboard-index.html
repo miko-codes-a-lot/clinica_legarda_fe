@@ -4,20 +4,20 @@
     <mat-card class="header-card">
       <mat-card-content>
         <div class="header-content">
-          <div class="title-section">
+        <div class="title-section">
 
-            <div class="left">
-              <h1>Admin Dashboard</h1>
-              <p class="week-info">
-                Week of {{ weeklyReport.weekOf | date:'mediumDate' }}
-              </p>
-            </div>
-
-            <button mat-raised-button color="primary" (click)="exportToPDF()">
-              Export PDF
-            </button>
-
+          <div class="left">
+            <h1>Admin Dashboard</h1>
+            <p class="week-info">
+              Week of {{ weeklyReport.weekOf | date:'mediumDate' }}
+            </p>
           </div>
+
+          <button mat-raised-button color="primary" (click)="exportToPDF()">
+            Export PDF
+          </button>
+
+        </div>
           <div class="notification-badge">
             <!-- UPDATED: Using the async pipe for the unread count observable -->
             <button mat-icon-button (click)="toggleNotifications()" class="notification-btn">

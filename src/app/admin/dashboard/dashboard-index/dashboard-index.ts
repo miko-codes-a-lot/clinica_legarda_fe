@@ -534,6 +534,9 @@ export class DashboardIndex {
   }
   exportToPDF() {
     this.isExporting = true;
+    
+    // Ensure the notification dropdown is closed before export
+    this.showNotifications = false; 
 
     setTimeout(() => {
       const element = this.dashboardContent.nativeElement;
@@ -541,32 +544,26 @@ export class DashboardIndex {
       html2canvas(element, {
         scale: 2,
         useCORS: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        // Ignore the floating notification dropdown and action buttons
+        ignoreElements: (el) => {
+          return el.classList.contains('notification-dropdown') || 
+                el.classList.contains('mark-read-btn');
+        }
       }).then(canvas => {
-
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
-
         const imgWidth = 210;
-        const pageHeight = 295;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-        let heightLeft = imgHeight;
-        let position = 0;
-
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-
-        while (heightLeft > 0) {
-          position -= pageHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-        }
-
-        pdf.save(`admin-dashboard.pdf`);
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save(`admin-dashboard-${new Date().getTime()}.pdf`);
+        
+        this.isExporting = false;
+      }).catch(err => {
+        console.error("PDF Export Error:", err);
         this.isExporting = false;
       });
-    }, 300); // allow DOM repaint
+    }, 500); // Increased slightly for safer DOM repaint
   }
 }

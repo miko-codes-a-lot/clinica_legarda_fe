@@ -1,12 +1,22 @@
-<div class="admin-dashboard">
+<div class="admin-dashboard" #dashboardContent [class.export-mode]="isExporting">
   <!-- Header Section -->
   <div class="dashboard-header">
     <mat-card class="header-card">
       <mat-card-content>
         <div class="header-content">
           <div class="title-section">
-            <h1>Admin Dashboard</h1>
-            <p class="week-info">Week of {{ weeklyReport.weekOf | date:'mediumDate' }}</p>
+
+            <div class="left">
+              <h1>Admin Dashboard</h1>
+              <p class="week-info">
+                Week of {{ weeklyReport.weekOf | date:'mediumDate' }}
+              </p>
+            </div>
+
+            <button mat-raised-button color="primary" (click)="exportToPDF()">
+              Export PDF
+            </button>
+
           </div>
           <div class="notification-badge">
             <!-- UPDATED: Using the async pipe for the unread count observable -->
