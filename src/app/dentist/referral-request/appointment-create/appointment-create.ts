@@ -11,6 +11,7 @@ import { DentalService } from '../../../_shared/model/dental-service';
 import { DentalServicesService } from '../../../_shared/service/dental-services-service';
 import { ClinicService } from '../../../_shared/service/clinic-service';
 import { Clinic } from '../../../_shared/model/clinic';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-appointment-create',
@@ -32,6 +33,8 @@ export class AppointmentCreate {
     private readonly clinicService: ClinicService,
     private readonly userService: UserService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -49,7 +52,7 @@ export class AppointmentCreate {
         this.clinics = clinics
         this.patients = patients
       },
-      error: (e) => alert(`Something went wrong ${e}`),
+      error: (e) => this.alertService.error(e.error.message),
       complete: () => this.isLoading = false,
     })
   }
@@ -59,7 +62,7 @@ export class AppointmentCreate {
     console.log('appointment on save', appointment);
     this.appointmentService.create(appointment).subscribe({
       next: (c) => this.router.navigate(['admin/appointment/details', c._id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 }

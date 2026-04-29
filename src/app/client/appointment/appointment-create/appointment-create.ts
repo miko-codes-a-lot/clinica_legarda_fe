@@ -15,6 +15,8 @@ import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UserSimple } from '../../../_shared/model/user-simple';
 import { AuthService } from '../../../_shared/service/auth-service';
+import { AlertService } from '../../../_shared/service/alert.service';
+
 
 @Component({
   selector: 'app-appointment-create',
@@ -40,6 +42,8 @@ export class AppointmentCreate {
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -62,7 +66,7 @@ export class AppointmentCreate {
         this.clinics = clinics
         this.patients = patients
       },
-      error: (e) => alert(`Something went wrong ${e}`),
+      error: (e) => this.alertService.error(e.error.message),
       complete: () => this.isLoading = false,
     })
   }
@@ -74,7 +78,7 @@ export class AppointmentCreate {
       next: (c) => this.router.navigate(['admin/appointment/details', c._id], { replaceUrl: true }),
       error: (e) => {
         console.log("e.error", e.error)
-        alert(e.error?.message || 'Something went wrong')
+        this.alertService.error(e.error.message)
       }
     }).add(() => this.isLoading = false)
   }

@@ -4,8 +4,10 @@
   [displayedColumns]="displayedColumns"
   [columnDefs]="columnDefs"
   [dataSource]="dataSource"
+  [enableDelete]="isSuperAdmin"
   [isLoading]="isLoading"
   (details)="onDetails($event)"
   (update)="onUpdate($event)"
+  (delete)="onDelete($event)"
   (create)="onCreate()"
 ></app-generic-table>

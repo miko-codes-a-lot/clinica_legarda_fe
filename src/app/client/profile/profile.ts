@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { AuthService } from '../../_shared/service/auth-service';
+import { AlertService } from '../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-profile',
@@ -23,6 +24,8 @@ export class Profile {
 
   constructor(
     private readonly authService: AuthService,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit() {
@@ -46,10 +49,10 @@ export class Profile {
   }
 
   editProfile() {
-    alert('Redirect to edit profile page.');
+    this.alertService.error('Redirect to edit profile page.');
   }
 
   logout() {
-    alert('Logout successful.');
+    this.alertService.error('Logout successful.');
   }
 }

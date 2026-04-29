@@ -32,6 +32,9 @@ import { ReasonService } from '../../_shared/service/reason-service';
 
 import { CommonModule } from '@angular/common';
 
+import { AlertService } from '../../_shared/service/alert.service';
+
+
 @Component({
   selector: 'app-appointment',
   standalone: true,
@@ -93,7 +96,9 @@ export class AppointmentPage {
     private readonly appointmentService: AppointmentService,
     private readonly referralService: ReferralService,
     private readonly reasonService: ReasonService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private readonly alertService: AlertService,
+
   ) {}
 
   private emptyDentist: User = {
@@ -394,7 +399,7 @@ export class AppointmentPage {
       },
       error: err => {
         console.log('error', err);
-        alert(`${err.error.message}`)
+        this.alertService.error(err.error.message)
       }
     });
 
@@ -420,7 +425,7 @@ export class AppointmentPage {
           this.applyPreviousAppointment();
         }
       },
-      error: (e) => alert(`Something went wrong ${e}`),
+      error: (e) => this.alertService.error(e.error.message),
       complete: () => this.isLoading = false
     });
   }

@@ -19,6 +19,7 @@ import { CommonModule } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
 
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 
 Chart.register(...registerables);
@@ -82,6 +83,8 @@ export class ProfileIndex implements OnInit {
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private dialog: MatDialog,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -188,12 +191,12 @@ export class ProfileIndex implements OnInit {
     this.userService.uploadProfilePicture(this.user._id, this.selectedFile)
     .subscribe({
       next: (res) => {
-        alert('Profile picture uploaded successfully!');
+        this.alertService.error('Profile picture uploaded successfully!');
         this.closeAvatarModal(); // close the dialog
       },
       error: (err) => {
         console.error('Upload error', err);
-        alert('Failed to upload profile picture.');
+        this.alertService.error('Failed to upload profile picture.');
       }
     });
   }
@@ -279,8 +282,8 @@ export class ProfileIndex implements OnInit {
       };
 
       this.userService.update(this.user._id, payload).subscribe({
-        next: (res) => alert('Profile updated successfully!'),
-        error: (err) => alert(`Failed to save profile: ${err.error.message}`)
+        next: (res) => this.alertService.error('Profile updated successfully!'),
+        error: (err) => this.alertService.error(err.error.message)
       });
     }
   }

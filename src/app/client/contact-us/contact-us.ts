@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClinicService } from '../../_shared/service/clinic-service';
 import { Clinic } from '../../_shared/model/clinic';
+import { AlertService } from '../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-contact-us',
@@ -21,6 +22,8 @@ export class ContactUs {
 
   constructor(
     private readonly clinicService: ClinicService,
+    private readonly alertService: AlertService,
+
   ) {}
 
   clinics: Clinic[] = []
@@ -31,7 +34,7 @@ export class ContactUs {
         this.clinics = clinics;
         console.log('this.clinics', this.clinics);
       },
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false);
   }
 
@@ -50,7 +53,7 @@ export class ContactUs {
     this.isLoading = true;
 
     setTimeout(() => {
-      alert('Your message has been sent successfully!');
+      this.alertService.error('Your message has been sent successfully!');
       this.contact = { name: '', email: '', message: '' };
       this.isLoading = false;
     }, 1000);

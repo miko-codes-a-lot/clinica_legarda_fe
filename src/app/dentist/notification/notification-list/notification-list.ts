@@ -9,6 +9,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { forkJoin } from 'rxjs';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 
 @Component({
@@ -32,7 +33,9 @@ export class NotificationList implements OnInit {
     private readonly notificationService: NotificationService,
     private readonly userService: UserService,
     private readonly router: Router,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -70,7 +73,7 @@ export class NotificationList implements OnInit {
         });
       },
       error: (err) => {
-        alert(`Something went wrong: ${err}`);
+        this.alertService.error(err.error.message);
         this.isLoading = false;
       }
     });
@@ -108,7 +111,7 @@ export class NotificationList implements OnInit {
 
     // for now it should load
     this.notificationService.markAsRead(docId).subscribe({
-      error: (err) => alert(`Something went wrong: ${err}`),
+      error: (err) => this.alertService.error(err.error.message),
     }).add(() => this.isLoading = false)
   }
 }

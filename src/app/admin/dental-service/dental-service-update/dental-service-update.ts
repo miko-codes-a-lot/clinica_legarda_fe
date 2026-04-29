@@ -3,6 +3,8 @@ import { DentalServiceForm } from '../dental-service-form/dental-service-form';
 import { DentalService } from '../../../_shared/model/dental-service';
 import { DentalServicesService } from '../../../_shared/service/dental-services-service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AlertService } from '../../../_shared/service/alert.service';
+
 
 @Component({
   selector: 'app-dental-service-update',
@@ -19,6 +21,8 @@ export class DentalServiceUpdate {
     private readonly dentalServicesService: DentalServicesService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -28,7 +32,7 @@ export class DentalServiceUpdate {
 
     this.dentalServicesService.getOne(this.id).subscribe({
       next: (d) => this.dentalService = d,
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 
@@ -36,7 +40,7 @@ export class DentalServiceUpdate {
     this.isLoading = true
     this.dentalServicesService.update(this.id, dentalService).subscribe({
       next: () => this.router.navigate(['admin/service/details', this.id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 }

@@ -6,6 +6,8 @@ import { BranchService } from '../../../_shared/service/branch-service';
 import { BranchPayload } from '../branch-form/branch-payload';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Branch } from '../../../_shared/model/branch';
+import { AlertService } from '../../../_shared/service/alert.service';
+
 
 @Component({
   selector: 'app-branch-create',
@@ -23,6 +25,7 @@ export class BranchCreate implements OnInit {
     private readonly branchService: BranchService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -37,7 +40,7 @@ export class BranchCreate implements OnInit {
 
     this.clinicService.getAll().subscribe({
       next: (c) => this.clinics = c,
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 
@@ -45,7 +48,7 @@ export class BranchCreate implements OnInit {
     this.isLoading = true
     this.branchService.create(branch).subscribe({
       next: (c) => this.router.navigate(['admin/branch/details', c._id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 }

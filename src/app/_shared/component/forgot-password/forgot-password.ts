@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth-service';
 import { UiStateService } from '../../service/ui-state-service';
+import { AlertService } from '../../service/alert.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -19,6 +20,7 @@ export class ForgotPassword {
     private readonly authService: AuthService,
     private readonly uiStateService: UiStateService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit() {
@@ -39,7 +41,7 @@ export class ForgotPassword {
       next: () => {
         this.router.navigate(['/app/verify-reset-otp'], { state: { emailAddress: email } })
       },
-      error: (err) => alert(err.message)
+      error: (err) => this.alertService.error(err.message)
     }).add(() => this.uiStateService.setLoading(false))
   }
 

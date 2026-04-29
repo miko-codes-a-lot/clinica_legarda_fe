@@ -3,6 +3,8 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModu
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth-service';
 import { UiStateService } from '../../service/ui-state-service';
+import { AlertService } from '../../service/alert.service';
+
 
 @Component({
   selector: 'app-reset-password',
@@ -23,6 +25,7 @@ export class ResetPassword {
     private readonly authService: AuthService,
     private readonly uiStateService: UiStateService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit() {
@@ -57,10 +60,10 @@ export class ResetPassword {
 
     this.authService.resetPassword(this.emailAddress, this.newPassword.value).subscribe({
       next: () => {
-        alert('Your password has been reset. Please log in with your new password.')
+        this.alertService.error('Your password has been reset. Please log in with your new password.')
         this.router.navigate(['/app/login'])
       },
-      error: (err) => alert(err.message)
+      error: (err) => this.alertService.error(err.message)
     }).add(() => this.uiStateService.setLoading(false))
   }
 

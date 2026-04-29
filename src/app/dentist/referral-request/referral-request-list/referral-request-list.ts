@@ -7,6 +7,7 @@ import { ReferralService } from '../../../_shared/service/referral-service';
 import { MatTableDataSource } from '@angular/material/table';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
 import { AuthService } from '../../../_shared/service/auth-service';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-referral-request-list',
@@ -95,6 +96,7 @@ export class ReferralRequestList implements OnInit {
     private readonly appointmentService: AppointmentService,
     private readonly router: Router,
     private readonly authService: AuthService,
+    private readonly alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -137,7 +139,7 @@ export class ReferralRequestList implements OnInit {
         this.dataSource.data = tableData as any;
         console.log('Merged table data', tableData);
       },
-      error: (e) => alert(`Something went wrong ${e}`),
+      error: (e) => this.alertService.error(e.error.message),
       complete: () => this.isLoading = false
     });
   }

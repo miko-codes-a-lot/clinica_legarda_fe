@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth-service';
 import { UiStateService } from '../../service/ui-state-service';
+import { AlertService } from '../../service/alert.service';
 
 @Component({
   selector: 'app-verify-reset-otp',
@@ -22,6 +23,7 @@ export class VerifyResetOtp {
     private readonly authService: AuthService,
     private readonly uiStateService: UiStateService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit() {
@@ -52,7 +54,7 @@ export class VerifyResetOtp {
       next: () => {
         this.router.navigate(['/app/reset-password'], { state: { emailAddress: this.emailAddress } })
       },
-      error: (err) => alert(err.message)
+      error: (err) => this.alertService.error(err.message)
     }).add(() => this.uiStateService.setLoading(false))
   }
 
@@ -67,8 +69,8 @@ export class VerifyResetOtp {
     }, 1000)
 
     this.authService.forgotPassword(this.emailAddress).subscribe({
-      next: () => alert('A new OTP has been sent to your phone.'),
-      error: (err) => alert(err.message)
+      next: () => this.alertService.error('A new OTP has been sent to your phone.'),
+      error: (err) => this.alertService.error(err.message)
     })
   }
 

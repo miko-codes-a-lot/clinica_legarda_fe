@@ -28,6 +28,9 @@ import { Referral, ReferralStatus } from '../../../_shared/model/referral';
 import { ReferralService } from '../../../_shared/service/referral-service';
 import { ReasonService } from '../../../_shared/service/reason-service';
 
+import { AlertService } from '../../../_shared/service/alert.service';
+
+
 @Component({
   selector: 'app-appointment-form',
   imports: [
@@ -91,6 +94,7 @@ export class AppointmentForm {
     private readonly authService: AuthService,
     private readonly referralService: ReferralService,
     private readonly reasonService: ReasonService,
+    private readonly alertService: AlertService,
   ) {}
 
   // private emptyDentist: User = {
@@ -431,7 +435,7 @@ export class AppointmentForm {
           this.applyPreviousAppointment();
         }
       },
-      error: (e) => alert(`Something went wrong ${e}`),
+      error: (e) => this.alertService.error(`Something went wrong ${e}`),
       complete: () => this.isLoading = false
     });
   }
@@ -508,7 +512,7 @@ export class AppointmentForm {
         this.onSubmitEvent.emit(appointmentData);
       },
       error: err => {
-        alert(`${err.error.message}`)
+        this.alertService.error(`${err.error.message}`)
       }
     });
 

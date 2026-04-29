@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Clinic } from '../../../_shared/model/clinic';
 import { DayService } from '../../../_shared/service/day-service';
 import { Day } from '../../../_shared/model/day';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-clinic-create',
@@ -20,6 +21,8 @@ export class ClinicCreate implements OnInit {
     private readonly clinicService: ClinicService,
     private readonly dayService: DayService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -27,7 +30,7 @@ export class ClinicCreate implements OnInit {
 
     this.dayService.getAll().subscribe({
       next: (days) => this.days = days,
-      error: (err) => alert(`Getting days crashed ${err}`)
+      error: (err) => this.alertService.error(err.error.message)
     }).add(() => this.isLoading = false)
   }
 
@@ -35,7 +38,7 @@ export class ClinicCreate implements OnInit {
     this.isLoading = true
     this.clinicService.create(clinic).subscribe({
       next: (c) => this.router.navigate(['admin/clinic/details', c._id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 }

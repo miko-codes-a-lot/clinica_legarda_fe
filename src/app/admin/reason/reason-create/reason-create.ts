@@ -4,6 +4,7 @@ import { ReasonService } from '../../../_shared/service/reason-service';
 import { Router } from '@angular/router';
 import { Reason } from '../../../_shared/model/reason';
 import { Day } from '../../../_shared/model/day';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-reason-create',
@@ -17,6 +18,8 @@ export class ReasonCreate implements OnInit {
   constructor(
     private readonly reasonService: ReasonService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -27,7 +30,7 @@ export class ReasonCreate implements OnInit {
     this.isLoading = true
     this.reasonService.create(reason).subscribe({
       next: (c) => this.router.navigate(['admin/reason/details', c._id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 }

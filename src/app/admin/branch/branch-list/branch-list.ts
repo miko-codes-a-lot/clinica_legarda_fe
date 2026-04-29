@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Branch } from '../../../_shared/model/branch';
 import { BranchService } from '../../../_shared/service/branch-service';
+import { AlertService } from '../../../_shared/service/alert.service';
+
 
 @Component({
   selector: 'app-branch-list',
@@ -17,6 +19,7 @@ export class BranchList {
   constructor(
     private readonly branchService: BranchService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -24,7 +27,7 @@ export class BranchList {
 
     this.branchService.getAll().subscribe({
       next: (branches) => this.branches = branches,
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 

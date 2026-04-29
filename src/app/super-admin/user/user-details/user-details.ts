@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { ListComponent } from '../../../_shared/component/list/list.component';
 import { MatIconModule } from '@angular/material/icon';
-
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-user-details',
@@ -24,6 +24,7 @@ export class UserDetails implements OnInit {
     private readonly userService: UserService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -47,7 +48,7 @@ export class UserDetails implements OnInit {
         }
         this.user = u
       },
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 

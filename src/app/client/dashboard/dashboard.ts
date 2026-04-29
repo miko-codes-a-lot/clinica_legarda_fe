@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { AlertService } from '../../_shared/service/alert.service';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -7,6 +9,10 @@ import { Component } from '@angular/core';
   styleUrl: './dashboard.css'
 })
 export class Dashboard {
+
+  constructor(
+    private readonly alertService: AlertService,
+  ) {}
  // Static Data for demonstration
   user = {
     firstName: 'Juan',
@@ -39,10 +45,10 @@ export class Dashboard {
   ];
 
   rescheduleAppointment(appointment: any) {
-    alert(`Reschedule ${appointment.service}`);
+    this.alertService.error(`Reschedule ${appointment.service}`);
   }
 
   cancelAppointment(appointment: any) {
-    alert(`Cancel ${appointment.service}`);
+    this.alertService.error(`Cancel ${appointment.service}`);
   }
 }

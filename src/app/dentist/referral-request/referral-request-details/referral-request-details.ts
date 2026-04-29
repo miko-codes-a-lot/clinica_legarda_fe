@@ -17,6 +17,7 @@ import { ConfirmDialogComponent } from '../../../_shared/component/dialog/confir
 import { FormDialogComponent } from '../../../_shared/component/dialog/form-dialog/form-dialog.component';
 import { Reason } from '../../../_shared/model/reason';
 import { ReasonService } from '../../../_shared/service/reason-service';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
 selector: 'app-referral-request-details',
@@ -40,7 +41,8 @@ export class ReferralRequestDetails {
     private readonly dialog: MatDialog,
     private readonly referralService: ReferralService,
     private readonly reasonService: ReasonService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -121,13 +123,13 @@ export class ReferralRequestDetails {
               // this.displayAppointment['status'] = updatedAppointment.status;
 
               this.isLoading = false;
-              alert('Request approved successfully!');
+              this.alertService.error('Request approved successfully!');
               this.loadAppointment();
             },
             error: (err: any) => {
               console.error(err);
               this.isLoading = false;
-              alert(err.error.message);
+              this.alertService.error(err.error.message);
             }
           });
         }
@@ -177,13 +179,13 @@ export class ReferralRequestDetails {
               this.referral = updatedReferral;
               // this.displayAppointment['status'] = updatedAppointment.status;
               this.isLoading = false;
-              alert('Request rejected successfully!');
+              this.alertService.error('Request rejected successfully!');
               this.loadAppointment();
             },
             error: (err: any) => {
               console.error(err);
               this.isLoading = false;
-              alert('Failed to reject request.');
+              this.alertService.error('Failed to reject request.');
             }
           });
         }
@@ -207,12 +209,12 @@ export class ReferralRequestDetails {
             .subscribe({
               next: (updatedAppointment) => {
                 this.appointment = updatedAppointment;
-                alert('Clinic notes updated successfully!');
+                this.alertService.error('Clinic notes updated successfully!');
                 this.isLoading = false;
               },
               error: (err) => {
                 console.error(err);
-                alert('Failed to update clinic notes');
+                this.alertService.error('Failed to update clinic notes');
                 this.isLoading = false;
               }
           });
@@ -235,13 +237,13 @@ export class ReferralRequestDetails {
         this.referralService.cancelReferral(this.referral._id).subscribe({
         next: () => {
           this.isLoading = false;
-          alert('Request cancelled successfully!');
+          this.alertService.error('Request cancelled successfully!');
           this.loadAppointment();
         },
         error: (err) => {
           console.error(err);
           this.isLoading = false;
-          alert('Request to cancel appointment.');
+          this.alertService.error('Request to cancel appointment.');
         }
       });
     }

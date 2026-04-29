@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ListComponent } from '../../../_shared/component/list/list.component';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-clinic-details',
@@ -23,6 +24,8 @@ export class ClinicDetails {
     private readonly clinicService: ClinicService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -41,7 +44,7 @@ export class ClinicDetails {
         }
         this.clinic = c
       },
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 

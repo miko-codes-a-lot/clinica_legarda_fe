@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { NotesDialogComponent } from '../../../_shared/component/dialog/notes-dialog/notes-dialog.component';
 import { CommonModule } from '@angular/common';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
 selector: 'app-appointment-details',
@@ -26,7 +27,8 @@ export class AppointmentDetails {
     private readonly appointmentService: AppointmentService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly dialog: MatDialog
+    private readonly dialog: MatDialog,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -49,7 +51,7 @@ export class AppointmentDetails {
         this.appointment = a
         console.log('this.displayAppointment', this.displayAppointment);
       },
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 
@@ -80,12 +82,12 @@ export class AppointmentDetails {
             .subscribe({
               next: (updatedAppointment) => {
                 this.appointment = updatedAppointment;
-                alert('Clinic notes updated successfully!');
+                this.alertService.error('Clinic notes updated successfully!');
                 this.isLoading = false;
               },
               error: (err) => {
                 console.error(err);
-                alert('Failed to update clinic notes');
+                this.alertService.error('Failed to update clinic notes');
                 this.isLoading = false;
               }
           });

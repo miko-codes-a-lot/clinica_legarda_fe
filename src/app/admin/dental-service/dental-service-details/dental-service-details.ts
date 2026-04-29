@@ -5,8 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ListComponent } from '../../../_shared/component/list/list.component';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
-
-
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-dental-service-details',
@@ -25,6 +24,8 @@ export class DentalServiceDetails {
     private readonly dentalServicesService: DentalServicesService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -42,7 +43,7 @@ export class DentalServiceDetails {
          }
         this.dentalService = d
       },
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 

@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../service/auth-service';
 import { UiStateService } from '../../service/ui-state-service';
+import { AlertService } from '../../service/alert.service';
 
 @Component({
   selector: 'app-verify-otp',
@@ -28,6 +29,7 @@ export class VerifyOtp implements OnInit, OnDestroy {
     private readonly uiStateService: UiStateService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit() {
@@ -77,7 +79,7 @@ export class VerifyOtp implements OnInit, OnDestroy {
           this.router.navigate([this.redirectUrl])
         }
       },
-      error: (err) => alert(err.message)
+      error: (err) => this.alertService.error(err.message)
     }).add(() => this.uiStateService.setLoading(false))
   }
 
@@ -92,8 +94,8 @@ export class VerifyOtp implements OnInit, OnDestroy {
     }, 1000)
 
     this.authService.resendOtp().subscribe({
-      next: () => alert('A new OTP has been sent to your email.'),
-      error: (err) => alert(err.message)
+      next: () => this.alertService.error('A new OTP has been sent to your email.'),
+      error: (err) => this.alertService.error(err.message)
     })
   }
 
