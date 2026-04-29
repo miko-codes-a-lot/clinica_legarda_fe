@@ -105,7 +105,7 @@ export class NotificationList implements OnInit {
 
     // for now it should load
     this.notificationService.markAsRead(docId).subscribe({
-      error: (err) => this.alertService.error(err.error.message),
+      error: (err) => this.alertService.error(err),
     }).add(() => this.isLoading = false)
   }
 }

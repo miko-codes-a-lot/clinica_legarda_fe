@@ -30,7 +30,7 @@ export class ClinicCreate implements OnInit {
 
     this.dayService.getAll().subscribe({
       next: (days) => this.days = days,
-      error: (err) => this.alertService.error(err.error.message)
+      error: (err) => this.alertService.error(err)
     }).add(() => this.isLoading = false)
   }
 

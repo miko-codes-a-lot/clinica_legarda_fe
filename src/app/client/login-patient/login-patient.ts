@@ -57,7 +57,9 @@ export class LoginPatient {
           this.router.navigate(['/app/my-appointment'])
         }
       },
-      error: (err) => this.alertService.error(err.error.message)
+      error: (err) => {
+        this.alertService.error(err)
+      }
     }).add(() => this.uiStateService.setLoading(false))
   }
 

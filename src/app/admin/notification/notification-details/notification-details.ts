@@ -48,7 +48,7 @@ export class NotificationDetails {
     this.isLoading = true
 
     this.notificationService.markAsRead(this.id).subscribe({
-      error: (err) => this.alertService.error(err.error.message),
+      error: (err) => this.alertService.error(err),
     }).add(() => this.isLoading = false)
   }
 }

@@ -512,7 +512,7 @@ export class AppointmentForm {
         this.onSubmitEvent.emit(appointmentData);
       },
       error: err => {
-        this.alertService.error(`${err.error.message}`)
+        this.alertService.error(`${err}`)
       }
     });
 

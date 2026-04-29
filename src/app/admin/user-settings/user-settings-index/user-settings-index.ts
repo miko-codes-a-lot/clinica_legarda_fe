@@ -140,7 +140,7 @@ export class UserSettingsIndex implements OnInit {
     this.authService.logout()
       .subscribe({
         next: () => this.router.navigate(['/admin/login']),
-        error: (err) => this.alertService.error(err.error.message)
+        error: (err) => this.alertService.error(err)
       })
       .add(() => this.isLoading = false)
   }

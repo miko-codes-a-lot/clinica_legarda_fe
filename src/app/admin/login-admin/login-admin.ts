@@ -51,7 +51,7 @@ export class LoginAdmin {
           this.router.navigate(['/admin/dashboard'])
         }
       },
-      error: (err) => this.alertService.error(err.error.message)
+      error: (err) => this.alertService.error(err)
     }).add(() => this.isLoading = false)
   }
 
