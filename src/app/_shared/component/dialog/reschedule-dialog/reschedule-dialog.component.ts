@@ -33,6 +33,11 @@ export class RescheduleDialogComponent implements OnInit {
   minDate: string = '';
   fakeDentist: any;
 
+  // appointment limit to 3 months
+  maxDate = new Date(
+    new Date().setMonth(new Date().getMonth() + 3)
+  );
+
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<RescheduleDialogComponent>,
