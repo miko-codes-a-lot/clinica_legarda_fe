@@ -6,6 +6,8 @@ import { ClinicForm } from '../clinic-form/clinic-form';
 import { Day } from '../../../_shared/model/day';
 import { forkJoin } from 'rxjs';
 import { DayService } from '../../../_shared/service/day-service';
+import { AlertService } from '../../../_shared/service/alert.service';
+
 
 @Component({
   selector: 'app-clinic-update',
@@ -24,6 +26,8 @@ export class ClinicUpdate {
     private readonly dayService: DayService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -39,7 +43,7 @@ export class ClinicUpdate {
         this.clinic = clinic
         this.days = days
       },
-      error: (e) => alert(`Something went wrong: ${e}`),
+      error: (e) => this.alertService.error(e.error.message),
       complete: () => this.isLoading = false
     })
   }
@@ -48,7 +52,7 @@ export class ClinicUpdate {
     this.isLoading = true
     this.clinicService.update(this.id, clinic).subscribe({
       next: () => this.router.navigate(['admin/clinic/details', this.id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 }

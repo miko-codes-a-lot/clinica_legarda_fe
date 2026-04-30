@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AuthService } from '../../_shared/service/auth-service';
 import { Router, RouterModule } from '@angular/router';
 import { UiStateService } from '../../_shared/service/ui-state-service';
+import { AlertService } from '../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-login-patient',
@@ -20,6 +21,8 @@ export class LoginPatient {
     private readonly authService: AuthService,
     private readonly fb: FormBuilder,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit() {
@@ -54,7 +57,9 @@ export class LoginPatient {
           this.router.navigate(['/app/my-appointment'])
         }
       },
-      error: (err) => alert(`Something went wrong: ${err}`)
+      error: (err) => {
+        this.alertService.error(err)
+      }
     }).add(() => this.uiStateService.setLoading(false))
   }
 

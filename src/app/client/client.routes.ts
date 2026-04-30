@@ -86,6 +86,21 @@ export const CLIENT_ROUTES: Routes = [
           redirectUrl: '/app/my-appointment',
           loginUrl: '/app/login'
         }
+      },
+      {
+        path: 'forgot-password',
+        loadComponent: () => import('../_shared/component/forgot-password/forgot-password')
+          .then(m => m.ForgotPassword),
+      },
+      {
+        path: 'verify-reset-otp',
+        loadComponent: () => import('../_shared/component/verify-reset-otp/verify-reset-otp')
+          .then(m => m.VerifyResetOtp),
+      },
+      {
+        path: 'reset-password',
+        loadComponent: () => import('../_shared/component/reset-password/reset-password')
+          .then(m => m.ResetPassword),
       }
     ]
   }

@@ -12,6 +12,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RescheduleDialogComponent } from '../../_shared/component/dialog/reschedule-dialog/reschedule-dialog.component';
 import { Reason } from '../../_shared/model/reason';
+import { AlertService } from '../../_shared/service/alert.service';
+
 
 @Component({
   selector: 'app-my-appointment',
@@ -35,7 +37,9 @@ export class MyAppointment {
     private readonly authService: AuthService,
     private readonly appointmentService: AppointmentService,
     private dialog: MatDialog,
-    private readonly reasonService: ReasonService
+    private readonly reasonService: ReasonService,
+    private readonly alertService: AlertService,
+
   ) {}
 
   isLoading = false;
@@ -78,13 +82,13 @@ export class MyAppointment {
     this.appointmentService.cancelAppointment(appointment._id).subscribe({
       next: () => {
         this.isLoading = false;
-        alert('Appointment cancelled successfully!');
+        this.alertService.error('Appointment cancelled successfully!');
         this.loadAppointments();
       },
       error: (err) => {
         console.error(err);
         this.isLoading = false;
-        alert('Failed to cancel appointment.');
+        this.alertService.error('Failed to cancel appointment.');
       }
     });
   }
@@ -126,13 +130,13 @@ export class MyAppointment {
       this.appointmentService.rescheduleAppointment(appointment._id, payload).subscribe({
         next: () => {
           this.isLoading = false;
-          alert('✅ Appointment rescheduled successfully!');
+          this.alertService.error('✅ Appointment rescheduled successfully!');
           this.loadAppointments();
         },
         error: (err) => {
           console.error(err);
           this.isLoading = false;
-          alert(err.error.message);
+          this.alertService.error(err.error.message);
         }
       });
     });

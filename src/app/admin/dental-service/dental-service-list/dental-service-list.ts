@@ -4,6 +4,7 @@ import { DentalService } from '../../../_shared/model/dental-service';
 import { DentalServicesService } from '../../../_shared/service/dental-services-service';
 import { MatTableDataSource } from '@angular/material/table';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-dental-service-list',
@@ -28,6 +29,7 @@ export class DentalServiceList implements OnInit {
   constructor(
     private readonly dentalServicesService: DentalServicesService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -36,7 +38,7 @@ export class DentalServiceList implements OnInit {
       next: (data) => {
         this.dataSource.data = data;
       },
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false);
   }
 

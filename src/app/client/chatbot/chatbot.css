@@ -91,6 +91,17 @@
   border-bottom-left-radius: 4px;
 }
 
+.chat-link {
+  color: #007bff;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.chat-link:hover {
+  color: #0056b3;
+}
+
 .user-bubble {
   background-color: #007bff;
   color: white;
@@ -129,31 +140,89 @@
 }
 
 
-.chat-options {
-  padding: 15px;
-  border-top: 1px solid #ddd;
+.chat-input {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
+  padding: 12px 15px;
+  border-top: 1px solid #ddd;
   background-color: #fff;
 }
 
-.chat-options button {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #007bff;
-  background-color: #fff;
-  color: #007bff;
+.chat-input input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
   border-radius: 20px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: background-color 0.2s, color 0.2s;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
 }
 
-.chat-options button:hover {
+.chat-input input:focus {
+  border-color: #007bff;
+}
+
+.chat-input input:disabled {
+  background-color: #f1f1f1;
+  cursor: not-allowed;
+}
+
+.chat-input button {
+  border: none;
   background-color: #007bff;
   color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.chat-input button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.chat-input button:disabled {
+  background-color: #b0c4de;
+  cursor: not-allowed;
+}
+
+.chat-input button .material-icons {
+  font-size: 20px;
+}
+
+.typing-indicator {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding: 14px 18px !important;
+}
+
+.typing-indicator span {
+  width: 7px;
+  height: 7px;
+  background-color: #888;
+  border-radius: 50%;
+  display: inline-block;
+  animation: typing-bounce 1.2s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-5px); opacity: 1; }
 }
 
 .close-button {

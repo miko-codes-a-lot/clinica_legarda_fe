@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TypeUtil } from '../../../utils/type-util';
 import { User } from '../../../_shared/model/user';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-notification-details',
@@ -20,6 +21,8 @@ export class NotificationDetails {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly route: ActivatedRoute,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -29,7 +32,7 @@ export class NotificationDetails {
     
     this.notificationService.getOne(this.id).subscribe({
       next: (n) => this.notification = n,
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 
@@ -45,7 +48,7 @@ export class NotificationDetails {
     this.isLoading = true
 
     this.notificationService.markAsRead(this.id).subscribe({
-      error: (err) => alert(`Something went wrong: ${err}`),
+      error: (err) => this.alertService.error(err.error.message),
     }).add(() => this.isLoading = false)
   }
 }

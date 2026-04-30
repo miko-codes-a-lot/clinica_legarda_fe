@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { NavComponent } from '../_shared/component/nav/nav.component';
 import { AuthService } from '../_shared/service/auth-service';
 import { CommonModule } from '@angular/common';
+import { AlertService } from '../_shared/service/alert.service';
 
 @Component({
   selector: 'app-admin',
@@ -50,6 +51,7 @@ export class Admin {
   constructor(
     private readonly authService: AuthService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit() {
@@ -93,7 +95,7 @@ export class Admin {
     this.authService.logout()
       .subscribe({
         next: () => this.router.navigate(['/admin/login']),
-        error: (err) => alert(`Something went wrong: ${err}`)
+        error: (err) => this.alertService.error(`Something went wrong: ${err}`)
       })
       .add(() => this.isLoading = false)
   }

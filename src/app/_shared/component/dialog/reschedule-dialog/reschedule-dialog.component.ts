@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { DatePicker } from '../../date-picker/date-picker';
 import { TimePicker } from '../../time-picker/time-picker';
+import { AlertService } from '../../../service/alert.service';
 
 interface OperatingHour {
   day: string;
@@ -32,9 +33,15 @@ export class RescheduleDialogComponent implements OnInit {
   minDate: string = '';
   fakeDentist: any;
 
+  // appointment limit to 3 months
+  maxDate = new Date(
+    new Date().setMonth(new Date().getMonth() + 3)
+  );
+
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<RescheduleDialogComponent>,
+    private readonly alertService: AlertService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       date: string;
@@ -79,7 +86,7 @@ export class RescheduleDialogComponent implements OnInit {
 
   onSave() {
     if (!this.form.valid) {
-      alert('Please select a date and time.');
+      this.alertService.error('Please select a date and time.');
     };
 
     const { date, time } = this.form.value;
@@ -96,7 +103,7 @@ export class RescheduleDialogComponent implements OnInit {
       selectedDate.toDateString() === currentAppointmentDate.toDateString() &&
       selectedTime.startsWith(currentTime)
     ) {
-      alert('You cannot select your current appointment date and time.');
+      this.alertService.error('You cannot select your current appointment date and time.');
       return;
     }
 
@@ -125,7 +132,7 @@ export class RescheduleDialogComponent implements OnInit {
     const endTime = formatToHHMM(endTimeRaw);
 
     if (!startTime || !endTime) {
-      alert('Invalid time format. Please select a valid time slot.');
+      this.alertService.error('Invalid time format. Please select a valid time slot.');
       return;
     }
 

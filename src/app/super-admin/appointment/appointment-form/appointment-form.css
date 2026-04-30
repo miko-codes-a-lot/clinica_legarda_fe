@@ -174,3 +174,9 @@ mat-form-field {
 .referral-note mat-icon {
   font-size: 18px;
 }
+
+.error-text-maxvisit {
+  color: red;
+  font-size: 18px;
+  margin: 20px;
+}

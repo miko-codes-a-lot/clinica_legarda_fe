@@ -9,7 +9,7 @@ export const DENTIST_ROUTES: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '/dentist/profile',
+        redirectTo: '/dentist/homepage',
         pathMatch: 'full'
       },
       {
@@ -35,6 +35,12 @@ export const DENTIST_ROUTES: Routes = [
         canActivate: [AuthGuard],
         data: { role: 'dentist' },
         loadChildren: () => import('./notification/notification.route').then(m => m.NOTIFICATION_ROUTES)
+      },
+      {
+        path: 'homepage',
+        canActivate: [AuthGuard],
+        data: { role: 'dentist' },
+        loadChildren: () => import('./homepage/homepage.route').then(m => m.HOMEPAGE_ROUTES)
       },
     ]
   }

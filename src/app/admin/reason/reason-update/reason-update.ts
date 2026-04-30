@@ -6,6 +6,7 @@ import { ReasonForm } from '../reason-form/reason-form';
 import { Day } from '../../../_shared/model/day';
 import { forkJoin } from 'rxjs';
 import { DayService } from '../../../_shared/service/day-service';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-reason-update',
@@ -24,6 +25,8 @@ export class ReasonUpdate {
     private readonly dayService: DayService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -39,7 +42,7 @@ export class ReasonUpdate {
         this.reason = reason
         this.days = days
       },
-      error: (e) => alert(`Something went wrong: ${e}`),
+      error: (e) => this.alertService.error(e.error.message),
       complete: () => this.isLoading = false
     })
   }
@@ -48,7 +51,7 @@ export class ReasonUpdate {
     this.isLoading = true
     this.reasonService.update(this.id, reason).subscribe({
       next: () => this.router.navigate(['admin/reason/details', this.id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 }

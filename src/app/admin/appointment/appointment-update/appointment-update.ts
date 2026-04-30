@@ -11,6 +11,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { AppointmentPayload } from '../appointment-payload';
 import { AppointmentForm } from '../appointment-form/appointment-form';
+import { AlertService } from '../../../_shared/service/alert.service';
+
 
 @Component({
   selector: 'app-appointment-update',
@@ -34,6 +36,7 @@ export class AppointmentUpdate {
     private readonly userService: UserService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -53,7 +56,7 @@ export class AppointmentUpdate {
         this.clinics = clinics
         this.patients = patients
       },
-      error: (e) => alert(`Something went wrong ${e}`),
+      error: (e) => this.alertService.error(e.error.message),
       complete: () => this.isLoading = false,
     })
   }
@@ -62,7 +65,7 @@ export class AppointmentUpdate {
     this.isLoading = true
     this.appointmentService.update(this.id, appointment).subscribe({
       next: (c) => this.router.navigate(['admin/appointment/details', c._id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 }

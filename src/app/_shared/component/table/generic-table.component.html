@@ -52,6 +52,16 @@
             </button>
           }
 
+          @if (enableDelete && delete.observers.length > 0) {
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="onDeleteClick(element)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          }
+
           @if (markAsRead.observers.length > 0) {
             <button mat-icon-button color="accent" (click)="onMarkAsReadClick(element)">
               <mat-icon>done_all</mat-icon>

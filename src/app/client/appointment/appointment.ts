@@ -32,6 +32,9 @@ import { ReasonService } from '../../_shared/service/reason-service';
 
 import { CommonModule } from '@angular/common';
 
+import { AlertService } from '../../_shared/service/alert.service';
+
+
 @Component({
   selector: 'app-appointment',
   standalone: true,
@@ -74,8 +77,12 @@ export class AppointmentPage {
   users: User[] = []
   selectReferringDentist: { value: string; label: string }[] = []
 
-  minDate = new Date()
-  maxDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 90 days from now only
+  minDate = new Date();
+
+  // appointment limit to 3 months
+  maxDate = new Date(
+    new Date().setMonth(new Date().getMonth() + 3)
+  );
 
   patientAppointments: Appointment[] = [];
   appointments: Appointment[] = [];
@@ -89,7 +96,9 @@ export class AppointmentPage {
     private readonly appointmentService: AppointmentService,
     private readonly referralService: ReferralService,
     private readonly reasonService: ReasonService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private readonly alertService: AlertService,
+
   ) {}
 
   private emptyDentist: User = {
@@ -152,7 +161,13 @@ export class AppointmentPage {
       clinic: [clinicId, Validators.required],
       dentist: [dentistId, Validators.required],
       patient: [user? `${user?.firstName} ${user?.lastName} `: '', Validators.required],
-      services: [this.appointment.services.map(s => s._id || ''), Validators.required],
+      services: [
+        this.appointment?.services.map(s => s._id || '') || [] as string[],
+        [
+          Validators.required,
+          Validators.maxLength(3)
+        ]
+      ],
       date: [this.appointment.date, Validators.required],
       time: [this.appointment.startTime, Validators.required],
       patientNotes: [this.appointment.notes?.patientNotes || '']
@@ -384,7 +399,7 @@ export class AppointmentPage {
       },
       error: err => {
         console.log('error', err);
-        alert(`${err.error.message}`)
+        this.alertService.error(err.error.message)
       }
     });
 
@@ -410,7 +425,7 @@ export class AppointmentPage {
           this.applyPreviousAppointment();
         }
       },
-      error: (e) => alert(`Something went wrong ${e}`),
+      error: (e) => this.alertService.error(e.error.message),
       complete: () => this.isLoading = false
     });
   }

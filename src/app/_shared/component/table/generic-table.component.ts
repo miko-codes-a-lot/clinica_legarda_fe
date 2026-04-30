@@ -34,10 +34,12 @@ export class GenericTableComponent<T> implements AfterViewInit {
 
   @Input() dataSource = new MatTableDataSource<T>();
   @Input() isLoading = false;
+  @Input() enableDelete = false;
 
   @Output() details = new EventEmitter<any>();
   @Output() update = new EventEmitter<any>();
   @Output() create = new EventEmitter<any>();
+  @Output() delete = new EventEmitter<any>();
   @Output() markAsRead = new EventEmitter<any>();
 
 
@@ -83,6 +85,10 @@ export class GenericTableComponent<T> implements AfterViewInit {
 
   onCreateClick() {
     this.create.emit();
+  }
+
+  onDeleteClick(element: any) {
+    this.delete.emit((element as any)._id);
   }
 
   onMarkAsReadClick(element: any) {

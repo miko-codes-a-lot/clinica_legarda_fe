@@ -5,6 +5,7 @@ import { User } from '../../../_shared/model/user';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { ListComponent } from '../../../_shared/component/list/list.component';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 
 @Component({
@@ -23,6 +24,8 @@ export class UserDetails implements OnInit {
     private readonly userService: UserService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -33,7 +36,7 @@ export class UserDetails implements OnInit {
     this.userService.getOne(this.id).subscribe({
       next: (u) => {
         // set the data to display
-        const { firstName, middleName, lastName, emailAddress, mobileNumber, address, role, status } = u;
+        const { firstName, middleName, lastName, emailAddress, mobileNumber, address, role } = u;
 
         this.displayUser = {
           firstName,
@@ -43,11 +46,10 @@ export class UserDetails implements OnInit {
           mobileNumber,
           address,
           role,
-          status
         }
         this.user = u
       },
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
 
   }

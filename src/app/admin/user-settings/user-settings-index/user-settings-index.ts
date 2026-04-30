@@ -14,7 +14,7 @@ import { ChangeDetectorRef } from '@angular/core';
 
 import { AuthService } from '../../../_shared/service/auth-service';
 import { UserService } from '../../../_shared/service/user-service';
-
+import { AlertService } from '../../../_shared/service/alert.service';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -58,7 +58,9 @@ export class UserSettingsIndex implements OnInit {
     private readonly userService: UserService,
     private readonly router: Router,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef  // <-- inject
+    private cdr: ChangeDetectorRef, 
+    private readonly alertService: AlertService,
+
   ) {}
 
 
@@ -77,12 +79,12 @@ export class UserSettingsIndex implements OnInit {
   this.userService.uploadProfilePicture(this.user._id, this.selectedFile)
     .subscribe({
       next: (res) => {
-        alert('Profile picture uploaded successfully!');
+        this.alertService.error('Profile picture uploaded successfully!');
         this.closeAvatarModal(); // close the dialog
       },
       error: (err) => {
         console.error('Upload error', err);
-        alert('Failed to upload profile picture.');
+        this.alertService.error('Failed to upload profile picture.');
       }
     });
     // console.log('result index TS', result)
@@ -138,7 +140,7 @@ export class UserSettingsIndex implements OnInit {
     this.authService.logout()
       .subscribe({
         next: () => this.router.navigate(['/admin/login']),
-        error: (err) => alert(`Something went wrong: ${err}`)
+        error: (err) => this.alertService.error(err)
       })
       .add(() => this.isLoading = false)
   }

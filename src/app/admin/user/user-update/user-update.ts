@@ -9,6 +9,7 @@ import { Day } from '../../../_shared/model/day';
 import { UserPayload } from '../user-form/user-payload';
 import { Clinic } from '../../../_shared/model/clinic';
 import { ClinicService } from '../../../_shared/service/clinic-service';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-user-update',
@@ -29,6 +30,8 @@ export class UserUpdate implements OnInit {
     private readonly dayService: DayService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -46,7 +49,7 @@ export class UserUpdate implements OnInit {
         this.user = user
         this.days = days
       },
-      error: (e) => alert(`Something went wrong: ${e}`),
+      error: (e) => this.alertService.error(e.error.message),
       complete: () => this.isLoading = false,
     })
   }
@@ -55,7 +58,7 @@ export class UserUpdate implements OnInit {
     this.isLoading = true
     this.userService.update(this.id, user).subscribe({
       next: () => this.router.navigate(['admin/user/details', this.id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 }

@@ -25,6 +25,8 @@ import { ReasonService } from '../../../_shared/service/reason-service';
 import { Referral } from '../../../_shared/model/referral';
 import { ReferralService } from '../../../_shared/service/referral-service';
 
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 Chart.register(...registerables);
 
@@ -52,6 +54,7 @@ export class DashboardIndex {
   @ViewChild('appointmentTrendChart', { static: false }) appointmentTrendRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('serviceTrendChart', { static: false }) serviceTrendChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('declinedReferralChart', { static: false }) declinedReferralChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('dashboardContent', { static: false }) dashboardContent!: ElementRef;
 
   serviceTrendChart!: Chart;
   notifications$!: Observable<Notification[]>;
@@ -67,6 +70,7 @@ export class DashboardIndex {
 
   clinics: any[] = [];
   selectedClinic: string = '';
+  isExporting = false;
 
   dashboardData = {
     adminDashboard: {
@@ -528,5 +532,38 @@ export class DashboardIndex {
 
     this.declinedReferralChart = new Chart(this.declinedReferralChartRef.nativeElement, config);
   }
+  exportToPDF() {
+    this.isExporting = true;
+    
+    // Ensure the notification dropdown is closed before export
+    this.showNotifications = false; 
 
+    setTimeout(() => {
+      const element = this.dashboardContent.nativeElement;
+
+      html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        // Ignore the floating notification dropdown and action buttons
+        ignoreElements: (el) => {
+          return el.classList.contains('notification-dropdown') || 
+                el.classList.contains('mark-read-btn');
+        }
+      }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 210;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save(`admin-dashboard-${new Date().getTime()}.pdf`);
+        
+        this.isExporting = false;
+      }).catch(err => {
+        console.error("PDF Export Error:", err);
+        this.isExporting = false;
+      });
+    }, 500); // Increased slightly for safer DOM repaint
+  }
 }

@@ -4,6 +4,7 @@ import { Reason } from '../../../_shared/model/reason';
 import { ReasonService } from '../../../_shared/service/reason-service';
 import { MatTableDataSource } from '@angular/material/table';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-reason-list',
@@ -29,6 +30,7 @@ export class ReasonList implements OnInit {
   constructor(
     private readonly reasonService: ReasonService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -38,7 +40,7 @@ export class ReasonList implements OnInit {
       next: (data) => {
         this.dataSource.data = data;
       },
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false);
   }
 

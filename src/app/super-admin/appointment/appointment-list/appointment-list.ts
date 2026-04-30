@@ -4,6 +4,7 @@ import { Appointment } from '../../../_shared/model/appointment';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
 import { MatTableDataSource } from '@angular/material/table';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-appointment-list',
@@ -34,6 +35,7 @@ export class AppointmentList implements OnInit {
   constructor(
     private readonly appointmentService: AppointmentService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -44,7 +46,7 @@ export class AppointmentList implements OnInit {
         this.dataSource.data = data;
         console.log('dataSource', this.dataSource.data);
       },
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false);
   }
 

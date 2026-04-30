@@ -13,6 +13,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { NgIf } from '@angular/common'; // if using standalone imports
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
 import { MatTableDataSource } from '@angular/material/table';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
 selector: 'app-appointment-details',
@@ -28,7 +29,7 @@ export class AppointmentDetails {
   displayAppointment: Record<string, any> = {};
   dataSource = new MatTableDataSource<Appointment>();
 
-  displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date', 'time', 'status'];
+  displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date', 'time', 'status', 'notes.clinicNotes', 'notes.patientNotes'];
   columnDefs = [
     { key: 'clinic', label: 'Clinic', cell: (appointmentHistory: Appointment) => appointmentHistory.clinic.name},
     { key: 'services', label: 'Services',   cell: (appointmentHistory: Appointment) => appointmentHistory.services.map(service =>     service.name).join(', ')
@@ -38,13 +39,17 @@ export class AppointmentDetails {
     { key: 'date', label: 'Date', cell: (appointmentHistory: Appointment) => appointmentHistory.date },
     { key: 'time', label: 'Time', cell: (appointmentHistory: Appointment) =>  `${appointmentHistory.startTime} - ${appointmentHistory.endTime}` },
     { key: 'status', label: 'Status', cell: (appointmentHistory: Appointment) => appointmentHistory.status },
+    { key: 'notes.clinicNotes', label: 'Clinic Notes', cell: (appointmentHistory: Appointment) => appointmentHistory.notes.clinicNotes },
+    { key: 'notes.patientNotes', label: 'Patient Notes', cell: (appointmentHistory: Appointment) => appointmentHistory.notes.patientNotes },
   ];
 
   constructor(
     private readonly appointmentService: AppointmentService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly dialog: MatDialog
+    private readonly dialog: MatDialog,
+    private readonly alertService: AlertService,
+
   ) {}
 
   ngOnInit(): void {
@@ -80,15 +85,16 @@ export class AppointmentDetails {
               && apt.status === 'confirmed'
               && new Date(apt.date) < now
             ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            console.log('this.appointmentHistory', this.appointmentHistory);
             this.dataSource.data = this.appointmentHistory;
             console.log('this.dataSource.data', this.dataSource.data);
         },
-        error: (e) => alert(`Something went wrong ${e}`),
+        error: (e) => this.alertService.error(e.error.message),
         complete: () => this.isLoading = false
       });
         // get the appointment history here
     },
-      error: (e) => alert(`Something went wrong ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 
@@ -109,12 +115,12 @@ export class AppointmentDetails {
 
         this.isLoading = false;
         console.log('this.appointment', this.appointment);
-        alert('Appointment approved successfully!');
+        this.alertService.error('Appointment approved successfully!');
       },
       error: (err: any) => {
         console.error(err);
         this.isLoading = false;
-        alert(err.error.message);
+        this.alertService.error(err.error.message);
       }
     });
   }
@@ -131,12 +137,12 @@ export class AppointmentDetails {
         this.displayAppointment['status'] = updatedAppointment.status;
 
         this.isLoading = false;
-        alert('Appointment rejected successfully!');
+        this.alertService.error('Appointment rejected successfully!');
       },
       error: (err: any) => {
         console.error(err);
         this.isLoading = false;
-        alert('Failed to reject appointment.');
+        this.alertService.error('Failed to reject appointment.');
       }
     });
   }
@@ -156,12 +162,12 @@ export class AppointmentDetails {
             .subscribe({
               next: (updatedAppointment) => {
                 this.appointment = updatedAppointment;
-                alert('Clinic notes updated successfully!');
+                this.alertService.error('Clinic notes updated successfully!');
                 this.isLoading = false;
               },
               error: (err) => {
                 console.error(err);
-                alert('Failed to update clinic notes');
+                this.alertService.error('Failed to update clinic notes');
                 this.isLoading = false;
               }
           });
@@ -184,13 +190,13 @@ export class AppointmentDetails {
         this.appointmentService.cancelAppointment(this.appointment._id).subscribe({
         next: () => {
           this.isLoading = false;
-          alert('Appointment cancelled successfully!');
+          this.alertService.error('Appointment cancelled successfully!');
           this.loadAppointment();
         },
         error: (err) => {
           console.error(err);
           this.isLoading = false;
-          alert('Failed to cancel appointment.');
+          this.alertService.error('Failed to cancel appointment.');
         }
       });
     }

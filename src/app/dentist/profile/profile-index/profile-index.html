@@ -137,7 +137,7 @@
 
           <mat-form-field appearance="outline" class="field">
             <mat-label>Mobile number</mat-label>
-            <input matInput type="tel" formControlName="mobileNumber" />
+            <input matInput type="tel" formControlName="mobileNumber" maxLength="13" />
             <mat-error>
               <app-form-control-errors [control]="profileForm.get('mobileNumber')"></app-form-control-errors>
             </mat-error>

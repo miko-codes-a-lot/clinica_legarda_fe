@@ -72,6 +72,33 @@ export class AuthService {
     )
   }
 
+  forgotPassword(emailAddress: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>('/auth/forgot-password', { emailAddress }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        const userMessage = error.error?.message || 'Could not send OTP. Please try again.'
+        return throwError(() => new Error(userMessage))
+      })
+    )
+  }
+
+  verifyResetOtp(emailAddress: string, otp: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>('/auth/verify-reset-otp', { emailAddress, otp }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        const userMessage = error.error?.message || 'Invalid or expired OTP.'
+        return throwError(() => new Error(userMessage))
+      })
+    )
+  }
+
+  resetPassword(emailAddress: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>('/auth/reset-password', { emailAddress, newPassword }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        const userMessage = error.error?.message || 'Could not reset password. Please try again.'
+        return throwError(() => new Error(userMessage))
+      })
+    )
+  }
+
   // login(username: string, password: string): Observable<LoginResponse> {
   //   return new Observable<LoginResponse>((s) => {
   //     setTimeout(() => {

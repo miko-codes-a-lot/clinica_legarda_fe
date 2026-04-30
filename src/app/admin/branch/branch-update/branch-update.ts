@@ -7,6 +7,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BranchPayload } from '../branch-form/branch-payload';
 import { Branch } from '../../../_shared/model/branch';
 import { forkJoin } from 'rxjs';
+import { AlertService } from '../../../_shared/service/alert.service';
+
 
 @Component({
   selector: 'app-branch-update',
@@ -25,6 +27,7 @@ export class BranchUpdate {
     private readonly branchService: BranchService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -40,7 +43,7 @@ export class BranchUpdate {
         this.branch = branch
         this.clinics = clinics
       },
-      error: (e) => alert(`Something went wrong ${e}`),
+      error: (e) => this.alertService.error(e.error.message),
       complete: () => this.isLoading = false
     })
   }
@@ -49,7 +52,7 @@ export class BranchUpdate {
     this.isLoading = true
     this.branchService.create(branch).subscribe({
       next: (c) => this.router.navigate(['admin/branch/details', c._id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 }

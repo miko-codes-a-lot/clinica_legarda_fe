@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { RxLogin } from '../../_shared/model/reactive/rx-login';
 import { AuthService } from '../../_shared/service/auth-service';
 import { Router } from '@angular/router';
+import { AlertService } from '../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-login-admin',
@@ -18,6 +19,7 @@ export class LoginAdmin {
     private readonly authService: AuthService,
     private readonly fb: FormBuilder,
     private readonly router: Router,
+    private readonly alertService: AlertService,
   ) {}
 
   ngOnInit() {
@@ -44,12 +46,12 @@ export class LoginAdmin {
             state: { maskedEmail: this.maskEmail(r.user.emailAddress) }
           })
         } else if (r.user.role === 'dentist') {
-          this.router.navigate(['/dentist/profile'])
+          this.router.navigate(['/dentist/homepage'])
         } else {
           this.router.navigate(['/admin/dashboard'])
         }
       },
-      error: (err) => alert(err.message)
+      error: (err) => this.alertService.error(err)
     }).add(() => this.isLoading = false)
   }
 

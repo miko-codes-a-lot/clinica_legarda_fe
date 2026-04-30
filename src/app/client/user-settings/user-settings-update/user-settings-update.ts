@@ -19,6 +19,7 @@ import { Router } from '@angular/router';
 import { UserService } from '../../../_shared/service/user-service';
 
 import { UserPayload } from '../../../admin/user/user-form/user-payload';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 
 // Register Chart.js components
@@ -54,7 +55,9 @@ export class UserSettingsUpdate implements OnInit {
     private fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly router: Router,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly alertService: AlertService,
+
   ) {}
 
   // figure out getting the user existing data
@@ -236,10 +239,10 @@ onSave() {
         });
       },
       error: (err) => {
-        alert(`Something went wrong: ${err?.message || err}`);
+        this.alertService.error(err.error.message)
       },
       complete: () => {
-        alert('Successfully Updated')
+        this.alertService.error('Successfully Updated')
         this.router.navigate(['/app/user-settings/index'])
         this.isLoading = false
       }

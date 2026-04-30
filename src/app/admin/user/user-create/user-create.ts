@@ -8,6 +8,7 @@ import { ClinicService } from '../../../_shared/service/clinic-service';
 import { Clinic } from '../../../_shared/model/clinic';
 import { forkJoin } from 'rxjs';
 import { UserPayload } from '../user-form/user-payload';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-user-create',
@@ -24,6 +25,7 @@ export class UserCreate implements OnInit {
     private readonly clinicService: ClinicService,
     private readonly userService: UserService,
     private readonly dayService: DayService,
+    private readonly alertService: AlertService,
     private readonly router: Router,
   ) {}
 
@@ -38,7 +40,11 @@ export class UserCreate implements OnInit {
         this.days = days
         this.clinics = clinics
       },
-      error: e => alert(`Something went wrong ${e}`),
+      error: e => {
+        this.alertService.error(
+          e.error?.message || 'Something went wrong'
+        );
+      },
       complete: () => this.isLoading = false
     })
   }
@@ -47,7 +53,11 @@ export class UserCreate implements OnInit {
     this.isLoading = true
     this.userService.create(user).subscribe({
       next: (u) => this.router.navigate(['admin/user/details', u._id], { replaceUrl: true }),
-      error: (e) => alert(`Something went wrong: ${e}`)
+      error: (e) => {
+        this.alertService.error(
+          e.error?.message || 'Something went wrong'
+        );
+      },
     }).add(() => this.isLoading = false)
   }
 }

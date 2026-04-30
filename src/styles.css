@@ -2,3 +2,27 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.success-snackbar {
+  --mdc-snackbar-container-color: #16a34a !important;
+  --mat-mdc-snack-bar-button-color: white !important;
+  color: white !important;
+}
+
+.error-snackbar {
+  --mdc-snackbar-container-color: #dc2626 !important;
+  --mat-mdc-snack-bar-button-color: white !important;
+  color: white !important;
+}
+
+.warning-snackbar {
+  --mdc-snackbar-container-color: #f59e0b !important;
+  --mat-mdc-snack-bar-button-color: white !important;
+  color: white !important;
+}
+
+.info-snackbar {
+  --mdc-snackbar-container-color: #2563eb !important;
+  --mat-mdc-snack-bar-button-color: white !important;
+  color: white !important;
+}

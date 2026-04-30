@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Day } from '../../../_shared/model/day';
 import { Clinic } from '../../../_shared/model/clinic';
 import { UserPayload } from '../../../admin/user/user-form/user-payload';
+import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-registration-create',
@@ -23,6 +24,8 @@ export class RegistrationCreate {
   constructor(
     private readonly userService: UserService,
     private readonly router: Router,
+    private readonly alertService: AlertService,
+
   ) {}
 
   onSubmit(user: UserPayload) {
@@ -32,7 +35,7 @@ export class RegistrationCreate {
       next: () => this.router.navigate(['/app/login']), // navigate to login page
       error: (e) => {
         console.error(e);
-        alert(`Something went wrong: ${e.error?.message || e.message}`);
+        this.alertService.error(e.error.message);
       }
     }).add(() => this.isLoading = false);
   }
