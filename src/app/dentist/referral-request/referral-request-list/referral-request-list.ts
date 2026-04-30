@@ -39,7 +39,7 @@ export class ReferralRequestList implements OnInit {
     {
       key: 'appointment.patient',
       label: 'Patient',
-      cell: (row: any) => `${row.appointment?.patient.firstName ?? ''} ${row.appointment.patient.lastName ?? ''}`
+      cell: (row: any) => `${row.appointment?.patient?.firstName ?? ''} ${row.appointment?.patient?.lastName ?? ''}`
     },
     {
       key: 'reason',
