@@ -16,7 +16,7 @@ export const CLIENT_ROUTES: Routes = [
       {
         path: '',
         redirectTo: '/app/home',
-        pathMatch: 'full'
+        pathMatch: 'full',
       },
       {
         path: 'home',
@@ -28,13 +28,17 @@ export const CLIENT_ROUTES: Routes = [
       },
       {
         path: 'appointment',
-        loadComponent: () => import('./appointment/appointment-create/appointment-create')
-          .then(m => m.AppointmentCreate),
+        loadComponent: () =>
+          import('./appointment/appointment-create/appointment-create').then(
+            (m) => m.AppointmentCreate,
+          ),
       },
       {
         path: 'registration',
-        loadComponent: () => import('./registration/registration-create/registration-create')
-          .then(m => m.RegistrationCreate),
+        loadComponent: () =>
+          import('./registration/registration-create/registration-create').then(
+            (m) => m.RegistrationCreate,
+          ),
       },
       {
         path: 'about-us',
@@ -49,29 +53,46 @@ export const CLIENT_ROUTES: Routes = [
         component: Faq,
       },
       {
+        path: 'privacy-policy',
+        loadComponent: () =>
+          import('./privacy-policy/privacy-policy').then(
+            (m) => m.PrivacyPolicy,
+          ),
+      },
+      {
         path: 'dashboard',
         canActivate: [AuthGuard],
-        loadComponent: () => import('./dashboard/dashboard').then(m => m.Dashboard),
+        loadComponent: () =>
+          import('./dashboard/dashboard').then((m) => m.Dashboard),
       },
       {
         path: 'profile',
         canActivate: [AuthGuard],
-        loadComponent: () => import('./profile/profile').then(m => m.Profile),
+        loadComponent: () => import('./profile/profile').then((m) => m.Profile),
       },
       {
         path: 'my-appointment',
         canActivate: [AuthGuard],
-        loadComponent: () => import('./my-appointment/my-appointment').then(m => m.MyAppointment),
+        loadComponent: () =>
+          import('./my-appointment/my-appointment').then(
+            (m) => m.MyAppointment,
+          ),
       },
       {
         path: 'my-appointment/details/:id',
         canActivate: [AuthGuard],
-        loadComponent: () => import('./appointment-details/appointment-details').then(m => m.AppointmentDetails),
+        loadComponent: () =>
+          import('./appointment-details/appointment-details').then(
+            (m) => m.AppointmentDetails,
+          ),
       },
       {
         path: 'user-settings',
         canActivate: [AuthGuard],
-        loadChildren: () => import('./user-settings/user-settings.route').then(m => m.USER_SETTINGS_ROUTES)
+        loadChildren: () =>
+          import('./user-settings/user-settings.route').then(
+            (m) => m.USER_SETTINGS_ROUTES,
+          ),
       },
       {
         path: 'login',
@@ -79,29 +100,37 @@ export const CLIENT_ROUTES: Routes = [
       },
       {
         path: 'verify-otp',
-        loadComponent: () => import('../_shared/component/verify-otp/verify-otp')
-          .then(m => m.VerifyOtp),
+        loadComponent: () =>
+          import('../_shared/component/verify-otp/verify-otp').then(
+            (m) => m.VerifyOtp,
+          ),
         data: {
           theme: 'patient',
           redirectUrl: '/app/my-appointment',
-          loginUrl: '/app/login'
-        }
+          loginUrl: '/app/login',
+        },
       },
       {
         path: 'forgot-password',
-        loadComponent: () => import('../_shared/component/forgot-password/forgot-password')
-          .then(m => m.ForgotPassword),
+        loadComponent: () =>
+          import('../_shared/component/forgot-password/forgot-password').then(
+            (m) => m.ForgotPassword,
+          ),
       },
       {
         path: 'verify-reset-otp',
-        loadComponent: () => import('../_shared/component/verify-reset-otp/verify-reset-otp')
-          .then(m => m.VerifyResetOtp),
+        loadComponent: () =>
+          import('../_shared/component/verify-reset-otp/verify-reset-otp').then(
+            (m) => m.VerifyResetOtp,
+          ),
       },
       {
         path: 'reset-password',
-        loadComponent: () => import('../_shared/component/reset-password/reset-password')
-          .then(m => m.ResetPassword),
-      }
-    ]
-  }
+        loadComponent: () =>
+          import('../_shared/component/reset-password/reset-password').then(
+            (m) => m.ResetPassword,
+          ),
+      },
+    ],
+  },
 ];
