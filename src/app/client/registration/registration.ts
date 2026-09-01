@@ -15,6 +15,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { FormComponent } from '../../_shared/component/form/form.component';
 import { ClinicService } from '../../_shared/service/clinic-service';
+import { PASSWORD_REQUIREMENTS_MESSAGE, strongPasswordValidators } from '../../utils/forms/password-policy';
 
 @Component({
   selector: 'app-registration',
@@ -86,7 +87,7 @@ export class RegistrationPage implements OnInit, OnChanges {
       mobileNumber: [this.user.mobileNumber, [Validators.required, Validators.pattern(/^\+639\d{9}$/)]],
       username: [this.user.username ?? '', Validators.required],
       address: [this.user.address, Validators.required],
-      password: [this.user.password ?? '', Validators.required],
+      password: [this.user.password ?? '', strongPasswordValidators()],
       passwordConfirm: [''],
       clinic: [this.user.clinic?._id],
       role: [this.user.role, Validators.required],
@@ -137,7 +138,7 @@ export class RegistrationPage implements OnInit, OnChanges {
       },
       { name: 'address', label: 'Address', type: 'text' },
       { name: 'username', label: 'Username', type: 'text' },
-      { name: 'password', label: 'Password', type: 'password' },
+      { name: 'password', label: 'Password', type: 'password', customError: PASSWORD_REQUIREMENTS_MESSAGE },
       { name: 'passwordConfirm', label: 'Confirm Password', type: 'password', customError: 'Passwords must match.' },
     ];
 

@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth-service';
 import { UiStateService } from '../../service/ui-state-service';
 import { AlertService } from '../../service/alert.service';
+import { PASSWORD_REQUIREMENTS_MESSAGE, strongPasswordValidators } from '../../../utils/forms/password-policy';
 
 
 @Component({
@@ -19,6 +20,7 @@ export class ResetPassword {
   }>
   isLoading = false
   emailAddress = ''
+  readonly passwordRequirementsMessage = PASSWORD_REQUIREMENTS_MESSAGE
 
   constructor(
     private readonly fb: FormBuilder,
@@ -38,7 +40,7 @@ export class ResetPassword {
 
     this.rxform = this.fb.nonNullable.group(
       {
-        newPassword: ['', [Validators.required, Validators.minLength(8)]],
+        newPassword: ['', strongPasswordValidators()],
         confirmPassword: ['', [Validators.required]],
       },
       { validators: this.matchPasswords }

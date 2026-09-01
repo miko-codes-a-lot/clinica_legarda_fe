@@ -10,12 +10,12 @@ import { AbstractControl } from '@angular/forms';
         <span>This field is required.</span>
       }
       @if (control?.errors?.['pattern']) {
-        <span>Invalid format.</span>
+        <span>{{ customMessage || 'Invalid format.' }}</span>
       }
       @if (control?.errors?.['email']) {
         <span>Enter a valid email address.</span>
       }
-      @if (customMessage) {
+      @if (customMessage && !control?.errors?.['required'] && !control?.errors?.['pattern'] && !control?.errors?.['email']) {
         <span>{{ customMessage }}</span>
       }
     }
