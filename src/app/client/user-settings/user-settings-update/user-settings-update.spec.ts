@@ -1,23 +1,25 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AlertService } from '../../../_shared/service/alert.service';
+import { AuthService } from '../../../_shared/service/auth-service';
+import { UserService } from '../../../_shared/service/user-service';
 import { UserSettingsUpdate } from './user-settings-update';
 
 describe('UserSettingsUpdate', () => {
-  let component: UserSettingsUpdate;
-  let fixture: ComponentFixture<UserSettingsUpdate>;
+  it('returns a patient to patient settings when editing is cancelled', () => {
+    const router = jasmine.createSpyObj<Router>('Router', ['navigate']);
+    const component = new UserSettingsUpdate(
+      new FormBuilder(),
+      {} as AuthService,
+      router,
+      {} as UserService,
+      {} as AlertService,
+    );
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [UserSettingsUpdate]
-    })
-    .compileComponents();
+    component.cancelEdit();
 
-    fixture = TestBed.createComponent(UserSettingsUpdate);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(router.navigate).toHaveBeenCalledOnceWith([
+      '/app/user-settings/index',
+    ]);
   });
 });

@@ -189,7 +189,7 @@ export class UserSettingsUpdate implements OnInit {
   }
 
   cancelEdit() {
-    this.router.navigate(['/admin/user-settings/index'])
+    this.router.navigate(['/app/user-settings/index'])
   }
 
   removeOperatingHour(index: number): void {

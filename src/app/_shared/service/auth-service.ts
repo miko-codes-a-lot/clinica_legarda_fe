@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, delay, Observable, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, delay, filter, Observable, tap, throwError } from 'rxjs';
 import { User } from '../model/user';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { MockService } from './mock-service';
@@ -10,8 +10,10 @@ import { UserSimple } from '../model/user-simple';
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject = new BehaviorSubject<UserSimple | null>(null)
-  currentUser$: Observable<UserSimple | null> = this.currentUserSubject.asObservable()
+  private currentUserSubject = new BehaviorSubject<UserSimple | null | undefined>(undefined)
+  currentUser$: Observable<UserSimple | null> = this.currentUserSubject.pipe(
+    filter((user): user is UserSimple | null => user !== undefined)
+  )
 
   mockUser: User
 
@@ -143,7 +145,7 @@ export class AuthService {
   }
 
   get currentUserValue(): UserSimple | null {
-    return this.currentUserSubject.value
+    return this.currentUserSubject.value ?? null
   }
 
   isLoggedIn(): boolean {

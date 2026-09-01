@@ -20,17 +20,25 @@ export class AuthGuard implements CanActivate {
 
     return this.authService.currentUser$.pipe(
       map(user => {
+        if (!user) {
+          const loginUrl = state.url.startsWith('/app')
+            ? '/app/login'
+            : '/admin/login'
+          this.router.navigate([loginUrl])
+          return false
+        }
+
         if (!expectedRole) return true
-        if (user?.role === expectedRole) {
+        if (user.role === expectedRole) {
           return true
         } else {
-          if (user?.role === 'dentist') {
+          if (user.role === 'dentist') {
             this.router.navigate(['/dentist/profile']);
-          } else if (user?.role === 'admin') {
+          } else if (user.role === 'admin') {
             this.router.navigate(['/admin/dashboard']);
-          } else if (user?.role === 'user') {
+          } else if (user.role === 'user') {
             this.router.navigate(['/app/my-appointment']);
-          }else if (user?.role === 'super-admin') {
+          }else if (user.role === 'super-admin') {
             this.router.navigate(['/super-admin/dashboard']);
           } else {
             this.router.navigate(['/admin/login']);
