@@ -108,3 +108,9 @@ h1 { margin: 0; font-size: 30px; letter-spacing: -.6px; }
 .clinic-filter select { max-width: 100%; padding: 10px 12px; border: 1px solid #b8c7c1; border-radius: 8px; background: white; color: #183f32; font: inherit; }
 
 .calendar-clinic { font-size: 10px; line-height: 1.2; overflow-wrap: anywhere; }
+
+.outcome-panel { margin-bottom: 24px; border-color: #946200; }
+.outcome-required { background: #fff4d6; }
+.appointment-item.outcome-required { border-left: 4px solid #946200; padding: 16px 12px; }
+.schedule-table tr.outcome-required td:first-child { border-left: 4px solid #946200; }
+.outcome-badge { display: inline-block; margin-top: 4px; padding: 5px 8px; border: 1px solid #946200; border-radius: 5px; color: #634200; background: #fff4d6; font-size: 12px; font-weight: 700; }

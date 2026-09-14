@@ -1,4 +1,9 @@
 import { Appointment, AppointmentStatus } from '../../_shared/model/appointment';
+import { appointmentHasEnded } from '../../_shared/model/appointment-history';
+
+export function requiresAppointmentOutcome(appointment: Appointment, now = new Date()): boolean {
+  return appointment.status === AppointmentStatus.CONFIRMED && appointmentHasEnded(appointment, now);
+}
 
 // Appointment dates are clinic calendar dates serialized at UTC midnight.
 export function appointmentDateKey(value: Date | string): string {

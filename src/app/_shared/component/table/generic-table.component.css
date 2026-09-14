@@ -60,6 +60,9 @@ mat-form-field {
   background-color: #f0f4ff;
 }
 
+.custom-table tr.attention-row { background-color: #fff4d6; }
+.custom-table tr.attention-row td:first-child { border-left: 4px solid #946200; }
+
 button.mat-raised-button {
   min-width: 90px;
 }
@@ -108,5 +111,4 @@ mat-paginator {
   text-underline-offset: 2px;
   text-decoration-thickness: 1px;
 }
-
 

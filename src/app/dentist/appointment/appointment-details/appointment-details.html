@@ -6,6 +6,13 @@
     <h2 class="page-title">Appointment</h2>
   </div>
 
+  @if (requiresOutcome(appointment, reminderNow)) {
+    <div class="outcome-reminder" role="status">
+      <strong>Outcome required</strong>
+      <p>This confirmed appointment has passed its scheduled end in Manila time. Record Completed or No show, or update the appointment as needed.</p>
+    </div>
+  }
+
   <app-list [data]="displayAppointment">
     <div class="custom-list">
       <mat-list-item>

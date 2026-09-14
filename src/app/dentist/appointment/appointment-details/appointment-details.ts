@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, finalize, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, finalize, interval, Observable, of, switchMap, tap } from 'rxjs';
 import { Appointment } from '../../../_shared/model/appointment';
 import { appointmentActorLabel, appointmentStatusLabel, isAppointmentHistory } from '../../../_shared/model/appointment-history';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
@@ -18,7 +18,7 @@ import { RescheduleDialogComponent, RescheduleDialogData, RescheduleDialogResult
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { AlertService } from '../../../_shared/service/alert.service';
-import { compareAppointmentSchedule, formatAppointmentDate } from '../appointment-schedule';
+import { compareAppointmentSchedule, formatAppointmentDate, requiresAppointmentOutcome } from '../appointment-schedule';
 
 @Component({
   selector: 'app-appointment-details',
@@ -33,6 +33,8 @@ export class AppointmentDetails {
   isDialogOpen = false;
   actionError = '';
   readonly actorLabel = appointmentActorLabel;
+  readonly requiresOutcome = requiresAppointmentOutcome;
+  reminderNow = new Date();
   id = '';
   appointment?: Appointment;
   appointmentHistory: Appointment[] = [];
@@ -64,6 +66,7 @@ export class AppointmentDetails {
 
   ngOnInit(): void {
     this.loadAppointment();
+    interval(30_000).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.reminderNow = new Date());
   }
 
   loadAppointment(): void {
@@ -190,6 +193,7 @@ export class AppointmentDetails {
   }
 
   private setAppointment(appointment: Appointment): void {
+    this.reminderNow = new Date();
     this.appointment = appointment;
     this.displayAppointment = {
       status: appointmentStatusLabel(appointment.status), date: formatAppointmentDate(appointment.date),

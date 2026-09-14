@@ -12,7 +12,7 @@ import { UserSimple } from '../../../_shared/model/user-simple';
 import { AuthService } from '../../../_shared/service/auth-service';
 import { NotificationService } from '../../../_shared/service/notification-service';
 import { ReferralService } from '../../../_shared/service/referral-service';
-import { appointmentDateKey, clinicClock, compareAppointmentSchedule, formatAppointmentDate, isActiveAppointment } from '../../appointment/appointment-schedule';
+import { appointmentDateKey, clinicClock, compareAppointmentSchedule, formatAppointmentDate, isActiveAppointment, requiresAppointmentOutcome } from '../../appointment/appointment-schedule';
 import { DentistAppointmentFeed } from '../../appointment/dentist-appointment-feed';
 
 interface CalendarDay {
@@ -33,6 +33,9 @@ interface CalendarDay {
 })
 export class HomepageIndex implements OnInit {
   readonly statusLabel = appointmentStatusLabel;
+  readonly requiresOutcome = requiresAppointmentOutcome;
+  reminderNow = new Date();
+  overdueAppointments: Appointment[] = [];
   private readonly destroyRef = inject(DestroyRef);
   private readonly feed = inject(DentistAppointmentFeed);
   private readonly authService = inject(AuthService);
@@ -70,6 +73,8 @@ export class HomepageIndex implements OnInit {
     this.rebuildCalendar();
     this.authService.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(user => this.user = user);
     this.feed.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(state => {
+      this.reminderNow = new Date();
+      this.overdueAppointments = this.activeAppointments.filter(appointment => requiresAppointmentOutcome(appointment, this.reminderNow));
       if (state.dentistId !== this.loadedDentistId) {
         this.loadedDentistId = state.dentistId;
         this.selectedClinic = 'all';
@@ -185,10 +190,12 @@ export class HomepageIndex implements OnInit {
 
   private updateAppointments(appointments: Appointment[]): void {
     this.appointments = appointments;
+    this.reminderNow = new Date();
     const now = clinicClock();
     this.todayStr = now.date;
     this.activeAppointments = filterAppointments(appointments, this.selectedClinic)
       .filter(isActiveAppointment).sort(compareAppointmentSchedule);
+    this.overdueAppointments = this.activeAppointments.filter(appointment => requiresAppointmentOutcome(appointment, this.reminderNow));
     this.todayAppointments = this.activeAppointments.filter(appointment => appointmentDateKey(appointment.date) === now.date);
     const upcoming = this.activeAppointments.filter(appointment => {
       const date = appointmentDateKey(appointment.date);

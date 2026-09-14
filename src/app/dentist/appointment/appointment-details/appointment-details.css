@@ -8,6 +8,9 @@
   margin-bottom: 16px;
 }
 
+.outcome-reminder { margin: 16px 8%; padding: 16px; border: 1px solid #946200; border-left-width: 4px; border-radius: 8px; color: #634200; background: #fff4d6; }
+.outcome-reminder p { margin: 8px 0 0; line-height: 1.5; }
+
 .item-title{
     font-size: 19px;
 }

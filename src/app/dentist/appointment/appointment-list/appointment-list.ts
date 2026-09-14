@@ -9,7 +9,7 @@ import { GenericTableComponent } from '../../../_shared/component/table/generic-
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { appointmentDateKey, clinicClock, formatAppointmentDate } from '../appointment-schedule';
+import { appointmentDateKey, clinicClock, formatAppointmentDate, requiresAppointmentOutcome } from '../appointment-schedule';
 import { DentistAppointmentFeed } from '../dentist-appointment-feed';
 
 type StatusFilter = 'all' | AppointmentStatus;
@@ -28,6 +28,9 @@ export class AppointmentList implements OnInit, AfterViewInit {
   private readonly router = inject(Router);
   private appointments: Appointment[] = [];
   private loadedDentistId = '';
+  private reminderNow = new Date();
+  readonly outcomeRowClass = (appointment: Appointment): string =>
+    requiresAppointmentOutcome(appointment, this.reminderNow) ? 'attention-row' : '';
 
   isLoading = true;
   errorMessage = '';
@@ -55,11 +58,13 @@ export class AppointmentList implements OnInit, AfterViewInit {
     { key: 'dentist', label: 'Dentist', cell: (appointment: Appointment) => `${appointment.dentist.firstName} ${appointment.dentist.lastName}` },
     { key: 'date', label: 'Date', cell: (appointment: Appointment) => formatAppointmentDate(appointment.date) },
     { key: 'time', label: 'Time', cell: (appointment: Appointment) => `${appointment.startTime} - ${appointment.endTime}` },
-    { key: 'status', label: 'Status', cell: (appointment: Appointment) => appointmentStatusLabel(appointment.status) },
+    { key: 'status', label: 'Status', cell: (appointment: Appointment) => appointmentStatusLabel(appointment.status) +
+      (requiresAppointmentOutcome(appointment, this.reminderNow) ? ' · Outcome required' : '') },
   ];
 
   ngOnInit(): void {
     this.feed.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(state => {
+      this.reminderNow = new Date();
       if (this.loadedDentistId !== state.dentistId) {
         this.loadedDentistId = state.dentistId;
         this.selectedClinic = 'all';

@@ -47,6 +47,24 @@
     </a>
   </div>
 
+  @if (overdueAppointments.length > 0) {
+    <section class="panel outcome-panel" aria-labelledby="outcome-title">
+      <div class="section-header">
+        <div><h2 id="outcome-title">Outcome required</h2><p>These confirmed appointments have ended. Open each visit to record its outcome.</p></div>
+      </div>
+      @for (appointment of overdueAppointments; track appointment._id) {
+        <article class="appointment-item outcome-required">
+          <div class="appointment-info">
+            <a [routerLink]="['/dentist/appointment/details', appointment._id]">{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</a>
+            <p>{{ formatDate(appointment.date) }} · {{ appointment.startTime }}–{{ appointment.endTime }}</p>
+            <p>{{ appointment.clinic.name }}</p>
+          </div>
+          <span class="outcome-badge">Outcome required</span>
+        </article>
+      }
+    </section>
+  }
+
   <section class="panel confirmed-panel" aria-labelledby="confirmed-title">
     <div class="section-header">
       <div>
@@ -120,7 +138,7 @@
             <thead><tr><th scope="col">Time</th><th scope="col">Patient / Service</th><th scope="col">Status</th></tr></thead>
             <tbody>
               @for (appointment of selectedAppointments; track appointment._id) {
-                <tr>
+                <tr [class.outcome-required]="requiresOutcome(appointment, reminderNow)">
                   <td class="time-cell">{{ appointment.startTime }}<small>– {{ appointment.endTime }}</small></td>
                   <td>
                     <a [routerLink]="['/dentist/appointment/details', appointment._id]">{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</a>
@@ -129,7 +147,10 @@
                     </div>
                     <small>{{ appointment.clinic.name }}</small>
                   </td>
-                  <td><span class="status" [class.pending]="appointment.status === 'pending'">{{ statusLabel(appointment.status) }}</span></td>
+                  <td>
+                    <span class="status" [class.pending]="appointment.status === 'pending'">{{ statusLabel(appointment.status) }}</span>
+                    @if (requiresOutcome(appointment, reminderNow)) { <span class="outcome-badge">Outcome required</span> }
+                  </td>
                 </tr>
               }
             </tbody>

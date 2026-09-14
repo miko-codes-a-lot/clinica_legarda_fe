@@ -31,6 +31,7 @@ export class GenericTableComponent<T> implements AfterViewInit {
     disableEdit?: (element: T) => boolean;
   }[] = [];
   @Input() disableEditFn?: (element: T) => boolean;
+  @Input() rowClassFn?: (element: T) => string;
 
   @Input() dataSource = new MatTableDataSource<T>();
   @Input() isLoading = false;
