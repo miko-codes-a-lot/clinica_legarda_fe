@@ -6,7 +6,7 @@ import { Component, EventEmitter, Input, Output, DestroyRef, inject } from '@ang
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AppointmentPayload } from '../appointment-payload';
 import { Appointment, AppointmentStatus } from '../../../_shared/model/appointment';
-import { User } from '../../../_shared/model/user';
+import { DentistDirectoryEntry, PatientDirectoryEntry } from '../../../_shared/model/user-directory';
 import { RxAppointmentForm } from './rx-appointment-form';
 import { DentalService } from '../../../_shared/model/dental-service';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
@@ -31,6 +31,7 @@ import { ReferralService } from '../../../_shared/service/referral-service';
 import { ReasonService } from '../../../_shared/service/reason-service';
 
 import { AlertService } from '../../../_shared/service/alert.service';
+import { AuthService } from '../../../_shared/service/auth-service';
 
 
 @Component({
@@ -55,10 +56,10 @@ export class AppointmentForm {
   @Input() clinics: Clinic[] = [];
   @Input() appointment!: Appointment;
   @Input() dentalServices: DentalService[] = [];
-  @Input() patients: User[] = [];
+  @Input() patients: PatientDirectoryEntry[] = [];
 
-  dentists: User[] = [];
-  selectedDentist?: User;
+  dentists: DentistDirectoryEntry[] = [];
+  selectedDentist?: DentistDirectoryEntry;
 
   rxform!: FormGroup<RxAppointmentForm>;
   appointmentFields: any[] = [];
@@ -79,7 +80,7 @@ export class AppointmentForm {
   isChangeBranch = false;
 
   
-  users: User[] = []
+  users: DentistDirectoryEntry[] = []
   selectReferringDentist: { value: string; label: string }[] = [];
   rxReferralForm!: FormGroup<RxReferralForm>;
   reasons: { value: string; label: string }[] = [];
@@ -94,6 +95,7 @@ export class AppointmentForm {
     private readonly reasonService: ReasonService,
     private readonly alertService: AlertService,
     private readonly bookingAvailability: BookingAvailabilityService,
+    private readonly authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -109,6 +111,13 @@ export class AppointmentForm {
       time: [this.appointment?.startTime || '', Validators.required],
       patientNotes: [this.appointment?.notes?.patientNotes || ''],
     });
+    if (this.authService.currentUserValue?.role === 'dentist') {
+      this.dentist.disable({ emitEvent: false });
+      if (this.isEditMode) {
+        this.clinic.disable({ emitEvent: false });
+        this.patient.disable({ emitEvent: false });
+      }
+    }
     this.rxReferralForm = this.fb.nonNullable.group({
       fromDoctorId: ['', Validators.required],
       fromClinicId: ['', Validators.required],
@@ -170,15 +179,18 @@ export class AppointmentForm {
     if (!clinic) return;
     this.availabilityLoading = true;
     const selectionVersion = this.clinicSelectionVersion;
-    this.directoryRequest = this.userService.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.directoryRequest = this.userService.getDentists().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: users => {
         if (selectionVersion !== this.clinicSelectionVersion || this.clinic.value !== clinicId) return;
         this.users = users;
         if (this.isChangeBranch) this.updateReferringDentists();
-        this.dentists = users.filter(user => isBookableDentist(user, clinicId));
+        this.dentists = users.filter(user => isBookableDentist(user, clinicId) &&
+          (this.authService.currentUserValue?.role !== 'dentist' || user._id === this.authService.currentUserValue._id));
         this.availabilityLoading = false;
         this.buildAppointmentFields();
-        const selected = this.dentists.find(dentist => dentist._id === dentistId);
+        const selectedId = this.authService.currentUserValue?.role === 'dentist'
+          ? this.authService.currentUserValue._id : dentistId;
+        const selected = this.dentists.find(dentist => dentist._id === selectedId);
         this.dentist.setValue(selected?._id || '', { emitEvent: false });
         this.setDentist(selected?._id || '');
       },
@@ -269,7 +281,9 @@ Do you want to proceed?` },
   private updateReferringDentists() {
     const last = this.latestPatientAppointment;
     const clinicId = last?.clinic._id || '';
-    const referring = this.users.filter(user => isBookableDentist(user, clinicId));
+    const referring = [...new Map(this.patientAppointments
+      .filter(appointment => appointment.clinic?._id === clinicId && appointment.dentist?._id)
+      .map(appointment => [appointment.dentist._id, appointment.dentist])).values()];
     this.selectReferringDentist = this.mapToOptions(this.setUsersKey(referring));
     this.rxReferralForm.patchValue({
       fromDoctorId: referring.some(dentist => dentist._id === last?.dentist?._id) ? last?.dentist?._id || '' : '',
@@ -412,7 +426,7 @@ Do you want to proceed?` },
       endTime,
       status: AppointmentStatus.PENDING,
       notes: {
-        clinicNotes: '',
+        clinicNotes: this.appointment?.notes?.clinicNotes || '',
         patientNotes: this.rxform.controls.patientNotes.value || ''
       }
     };
@@ -423,6 +437,7 @@ Do you want to proceed?` },
     }
 
     const referral: ReferralPayload = {
+      patient: this.patient.value,
       fromDoctorId: this.fromDoctorId.value,
       fromClinicId: previousClinicId ?? '',
       reason: this.reason.value,
@@ -452,7 +467,7 @@ Do you want to proceed?` },
   get services() { return this.rxform.controls.services; }
   get date() { return this.rxform.controls.date; }
   get time() { return this.rxform.controls.time; }
-  get selectedPatient(): User | undefined {
+  get selectedPatient(): PatientDirectoryEntry | undefined {
     return this.patients.find(p => p._id === this.patient.value);
   }
 

@@ -7,7 +7,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { AppointmentPayload } from '../../admin/appointment/appointment-payload';
 import { ReferralPayload } from '../../admin/appointment/referral-payload';
 import { Appointment, AppointmentStatus } from '../../_shared/model/appointment';
-import { User } from '../../_shared/model/user';
+import { DentistDirectoryEntry } from '../../_shared/model/user-directory';
 import { RxAppointmentForm } from './rx-appointment-form';
 import { RxReferralForm } from './rx-referral-form';
 import { DentalService } from '../../_shared/model/dental-service';
@@ -63,14 +63,12 @@ export class AppointmentPage {
   @Input() clinics: Clinic[] = []
   @Input() appointment!: Appointment
   @Input() dentalServices: DentalService[] = []
-  @Input() patients: User[] = []
-  // @Input() loggedInUser?: User[] = []
   user: UserSimple | null = null
 
   isChangeBranch = false;
 
-  dentists: User[] = []
-  selectedDentist?: User
+  dentists: DentistDirectoryEntry[] = []
+  selectedDentist?: DentistDirectoryEntry
   referralSavedData!: Referral;
 
   referringDentist: { value: string; label: string }[] = []
@@ -78,7 +76,7 @@ export class AppointmentPage {
   rxform!: FormGroup<RxAppointmentForm>
   rxReferralForm!: FormGroup<RxReferralForm>
   appointmentFields: any[] = [];
-  users: User[] = []
+  users: DentistDirectoryEntry[] = []
   selectReferringDentist: { value: string; label: string }[] = []
 
   minDate = new Date();
@@ -179,7 +177,7 @@ export class AppointmentPage {
     if (!clinic) return;
     this.availabilityLoading = true;
     const selectionVersion = this.clinicSelectionVersion;
-    this.directoryRequest = this.userService.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.directoryRequest = this.userService.getDentists().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: users => {
         if (selectionVersion !== this.clinicSelectionVersion || this.clinic.value !== clinicId) return;
         this.users = users;
@@ -278,7 +276,9 @@ Do you want to proceed?` },
   private updateReferringDentists() {
     const last = this.latestPatientAppointment;
     const clinicId = last?.clinic._id || '';
-    const referring = this.users.filter(user => isBookableDentist(user, clinicId));
+    const referring = [...new Map(this.patientAppointments
+      .filter(appointment => appointment.clinic?._id === clinicId && appointment.dentist?._id)
+      .map(appointment => [appointment.dentist._id, appointment.dentist])).values()];
     this.selectReferringDentist = this.maptoOptions(this.setUsersKey(referring));
     this.rxReferralForm.patchValue({
       fromDoctorId: referring.some(dentist => dentist._id === last?.dentist?._id) ? last?.dentist?._id || '' : '',

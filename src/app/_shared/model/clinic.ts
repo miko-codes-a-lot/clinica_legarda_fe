@@ -1,6 +1,6 @@
 import { Branch } from "./branch"
 import { OperatingHour } from "./operating-hour"
-import { User } from "./user"
+import { DentistDirectoryEntry } from "./user-directory"
 
 export interface Clinic {
   _id?: string
@@ -9,6 +9,6 @@ export interface Clinic {
   mobileNumber: string
   emailAddress: string
   operatingHours: OperatingHour[]
-  dentists: User[]
+  dentists: DentistDirectoryEntry[]
   // branches: Branch[]
 }

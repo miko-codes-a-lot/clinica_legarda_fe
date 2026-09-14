@@ -48,7 +48,7 @@ describe('Patient appointment booking form', () => {
     const component = fixture.componentInstance;
     const dentist = TestBed.inject(MockService).mockUserBase();
     component.clinic.setValue('clinic-1');
-    http.expectOne('/users').flush([{ ...dentist, _id: 'dentist-1', clinic: 'clinic-1', role: 'dentist', status: 'confirmed' }]);
+    http.expectOne('/users/dentists').flush([{ ...dentist, _id: 'dentist-1', clinic: 'clinic-1', role: 'dentist', status: 'confirmed' }]);
     component.dentist.setValue('dentist-1');
     http.expectOne('/appointments/availability/dentist-1').flush([]);
     component.services.setValue(['service-1']);

@@ -1,4 +1,6 @@
-@if (clinics.length !== 0 && appointment) {
+@if (loadError) {
+  <p role="alert">{{ loadError }}</p>
+} @else if (clinics.length !== 0 && appointment) {
   <app-appointment-form
     [isLoading]="isLoading"
     [dentalServices]="dentalServices"
@@ -8,5 +10,9 @@
     (onSubmitEvent)="onSubmit($event)">
   </app-appointment-form>
 } @else {
-  <p>Fetching data...</p>
+  @if (isLoading) {
+    <p role="status">Loading appointment options...</p>
+  } @else {
+    <p>No appointment options are available.</p>
+  }
 }

@@ -2,6 +2,7 @@ import { ReferralStatus } from "../../_shared/model/referral"
 
 export interface ReferralPayload {
     _id?: string
+    patient?: string
     fromDoctorId: string
     fromClinicId: string
     reason?: string

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Appointment } from '../../../_shared/model/appointment';
 import { DentalService } from '../../../_shared/model/dental-service';
 import { Clinic } from '../../../_shared/model/clinic';
-import { User } from '../../../_shared/model/user';
+import { PatientDirectoryEntry } from '../../../_shared/model/user-directory';
 import { DentalServicesService } from '../../../_shared/service/dental-services-service';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
 import { ClinicService } from '../../../_shared/service/clinic-service';
@@ -20,13 +20,14 @@ import { AlertService } from '../../../_shared/service/alert.service';
   styleUrl: './appointment-update.css'
 })
 export class AppointmentUpdate {
+  loadError = ''
   isLoading = false
   id!: string
   appointment?: Appointment
 
   dentalServices: DentalService[] = []
   clinics: Clinic[] = []
-  patients: User[] = []
+  patients: PatientDirectoryEntry[] = []
 
   constructor(
     private readonly dentalServicesService: DentalServicesService,
@@ -48,7 +49,7 @@ export class AppointmentUpdate {
       appointment: this.appointmentService.getOne(this.id),
       services: this.dentalServicesService.getAll(),
       clinics: this.clinicService.getAll(),
-      patients: this.userService.getAll(),
+      patients: this.userService.getPatients(),
     }).subscribe({
       next: ({ appointment, services, clinics, patients }) => {
         this.appointment = appointment
@@ -56,7 +57,11 @@ export class AppointmentUpdate {
         this.clinics = clinics
         this.patients = patients
       },
-      error: (e) => this.alertService.error(e.error.message),
+      error: (e) => {
+        this.isLoading = false
+        this.loadError = 'Unable to load appointment options.'
+        this.alertService.error(e.error.message)
+      },
       complete: () => this.isLoading = false,
     })
   }

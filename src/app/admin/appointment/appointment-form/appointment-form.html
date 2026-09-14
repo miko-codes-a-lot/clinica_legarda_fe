@@ -1,8 +1,10 @@
 
-  @if (clinics.length === 0) {
-    <p>Fetching clinics...</p>
+  @if (isLoading) {
+    <p role="status">Loading appointment options...</p>
+  } @else if (clinics.length === 0) {
+    <p>No clinics are available.</p>
   } @else if (patients.length === 0) {
-    <p>Fetching patients...</p>
+    <p>No patients are available for you to schedule.</p>
   } @else {
       <app-form
         [form]="rxform"

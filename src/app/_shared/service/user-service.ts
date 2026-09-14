@@ -4,6 +4,7 @@ import { map, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { User } from '../model/user';
 import { StaffUserPayload } from '../model/staff-user-payload';
+import { DentistDirectoryEntry, PatientDirectoryEntry } from '../model/user-directory';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,14 @@ export class UserService {
 
   getAll(): Observable<User[]> { 
     return this.http.get<User[]>(this.baseUrl, { withCredentials: true });
+  }
+
+  getDentists(): Observable<DentistDirectoryEntry[]> {
+    return this.http.get<DentistDirectoryEntry[]>(`${this.baseUrl}/dentists`, { withCredentials: true });
+  }
+
+  getPatients(): Observable<PatientDirectoryEntry[]> {
+    return this.http.get<PatientDirectoryEntry[]>(`${this.baseUrl}/patients`, { withCredentials: true });
   }
 
   getOne(id: string): Observable<User> {

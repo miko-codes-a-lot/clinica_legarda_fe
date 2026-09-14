@@ -1,7 +1,8 @@
 import { AppointmentStatus } from './appointment';
 import { Clinic } from './clinic';
 import { OperatingHour } from './operating-hour';
-import { assignedClinicIds, User } from './user';
+import { assignedClinicIds } from './user';
+import { DentistDirectoryEntry } from './user-directory';
 
 /** The availability endpoint intentionally excludes patient and clinical details. */
 export interface AppointmentAvailability {
@@ -21,7 +22,7 @@ export interface DentistBookingSchedule {
 
 export interface BookingSlot { value: string; available: boolean; }
 
-export function isBookableDentist(dentist: User, clinicId: string): boolean {
+export function isBookableDentist(dentist: DentistDirectoryEntry, clinicId: string): boolean {
   return dentist.role === 'dentist' && dentist.status === 'confirmed' && assignedClinicIds(dentist).includes(clinicId);
 }
 
@@ -51,7 +52,7 @@ export function pickerDateFromStored(value: Date | string): Date {
 }
 
 export function createBookingSchedule(
-  dentist: DentistBookingSchedule,
+  dentist: Omit<DentistBookingSchedule, 'appointments'>,
   clinic: Pick<Clinic, 'operatingHours'>,
   appointments: readonly AppointmentAvailability[],
   excludeAppointmentId?: string,

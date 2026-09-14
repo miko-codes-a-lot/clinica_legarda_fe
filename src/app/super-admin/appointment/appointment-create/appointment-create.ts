@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Appointment } from '../../../_shared/model/appointment';
-import { User } from '../../../_shared/model/user';
+import { PatientDirectoryEntry } from '../../../_shared/model/user-directory';
 import { UserService } from '../../../_shared/service/user-service';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
 import { Router } from '@angular/router';
@@ -20,12 +20,13 @@ import { AlertService } from '../../../_shared/service/alert.service';
   styleUrl: './appointment-create.css'
 })
 export class AppointmentCreate {
+  loadError = ''
   isLoading = false
   initDoc!: Appointment
 
   dentalServices: DentalService[] = []
   clinics: Clinic[] = []
-  patients: User[] = []
+  patients: PatientDirectoryEntry[] = []
 
   constructor(
     private readonly dentalServicesService: DentalServicesService,
@@ -44,14 +45,18 @@ export class AppointmentCreate {
     forkJoin({
       services: this.dentalServicesService.getAll(),
       clinics: this.clinicService.getAll(),
-      patients: this.userService.getAll(),
+      patients: this.userService.getPatients(),
     }).subscribe({
       next: ({ services, clinics, patients }) => {
         this.dentalServices = services
         this.clinics = clinics
         this.patients = patients
       },
-      error: (e) => this.alertService.error(e.error.message),
+      error: (e) => {
+        this.isLoading = false
+        this.loadError = 'Unable to load appointment options.'
+        this.alertService.error(e.error.message)
+      },
       complete: () => this.isLoading = false,
     })
   }

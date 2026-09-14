@@ -46,7 +46,7 @@ describe('AppointmentCreate session restoration', () => {
     http.expectOne('/users/profile').flush(signedInPatient);
     http.expectOne('/dental-catalog').flush([]);
     http.expectOne('/clinics').flush([clinic]);
-    http.expectOne('/users').flush([]);
+    http.expectNone('/users');
     fixture.detectChanges();
     http.expectOne('/appointments').flush([]);
     http.expectOne('/reasons').flush([]);
@@ -65,7 +65,7 @@ describe('AppointmentCreate session restoration', () => {
     expect(fixture.nativeElement.querySelector('[role="status"]')).not.toBeNull();
     http.expectOne('/dental-catalog').flush([]);
     http.expectOne('/clinics').flush([]);
-    http.expectOne('/users').flush([]);
+    http.expectNone('/users');
   });
 
   it('offers login after the profile request confirms there is no session', () => {
@@ -80,7 +80,7 @@ describe('AppointmentCreate session restoration', () => {
     http.expectOne('/users/profile').flush(signedInPatient);
     http.expectOne('/dental-catalog').flush([]);
     http.expectOne('/clinics').flush([]);
-    http.expectOne('/users').flush([]);
+    http.expectNone('/users');
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.login-required')).toBeNull();
     expect(fixture.nativeElement.textContent).toContain('No clinics');

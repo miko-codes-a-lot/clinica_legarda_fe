@@ -1,8 +1,6 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Appointment } from '../../../_shared/model/appointment';
-import { User } from '../../../_shared/model/user';
-import { UserService } from '../../../_shared/service/user-service';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
 import { Router, RouterLink } from '@angular/router';
 import { catchError, EMPTY, finalize, forkJoin, switchMap } from 'rxjs';
@@ -37,13 +35,11 @@ export class AppointmentCreate {
 
   dentalServices: DentalService[] = []
   clinics: Clinic[] = []
-  patients: User[] = []
 
   constructor(
     private readonly dentalServicesService: DentalServicesService,
     private readonly appointmentService: AppointmentService,
     private readonly clinicService: ClinicService,
-    private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly router: Router,
     private readonly alertService: AlertService,
@@ -66,7 +62,6 @@ export class AppointmentCreate {
         return forkJoin({
           services: this.dentalServicesService.getAll(),
           clinics: this.clinicService.getAll(),
-          patients: this.userService.getAll(),
         }).pipe(
           catchError(() => {
             this.loadError = true
@@ -80,10 +75,9 @@ export class AppointmentCreate {
       }),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
-      next: ({ services, clinics, patients }) => {
+      next: ({ services, clinics }) => {
         this.dentalServices = services
         this.clinics = clinics
-        this.patients = patients
       },
     })
   }
@@ -94,7 +88,6 @@ export class AppointmentCreate {
     this.appointmentService.create(appointment).subscribe({
       next: (c) => this.router.navigate(['/app/my-appointment/details', c._id], { replaceUrl: true }),
       error: (e) => {
-        console.log("e.error", e.error)
         this.alertService.error(e.error.message)
       }
     }).add(() => this.isLoading = false)
