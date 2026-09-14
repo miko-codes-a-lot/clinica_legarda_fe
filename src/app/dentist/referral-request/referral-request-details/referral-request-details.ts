@@ -123,8 +123,9 @@ export class ReferralRequestDetails {
   }
 
   isActionDisabled(): boolean {
-    return this.isLoading || !this.referral?._id || this.referral.status !== ReferralStatus.PENDING ||
-      this.referral.fromDoctorId?._id !== this.authService.currentUserValue?._id;
+    const dentistId = this.authService.currentUserValue?._id;
+    return this.isLoading || !this.referral?._id || this.referral.status !== ReferralStatus.PENDING || !dentistId ||
+      (this.referral.fromDoctorId?._id !== dentistId && this.referral.appointment?.dentist?._id !== dentistId);
   }
 
   private getReasonLabel(code?: string): string {

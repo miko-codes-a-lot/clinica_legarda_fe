@@ -110,7 +110,7 @@ export class HomepageIndex implements OnInit {
         return dentistId ? this.referralService.getAll().pipe(
           map(referrals => referrals.filter(referral => {
             const fromId = typeof referral.fromDoctorId === 'string' ? referral.fromDoctorId : referral.fromDoctorId?._id;
-            return fromId === dentistId;
+            return fromId === dentistId || referral.appointment?.dentist?._id === dentistId;
           })),
           catchError(() => {
             this.referralError = 'Referral count unavailable.';

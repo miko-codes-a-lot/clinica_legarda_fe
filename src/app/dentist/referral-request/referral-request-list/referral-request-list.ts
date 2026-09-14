@@ -103,7 +103,7 @@ export class ReferralRequestList implements OnInit {
       switchMap(user => {
         this.isLoading = !!user;
         this.loadError = '';
-        return user ? this.referralService.getAllByDentist(user._id).pipe(
+        return user ? this.referralService.getAll().pipe(
           catchError(() => {
             this.loadError = 'Unable to load referrals.';
             return of([] as Referral[]);

@@ -1,4 +1,4 @@
-import { DentistDirectoryEntry, PatientDirectoryEntry } from "./user-directory"
+import { PersonSummary, PatientDirectoryEntry } from "./user-directory"
 import { Clinic } from './clinic'
 import { Appointment } from "./appointment"
 import { Reason } from "./reason"
@@ -12,7 +12,7 @@ export enum ReferralStatus {
 
 export interface Referral {
   _id?: string
-  fromDoctorId: DentistDirectoryEntry
+  fromDoctorId: PersonSummary
   fromClinicId: Clinic
   reason?: string
   appointment: ReferralAppointment | null
@@ -23,7 +23,7 @@ export interface Referral {
 
 export type ReferralAppointment = Pick<Appointment,
   '_id' | 'clinic' | 'services' | 'date' | 'startTime' | 'endTime' | 'status'> & {
-    dentist: DentistDirectoryEntry;
+    dentist: PersonSummary;
     patient: PatientDirectoryEntry;
     notes?: { patientNotes?: string };
   };
