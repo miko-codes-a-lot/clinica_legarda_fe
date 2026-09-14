@@ -81,28 +81,34 @@
     }
   </app-list>
 
-  <div class="action-buttons">
-    <button mat-stroked-button color="warn" 
-            (click)="cancelAppointment()" 
-            *ngIf="appointment.status === 'confirmed' else notConfirmed">
-      <mat-icon>cancel</mat-icon> Cancel
-    </button>
-  </div>
-  <ng-template #notConfirmed>
-    <div class="action-buttons" >
-      <button mat-flat-button color="primary" 
-              (click)="approveAppointment()" 
-              [disabled]="isActionDisabled()">
+  <section class="history-section">
+    <h3>Appointment history</h3>
+    @for (entry of appointment.history; track $index) {
+      <article>
+        <strong>{{ entry.action }}</strong>
+        <p>{{ entry.timestamp | date:'medium':'+0800' }}</p>
+        @if (actorLabel(entry)) { <p>By {{ actorLabel(entry) }}</p> }
+        @if (entry.reason) { <p><strong>Reason:</strong> {{ entry.reason }}</p> }
+      </article>
+    } @empty { <p>No history available.</p> }
+  </section>
+  @if (appointment.status === 'confirmed') {
+    <div class="action-buttons">
+      <button mat-stroked-button color="warn" (click)="cancelAppointment()" [disabled]="isLoading">
+        <mat-icon>cancel</mat-icon> Cancel
+      </button>
+    </div>
+  }
+  @if (appointment.status === 'pending') {
+    <div class="action-buttons">
+      <button mat-flat-button color="primary" (click)="approveAppointment()" [disabled]="isActionDisabled()">
         <mat-icon>check</mat-icon> Approve
       </button>
-
-      <button mat-stroked-button color="warn" 
-              (click)="declineAppointment()" 
-              [disabled]="isActionDisabled()">
+      <button mat-stroked-button color="warn" (click)="declineAppointment()" [disabled]="isActionDisabled()">
         <mat-icon>close</mat-icon> Reject
       </button>
     </div>
-  </ng-template>
+  }
 } @else {
   <p>Fetching details...</p>
 }

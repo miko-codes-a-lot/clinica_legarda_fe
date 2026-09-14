@@ -1,5 +1,5 @@
 @if (loadError) {
-  <p role="alert">{{ loadError }} <button type="button" (click)="loadAppointment()">Try again</button></p>
+  <p role="alert">{{ loadError }} <button type="button" (click)="loadAppointment()" [disabled]="isBusy">Try again</button></p>
 }
 @if (appointment) {
   <div class="view-header">
@@ -22,7 +22,7 @@
       <div class="note-item clinic-notes">
         <div class="note-header">
           <strong>Clinic Notes:</strong>
-          <button mat-icon-button color="primary" (click)="openNotesDialog()" [disabled]="isClinicNotesDisabled()">
+          <button mat-icon-button color="primary" aria-label="Edit clinic notes" (click)="openNotesDialog()" [disabled]="isClinicNotesDisabled()">
             <mat-icon>edit</mat-icon>
           </button>
         </div>
@@ -94,6 +94,7 @@
       <article class="activity-entry">
         <strong>{{ entry.action }}</strong>
         <time>{{ entry.timestamp | date:'MMM d, yyyy, h:mm a':'+0800' }}</time>
+        @if (actorLabel(entry); as actor) { <p><strong>Changed by:</strong> {{ actor }}</p> }
         @if (entry.reason) { <p><strong>Reason:</strong> {{ entry.reason }}</p> }
       </article>
     } @empty { <p>No appointment activity yet.</p> }
@@ -103,7 +104,9 @@
   <div class="row-divider"></div>
   <div class="history-body">
     <h3 class="history-title">Previous Appointments/History</h3>
-    @if (historyError) { <p role="alert">{{ historyError }}</p> }
+    @if (historyError) {
+      <p role="alert">{{ historyError }} <button type="button" (click)="loadAppointment()" [disabled]="isBusy">Try again</button></p>
+    }
 
     <div *ngIf="appointmentHistory && appointmentHistory.length; else noHistory">
       <app-generic-table
@@ -119,30 +122,39 @@
     </ng-template>
   </div>
 
-  <!-- Approve / Decline Buttons -->
-
-  <div class="action-buttons">
-    <button mat-stroked-button color="warn" 
-            (click)="cancelAppointment()" [disabled]="isLoading"
-            *ngIf="appointment.status === 'confirmed' else notConfirmed">
-      <mat-icon>cancel</mat-icon> Cancel
-    </button>
-  </div>
-  <ng-template #notConfirmed>
-    <div class="action-buttons" >
-      <button mat-flat-button color="primary" 
-              (click)="approveAppointment()" 
-              [disabled]="isActionDisabled()">
-        <mat-icon>check</mat-icon> Approve
+  @if (actionError) {
+    <p class="action-feedback" role="alert">
+      {{ actionError }}
+      <button type="button" (click)="loadAppointment()" [disabled]="isBusy">Reload appointment</button>
+    </p>
+  }
+  @if (isSaving) { <p class="action-feedback" role="status">Saving appointment...</p> }
+  @if (isActive) {
+    <div class="action-buttons">
+      @if (appointment.status === 'pending') {
+        <button mat-flat-button color="primary" (click)="approveAppointment()" [disabled]="isBusy">
+          <mat-icon>check</mat-icon> Approve
+        </button>
+        <button mat-stroked-button color="warn" (click)="declineAppointment()" [disabled]="isBusy">
+          <mat-icon>close</mat-icon> Reject
+        </button>
+      }
+      @if (appointment.status === 'confirmed') {
+        <button mat-flat-button color="primary" (click)="completeAppointment()" [disabled]="isBusy">
+          <mat-icon>task_alt</mat-icon> Completed
+        </button>
+        <button mat-stroked-button (click)="noShowAppointment()" [disabled]="isBusy">
+          <mat-icon>person_off</mat-icon> No show
+        </button>
+      }
+      <button mat-stroked-button (click)="rescheduleAppointment()" [disabled]="isBusy">
+        <mat-icon>event</mat-icon> Reschedule
       </button>
-
-      <button mat-stroked-button color="warn" 
-              (click)="declineAppointment()" 
-              [disabled]="isActionDisabled()">
-        <mat-icon>close</mat-icon> Reject
+      <button mat-stroked-button color="warn" (click)="cancelAppointment()" [disabled]="isBusy">
+        <mat-icon>cancel</mat-icon> Cancel
       </button>
     </div>
-  </ng-template>
+  }
 
 } @else {
   @if (!loadError) { <p>Fetching details...</p> }

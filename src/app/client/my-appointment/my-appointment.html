@@ -19,7 +19,7 @@
          <div *ngFor="let appointment of confirmedAppointments" class="appointment-card confirmed">
 
           <div class="appointment-date">
-            <span class="date">{{ appointment.date | date:'mediumDate' }}</span>
+            <span class="date">{{ appointment.date | date:'mediumDate':'+0000' }}</span>
             <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
           </div>
 
@@ -29,12 +29,8 @@
               <li *ngFor="let s of appointment.services">{{ s.name }}</li>
             </ul>
             <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
-            <p>Clinic: {{ appointment.clinic.address }}</p>
-            @for (entry of appointment.history; track $index) {
-              @if (entry.reason) {
-                <p class="change-reason"><strong>{{ entry.action }} Reason:</strong> {{ entry.reason }}</p>
-              }
-            }
+            <p>Clinic: {{ appointment.clinic.name }} — {{ appointment.clinic.address }}</p>
+            <ng-container *ngTemplateOutlet="activity; context: { $implicit: appointment }"></ng-container>
 
             <!-- Patient Notes -->
             <p *ngIf="appointment.notes.patientNotes">
@@ -84,7 +80,7 @@
       <div *ngIf="hasPendingAppointments; else noPending">
         <div *ngFor="let appointment of pendingAppointments" class="appointment-card pending">
           <div class="appointment-date">
-            <span class="date">{{ appointment.date | date:'mediumDate' }}</span>
+            <span class="date">{{ appointment.date | date:'mediumDate':'+0000' }}</span>
             <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
           </div>
           <div class="appointment-details">
@@ -93,12 +89,8 @@
               <li *ngFor="let s of appointment.services">{{ s.name }}</li>
             </ul>
             <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
-            <p>Clinic: {{ appointment.clinic.address }}</p>
-            @for (entry of appointment.history; track $index) {
-              @if (entry.reason) {
-                <p class="change-reason"><strong>{{ entry.action }} Reason:</strong> {{ entry.reason }}</p>
-              }
-            }
+            <p>Clinic: {{ appointment.clinic.name }} — {{ appointment.clinic.address }}</p>
+            <ng-container *ngTemplateOutlet="activity; context: { $implicit: appointment }"></ng-container>
             <!-- Patient Notes -->
             <p *ngIf="appointment.notes.patientNotes">
               <strong>Patient Notes:</strong> {{ appointment.notes.patientNotes }}
@@ -130,7 +122,7 @@
       <div *ngIf="hasRejectedAppointments; else noRejected">
         <div *ngFor="let appointment of rejectedAppointments" class="appointment-card rejected">
           <div class="appointment-date">
-            <span class="date">{{ appointment.date | date:'mediumDate' }}</span>
+            <span class="date">{{ appointment.date | date:'mediumDate':'+0000' }}</span>
             <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
           </div>
           <div class="appointment-details">
@@ -139,12 +131,8 @@
               <li *ngFor="let s of appointment.services">{{ s.name }}</li>
             </ul>
             <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
-            <p>Clinic: {{ appointment.clinic.address }}</p>
-            @for (entry of appointment.history; track $index) {
-              @if (entry.reason) {
-                <p class="change-reason"><strong>{{ entry.action }} Reason:</strong> {{ entry.reason }}</p>
-              }
-            }
+            <p>Clinic: {{ appointment.clinic.name }} — {{ appointment.clinic.address }}</p>
+            <ng-container *ngTemplateOutlet="activity; context: { $implicit: appointment }"></ng-container>
             @if(appointment.referral?.status === 'rejected') {
               <b>Rejected By the Referring Dentist</b>
               <p>- Reason for Rejection: {{ getReasonLabel(appointment.referral?.reasonOfDecline) }}</p>
@@ -168,7 +156,7 @@
       <div *ngIf="hasCancelledAppointments; else noCancelled">
         <div *ngFor="let appointment of cancelledAppointments" class="appointment-card cancelled">
           <div class="appointment-date">
-            <span class="date">{{ appointment.date | date:'mediumDate' }}</span>
+            <span class="date">{{ appointment.date | date:'mediumDate':'+0000' }}</span>
             <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
           </div>
           <div class="appointment-details">
@@ -177,12 +165,8 @@
               <li *ngFor="let s of appointment.services">{{ s.name }}</li>
             </ul>
             <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
-            <p>Clinic: {{ appointment.clinic.address }}</p>
-            @for (entry of appointment.history; track $index) {
-              @if (entry.reason) {
-                <p class="change-reason"><strong>{{ entry.action }} Reason:</strong> {{ entry.reason }}</p>
-              }
-            }
+            <p>Clinic: {{ appointment.clinic.name }} — {{ appointment.clinic.address }}</p>
+            <ng-container *ngTemplateOutlet="activity; context: { $implicit: appointment }"></ng-container>
           </div>
           <div class="appointment-status">
             <span class="status-badge cancelled">
@@ -194,5 +178,45 @@
       <ng-template #noCancelled><p class="no-appointments">No cancelled appointments.</p></ng-template>
     </div>
 
+
+    <div class="appointment-group">
+      <h2 class="group-title"><mat-icon>history</mat-icon> Completed and no-show appointments</h2>
+      @for (appointment of finishedAppointments; track appointment._id) {
+        <article class="appointment-card" [class.completed]="appointment.status === AppointmentStatus.COMPLETED"
+                 [class.no-show]="appointment.status === AppointmentStatus.NO_SHOW">
+          <div class="appointment-date">
+            <span class="date">{{ appointment.date | date:'mediumDate':'+0000' }}</span>
+            <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
+          </div>
+          <div class="appointment-details">
+            <h3>Services:</h3>
+            <ul>@for (service of appointment.services; track service._id) { <li>{{ service.name }}</li> }</ul>
+            <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
+            <p>Clinic: {{ appointment.clinic.name }} — {{ appointment.clinic.address }}</p>
+            @if (appointment.notes.patientNotes) { <p><strong>Patient notes:</strong> {{ appointment.notes.patientNotes }}</p> }
+            @if (appointment.notes.clinicNotes) { <p><strong>Dentist notes:</strong> {{ appointment.notes.clinicNotes }}</p> }
+            <ng-container *ngTemplateOutlet="activity; context: { $implicit: appointment }"></ng-container>
+          </div>
+          <div class="appointment-status">
+            <span class="status-badge">{{ statusLabel(appointment.status) }}</span>
+          </div>
+        </article>
+      } @empty { <p class="no-appointments">No completed or no-show appointments.</p> }
+    </div>
+
   </section>
 </div>
+
+<ng-template #activity let-appointment>
+  <details class="appointment-activity">
+    <summary>Appointment activity</summary>
+    @for (entry of appointment.history; track $index) {
+      <div class="activity-entry">
+        <strong>{{ entry.action }}</strong>
+        <p>{{ entry.timestamp | date:'MMM d, yyyy, h:mm a':'+0800' }}</p>
+        @if (actorLabel(entry)) { <p>By {{ actorLabel(entry) }}</p> }
+        @if (entry.reason) { <p class="change-reason"><strong>Reason:</strong> {{ entry.reason }}</p> }
+      </div>
+    } @empty { <p>No appointment activity yet.</p> }
+  </details>
+</ng-template>

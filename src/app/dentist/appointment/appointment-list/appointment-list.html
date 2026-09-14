@@ -55,7 +55,7 @@
   }
 </div>
 @if (!isLoading && !errorMessage && dataSource.data.length === 0) {
-  <p class="empty-filter" role="status">No {{ selectedStatus === 'all' ? '' : selectedStatus }} appointments found.</p>
+  <p class="empty-filter" role="status">No {{ selectedStatus === 'all' ? '' : statusLabel(selectedStatus).toLowerCase() }} appointments found.</p>
 }
 <app-generic-table
   [displayedColumns]="displayedColumns"

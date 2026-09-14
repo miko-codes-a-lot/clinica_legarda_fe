@@ -7,6 +7,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { AppointmentPayload } from '../../admin/appointment/appointment-payload';
 import { ReferralPayload } from '../../admin/appointment/referral-payload';
 import { Appointment, AppointmentStatus } from '../../_shared/model/appointment';
+import { isPreviousTreatment } from '../../_shared/model/appointment-history';
 import { DentistDirectoryEntry } from '../../_shared/model/user-directory';
 import { RxAppointmentForm } from './rx-appointment-form';
 import { RxReferralForm } from './rx-referral-form';
@@ -456,8 +457,7 @@ Do you want to proceed?` },
     const patientId = this.user?._id;
     const now = new Date();
     this.patientAppointments = this.appointments.filter(appointment =>
-      appointment.patient?._id === patientId && appointment.status === 'confirmed' &&
-      pickerDateFromStored(appointment.date) < now,
+      appointment.patient?._id === patientId && isPreviousTreatment(appointment, now),
     ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 

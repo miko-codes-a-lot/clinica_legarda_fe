@@ -70,9 +70,9 @@
 
     <!-- MEDICAL HISTORY TAB -->
     <div *ngIf="activeTab === 'history'" class="history-container">
-      <h3>Medical History</h3>
+      <h3>Appointment history</h3>
 
-      <div *ngIf="appointments.length; else noHistory">
+      <div *ngIf="latestAppointments.length; else noHistory">
         <app-generic-table
           [displayedColumns]="displayedColumns"
           [columnDefs]="columnDefs"
@@ -83,7 +83,7 @@
       </div>
 
       <ng-template #noHistory>
-        <p>No medical history found.</p>
+        <p>No appointment history found.</p>
       </ng-template>
 </div>
 

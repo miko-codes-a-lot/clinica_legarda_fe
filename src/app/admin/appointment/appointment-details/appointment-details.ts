@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { Appointment } from '../../../_shared/model/appointment';
+import { appointmentActorLabel, appointmentStatusLabel } from '../../../_shared/model/appointment-history';
+import { formatAppointmentDate } from '../../../dentist/appointment/appointment-schedule';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ListComponent } from '../../../_shared/component/list/list.component';
@@ -18,10 +20,11 @@ selector: 'app-appointment-details',
   styleUrl: './appointment-details.css'
 })
 export class AppointmentDetails {
+  readonly actorLabel = appointmentActorLabel;
   isLoading = false
   id!: string
   appointment?: Appointment
-  displayAppointment: Record<string, any> = {};
+  displayAppointment: Record<string, string> = {};
 
   constructor(
     private readonly appointmentService: AppointmentService,
@@ -40,8 +43,8 @@ export class AppointmentDetails {
       next: (a) => {
         const { status, date, startTime, endTime, clinic: clinicData, dentist: dentistData, patient: patientData } = a
         this.displayAppointment = {
-          status,
-          date,
+          status: appointmentStatusLabel(status),
+          date: formatAppointmentDate(date),
           time: startTime + ' - ' + endTime,
           clinic: clinicData.name,
           clinicAddress: clinicData.address,
@@ -49,7 +52,6 @@ export class AppointmentDetails {
           patient: patientData.firstName + ' ' + patientData.lastName,
         }
         this.appointment = a
-        console.log('this.displayAppointment', this.displayAppointment);
       },
       error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
@@ -64,7 +66,7 @@ export class AppointmentDetails {
   }
 
   isClinicEditDisabled() {
-    return this.appointment && ['rejected', 'cancelled', 'confirmed'].includes(this.appointment.status);
+    return this.isLoading || !this.appointment || this.appointment.status !== 'pending';
   }
 
   openNotesDialog() {

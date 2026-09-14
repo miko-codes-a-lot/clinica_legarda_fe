@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { catchError, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { Appointment, AppointmentStatus } from '../../../_shared/model/appointment';
+import { appointmentStatusLabel } from '../../../_shared/model/appointment-history';
 import { AppointmentClinicOption, filterAppointments } from '../../../_shared/model/appointment-filters';
 import { Notification } from '../../../_shared/model/notification';
 import { Referral } from '../../../_shared/model/referral';
@@ -31,6 +32,7 @@ interface CalendarDay {
   providers: [DentistAppointmentFeed],
 })
 export class HomepageIndex implements OnInit {
+  readonly statusLabel = appointmentStatusLabel;
   private readonly destroyRef = inject(DestroyRef);
   private readonly feed = inject(DentistAppointmentFeed);
   private readonly authService = inject(AuthService);

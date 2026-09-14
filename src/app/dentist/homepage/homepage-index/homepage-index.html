@@ -129,7 +129,7 @@
                     </div>
                     <small>{{ appointment.clinic.name }}</small>
                   </td>
-                  <td><span class="status" [class.pending]="appointment.status === 'pending'">{{ appointment.status }}</span></td>
+                  <td><span class="status" [class.pending]="appointment.status === 'pending'">{{ statusLabel(appointment.status) }}</span></td>
                 </tr>
               }
             </tbody>
@@ -156,7 +156,7 @@
               <p>{{ formatDate(appointment.date) }} · {{ appointment.startTime }}–{{ appointment.endTime }}</p>
               <p>{{ appointment.clinic.name }}</p>
             </div>
-            <span class="status" [class.pending]="appointment.status === 'pending'">{{ appointment.status }}</span>
+            <span class="status" [class.pending]="appointment.status === 'pending'">{{ statusLabel(appointment.status) }}</span>
           </article>
         } @empty { <p class="empty">{{ isLoading ? 'Loading appointments…' : 'No upcoming appointments.' }}</p> }
       </div>

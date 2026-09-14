@@ -171,3 +171,10 @@ button mat-icon {
   font-size: 18px;
   vertical-align: middle;
 }
+
+.appointment-card.completed { border-left: 4px solid #237a49; }
+.appointment-card.no-show { border-left: 4px solid #805b12; }
+.appointment-activity { margin-top: 12px; }
+.appointment-activity summary { cursor: pointer; font-weight: 600; }
+.activity-entry { padding: 10px 0; border-bottom: 1px solid #ddd; }
+.activity-entry p { margin: 4px 0; }

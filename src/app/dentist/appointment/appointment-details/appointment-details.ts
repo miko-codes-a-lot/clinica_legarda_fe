@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, finalize, Observable, of, switchMap, tap } from 'rxjs';
 import { Appointment } from '../../../_shared/model/appointment';
+import { appointmentActorLabel, appointmentStatusLabel, isAppointmentHistory } from '../../../_shared/model/appointment-history';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ListComponent } from '../../../_shared/component/list/list.component';
@@ -12,10 +13,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { NotesDialogComponent } from '../../../_shared/component/dialog/notes-dialog/notes-dialog.component';
 import { CancelAppointmentDialogComponent } from '../../../_shared/component/dialog/cancel-appointment-dialog/cancel-appointment-dialog.component';
+import { ConfirmDialogComponent } from '../../../_shared/component/dialog/confirm-dialog/confirm-dialog.component';
+import { RescheduleDialogComponent, RescheduleDialogData, RescheduleDialogResult } from '../../../_shared/component/dialog/reschedule-dialog/reschedule-dialog.component';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { AlertService } from '../../../_shared/service/alert.service';
-import { appointmentDateKey, clinicClock, compareAppointmentSchedule, formatAppointmentDate } from '../appointment-schedule';
+import { compareAppointmentSchedule, formatAppointmentDate } from '../appointment-schedule';
 
 @Component({
   selector: 'app-appointment-details',
@@ -26,6 +29,10 @@ import { appointmentDateKey, clinicClock, compareAppointmentSchedule, formatAppo
 export class AppointmentDetails {
   private readonly destroyRef = inject(DestroyRef);
   isLoading = false;
+  isSaving = false;
+  isDialogOpen = false;
+  actionError = '';
+  readonly actorLabel = appointmentActorLabel;
   id = '';
   appointment?: Appointment;
   appointmentHistory: Appointment[] = [];
@@ -42,7 +49,7 @@ export class AppointmentDetails {
     { key: 'dentist', label: 'Dentist', cell: (appointment: Appointment) => `${appointment.dentist.firstName} ${appointment.dentist.lastName}` },
     { key: 'date', label: 'Date', cell: (appointment: Appointment) => formatAppointmentDate(appointment.date) },
     { key: 'time', label: 'Time', cell: (appointment: Appointment) => `${appointment.startTime} - ${appointment.endTime}` },
-    { key: 'status', label: 'Status', cell: (appointment: Appointment) => appointment.status },
+    { key: 'status', label: 'Status', cell: (appointment: Appointment) => appointmentStatusLabel(appointment.status) },
     { key: 'notes.clinicNotes', label: 'Clinic Notes', cell: (appointment: Appointment) => appointment.notes.clinicNotes },
     { key: 'notes.patientNotes', label: 'Patient Notes', cell: (appointment: Appointment) => appointment.notes.patientNotes },
   ];
@@ -60,30 +67,18 @@ export class AppointmentDetails {
   }
 
   loadAppointment(): void {
+    if (this.isBusy) return;
     this.isLoading = true;
     this.loadError = '';
+    this.actionError = '';
     this.historyError = '';
     this.id = this.route.snapshot.params['id'];
     this.appointmentService.getOne(this.id).pipe(
       tap(appointment => this.setAppointment(appointment)),
-      switchMap(appointment => this.appointmentService.getAll(appointment.patient._id).pipe(
-        catchError(() => {
-          this.historyError = 'Previous appointments could not be loaded.';
-          return of([]);
-        }),
-      )),
+      switchMap(appointment => this.loadHistory(appointment)),
       takeUntilDestroyed(this.destroyRef),
       finalize(() => this.isLoading = false),
     ).subscribe({
-      next: appointments => {
-        const now = clinicClock();
-        this.appointmentHistory = appointments.filter(appointment => {
-          const date = appointmentDateKey(appointment.date);
-          return appointment.patient._id === this.appointment?.patient._id && appointment.status === 'confirmed' &&
-            (date < now.date || (date === now.date && appointment.endTime < now.time));
-        }).sort((a, b) => compareAppointmentSchedule(b, a));
-        this.dataSource.data = this.appointmentHistory;
-      },
       error: () => this.loadError = 'Appointment details could not be loaded. Please try again.',
     });
   }
@@ -105,9 +100,11 @@ export class AppointmentDetails {
   openNotesDialog(): void {
     if (!this.appointment || this.isClinicNotesDisabled()) return;
     const appointmentId = this.appointment._id;
+    this.isDialogOpen = true;
     this.dialog.open<NotesDialogComponent, { clinicNotes: string }, string>(NotesDialogComponent, {
       data: { clinicNotes: this.appointment.notes.clinicNotes },
     }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(notes => {
+      this.isDialogOpen = false;
       if (notes !== undefined) {
         this.saveAppointment(this.appointmentService.updateDentistNotes(appointmentId, notes), 'Clinic notes updated successfully!');
       }
@@ -115,21 +112,79 @@ export class AppointmentDetails {
   }
 
   isActionDisabled(): boolean {
-    return this.isLoading || !this.appointment || this.appointment.status !== 'pending';
+    return this.isBusy || !this.appointment || this.appointment.status !== 'pending';
   }
 
   isClinicNotesDisabled(): boolean {
-    return this.isLoading || !this.appointment || ['rejected', 'cancelled'].includes(this.appointment.status);
+    return this.isBusy || !this.appointment || ['rejected', 'cancelled'].includes(this.appointment.status);
+  }
+
+  get isBusy(): boolean {
+    return this.isLoading || this.isDialogOpen;
+  }
+
+  get isActive(): boolean {
+    return this.appointment?.status === 'pending' || this.appointment?.status === 'confirmed';
   }
 
   cancelAppointment(): void {
-    if (!this.appointment || this.appointment.status !== 'confirmed' || this.isLoading) return;
+    if (!this.appointment || !this.isActive || this.isBusy) return;
     const appointmentId = this.appointment._id;
+    this.isDialogOpen = true;
     this.dialog.open<CancelAppointmentDialogComponent, undefined, string>(CancelAppointmentDialogComponent, {
       width: '460px', maxWidth: '95vw',
     }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(reason => {
+      this.isDialogOpen = false;
       if (reason?.trim()) {
         this.saveAppointment(this.appointmentService.cancelAppointment(appointmentId, reason.trim()), 'Appointment cancelled successfully!');
+      }
+    });
+  }
+
+  completeAppointment(): void {
+    this.confirmOutcome('completed');
+  }
+
+  noShowAppointment(): void {
+    this.confirmOutcome('no_show');
+  }
+
+  rescheduleAppointment(): void {
+    if (!this.appointment || !this.isActive || this.isBusy) return;
+    const appointment = this.appointment;
+    this.isDialogOpen = true;
+    this.dialog.open<RescheduleDialogComponent, RescheduleDialogData, RescheduleDialogResult>(RescheduleDialogComponent, {
+      width: '560px', maxWidth: '95vw',
+      data: {
+        appointmentId: appointment._id, clinic: appointment.clinic, dentist: appointment.dentist,
+        date: appointment.date, startTime: appointment.startTime, endTime: appointment.endTime,
+      },
+    }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
+      this.isDialogOpen = false;
+      if (result) {
+        this.saveAppointment(this.appointmentService.rescheduleAppointment(appointment._id, result),
+          'Appointment rescheduled and awaiting approval.');
+      }
+    });
+  }
+
+  private confirmOutcome(outcome: 'completed' | 'no_show'): void {
+    if (!this.appointment || this.appointment.status !== 'confirmed' || this.isBusy) return;
+    const appointmentId = this.appointment._id;
+    const message = outcome === 'completed'
+      ? 'Mark this appointment as completed? Confirm that the patient attended and the visit is finished. This final outcome cannot be changed or rescheduled. Clinical notes and history will remain available.'
+      : 'Mark this appointment as no show? Confirm that the patient did not attend. This final outcome cannot be changed or rescheduled. Clinical notes and history will remain available.';
+    this.isDialogOpen = true;
+    this.dialog.open<ConfirmDialogComponent, { message: string }, boolean>(ConfirmDialogComponent, {
+      width: '460px', maxWidth: '95vw', data: { message },
+    }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(confirmed => {
+      this.isDialogOpen = false;
+      if (confirmed === true) {
+        const request = outcome === 'completed'
+          ? this.appointmentService.completeAppointment(appointmentId)
+          : this.appointmentService.noShowAppointment(appointmentId);
+        this.saveAppointment(request, outcome === 'completed'
+          ? 'Appointment completed successfully!' : 'Appointment marked as no show.');
       }
     });
   }
@@ -137,7 +192,7 @@ export class AppointmentDetails {
   private setAppointment(appointment: Appointment): void {
     this.appointment = appointment;
     this.displayAppointment = {
-      status: appointment.status, date: formatAppointmentDate(appointment.date),
+      status: appointmentStatusLabel(appointment.status), date: formatAppointmentDate(appointment.date),
       time: `${appointment.startTime} - ${appointment.endTime}`,
       clinic: appointment.clinic.name, clinicAddress: appointment.clinic.address,
       dentist: `${appointment.dentist.firstName} ${appointment.dentist.lastName}`,
@@ -146,15 +201,44 @@ export class AppointmentDetails {
   }
 
   private saveAppointment(request: Observable<Appointment>, successMessage: string): void {
+    if (this.isBusy) return;
     this.isLoading = true;
-    request.pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.isLoading = false)).subscribe({
-      next: appointment => {
-        // Status/notes responses contain only the referral ID; these actions do not change the referral.
+    this.isSaving = true;
+    this.actionError = '';
+    request.pipe(
+      tap(appointment => {
+        // Retain populated referral details for older API responses containing only its ID.
         const referral = typeof appointment.referral === 'string' ? this.appointment?.referral : appointment.referral;
         this.setAppointment({ ...appointment, referral });
+        this.setHistory([...this.appointmentHistory.filter(previous => previous._id !== appointment._id), appointment]);
         this.alertService.success(successMessage);
+      }),
+      switchMap(appointment => this.loadHistory(appointment)),
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => { this.isLoading = false; this.isSaving = false; }),
+    ).subscribe({
+      error: () => {
+        this.actionError = 'The appointment could not be updated. Your current details are still shown. Please try the action again.';
+        this.alertService.error(this.actionError);
       },
-      error: () => this.alertService.error('The appointment could not be updated. Please try again.'),
     });
+  }
+
+  private loadHistory(appointment: Appointment): Observable<Appointment[]> {
+    this.historyError = '';
+    return this.appointmentService.getAll(appointment.patient._id).pipe(
+      tap(appointments => this.setHistory(appointments)),
+      catchError(() => {
+        this.historyError = 'Previous appointments could not be refreshed. Please try again.';
+        return of(this.appointmentHistory);
+      }),
+    );
+  }
+
+  private setHistory(appointments: Appointment[]): void {
+    this.appointmentHistory = appointments.filter(appointment =>
+      appointment.patient._id === this.appointment?.patient._id && isAppointmentHistory(appointment),
+    ).sort((a, b) => compareAppointmentSchedule(b, a));
+    this.dataSource.data = this.appointmentHistory;
   }
 }

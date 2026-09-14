@@ -6,6 +6,7 @@ import { AuthService } from '../../_shared/service/auth-service';
 import { AppointmentService } from '../../_shared/service/appointment-service';
 import { ReasonService } from '../../_shared/service/reason-service';
 import { Appointment, AppointmentStatus } from '../../_shared/model/appointment';
+import { appointmentActorLabel, appointmentHasEnded, appointmentStatusLabel } from '../../_shared/model/appointment-history';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -35,6 +36,8 @@ import { AlertService } from '../../_shared/service/alert.service';
 })
 export class MyAppointment {
   AppointmentStatus = AppointmentStatus;
+  readonly actorLabel = appointmentActorLabel;
+  readonly statusLabel = appointmentStatusLabel;
   private readonly destroyRef = inject(DestroyRef);
 
   constructor(
@@ -134,14 +137,7 @@ export class MyAppointment {
   }
 
   isAppointmentPast(appointment: Appointment): boolean {
-    if (!appointment?.date || !appointment?.endTime) return false;
-
-    const appointmentDate = new Date(appointment.date);
-
-    const [hours, minutes] = appointment.endTime.split(':').map(Number);
-    appointmentDate.setHours(hours, minutes, 0, 0);
-
-    return appointmentDate.getTime() < new Date().getTime();
+    return appointmentHasEnded(appointment);
   }
 
   // ✅ Computed lists
@@ -156,6 +152,12 @@ export class MyAppointment {
   }
   get cancelledAppointments(): Appointment[] {
     return this.upcomingAppointmentsData.filter(a => a.status === AppointmentStatus.CANCELLED);
+  }
+
+  get finishedAppointments(): Appointment[] {
+    return this.upcomingAppointmentsData.filter(a =>
+      a.status === AppointmentStatus.COMPLETED || a.status === AppointmentStatus.NO_SHOW,
+    ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 
   // ✅ Booleans

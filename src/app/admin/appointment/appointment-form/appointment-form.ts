@@ -6,6 +6,7 @@ import { Component, EventEmitter, Input, Output, DestroyRef, inject } from '@ang
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AppointmentPayload } from '../appointment-payload';
 import { Appointment, AppointmentStatus } from '../../../_shared/model/appointment';
+import { isPreviousTreatment } from '../../../_shared/model/appointment-history';
 import { DentistDirectoryEntry, PatientDirectoryEntry } from '../../../_shared/model/user-directory';
 import { RxAppointmentForm } from './rx-appointment-form';
 import { DentalService } from '../../../_shared/model/dental-service';
@@ -370,8 +371,7 @@ Do you want to proceed?` },
     const patientId = this.patient.value;
     const now = new Date();
     this.patientAppointments = this.appointments.filter(appointment =>
-      appointment.patient?._id === patientId && appointment.status === 'confirmed' &&
-      pickerDateFromStored(appointment.date) < now,
+      appointment.patient?._id === patientId && isPreviousTreatment(appointment, now),
     ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 

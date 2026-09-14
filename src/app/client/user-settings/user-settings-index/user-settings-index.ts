@@ -19,6 +19,8 @@ import { GenericTableComponent } from '../../../_shared/component/table/generic-
 import { MatTableDataSource } from '@angular/material/table';
 
 import { Appointment } from '../../../_shared/model/appointment';
+import { appointmentStatusLabel, isAppointmentHistory } from '../../../_shared/model/appointment-history';
+import { formatAppointmentDate } from '../../../dentist/appointment/appointment-schedule';
 import { ClinicService } from '../../../_shared/service/clinic-service';
 import { Clinic } from '../../../_shared/model/clinic';
 
@@ -64,11 +66,11 @@ export class UserSettingsIndex implements OnInit {
 
   activeTab: 'profile' | 'history' = 'profile';
 
-  latestAppointments?: Appointment[] = [];;
-  appointments: any[] = [];
+  latestAppointments: Appointment[] = [];
+  appointments: Appointment[] = [];
   showAllHistory = false;
 
-  displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date'];
+  displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date', 'status'];
   columnDefs = [
     { key: 'clinic', label: 'Clinic', cell: (latestAppointments: Appointment) => latestAppointments.clinic.name},
     { key: 'services', label: 'Services',   cell: (latestAppointments: Appointment) => latestAppointments.services.map(service => service.name).join(', ')
@@ -80,16 +82,12 @@ export class UserSettingsIndex implements OnInit {
       key: 'date',
       label: 'Date & Time',
       cell: (a: Appointment) => {
-        const date = new Date(a.date).toLocaleString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        });
+        const date = formatAppointmentDate(a.date);
 
         return `${date}, ${a.startTime} - ${a.endTime}`;
       }
-    }
-    // { key: 'time', label: 'Time', cell: (latestAppointments: Appointment) =>  `${latestAppointments.startTime} - ${latestAppointments.endTime}` },
+    },
+    { key: 'status', label: 'Status', cell: (appointment: Appointment) => appointmentStatusLabel(appointment.status) },
   ];
   
   constructor(
@@ -217,33 +215,25 @@ export class UserSettingsIndex implements OnInit {
   }
 
   loadAppointments() {
-    // Replace with your actual API call
-    this.appointmentService.getAll(this.user._id)
-      .subscribe((res: any) => {
-        this.appointments = res;
-        this.latestAppointments = this.appointments
-          .filter(appointment => appointment.status === 'confirmed')
-          .slice()
-          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-          .slice(0, 10);
-
-        this.dataSource.data = this.latestAppointments;
-        console.log('this.dataSource.data', this.dataSource.data);
+    this.appointmentService.getAll(this.user._id).subscribe({
+      next: appointments => {
+        this.appointments = appointments;
+        this.updateAppointmentHistory();
+      },
+      error: () => this.alertService.error('Appointment history could not be loaded.'),
     });
   }
 
   toggleHistory() {
     this.showAllHistory = !this.showAllHistory;
+    this.updateAppointmentHistory();
+  }
 
-    if (this.showAllHistory) {
-      // show all
-      this.latestAppointments = this.appointments
-        .slice()
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    } else {
-      // show latest 10 only
-      this.loadAppointments();
-    }
+  private updateAppointmentHistory(): void {
+    const history = this.appointments.filter(appointment => isAppointmentHistory(appointment))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    this.latestAppointments = this.showAllHistory ? history : history.slice(0, 10);
+    this.dataSource.data = this.latestAppointments;
   }
 
   getServiceNames(services: any[]) {

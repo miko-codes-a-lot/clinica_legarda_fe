@@ -35,6 +35,7 @@
 
 .action-buttons {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center; /* centers horizontally */
   gap: 16px; /* space between buttons */
   margin-top: 24px;
@@ -210,6 +211,8 @@ button[mat-icon-button] {
 .action-buttons {
   padding-bottom: 10px;
 }
+
+.action-feedback { margin: 40px 8% 0; }
 
 
 .appointment-activity { margin: 28px auto; max-width: 1000px; padding: 20px; border: 1px solid #e0e6ef; border-radius: 10px; }

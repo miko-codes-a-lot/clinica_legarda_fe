@@ -2,6 +2,7 @@ import { AfterViewInit, Component, DestroyRef, inject, OnInit } from '@angular/c
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Appointment, AppointmentStatus } from '../../../_shared/model/appointment';
+import { appointmentStatusLabel } from '../../../_shared/model/appointment-history';
 import { AppointmentClinicOption, filterAppointments } from '../../../_shared/model/appointment-filters';
 import { MatTableDataSource } from '@angular/material/table';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
@@ -21,6 +22,7 @@ type StatusFilter = 'all' | AppointmentStatus;
   providers: [DentistAppointmentFeed],
 })
 export class AppointmentList implements OnInit, AfterViewInit {
+  readonly statusLabel = appointmentStatusLabel;
   private readonly feed = inject(DentistAppointmentFeed);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
@@ -53,7 +55,7 @@ export class AppointmentList implements OnInit, AfterViewInit {
     { key: 'dentist', label: 'Dentist', cell: (appointment: Appointment) => `${appointment.dentist.firstName} ${appointment.dentist.lastName}` },
     { key: 'date', label: 'Date', cell: (appointment: Appointment) => formatAppointmentDate(appointment.date) },
     { key: 'time', label: 'Time', cell: (appointment: Appointment) => `${appointment.startTime} - ${appointment.endTime}` },
-    { key: 'status', label: 'Status', cell: (appointment: Appointment) => appointment.status },
+    { key: 'status', label: 'Status', cell: (appointment: Appointment) => appointmentStatusLabel(appointment.status) },
   ];
 
   ngOnInit(): void {
