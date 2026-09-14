@@ -1,147 +1,105 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { DatePicker } from '../../date-picker/date-picker';
 import { TimePicker } from '../../time-picker/time-picker';
 import { AlertService } from '../../../service/alert.service';
+import { User } from '../../../model/user';
+import { OperatingHour } from '../../../model/operating-hour';
 
-interface OperatingHour {
-  day: string;
+export interface RescheduleDialogResult {
+  date: string;
   startTime: string;
   endTime: string;
+  reason: string;
+}
+
+export interface RescheduleDialogData {
+  date: Date | string;
+  startTime: string;
+  endTime: string;
+  operatingHours: OperatingHour[];
+  dentist?: User;
 }
 
 @Component({
   selector: 'app-reschedule-dialog',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatButtonModule,
-    DatePicker,
-    TimePicker
-  ],
+  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule,
+    MatFormFieldModule, MatInputModule, DatePicker, TimePicker],
   templateUrl: './reschedule-dialog.component.html',
   styleUrls: ['./reschedule-dialog.component.css'],
 })
-export class RescheduleDialogComponent implements OnInit {
-  form!: FormGroup;
-  availableDays: string[] = [];
-  minDate: string = '';
-  fakeDentist: any;
-
-  // appointment limit to 3 months
-  maxDate = new Date(
-    new Date().setMonth(new Date().getMonth() + 3)
-  );
+export class RescheduleDialogComponent implements OnInit, OnDestroy {
+  private dateChanges?: Subscription;
+  readonly form: FormGroup<{
+    date: FormControl<Date | null>;
+    time: FormControl<string>;
+    reason: FormControl<string>;
+  }>;
+  pickerDentist!: User;
+  readonly minDate = new Date(new Date().setHours(0, 0, 0, 0));
+  readonly maxDate = new Date(new Date().setMonth(new Date().getMonth() + 3));
+  serviceDuration = 60;
 
   constructor(
-    private fb: FormBuilder,
-    public dialogRef: MatDialogRef<RescheduleDialogComponent>,
+    fb: FormBuilder,
+    public dialogRef: MatDialogRef<RescheduleDialogComponent, RescheduleDialogResult>,
     private readonly alertService: AlertService,
-    @Inject(MAT_DIALOG_DATA)
-    public data: {
-      date: string;
-      startTime: string;
-      endTime: string;
-      operatingHours: OperatingHour[];
-    }
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: RescheduleDialogData,
+  ) {
+    this.form = fb.group({
+      date: new FormControl<Date | null>(null, Validators.required),
+      time: fb.nonNullable.control('', [Validators.required, Validators.pattern(/^([01]\d|2[0-3]):[0-5]\d$/)]),
+      reason: fb.nonNullable.control('', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(500)]),
+    });
+  }
 
   ngOnInit() {
-    this.availableDays = (this.data.operatingHours || []).map(d => d.day.toLowerCase());
-    this.minDate = new Date().toISOString().split('T')[0];
-
-    // const appointmentDate = new Date(this.data.date);
-
-    // Prefill time as string "HH:MM - HH:MM" for TimePicker
-    // const timeValue = this.data.startTime && this.data.endTime
-    //   ? `${this.data.startTime} - ${this.data.endTime}`
-    //   : '';
-    this.form = this.fb.group({
-      date: [], // no selected date
-      time: [] // ✅ prefill the picker correctly
-    });
-
-    // Fake dentist object for the picker
-    this.fakeDentist = {
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      emailAddress: '',
-      mobileNumber: '',
-      address: '',
-      operatingHours: this.data.operatingHours,
-      appointments: [],
-      role: 'dentist',
+    this.dateChanges = this.form.controls.date.valueChanges.subscribe(() => this.form.controls.time.reset());
+    this.pickerDentist = this.data.dentist ?? {
+      firstName: '', middleName: '', lastName: '', emailAddress: '', mobileNumber: '',
+      address: '', operatingHours: this.data.operatingHours, appointments: [], role: 'dentist',
     };
+    const minutes = (time: string) => {
+      const [hour, minute] = time.split(':').map(Number);
+      return hour * 60 + minute;
+    };
+    const duration = minutes(this.data.endTime) - minutes(this.data.startTime);
+    if (duration > 0) this.serviceDuration = duration;
   }
 
-  onCancel() {
-    this.dialogRef.close();
-  }
+  onCancel() { this.dialogRef.close(); }
+
+  ngOnDestroy() { this.dateChanges?.unsubscribe(); }
 
   onSave() {
-    if (!this.form.valid) {
-      this.alertService.error('Please select a date and time.');
-    };
-
-    const { date, time } = this.form.value;
-
-    const currentAppointmentDate = new Date(this.data.date);
-    const selectedDate = new Date(date);
-
-    // Format the time from the picker
-    const selectedTime = time; 
-    const currentTime = this.data.startTime; 
-
-    // Check if both date and time are the same
-    if (
-      selectedDate.toDateString() === currentAppointmentDate.toDateString() &&
-      selectedTime.startsWith(currentTime)
-    ) {
+    this.form.markAllAsTouched();
+    if (this.form.invalid) {
+      this.alertService.error('Please select a date and time and enter a reason.');
+      return;
+    }
+    const { date, time, reason } = this.form.getRawValue();
+    if (!date || Number.isNaN(date.getTime())) return;
+    const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const currentDate = this.data.date instanceof Date
+      ? this.data.date.toISOString().slice(0, 10) : this.data.date.slice(0, 10);
+    if (formattedDate === currentDate && time === this.data.startTime) {
       this.alertService.error('You cannot select your current appointment date and time.');
       return;
     }
-
-    // If time picker returns only a start time (e.g., "09:30")
     const [hour, minute] = time.split(':').map(Number);
-    const startTimeRaw = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-
-    // Calculate end time based on service duration (e.g., 60 min)
-    const endDate = new Date();
-    endDate.setHours(hour, minute + 60); // use your service duration
-    const endHour = endDate.getHours().toString().padStart(2, '0');
-    const endMinute = endDate.getMinutes().toString().padStart(2, '0');
-    const endTimeRaw = `${endHour}:${endMinute}`;
-
-    const formatToHHMM = (val: any) => {
-      if (!val) return '';
-      if (val instanceof Date) return val.toTimeString().slice(0, 5);
-      if (typeof val === 'string') {
-        const parts = val.split(':');
-        if (parts.length >= 2) return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
-      }
-      return '';
-    };
-
-    const startTime = formatToHHMM(startTimeRaw);
-    const endTime = formatToHHMM(endTimeRaw);
-
-    if (!startTime || !endTime) {
-      this.alertService.error('Invalid time format. Please select a valid time slot.');
+    const end = hour * 60 + minute + this.serviceDuration;
+    if (end >= 24 * 60) {
+      this.alertService.error('The appointment must finish on the selected day.');
       return;
     }
-
-    const formattedDate = date instanceof Date
-      ? `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
-      : date;
-
-
-    this.dialogRef.close({ date: formattedDate, startTime, endTime });
+    const endTime = `${String(Math.floor(end / 60)).padStart(2, '0')}:${String(end % 60).padStart(2, '0')}`;
+    this.dialogRef.close({ date: formattedDate, startTime: time, endTime, reason: reason.trim() });
   }
-
 }

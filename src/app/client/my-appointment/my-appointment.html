@@ -6,7 +6,8 @@
     <p>View and manage your dental appointments with Clinica Legarda.</p>
   </section>
 
-  <section class="appointments-section">
+  @if (isLoading) { <p role="status">Updating appointments…</p> }
+  <section class="appointments-section" [attr.aria-busy]="isLoading">
 
     <!-- Confirmed -->
     <div class="appointment-group">
@@ -29,6 +30,11 @@
             </ul>
             <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
             <p>Clinic: {{ appointment.clinic.address }}</p>
+            @for (entry of appointment.history; track $index) {
+              @if (entry.reason) {
+                <p class="change-reason"><strong>{{ entry.action }} Reason:</strong> {{ entry.reason }}</p>
+              }
+            }
 
             <!-- Patient Notes -->
             <p *ngIf="appointment.notes.patientNotes">
@@ -50,10 +56,10 @@
             </span>
             <div class="actions">
               @if(!isAppointmentPast(appointment)) {
-                <button class="btn-reschedule" (click)="onReschedule(appointment)">
+                <button class="btn-reschedule" (click)="onReschedule(appointment)" [disabled]="isLoading">
                   <mat-icon>event_repeat</mat-icon> Reschedule
                 </button>
-                <button class="btn-cancel" (click)="onCancel(appointment)">
+                <button class="btn-cancel" (click)="onCancel(appointment)" [disabled]="isLoading">
                   <mat-icon>cancel</mat-icon> Cancel
                 </button>
               }
@@ -88,6 +94,11 @@
             </ul>
             <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
             <p>Clinic: {{ appointment.clinic.address }}</p>
+            @for (entry of appointment.history; track $index) {
+              @if (entry.reason) {
+                <p class="change-reason"><strong>{{ entry.action }} Reason:</strong> {{ entry.reason }}</p>
+              }
+            }
             <!-- Patient Notes -->
             <p *ngIf="appointment.notes.patientNotes">
               <strong>Patient Notes:</strong> {{ appointment.notes.patientNotes }}
@@ -98,7 +109,7 @@
               <mat-icon>hourglass_empty</mat-icon> Pending
             </span>
             <div class="actions">
-              <button class="btn-cancel" (click)="onCancel(appointment)">
+              <button class="btn-cancel" (click)="onCancel(appointment)" [disabled]="isLoading">
                 <mat-icon>cancel</mat-icon> Cancel
               </button>
             </div>
@@ -129,6 +140,11 @@
             </ul>
             <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
             <p>Clinic: {{ appointment.clinic.address }}</p>
+            @for (entry of appointment.history; track $index) {
+              @if (entry.reason) {
+                <p class="change-reason"><strong>{{ entry.action }} Reason:</strong> {{ entry.reason }}</p>
+              }
+            }
             @if(appointment.referral?.status === 'rejected') {
               <b>Rejected By the Referring Dentist</b>
               <p>- Reason for Rejection: {{ getReasonLabel(appointment.referral?.reasonOfDecline) }}</p>
@@ -162,6 +178,11 @@
             </ul>
             <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
             <p>Clinic: {{ appointment.clinic.address }}</p>
+            @for (entry of appointment.history; track $index) {
+              @if (entry.reason) {
+                <p class="change-reason"><strong>{{ entry.action }} Reason:</strong> {{ entry.reason }}</p>
+              }
+            }
           </div>
           <div class="appointment-status">
             <span class="status-badge cancelled">

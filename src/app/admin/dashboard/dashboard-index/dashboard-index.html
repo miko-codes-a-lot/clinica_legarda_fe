@@ -1,4 +1,4 @@
-<div class="admin-dashboard" #dashboardContent [class.export-mode]="isExporting">
+<div class="admin-dashboard">
   <!-- Header Section -->
   <div class="dashboard-header">
     <mat-card class="header-card">
@@ -13,9 +13,14 @@
             </p>
           </div>
 
-          <button mat-raised-button color="primary" (click)="exportToPDF()">
-            Export PDF
-          </button>
+          <div class="report-actions">
+            <button mat-raised-button (click)="printTables()" [disabled]="!canExport || isExporting">
+              Print Tables
+            </button>
+            <button mat-raised-button color="primary" (click)="exportToPDF()" [disabled]="!canExport || isExporting">
+              Export PDF
+            </button>
+          </div>
 
         </div>
           <div class="notification-badge">
@@ -74,6 +79,8 @@
       </mat-card-content>
     </mat-card>
   </div>
+
+  <p *ngIf="reportError" class="report-error" role="alert">{{ reportError }}</p>
 
   <!-- Key Metrics Section (No changes here) -->
   <div class="metrics-section">

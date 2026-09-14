@@ -128,11 +128,15 @@ export class DatePicker implements ControlValueAccessor, Validator, OnDestroy, O
       return { required: true };
     }
 
-    if (control.value && this.minDate && control.value < this.minDate) {
+    if (control.value && !this.isDate(control.value)) {
+      return { matDatepickerParse: true };
+    }
+
+    if (control.value && this.minDate && this.dateOnlyTime(control.value) < this.dateOnlyTime(this.minDate)) {
       return { matDatepickerMin: { min: this.minDate, actual: control.value } };
     }
 
-    if (control.value && this.maxDate && control.value > this.maxDate) {
+    if (control.value && this.maxDate && this.dateOnlyTime(control.value) > this.dateOnlyTime(this.maxDate)) {
       return { matDatepickerMax: { max: this.maxDate, actual: control.value } };
     }
 
@@ -143,7 +147,7 @@ export class DatePicker implements ControlValueAccessor, Validator, OnDestroy, O
     return null;
   }
 
-  isDate(value: any): value is Date {
+  isDate(value: unknown): value is Date {
     return value instanceof Date && !isNaN(value.getTime());
   }
 
@@ -228,14 +232,11 @@ export class DatePicker implements ControlValueAccessor, Validator, OnDestroy, O
   }
 
   isPastDate(dateToCheck: Date): boolean {
-    const today = new Date();
+    return this.dateOnlyTime(dateToCheck) < this.dateOnlyTime(new Date());
+  }
 
-    const toDateOnly = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-
-    const checkDateOnly = toDateOnly(dateToCheck);
-    const todayOnly = toDateOnly(today);
-    // Return true if the date s before today (i.e., a past date)
-    return checkDateOnly < todayOnly;
+  private dateOnlyTime(date: Date): number {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
   }
 
   private onDentistChanged() {

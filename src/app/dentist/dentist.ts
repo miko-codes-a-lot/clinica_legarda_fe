@@ -1,4 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterOutlet } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -12,6 +16,8 @@ import { AlertService } from '../_shared/service/alert.service';
   standalone: true,
   imports: [
     RouterOutlet,
+    MatButtonModule,
+    MatIconModule,
     MatSidenavModule,
     MatListModule,
     MatToolbarModule,
@@ -21,6 +27,10 @@ import { AlertService } from '../_shared/service/alert.service';
   styleUrl: './dentist.css'
 })
 export class Dentist {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly breakpoints = inject(BreakpointObserver);
+  isMobile = false;
+  menuOpen = false;
   isLoading = false
   isLoggedIn = false
   user = {}
@@ -46,17 +56,24 @@ export class Dentist {
   ) {}
 
   ngOnInit() {
-    this.authService.currentUser$.subscribe({
+    this.breakpoints.observe('(max-width: 767px)').pipe(takeUntilDestroyed(this.destroyRef)).subscribe(state => {
+      this.isMobile = state.matches;
+      this.menuOpen = false;
+    });
+    this.authService.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (user) => {
         if (user) {
           this.user = user
-          console.log('this.user', this.user)
           this.isLoggedIn = true
         } else {
           this.isLoggedIn = false
         }
       }
     })
+  }
+
+  closeMobileMenu(): void {
+    if (this.isMobile) this.menuOpen = false;
   }
 
   onClickLogout() {

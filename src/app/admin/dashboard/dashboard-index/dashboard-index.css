@@ -414,7 +414,12 @@
   }
 }
 
-.export-mode * {
-  animation: none !important;
-  transition: none !important;
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.report-error {
+  color: #b3261e;
 }

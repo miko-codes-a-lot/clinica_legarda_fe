@@ -91,3 +91,11 @@
   gap: 8px;
   text-align: center;
 }
+
+.status-filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 24px 16px 8px; }
+.status-filters button { border: 1px solid #d9e0ee; border-radius: 8px; color: #4c5c75; background: #fff; padding: 10px 15px; font: inherit; font-size: 13px; cursor: pointer; }
+.status-filters button.active { color: #fff; background: #3f51b5; border-color: #3f51b5; }
+.status-filters button:focus-visible { outline: 3px solid #93a3ed; outline-offset: 2px; }
+.status-filters span { display: inline-block; margin-left: 6px; font-size: 11px; opacity: .85; }
+.load-error { margin: 20px; padding: 12px; color: #a13d35; background: #fff0ed; border-radius: 8px; }
+.empty-filter { text-align: center; margin: 22px; color: #6b7b92; }

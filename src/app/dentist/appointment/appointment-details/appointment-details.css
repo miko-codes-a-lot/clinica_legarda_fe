@@ -211,3 +211,9 @@ button[mat-icon-button] {
   padding-bottom: 10px;
 }
 
+
+.appointment-activity { margin: 28px auto; max-width: 1000px; padding: 20px; border: 1px solid #e0e6ef; border-radius: 10px; }
+.appointment-activity h3 { margin: 0 0 18px; color: #3f51b5; }
+.activity-entry { padding: 14px 0; border-top: 1px solid #edf0f5; font-size: 14px; }
+.activity-entry time { display: block; margin-top: 5px; color: #758299; font-size: 12px; }
+.activity-entry p { margin: 10px 0 0; color: #475569; white-space: pre-wrap; overflow-wrap: anywhere; }

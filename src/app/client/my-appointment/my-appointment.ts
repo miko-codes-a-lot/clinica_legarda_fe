@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../_shared/service/auth-service';
 import { AppointmentService } from '../../_shared/service/appointment-service';
@@ -10,7 +12,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { RescheduleDialogComponent } from '../../_shared/component/dialog/reschedule-dialog/reschedule-dialog.component';
+import { CancelAppointmentDialogComponent } from '../../_shared/component/dialog/cancel-appointment-dialog/cancel-appointment-dialog.component';
+import { RescheduleDialogComponent, RescheduleDialogData, RescheduleDialogResult } from '../../_shared/component/dialog/reschedule-dialog/reschedule-dialog.component';
 import { Reason } from '../../_shared/model/reason';
 import { AlertService } from '../../_shared/service/alert.service';
 
@@ -32,6 +35,7 @@ import { AlertService } from '../../_shared/service/alert.service';
 })
 export class MyAppointment {
   AppointmentStatus = AppointmentStatus;
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private readonly authService: AuthService,
@@ -47,16 +51,19 @@ export class MyAppointment {
   reasons: Reason[] = [];
 
   ngOnInit(): void {
-    this.reasonService.getAll().subscribe(r => this.reasons = r);
+    this.reasonService.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: reasons => this.reasons = reasons,
+      error: () => this.alertService.error('Could not load referral reasons.'),
+    });
     this.loadAppointments();
   }
 
   loadAppointments() {
     this.isLoading = true;
-    this.authService.currentUser$.subscribe({
+    this.authService.currentUser$.pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (user) => {
         if (user) {
-          this.appointmentService.getAll(user._id).subscribe({
+          this.appointmentService.getAll(user._id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
             next: (data: Appointment[]) => {
               this.upcomingAppointmentsData = data.sort((a, b) => {
                 // Prioritize confirmed over pending
@@ -68,79 +75,63 @@ export class MyAppointment {
               this.isLoading = false;
             },
             error: (err) => {
-              console.error(err);
+              this.alertService.error('Could not load appointments. Please try again.');
               this.isLoading = false;
             }
           });
+        } else {
+          this.upcomingAppointmentsData = [];
+          this.isLoading = false;
         }
       }
     });
   }
 
   onCancel(appointment: Appointment) {
-    this.isLoading = true;
-    this.appointmentService.cancelAppointment(appointment._id).subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.alertService.error('Appointment cancelled successfully!');
-        this.loadAppointments();
-      },
-      error: (err) => {
-        console.error(err);
-        this.isLoading = false;
-        this.alertService.error('Failed to cancel appointment.');
-      }
+    this.dialog.open<CancelAppointmentDialogComponent, undefined, string>(CancelAppointmentDialogComponent, {
+      width: '450px',
+    }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(reason => {
+      if (!reason?.trim()) return;
+      this.isLoading = true;
+      this.appointmentService.cancelAppointment(appointment._id, reason.trim())
+        .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+          next: () => {
+            this.alertService.success('Appointment cancelled successfully.');
+            this.loadAppointments();
+          },
+          error: () => {
+            this.isLoading = false;
+            this.alertService.error('Failed to cancel appointment. Please try again.');
+          },
+        });
     });
   }
 
   onReschedule(appointment: Appointment) {
-    const dialogRef = this.dialog.open(RescheduleDialogComponent, {
+    const dialogRef = this.dialog.open<RescheduleDialogComponent, RescheduleDialogData, RescheduleDialogResult>(RescheduleDialogComponent, {
       width: '450px',
       data: {
-        date: appointment.date,
-        startTime: appointment.startTime,
-        endTime: appointment.endTime,
-        operatingHours:
-          appointment.dentist?.operatingHours?.length
-            ? appointment.dentist.operatingHours
-            : appointment.clinic?.operatingHours || []
-      }
+        date: appointment.date, startTime: appointment.startTime, endTime: appointment.endTime,
+        operatingHours: appointment.dentist?.operatingHours?.length
+          ? appointment.dentist.operatingHours : appointment.clinic?.operatingHours || [],
+      },
     });
-
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       if (!result) return;
-
-      const formatTime = (time: any) => {
-        if (!time) return '';
-        if (typeof time === 'string') return time; // already string
-        if (time instanceof Date) return time.toTimeString().slice(0, 5); // "HH:MM"
-        return '';
-      };
-
-      const payload = {
-        date: result.date instanceof Date ? result.date.toISOString().split('T')[0] : result.date,
-        startTime: formatTime(result.startTime),
-        endTime: formatTime(result.endTime),
-        patient: appointment.patient._id,
-        dentist: appointment.dentist._id
-      };
-
       this.isLoading = true;
-
-      this.appointmentService.rescheduleAppointment(appointment._id, payload).subscribe({
+      this.appointmentService.rescheduleAppointment(appointment._id, {
+        ...result, patient: appointment.patient._id, dentist: appointment.dentist._id,
+      }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: () => {
-          this.isLoading = false;
-          this.alertService.error('✅ Appointment rescheduled successfully!');
+          this.alertService.success('Appointment rescheduled successfully.');
           this.loadAppointments();
         },
-        error: (err) => {
-          console.error(err);
+        error: () => {
           this.isLoading = false;
-          this.alertService.error(err.error.message);
-        }
+          this.alertService.error('Could not reschedule the appointment. Please check the selected time and try again.');
+        },
       });
     });
-
   }
 
   isAppointmentPast(appointment: Appointment): boolean {

@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Appointment } from '../../../_shared/model/appointment';
 import { User } from '../../../_shared/model/user';
 import { UserService } from '../../../_shared/service/user-service';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
 import { Router, RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { catchError, EMPTY, finalize, forkJoin, switchMap } from 'rxjs';
 import { AppointmentPayload } from '../../../admin/appointment/appointment-payload';
 import { AppointmentPage } from '../appointment';
 import { DentalService } from '../../../_shared/model/dental-service';
@@ -29,6 +30,9 @@ import { AlertService } from '../../../_shared/service/alert.service';
 export class AppointmentCreate {
   user: UserSimple | null = null
   isLoading = false
+  isInitializing = true
+  loadError = false
+  private readonly destroyRef = inject(DestroyRef)
   initDoc!: Appointment
 
   dentalServices: DentalService[] = []
@@ -47,27 +51,40 @@ export class AppointmentCreate {
   ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe({
-      next: (u) => this.user = u
-    })
-    if (!this.user) {
-      return
-    }
-    this.isLoading = true
+    this.authService.currentUser$.pipe(
+      switchMap(user => {
+        this.user = user
+        this.loadError = false
+        if (!user) {
+          this.isInitializing = false
+          return EMPTY
+        }
 
-    this.initDoc = this.appointmentService.getEmptyNonNullDoc()
-    forkJoin({
-      services: this.dentalServicesService.getAll(),
-      clinics: this.clinicService.getAll(),
-      patients: this.userService.getAll(),
-    }).subscribe({
+        this.isInitializing = true
+        this.isLoading = true
+        this.initDoc = this.appointmentService.getEmptyNonNullDoc()
+        return forkJoin({
+          services: this.dentalServicesService.getAll(),
+          clinics: this.clinicService.getAll(),
+          patients: this.userService.getAll(),
+        }).pipe(
+          catchError(() => {
+            this.loadError = true
+            return EMPTY
+          }),
+          finalize(() => {
+            this.isInitializing = false
+            this.isLoading = false
+          }),
+        )
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: ({ services, clinics, patients }) => {
         this.dentalServices = services
         this.clinics = clinics
         this.patients = patients
       },
-      error: (e) => this.alertService.error(e.error.message),
-      complete: () => this.isLoading = false,
     })
   }
 

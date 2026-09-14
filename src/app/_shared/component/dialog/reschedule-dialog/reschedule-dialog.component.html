@@ -15,8 +15,10 @@
     formControlName="date"
     label="New Appointment Day"
     placeholder="Choose a date"
-    [dentist]="fakeDentist"
+    [dentist]="pickerDentist"
+    [minDate]="minDate"
     [maxDate]="maxDate"
+    [required]="true"
   ></app-date-picker>
 
   <br />
@@ -25,16 +27,22 @@
   <app-time-picker
     formControlName="time"
     label="New Appointment Time"
-    [dentist]="fakeDentist"
-    [selectedDate]="form.get('date')?.value"
-    [serviceDuration]="60"
+    [dentist]="pickerDentist"
+    [selectedDate]="form.controls.date.value"
+    [serviceDuration]="serviceDuration"
     [timeSlotInterval]="30"
     [required]="true"
   ></app-time-picker>
 
+  <mat-form-field appearance="outline">
+    <mat-label>Reason for rescheduling</mat-label>
+    <textarea matInput formControlName="reason" rows="3" maxlength="500" required></textarea>
+    <mat-hint>Help the clinic understand the change (up to 500 characters).</mat-hint>
+    <mat-error>Please enter a reason.</mat-error>
+  </mat-form-field>
 </div>
 
 <div mat-dialog-actions align="end">
   <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-raised-button color="primary" (click)="onSave()">Save</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="form.invalid">Save</button>
 </div>

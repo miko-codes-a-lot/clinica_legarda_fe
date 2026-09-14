@@ -1,133 +1,174 @@
 <div class="home-page">
+  <header class="dashboard-header">
+    <div>
+      <p class="eyebrow">Dentist workspace</p>
+      <h1>Dashboard</h1>
+      <p class="welcome">Welcome back, Dr. {{ user?.firstName }}. Here is your schedule.</p>
+    </div>
+    <button type="button" class="outline-button" (click)="refresh()" [disabled]="isLoading">
+      {{ isLoading ? 'Refreshing…' : 'Refresh appointments' }}
+    </button>
+  </header>
 
-  <h2 class="welcome">
-    Welcome back, Dr. {{ user?.firstName }}
-  </h2>
+  @if (errorMessage) {
+    <p class="error-message" role="alert">{{ errorMessage }}</p>
+  }
 
-  <!-- SUMMARY -->
   <div class="summary-grid">
-
     <div class="summary-card">
-      <h3>Today's Appointments</h3>
-      <p>{{ todayAppointments.length }}</p>
+      <span>Today's appointments</span>
+      <strong>{{ todayAppointments.length }}</strong>
+      <small>{{ formatDate(todayStr) }}</small>
     </div>
-
     <div class="summary-card">
-      <h3>Upcoming</h3>
-      <p>{{ upcomingAppointments.length }}</p>
+      <span>Upcoming appointments</span>
+      <strong>{{ upcomingCount }}</strong>
+      <small>Pending and confirmed</small>
     </div>
-
-    <div class="summary-card">
-      <h3>Pending Referrals</h3>
-      <p>{{ pendingReferralCount }}</p>
-    </div>
-
+    <a class="summary-card" routerLink="/dentist/referral-request">
+      <span>Pending referrals</span>
+      <strong>{{ referralError ? '—' : pendingReferralCount }}</strong>
+      <small>{{ referralError || 'View referral requests' }}</small>
+    </a>
+    <a class="summary-card" routerLink="/dentist/notification">
+      <span>Unread notifications</span>
+      <strong>{{ unreadCount }}</strong>
+      <small>View all notifications</small>
+    </a>
   </div>
 
-  <!-- TODAY -->
-  <section class="section">
-
+  <section class="panel confirmed-panel" aria-labelledby="confirmed-title">
     <div class="section-header">
-      <h3>Today's Schedule</h3>
-      <span>{{ todayAppointments.length }} appointments</span>
-    </div>
-
-    @if (todayAppointments.length === 0) {
-
-      <p class="empty">No appointments today.</p>
-
-    } @else {
-
-      <div class="appointment-list">
-
-        @for (appointment of todayAppointments; track appointment._id) {
-
-          <div class="appointment-item">
-
-            <div class="appointment-info">
-
-              <div class="avatar">
-                {{ appointment.patient.firstName.charAt(0) }}
-              </div>
-
-              <div>
-                <strong>
-                  {{ appointment.patient.firstName }}
-                  {{ appointment.patient.lastName }}
-                </strong>
-
-                <div class="meta">
-                  {{ appointment.startTime }}
-                  -
-                  {{ appointment.endTime }}
-                </div>
-              </div>
-
-            </div>
-
-            <span class="status">
-              {{ appointment.status }}
-            </span>
-
-          </div>
-
-        }
-
+      <div>
+        <h2 id="confirmed-title">Doctor's Confirmed Schedules</h2>
+        <p>Your next scheduled clinic days</p>
       </div>
-
-    }
-
+      <a routerLink="/dentist/appointment">View appointments</a>
+    </div>
+    <div class="confirmed-days">
+      @for (day of confirmedDays; track day.date) {
+        <button type="button" class="day-card" [class.today]="day.date === todayStr"
+          [attr.aria-pressed]="selectedDate === day.date" (click)="selectDate(day.date)">
+          <span>{{ (day.date + 'T00:00:00Z') | date:'EEE, MMM d':'UTC' }}</span>
+          <strong>{{ day.count }} patient{{ day.count === 1 ? '' : 's' }}</strong>
+          @if (day.date === todayStr) { <small>Today</small> }
+        </button>
+      } @empty {
+        <p class="empty">{{ isLoading ? 'Loading schedules…' : 'No upcoming confirmed appointments.' }}</p>
+      }
+    </div>
   </section>
 
-  <!-- UPCOMING -->
-  <section class="section">
+  <div class="schedule-grid">
+    <section class="panel calendar-panel" aria-labelledby="calendar-title">
+      <div class="section-header calendar-header">
+        <div>
+          <h2 id="calendar-title">Appointment calendar</h2>
+          <p>Clinic time · Asia/Manila</p>
+        </div>
+        <button class="text-button" type="button" (click)="selectDate(todayStr)">Today</button>
+      </div>
+      <div class="month-navigation">
+        <button type="button" class="month-button" aria-label="Previous month" (click)="moveMonth(-1)">‹</button>
+        <h3 aria-live="polite">{{ calendarMonth | date:'MMMM yyyy':'UTC' }}</h3>
+        <button type="button" class="month-button" aria-label="Next month" (click)="moveMonth(1)">›</button>
+      </div>
+      <div class="calendar-weekdays" aria-hidden="true">
+        @for (weekday of weekdays; track weekday) { <span>{{ weekday }}</span> }
+      </div>
+      <div class="calendar-days">
+        @for (day of calendarDays; track day.date) {
+          <button type="button" class="calendar-day" [class.outside-month]="!day.inMonth"
+            [class.selected]="day.date === selectedDate" [class.current-day]="day.date === todayStr"
+            [class.has-appointments]="day.appointments.length > 0"
+            [attr.data-date]="day.date" [attr.aria-label]="day.label"
+            [attr.aria-pressed]="day.date === selectedDate" (click)="selectDate(day.date)">
+            <span class="day-number">{{ day.day }}</span>
+            @if (day.appointments.length > 0) {
+              <span class="calendar-count">{{ day.appointments.length }} <span class="appointment-word">appt{{ day.appointments.length === 1 ? '' : 's' }}</span></span>
+              <span class="calendar-time">{{ day.appointments[0].startTime }}</span>
+            }
+          </button>
+        }
+      </div>
+      <p class="calendar-hint">Select a date to see appointment times and details.</p>
+    </section>
 
-    <div class="section-header">
-      <h3>Upcoming Appointments</h3>
-      <span>{{ upcomingAppointments.length }} upcoming</span>
-    </div>
+    <section class="panel schedule-panel" data-testid="selected-schedule" aria-labelledby="schedule-title">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Selected day</p>
+          <h2 id="schedule-title">{{ (selectedDate + 'T00:00:00Z') | date:'EEE, MMM d, yyyy':'UTC' }}</h2>
+          <p>{{ selectedAppointments.length }} appointment{{ selectedAppointments.length === 1 ? '' : 's' }} · Clinic time</p>
+        </div>
+      </div>
+      @if (selectedAppointments.length > 0) {
+        <div class="schedule-table-scroll">
+          <table class="schedule-table">
+            <thead><tr><th scope="col">Time</th><th scope="col">Patient / Service</th><th scope="col">Status</th></tr></thead>
+            <tbody>
+              @for (appointment of selectedAppointments; track appointment._id) {
+                <tr>
+                  <td class="time-cell">{{ appointment.startTime }}<small>– {{ appointment.endTime }}</small></td>
+                  <td>
+                    <a [routerLink]="['/dentist/appointment/details', appointment._id]">{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</a>
+                    <div class="services">
+                      @for (service of appointment.services; track service._id) { <span>{{ service.name }}</span> }
+                    </div>
+                    <small>{{ appointment.clinic.name }}</small>
+                  </td>
+                  <td><span class="status" [class.pending]="appointment.status === 'pending'">{{ appointment.status }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="schedule-empty"><span aria-hidden="true">○</span><h3>No appointments on this date</h3><p>Select a highlighted date to view your schedule.</p></div>
+      }
+    </section>
+  </div>
 
-    @if (upcomingAppointments.length === 0) {
-
-      <p class="empty">No upcoming appointments.</p>
-
-    } @else {
-
+  <div class="detail-grid">
+    <section class="panel" aria-labelledby="upcoming-title">
+      <div class="section-header">
+        <div><h2 id="upcoming-title">Upcoming appointments</h2><p>Next {{ upcomingAppointments.length }} of {{ upcomingCount }} appointments</p></div>
+        <a routerLink="/dentist/appointment">View all</a>
+      </div>
       <div class="appointment-list">
-
         @for (appointment of upcomingAppointments; track appointment._id) {
-
-          <div class="appointment-item">
-
+          <article class="appointment-item">
+            <div class="avatar" aria-hidden="true">{{ appointment.patient.firstName.charAt(0) }}</div>
             <div class="appointment-info">
-
-              <div class="avatar secondary">
-                {{ appointment.patient.firstName.charAt(0) }}
-              </div>
-
-              <div>
-                <strong>
-                  {{ appointment.patient.firstName }}
-                  {{ appointment.patient.lastName }}
-                </strong>
-
-                <div class="meta">
-                  {{ appointment.date | date:'mediumDate' }}
-                  •
-                  {{ appointment.startTime }}
-                </div>
-              </div>
-
+              <a [routerLink]="['/dentist/appointment/details', appointment._id]">{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</a>
+              <p>{{ formatDate(appointment.date) }} · {{ appointment.startTime }}–{{ appointment.endTime }}</p>
             </div>
-
-          </div>
-
-        }
-
+            <span class="status" [class.pending]="appointment.status === 'pending'">{{ appointment.status }}</span>
+          </article>
+        } @empty { <p class="empty">{{ isLoading ? 'Loading appointments…' : 'No upcoming appointments.' }}</p> }
       </div>
+    </section>
 
-    }
-
-  </section>
-
+    <section class="panel" aria-labelledby="notifications-title">
+      <div class="section-header">
+        <div><h2 id="notifications-title">Notifications <span class="unread-badge">{{ unreadCount }} unread</span></h2><p>Recent appointment updates</p></div>
+        <a routerLink="/dentist/notification">View all</a>
+      </div>
+      @if (notificationError) { <p class="error-message" role="alert">{{ notificationError }}</p> }
+      <div class="notification-list">
+        @for (notification of notifications; track notification._id) {
+          <article class="notification-item" [class.unread]="!notification.read">
+            <div>
+              @if (notification.link) { <a [routerLink]="notification.link">{{ notification.message }}</a> }
+              @else { <p>{{ notification.message }}</p> }
+              <small>{{ notification.createdAt | date:'MMM d, yyyy, h:mm a':'+0800' }}</small>
+            </div>
+            @if (!notification.read) {
+              <button type="button" class="text-button" (click)="markAsRead(notification)" [disabled]="markingReadId === notification._id">Mark read</button>
+            } @else { <span class="read-label">Read</span> }
+          </article>
+        } @empty { <p class="empty">{{ notificationsLoading ? 'Loading notifications…' : 'No notifications yet.' }}</p> }
+      </div>
+    </section>
+  </div>
 </div>

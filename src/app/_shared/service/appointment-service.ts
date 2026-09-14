@@ -1,15 +1,26 @@
 import { Injectable } from '@angular/core';
 import { Appointment, AppointmentStatus } from '../model/appointment';
 import { UserStatus } from '../model/user';
-import { Observable } from 'rxjs';
+import { Observable, Subject, tap } from 'rxjs';
 import { AppointmentPayload } from '../../admin/appointment/appointment-payload';
 import { HttpClient } from '@angular/common/http';
 import { MockService } from './mock-service';
+
+export interface RescheduleAppointmentPayload {
+  date: Date | string;
+  startTime: string;
+  endTime: string;
+  patient?: string;
+  dentist?: string;
+  reason?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppointmentService {
+  private readonly changes = new Subject<void>();
+  readonly changes$ = this.changes.asObservable();
   constructor(
     private readonly http: HttpClient,
     private readonly mockService: MockService
@@ -86,7 +97,7 @@ export class AppointmentService {
       const d = new Date(appointment.date);
       appointment.date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
     }
-    return this.http.post<Appointment>(this.baseUrl, appointment, { withCredentials: true });
+    return this.http.post<Appointment>(this.baseUrl, appointment, { withCredentials: true }).pipe(tap(() => this.changes.next()));
     // return new Observable((s) => {
     //   setTimeout(() => {
     //     const a: Appointment = {
@@ -116,35 +127,35 @@ export class AppointmentService {
       const d = new Date(appointment.date);
       appointment.date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
     }
-    return this.http.put<Appointment>(`${this.baseUrl}/${id}`, appointment, { withCredentials: true });
+    return this.http.put<Appointment>(`${this.baseUrl}/${id}`, appointment, { withCredentials: true }).pipe(tap(() => this.changes.next()));
   }
 
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
+    return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true }).pipe(tap(() => this.changes.next()));
   }
 
   approveAppointment(appointmentId: string) {
-    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/approve`, {}, { withCredentials: true });
+    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/approve`, {}, { withCredentials: true }).pipe(tap(() => this.changes.next()));
   }
 
   rejectAppointment(appointmentId: string) {
-    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/reject`, {}, { withCredentials: true });
+    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/reject`, {}, { withCredentials: true }).pipe(tap(() => this.changes.next()));
   }
 
-  cancelAppointment(appointmentId: string) {
-    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/cancel`, {}, { withCredentials: true });
+  cancelAppointment(appointmentId: string, reason?: string) {
+    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/cancel`, { reason }, { withCredentials: true }).pipe(tap(() => this.changes.next()));
   }
 
-  rescheduleAppointment(appointmentId: string, payload: { date: Date; startTime: string; endTime: string }) {
-    if(payload.date) {
-      const d = new Date(payload.date);
-      payload.date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    }
+  rescheduleAppointment(appointmentId: string, payload: RescheduleAppointmentPayload) {
+    // Date pickers provide local Dates; a YYYY-MM-DD string is already a calendar day.
+    const date = payload.date instanceof Date
+      ? new Date(Date.UTC(payload.date.getFullYear(), payload.date.getMonth(), payload.date.getDate()))
+      : payload.date;
     return this.http.patch<Appointment>(
       `${this.baseUrl}/${appointmentId}/reschedule`,
-      payload,
+      { ...payload, date },
       { withCredentials: true }
-    );
+    ).pipe(tap(() => this.changes.next()));
   }
   updateDentistNotes(appointmentId: string, notes: string): Observable<Appointment> {
     console.log('notes', notes)

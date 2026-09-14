@@ -60,6 +60,14 @@ interface TimeSlot {
     </mat-form-field>
   `,
   styles: [`
+    mat-form-field {
+      --mat-form-field-filled-focus-active-indicator-color: #1976d2;
+      --mat-form-field-filled-focus-label-text-color: #1976d2;
+      --mat-form-field-outlined-focus-outline-color: #1976d2;
+      --mat-form-field-outlined-focus-label-text-color: #1976d2;
+      --mat-form-field-focus-select-arrow-color: #1976d2;
+    }
+
     .unavailable-slot {
       color: rgba(0, 0, 0, 0.38) !important;
       background-color: rgba(0, 0, 0, 0.05);
@@ -97,24 +105,6 @@ export class TimePicker implements ControlValueAccessor, Validator, OnInit {
   private onTouched = () => {};
 
   ngOnInit(): void {
-    this.dentist.appointments = [
-      {
-        _id: '',
-        clinic: {} as any,
-        patient: {} as User,
-        dentist: {} as User,
-        services: [],
-        date: new Date(),
-        startTime: '10:00',
-        endTime: '11:00',
-        status: AppointmentStatus.CONFIRMED,
-        notes: {
-          patientNotes: '',
-          clinicNotes: '',
-        },
-        history: []
-      }
-    ]
     this.generateTimeSlots();
   }
 
@@ -198,6 +188,9 @@ export class TimePicker implements ControlValueAccessor, Validator, OnInit {
     const minutes = String(dateNow.getMinutes()).padStart(2, '0');
 
     const currentTime = `${hours}:${minutes}`;
+    if (this.isSameDate(dateNow, date) && currentTime > startTime) {
+      return false;
+    }
  
     const startMinutes = TimeUtil.timeToMinutes(startTime);
     const endMinutes = startMinutes + this.serviceDuration;
@@ -219,8 +212,7 @@ export class TimePicker implements ControlValueAccessor, Validator, OnInit {
       if (
         (startMinutes >= appointmentStart && startMinutes < appointmentEnd) ||
         (endMinutes > appointmentStart && endMinutes <= appointmentEnd) ||
-        (startMinutes <= appointmentStart && endMinutes >= appointmentEnd) ||
-        (currentTime > startTime)
+        (startMinutes <= appointmentStart && endMinutes >= appointmentEnd)
       ) {
         return false; // Time slot is not available
       }

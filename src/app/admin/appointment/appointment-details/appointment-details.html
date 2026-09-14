@@ -88,6 +88,7 @@
       <div class="history-item" *ngFor="let h of appointment.history">
         <div class="history-action">
           {{ h.action }}
+          @if (h.reason) { <p><strong>Reason:</strong> {{ h.reason }}</p> }
         </div>
         <div class="history-time">
           {{ h.timestamp | date: 'medium' }}

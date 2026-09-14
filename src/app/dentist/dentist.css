@@ -4,3 +4,7 @@
   background: #eee;
 }
 
+
+mat-drawer { width: 260px; max-width: 85vw; }
+mat-drawer-content { min-width: 0; }
+.mobile-toolbar { position: sticky; top: 0; z-index: 10; gap: 12px; background: white; font-size: 18px; }

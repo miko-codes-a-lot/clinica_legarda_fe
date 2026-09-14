@@ -15,7 +15,7 @@
         *ngFor="let date of dailyDates"
         [class.today]="date === todayStr"
       >
-        <div class="date">{{ date | date:'EEE, MMM d' }}</div>
+        <div class="date">{{ (date + 'T00:00:00Z') | date:'EEE, MMM d':'UTC' }}</div>
         <div class="count">
           {{ dailyAppointments[date].length }} patient{{ dailyAppointments[date].length > 1 ? 's' : '' }}
         </div>
@@ -32,6 +32,20 @@
   <h2>Appointments</h2>
 </div>
 
+@if (errorMessage) {
+  <div class="load-error" role="alert">{{ errorMessage }} <button type="button" (click)="refresh()">Try again</button></div>
+}
+<div class="status-filters" role="group" aria-label="Filter appointments by status">
+  @for (filter of statusFilters; track filter.value) {
+    <button type="button" [attr.data-status]="filter.value" [attr.aria-pressed]="selectedStatus === filter.value"
+      [class.active]="selectedStatus === filter.value" (click)="selectStatus(filter.value)">
+      {{ filter.label }} <span>{{ statusCounts[filter.value] }}</span>
+    </button>
+  }
+</div>
+@if (!isLoading && !errorMessage && dataSource.data.length === 0) {
+  <p class="empty-filter" role="status">No {{ selectedStatus === 'all' ? '' : selectedStatus }} appointments found.</p>
+}
 <app-generic-table
   [displayedColumns]="displayedColumns"
   [columnDefs]="columnDefs"

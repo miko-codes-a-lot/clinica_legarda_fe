@@ -1,3 +1,6 @@
+@if (loadError) {
+  <p role="alert">{{ loadError }} <button type="button" (click)="loadAppointment()">Try again</button></p>
+}
 @if (appointment) {
   <div class="view-header">
     <h2 class="page-title">Appointment</h2>
@@ -85,10 +88,22 @@
 
   </app-list>
 
+<section class="appointment-activity" aria-labelledby="activity-title">
+    <h3 id="activity-title">Appointment activity</h3>
+    @for (entry of appointment.history; track $index) {
+      <article class="activity-entry">
+        <strong>{{ entry.action }}</strong>
+        <time>{{ entry.timestamp | date:'MMM d, yyyy, h:mm a':'+0800' }}</time>
+        @if (entry.reason) { <p><strong>Reason:</strong> {{ entry.reason }}</p> }
+      </article>
+    } @empty { <p>No appointment activity yet.</p> }
+  </section>
+
 <!-- Previous Appointments History -->
   <div class="row-divider"></div>
   <div class="history-body">
     <h3 class="history-title">Previous Appointments/History</h3>
+    @if (historyError) { <p role="alert">{{ historyError }}</p> }
 
     <div *ngIf="appointmentHistory && appointmentHistory.length; else noHistory">
       <app-generic-table
@@ -108,7 +123,7 @@
 
   <div class="action-buttons">
     <button mat-stroked-button color="warn" 
-            (click)="cancelAppointment()" 
+            (click)="cancelAppointment()" [disabled]="isLoading"
             *ngIf="appointment.status === 'confirmed' else notConfirmed">
       <mat-icon>cancel</mat-icon> Cancel
     </button>
@@ -130,5 +145,5 @@
   </ng-template>
 
 } @else {
-  <p>Fetching details...</p>
+  @if (!loadError) { <p>Fetching details...</p> }
 }

@@ -16,7 +16,7 @@ export class NotificationService {
   public notifications$: Observable<Notification[]> = this.notifications$$.asObservable()
 
 
-  private readonly apiUrl = `${environment.apiUrl}/notifications`;
+  private readonly apiUrl = '/notifications';
 
   constructor(
     private readonly mockService: MockService,
@@ -25,11 +25,13 @@ export class NotificationService {
 
   // call on login
   connect() {
-    if (this.socket?.connected) {
+    if (this.socket) {
       return;
     }
 
-    this.socket = io(`${environment.apiUrl}/notifications`, {
+    const apiOrigin = new URL(environment.apiUrl, window.location.origin).origin;
+    this.socket = io(`${apiOrigin}/notifications`, {
+      path: '/api/socket.io',
       withCredentials: true,
     })
 
@@ -42,11 +44,10 @@ export class NotificationService {
     });
 
     this.socket.on('new_notification', (notification: Notification) => {
-      console.log('New notification received:', notification);
 
       // Get the current list of notifications and add the new one to the top
       const currentNotifications = this.notifications$$.getValue();
-      this.notifications$$.next([notification, ...currentNotifications]);
+      this.notifications$$.next([notification, ...currentNotifications.filter(item => item._id !== notification._id)]);
     });
   }
 
@@ -54,7 +55,9 @@ export class NotificationService {
   disconnect(): void {
     if (this.socket) {
       this.socket.disconnect();
+      this.socket = undefined;
     }
+    this.notifications$$.next([]);
   }
 
   getAll(): Observable<Notification[]> {

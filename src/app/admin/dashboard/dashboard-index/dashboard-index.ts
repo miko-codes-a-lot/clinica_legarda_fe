@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -12,7 +12,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
-import { map, Observable } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { NotificationService } from '../../../_shared/service/notification-service';
 import { ClinicService } from '../../../_shared/service/clinic-service';
 import { Notification, NotificationType } from '../../../_shared/model/notification';
@@ -25,8 +25,8 @@ import { ReasonService } from '../../../_shared/service/reason-service';
 import { Referral } from '../../../_shared/model/referral';
 import { ReferralService } from '../../../_shared/service/referral-service';
 
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { Clinic } from '../../../_shared/model/clinic';
+import { createDashboardPdf, createDashboardReport, DashboardReport, renderDashboardReport } from './dashboard-report';
 
 Chart.register(...registerables);
 
@@ -54,12 +54,11 @@ export class DashboardIndex {
   @ViewChild('appointmentTrendChart', { static: false }) appointmentTrendRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('serviceTrendChart', { static: false }) serviceTrendChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('declinedReferralChart', { static: false }) declinedReferralChartRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('dashboardContent', { static: false }) dashboardContent!: ElementRef;
 
-  serviceTrendChart!: Chart;
+  serviceTrendChart!: Chart<'bar', number[], string>;
   notifications$!: Observable<Notification[]>;
   unreadNotificationsCount$!: Observable<number>;
-  declinedReferralChart!: Chart;
+  declinedReferralChart!: Chart<'doughnut', number[], string>;
 
   /** 🔹 Separate all appointments vs filtered ones */
   allAppointments: Appointment[] = [];
@@ -68,9 +67,12 @@ export class DashboardIndex {
   reasons: Reason[] = [];
   referrals: Referral[] = [];
 
-  clinics: any[] = [];
+  clinics: Pick<Clinic, '_id' | 'name'>[] = [];
   selectedClinic: string = '';
   isExporting = false;
+  reportError = '';
+  private reportWeekStart = this.getStartOfWeek();
+  private reportNotifications: Notification[] = [];
 
   dashboardData = {
     adminDashboard: {
@@ -85,8 +87,8 @@ export class DashboardIndex {
     }
   };
 
-  servicesChart!: Chart;
-  appointmentTrendChart!: Chart;
+  servicesChart!: Chart<'doughnut', number[], string>;
+  appointmentTrendChart!: Chart<'line', number[], string>;
 
   showNotifications = false;
   displayedColumns: string[] = ['time', 'patientName', 'service'];
@@ -128,7 +130,8 @@ export class DashboardIndex {
     this.loadAppointmentData();
 
     this.notifications$ = this.notificationService.notifications$.pipe(
-      map(n => n.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 10))
+      map(n => [...n].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 10)),
+      tap(notifications => this.reportNotifications = notifications)
     );
     this.unreadNotificationsCount$ = this.notifications$.pipe(map(n => n.filter(x => !x.read).length));
 
@@ -167,6 +170,7 @@ export class DashboardIndex {
 
   // ----------------- APPLY CLINIC FILTER -----------------
   applyClinicFilter(): void {
+    this.reportWeekStart = this.getStartOfWeek();
     if (this.selectedClinic && this.selectedClinic !== 'all') {
       this.appointmentData = this.allAppointments.filter(a => a.clinic?._id === this.selectedClinic);
     } else {
@@ -181,7 +185,7 @@ export class DashboardIndex {
 
   // ----------------- METRICS CALCULATION -----------------
   updateDashboardMetrics(): void {
-    const startOfWeek = this.getStartOfWeek();
+    const startOfWeek = this.reportWeekStart;
     const confirmedAppointments = this.appointmentData.filter(a => a.status === 'confirmed');
     const updatedWeekly = this.appointmentData.filter(a => {
       const dateStr = a.updatedAt || a.createdAt;
@@ -198,7 +202,7 @@ export class DashboardIndex {
     });
 
     this.dashboardData.adminDashboard.weeklyReport = {
-      weekOf: startOfWeek.toISOString().split('T')[0],
+      weekOf: this.datePipe.transform(startOfWeek, 'yyyy-MM-dd') ?? '',
       totalAppointments: confirmedAppointments.length,
       patientRecordsChanged: updatedWeekly.length,
       preferredServices
@@ -217,7 +221,7 @@ export class DashboardIndex {
       return;
     }
 
-    const config: ChartConfiguration = {
+    const config: ChartConfiguration<'doughnut', number[], string> = {
       type: 'doughnut',
       data: {
         labels: services,
@@ -253,7 +257,7 @@ export class DashboardIndex {
 
   // ----------------- WEEKLY APPOINTMENT TREND -----------------
   private getWeeklyTrendData(): { labels: string[], scheduled: number[], completed: number[] } {
-    const startOfWeek = this.getStartOfWeek();
+    const startOfWeek = this.reportWeekStart;
     const labels: string[] = [];
     const scheduled: number[] = [];
     const completed: number[] = [];
@@ -293,7 +297,7 @@ export class DashboardIndex {
       return;
     }
 
-    const config: ChartConfiguration = {
+    const config: ChartConfiguration<'line', number[], string> = {
       type: 'line',
       data: {
         labels: trendData.labels,
@@ -380,6 +384,8 @@ export class DashboardIndex {
   ngOnDestroy(): void {
     if (this.servicesChart) this.servicesChart.destroy();
     if (this.appointmentTrendChart) this.appointmentTrendChart.destroy();
+    if (this.serviceTrendChart) this.serviceTrendChart.destroy();
+    if (this.declinedReferralChart) this.declinedReferralChart.destroy();
   }
 
   redirectToDetails(link: string | undefined) {
@@ -396,7 +402,7 @@ export class DashboardIndex {
       return;
     }
 
-    const config: ChartConfiguration = {
+    const config: ChartConfiguration<'bar', number[], string> = {
       type: 'bar',
       data: {
         labels: trendData.labels,
@@ -428,7 +434,7 @@ export class DashboardIndex {
   }
 
   private getServiceTrendData(): { labels: string[], datasets: { label: string, data: number[], backgroundColor: string }[] } {
-    const startOfWeek = this.getStartOfWeek();
+    const startOfWeek = this.reportWeekStart;
     const labels: string[] = [];
     const dayAppointments: Appointment[][] = [[], [], [], [], [], [], []]; // 7 days
 
@@ -491,7 +497,6 @@ export class DashboardIndex {
 
   private createOrUpdateDeclinedReferralChart(): void {
     const { labels, counts } = this.getDeclinedReferralData();
-    console.log('this.declinedReferralChart', this.declinedReferralChart);
     if (this.declinedReferralChart) {
       this.declinedReferralChart.data.labels = labels;
       this.declinedReferralChart.data.datasets[0].data = counts;
@@ -499,7 +504,7 @@ export class DashboardIndex {
       return;
     }
 
-    const config: ChartConfiguration = {
+    const config: ChartConfiguration<'doughnut', number[], string> = {
       type: 'doughnut',
       data: {
         labels,
@@ -532,38 +537,63 @@ export class DashboardIndex {
 
     this.declinedReferralChart = new Chart(this.declinedReferralChartRef.nativeElement, config);
   }
-  exportToPDF() {
+  get canExport(): boolean {
+    return !!(this.servicesChart && this.appointmentTrendChart && this.serviceTrendChart && this.declinedReferralChart);
+  }
+
+  private dashboardReport(): DashboardReport {
+    return createDashboardReport({
+      clinic: this.clinics.find(clinic => clinic._id === this.selectedClinic)?.name ?? 'All Clinics',
+      weekStart: this.reportWeekStart,
+      services: this.servicesChart.data,
+      appointments: this.appointmentTrendChart.data,
+      serviceTrend: this.serviceTrendChart.data,
+      declinedReferrals: this.declinedReferralChart.data,
+      today: new Date(),
+      metrics: {
+        totalAppointments: this.weeklyReport.totalAppointments,
+        recordsUpdated: this.weeklyReport.patientRecordsChanged,
+        queueCount: this.getTodaysQueue().length,
+      },
+      queue: this.getTodaysQueue().map(appointment => ({
+        time: appointment.startTime,
+        patient: `${appointment.patient.firstName} ${appointment.patient.lastName}`,
+        services: appointment.services.map(service => service.name).join(', '),
+      })),
+      notifications: this.reportNotifications.map(notification => ({
+        type: this.formatNotificationType(notification.type),
+        message: notification.message,
+        timestamp: this.formatTimestamp(notification.createdAt),
+        status: notification.read ? 'Read' : 'Unread',
+      })),
+    });
+  }
+
+  printTables(): void {
+    if (!this.canExport) return;
+    this.reportError = '';
+    const printWindow = window.open('', '_blank', 'popup');
+    if (!printWindow) {
+      this.reportError = 'Allow pop-ups to print the graph tables, or use Export PDF.';
+      return;
+    }
+    printWindow.opener = null;
+    renderDashboardReport(printWindow.document, this.dashboardReport());
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  }
+
+  exportToPDF(): void {
+    if (!this.canExport || this.isExporting) return;
     this.isExporting = true;
-    
-    // Ensure the notification dropdown is closed before export
-    this.showNotifications = false; 
-
-    setTimeout(() => {
-      const element = this.dashboardContent.nativeElement;
-
-      html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        // Ignore the floating notification dropdown and action buttons
-        ignoreElements: (el) => {
-          return el.classList.contains('notification-dropdown') || 
-                el.classList.contains('mark-read-btn');
-        }
-      }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgWidth = 210;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-        pdf.save(`admin-dashboard-${new Date().getTime()}.pdf`);
-        
-        this.isExporting = false;
-      }).catch(err => {
-        console.error("PDF Export Error:", err);
-        this.isExporting = false;
-      });
-    }, 500); // Increased slightly for safer DOM repaint
+    this.reportError = '';
+    try {
+      createDashboardPdf(this.dashboardReport()).save(`admin-dashboard-${Date.now()}.pdf`);
+    } catch {
+      this.reportError = 'Unable to export the graph tables. Please try again.';
+    } finally {
+      this.isExporting = false;
+    }
   }
 }

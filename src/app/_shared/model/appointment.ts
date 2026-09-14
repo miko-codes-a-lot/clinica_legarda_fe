@@ -18,6 +18,7 @@ export interface AppointmentNote {
 export interface AppointmentHistory {
   timestamp: Date
   action: string
+  reason?: string
 }
 
 export interface Appointment {
