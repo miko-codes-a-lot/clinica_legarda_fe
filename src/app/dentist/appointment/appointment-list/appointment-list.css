@@ -99,3 +99,7 @@
 .status-filters span { display: inline-block; margin-left: 6px; font-size: 11px; opacity: .85; }
 .load-error { margin: 20px; padding: 12px; color: #a13d35; background: #fff0ed; border-radius: 8px; }
 .empty-filter { text-align: center; margin: 22px; color: #6b7b92; }
+
+.clinic-filter { display: flex; align-items: center; gap: 12px; margin: 16px 0; flex-wrap: wrap; }
+.clinic-filter label { font-weight: 600; }
+.clinic-filter select { max-width: 100%; padding: 10px 12px; border: 1px solid #b8c7c1; border-radius: 8px; background: white; color: #183f32; font: inherit; }

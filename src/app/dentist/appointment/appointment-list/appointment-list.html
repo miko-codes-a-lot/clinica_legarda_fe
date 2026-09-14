@@ -1,3 +1,13 @@
+<div class="clinic-filter">
+  <label for="dentist-appointment-clinic">Clinic</label>
+  <select #clinicSelect id="dentist-appointment-clinic" [value]="selectedClinic" (change)="selectClinic(clinicSelect.value)">
+    <option value="all">All my clinics</option>
+    @for (clinic of clinicOptions; track clinic.id) {
+      <option [value]="clinic.id">{{ clinic.name }}</option>
+    }
+  </select>
+</div>
+
 <!-- Daily Summary Card -->
 <mat-card class="daily-summary-card">
 
@@ -19,6 +29,7 @@
         <div class="count">
           {{ dailyAppointments[date].length }} patient{{ dailyAppointments[date].length > 1 ? 's' : '' }}
         </div>
+        <small>{{ dailyClinicNames[date] }}</small>
       </div>
       <div *ngIf="dailyDates.length === 0" class="no-appointments">
         No upcoming appointments

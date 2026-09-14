@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { catchError, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { Appointment, AppointmentStatus } from '../../../_shared/model/appointment';
+import { AppointmentClinicOption, filterAppointments } from '../../../_shared/model/appointment-filters';
 import { Notification } from '../../../_shared/model/notification';
 import { Referral } from '../../../_shared/model/referral';
 import { UserSimple } from '../../../_shared/model/user-simple';
@@ -19,6 +20,7 @@ interface CalendarDay {
   inMonth: boolean;
   label: string;
   appointments: Appointment[];
+  clinicNames: string;
 }
 
 @Component({
@@ -35,9 +37,12 @@ export class HomepageIndex implements OnInit {
   private readonly referralService = inject(ReferralService);
   private readonly notificationService = inject(NotificationService);
   private activeAppointments: Appointment[] = [];
+  private appointments: Appointment[] = [];
   private loadedDentistId = '';
 
   user: UserSimple | null = null;
+  selectedClinic = 'all';
+  clinicOptions: AppointmentClinicOption[] = [];
   todayAppointments: Appointment[] = [];
   upcomingAppointments: Appointment[] = [];
   upcomingCount = 0;
@@ -55,7 +60,7 @@ export class HomepageIndex implements OnInit {
   calendarMonth = new Date(`${this.todayStr.slice(0, 7)}-01T00:00:00Z`);
   calendarDays: CalendarDay[] = [];
   selectedAppointments: Appointment[] = [];
-  confirmedDays: { date: string; count: number }[] = [];
+  confirmedDays: { date: string; count: number; clinicNames: string }[] = [];
   readonly weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   readonly formatDate = formatAppointmentDate;
 
@@ -65,6 +70,17 @@ export class HomepageIndex implements OnInit {
     this.feed.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(state => {
       if (state.dentistId !== this.loadedDentistId) {
         this.loadedDentistId = state.dentistId;
+        this.selectedClinic = 'all';
+        this.clinicOptions = [];
+        this.selectedDate = clinicClock().date;
+        this.calendarMonth = new Date(`${this.selectedDate.slice(0, 7)}-01T00:00:00Z`);
+        this.errorMessage = '';
+        this.notificationError = '';
+        this.referralError = '';
+        this.referrals = [];
+        this.notifications = [];
+        this.unreadCount = 0;
+        this.markingReadId = '';
         this.updateAppointments([]);
       }
       this.isLoading = state.kind === 'loading';
@@ -73,6 +89,12 @@ export class HomepageIndex implements OnInit {
         this.updateAppointments(state.appointments);
       } else if (state.kind === 'error') {
         this.errorMessage = state.message;
+      }
+    });
+    this.feed.clinicOptions$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(options => {
+      this.clinicOptions = options;
+      if (this.selectedClinic !== 'all' && !options.some(option => option.id === this.selectedClinic)) {
+        this.selectClinic('all');
       }
     });
 
@@ -106,6 +128,7 @@ export class HomepageIndex implements OnInit {
     this.authService.currentUser$.pipe(
       map(user => user?._id ?? ''), distinctUntilChanged(),
       switchMap(dentistId => {
+        this.referrals = [];
         this.referralError = '';
         return dentistId ? this.referralService.getAll().pipe(
           map(referrals => referrals.filter(referral => {
@@ -128,6 +151,11 @@ export class HomepageIndex implements OnInit {
 
   refresh(): void {
     this.feed.refresh();
+  }
+
+  selectClinic(clinicId: string): void {
+    this.selectedClinic = clinicId;
+    this.updateAppointments(this.appointments);
   }
 
   selectDate(date: string): void {
@@ -154,9 +182,11 @@ export class HomepageIndex implements OnInit {
   }
 
   private updateAppointments(appointments: Appointment[]): void {
+    this.appointments = appointments;
     const now = clinicClock();
     this.todayStr = now.date;
-    this.activeAppointments = appointments.filter(isActiveAppointment).sort(compareAppointmentSchedule);
+    this.activeAppointments = filterAppointments(appointments, this.selectedClinic)
+      .filter(isActiveAppointment).sort(compareAppointmentSchedule);
     this.todayAppointments = this.activeAppointments.filter(appointment => appointmentDateKey(appointment.date) === now.date);
     const upcoming = this.activeAppointments.filter(appointment => {
       const date = appointmentDateKey(appointment.date);
@@ -164,14 +194,16 @@ export class HomepageIndex implements OnInit {
     });
     this.upcomingCount = upcoming.length;
     this.upcomingAppointments = upcoming.slice(0, 5);
-    const confirmed = new Map<string, number>();
+    const confirmed = new Map<string, Appointment[]>();
     for (const appointment of this.activeAppointments) {
       const date = appointmentDateKey(appointment.date);
       if (appointment.status === AppointmentStatus.CONFIRMED && date >= now.date) {
-        confirmed.set(date, (confirmed.get(date) ?? 0) + 1);
+        confirmed.set(date, [...(confirmed.get(date) ?? []), appointment]);
       }
     }
-    this.confirmedDays = Array.from(confirmed, ([date, count]) => ({ date, count })).slice(0, 7);
+    this.confirmedDays = Array.from(confirmed, ([date, appointments]) => ({
+      date, count: appointments.length, clinicNames: this.clinicNames(appointments),
+    })).slice(0, 7);
     this.rebuildCalendar();
   }
 
@@ -190,11 +222,15 @@ export class HomepageIndex implements OnInit {
       const appointments = byDate.get(key) ?? [];
       return {
         date: key, day: date.getUTCDate(), inMonth: date.getUTCMonth() === this.calendarMonth.getUTCMonth(),
-        label: `${formatAppointmentDate(date)}, ${appointments.length} appointment${appointments.length === 1 ? '' : 's'}`,
-        appointments,
+        label: `${formatAppointmentDate(date)}, ${appointments.length} appointment${appointments.length === 1 ? '' : 's'}${appointments.length ? ', ' + this.clinicNames(appointments) : ''}`,
+        appointments, clinicNames: this.clinicNames(appointments),
       };
     });
     this.selectedAppointments = byDate.get(this.selectedDate) ?? [];
+  }
+
+  private clinicNames(appointments: readonly Appointment[]): string {
+    return [...new Set(appointments.map(appointment => appointment.clinic.name))].join(', ');
   }
 
   private dentistNotificationLink(link: string | undefined): string | undefined {

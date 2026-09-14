@@ -2,6 +2,7 @@ import { AfterViewInit, Component, DestroyRef, inject, OnInit } from '@angular/c
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Appointment, AppointmentStatus } from '../../../_shared/model/appointment';
+import { AppointmentClinicOption, filterAppointments } from '../../../_shared/model/appointment-filters';
 import { MatTableDataSource } from '@angular/material/table';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
 import { MatCardModule } from '@angular/material/card';
@@ -30,15 +31,19 @@ export class AppointmentList implements OnInit, AfterViewInit {
   errorMessage = '';
   dataSource = new MatTableDataSource<Appointment>();
   dailyAppointments: Record<string, Appointment[]> = {};
+  dailyClinicNames: Record<string, string> = {};
   dailyDates: string[] = [];
   todayStr = clinicClock().date;
   selectedStatus: StatusFilter = 'all';
+  selectedClinic = 'all';
+  clinicOptions: AppointmentClinicOption[] = [];
   readonly statusFilters: { value: StatusFilter; label: string }[] = [
     { value: 'all', label: 'All' }, { value: AppointmentStatus.PENDING, label: 'Pending' },
     { value: AppointmentStatus.CONFIRMED, label: 'Confirmed' }, { value: AppointmentStatus.CANCELLED, label: 'Cancelled' },
     { value: AppointmentStatus.REJECTED, label: 'Rejected' },
+    { value: AppointmentStatus.COMPLETED, label: 'Completed' }, { value: AppointmentStatus.NO_SHOW, label: 'No show' },
   ];
-  statusCounts: Record<StatusFilter, number> = { all: 0, pending: 0, confirmed: 0, cancelled: 0, rejected: 0 };
+  statusCounts: Record<StatusFilter, number> = { all: 0, pending: 0, confirmed: 0, cancelled: 0, rejected: 0, completed: 0, no_show: 0 };
 
   displayedColumns = ['_id', 'clinic', 'patient', 'dentist', 'date', 'time', 'status', 'actions'];
   columnDefs = [
@@ -55,6 +60,12 @@ export class AppointmentList implements OnInit, AfterViewInit {
     this.feed.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(state => {
       if (this.loadedDentistId !== state.dentistId) {
         this.loadedDentistId = state.dentistId;
+        this.selectedClinic = 'all';
+        this.selectedStatus = 'all';
+        this.clinicOptions = [];
+        this.dataSource.filter = '';
+        this.dataSource.paginator?.firstPage();
+        this.errorMessage = '';
         this.updateAppointments([]);
       }
       this.isLoading = state.kind === 'loading';
@@ -63,6 +74,12 @@ export class AppointmentList implements OnInit, AfterViewInit {
         this.updateAppointments(state.appointments);
       } else if (state.kind === 'error') {
         this.errorMessage = state.message;
+      }
+    });
+    this.feed.clinicOptions$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(options => {
+      this.clinicOptions = options;
+      if (this.selectedClinic !== 'all' && !options.some(option => option.id === this.selectedClinic)) {
+        this.selectClinic('all');
       }
     });
   }
@@ -75,7 +92,13 @@ export class AppointmentList implements OnInit, AfterViewInit {
 
   selectStatus(status: StatusFilter): void {
     this.selectedStatus = status;
-    this.applyStatusFilter();
+    this.applyFilters();
+    this.dataSource.paginator?.firstPage();
+  }
+
+  selectClinic(clinicId: string): void {
+    this.selectedClinic = clinicId;
+    this.applyFilters();
     this.dataSource.paginator?.firstPage();
   }
 
@@ -93,19 +116,20 @@ export class AppointmentList implements OnInit, AfterViewInit {
       const bDate = b.updatedAt ?? b.createdAt ?? '';
       return bDate.localeCompare(aDate);
     });
-    this.statusCounts = { all: appointments.length, pending: 0, confirmed: 0, cancelled: 0, rejected: 0 };
-    for (const appointment of appointments) this.statusCounts[appointment.status]++;
-    this.applyStatusFilter();
-    this.prepareDailySummary(appointments);
+    this.applyFilters();
   }
 
-  private applyStatusFilter(): void {
-    this.dataSource.data = this.selectedStatus === 'all' ? this.appointments
-      : this.appointments.filter(appointment => appointment.status === this.selectedStatus);
+  private applyFilters(): void {
+    const appointments = filterAppointments(this.appointments, this.selectedClinic);
+    this.statusCounts = { all: appointments.length, pending: 0, confirmed: 0, cancelled: 0, rejected: 0, completed: 0, no_show: 0 };
+    for (const appointment of appointments) this.statusCounts[appointment.status]++;
+    this.dataSource.data = filterAppointments(appointments, 'all', this.selectedStatus);
+    this.prepareDailySummary(appointments);
   }
 
   private prepareDailySummary(appointments: Appointment[]): void {
     this.dailyAppointments = {};
+    this.dailyClinicNames = {};
     this.todayStr = clinicClock().date;
     for (const appointment of appointments) {
       const date = appointmentDateKey(appointment.date);
@@ -113,5 +137,8 @@ export class AppointmentList implements OnInit, AfterViewInit {
       (this.dailyAppointments[date] ??= []).push(appointment);
     }
     this.dailyDates = Object.keys(this.dailyAppointments).sort();
+    for (const date of this.dailyDates) {
+      this.dailyClinicNames[date] = [...new Set(this.dailyAppointments[date].map(appointment => appointment.clinic.name))].join(', ');
+    }
   }
 }

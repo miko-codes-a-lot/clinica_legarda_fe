@@ -10,7 +10,7 @@
   }
   <mat-form-field appearance="fill">
     <mat-label>Search</mat-label>
-    <input matInput (keyup)="applyFilter($event)" placeholder="Type to search">
+    <input matInput [value]="dataSource.filter" (keyup)="applyFilter($event)" placeholder="Type to search">
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
   <div class="user-table-container">

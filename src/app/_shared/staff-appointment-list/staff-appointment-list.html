@@ -1,0 +1,37 @@
+<h2>Appointments</h2>
+<div class="filters">
+  <mat-form-field appearance="outline">
+    <mat-label>Clinic</mat-label>
+    <mat-select [value]="selectedClinic" (selectionChange)="selectClinic($event.value)">
+      <mat-option value="all">All clinics</mat-option>
+      @for (clinic of clinics; track clinic._id) {
+        <mat-option [value]="clinic._id">{{ clinic.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>Status</mat-label>
+    <mat-select [value]="selectedStatus" (selectionChange)="selectStatus($event.value)">
+      <mat-option value="all">All statuses</mat-option>
+      @for (status of statuses; track status.value) {
+        <mat-option [value]="status.value">{{ status.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <button mat-stroked-button (click)="refresh()" [disabled]="isLoading">Refresh</button>
+</div>
+@if (loadError) { <p role="alert">{{ loadError }}</p> }
+@if (!isLoading && !loadError && dataSource.data.length === 0) {
+  <p>No appointments match the selected clinic and status.</p>
+}
+<app-generic-table
+  [displayedColumns]="displayedColumns"
+  [columnDefs]="columnDefs"
+  [dataSource]="dataSource"
+  [isLoading]="isLoading"
+  [disableEditFn]="disableEdit"
+  createButtonLabel="Create appointment"
+  (details)="onDetails($event)"
+  (update)="onUpdate($event)"
+  (create)="onCreate()">
+</app-generic-table>

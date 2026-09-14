@@ -5,6 +5,7 @@ import { Appointment, AppointmentStatus } from '../../../_shared/model/appointme
 import { Notification, NotificationType } from '../../../_shared/model/notification';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
 import { AuthService } from '../../../_shared/service/auth-service';
+import { ClinicService } from '../../../_shared/service/clinic-service';
 import { NotificationService } from '../../../_shared/service/notification-service';
 import { ReferralService } from '../../../_shared/service/referral-service';
 import { dentistAppointment, dentistUser } from '../../appointment/appointment-test-fixtures';
@@ -37,6 +38,7 @@ describe('Dentist dashboard', () => {
       providers: [
         provideRouter([]),
         { provide: AuthService, useValue: { currentUser$: of(dentistUser) } },
+        { provide: ClinicService, useValue: { getAll: () => of([]) } },
         { provide: AppointmentService, useValue: { getAll: getAppointments, getAllByDentist: getAppointments, changes$: changes } },
         { provide: ReferralService, useValue: { getAll: () => of([]) } },
         { provide: NotificationService, useValue: {

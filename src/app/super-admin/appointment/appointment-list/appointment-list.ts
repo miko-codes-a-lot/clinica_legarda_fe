@@ -1,65 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Appointment } from '../../../_shared/model/appointment';
-import { AppointmentService } from '../../../_shared/service/appointment-service';
-import { MatTableDataSource } from '@angular/material/table';
-import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
-import { AlertService } from '../../../_shared/service/alert.service';
+import { Component } from '@angular/core';
+import { StaffAppointmentList } from '../../../_shared/staff-appointment-list/staff-appointment-list';
 
 @Component({
-  selector: 'app-appointment-list',
-  imports: [GenericTableComponent],
-  templateUrl: './appointment-list.html',
-  styleUrl: './appointment-list.css'
+  selector: 'app-super-admin-appointment-list',
+  imports: [StaffAppointmentList],
+  template: '<app-staff-appointment-list area="super-admin" />',
 })
-
-export class AppointmentList implements OnInit {
-  isLoading = false
-  moduleUrl = '/super-admin/appointment/'
-  title = 'Appointment'
-  createLabel = 'Create appointment'
-  dataSource = new MatTableDataSource<Appointment>();
-  displayedColumns: string[] = ['_id', 'clinic', 'patient', 'dentist', 'date', 'time', 'status', 'actions'];
-  columnDefs = [
-    { key: '_id', label: 'ID', cell: (appointment: Appointment) => appointment._id ?? '' },
-    { key: 'clinic', label: 'Clinic', cell: (appointment: Appointment) => appointment.clinic.name},
-    { key: 'patient', label: 'Patient', cell: (appointment: Appointment) =>  `${appointment.patient.firstName} ${appointment.patient.lastName}` },
-    { key: 'dentist', label: 'Dentist', cell: (appointment: Appointment) =>  `${appointment.dentist.firstName} ${appointment.dentist.lastName}` },
-    { key: 'date', label: 'Date', cell: (appointment: Appointment) => appointment.date },
-    { key: 'time', label: 'Time', cell: (appointment: Appointment) =>  `${appointment.startTime} - ${appointment.endTime}` },
-    { key: 'status', label: 'Status', cell: (appointment: Appointment) =>  appointment.status },
-  ];
-
-  disableEdit = (appointment: Appointment) => appointment.status !== 'pending';
-
-  constructor(
-    private readonly appointmentService: AppointmentService,
-    private readonly router: Router,
-    private readonly alertService: AlertService,
-  ) {}
-
-  ngOnInit(): void {
-    this.isLoading = true
-
-    this.appointmentService.getAll().subscribe({
-      next: (data) => {
-        this.dataSource.data = data;
-        console.log('dataSource', this.dataSource.data);
-      },
-      error: (e) => this.alertService.error(e.error.message)
-    }).add(() => this.isLoading = false);
-  }
-
-  onDetails(id: string) {
-    this.router.navigate([`${this.moduleUrl}/details`, id])
-  }
-
-  onUpdate(id: string) {
-    this.router.navigate([`${this.moduleUrl}/update`, id])
-  }
-
-  onCreate() {
-    this.router.navigate([`${this.moduleUrl}/create`])
-  }
-
-}
+export class AppointmentList {}

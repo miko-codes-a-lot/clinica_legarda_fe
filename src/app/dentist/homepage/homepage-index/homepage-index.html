@@ -10,6 +10,16 @@
     </button>
   </header>
 
+  <div class="clinic-filter">
+    <label for="dentist-dashboard-clinic">Clinic</label>
+    <select #clinicSelect id="dentist-dashboard-clinic" [value]="selectedClinic" (change)="selectClinic(clinicSelect.value)">
+      <option value="all">All my clinics</option>
+      @for (clinic of clinicOptions; track clinic.id) {
+        <option [value]="clinic.id">{{ clinic.name }}</option>
+      }
+    </select>
+  </div>
+
   @if (errorMessage) {
     <p class="error-message" role="alert">{{ errorMessage }}</p>
   }
@@ -26,12 +36,12 @@
       <small>Pending and confirmed</small>
     </div>
     <a class="summary-card" routerLink="/dentist/referral-request">
-      <span>Pending referrals</span>
+      <span>Pending referrals · Account-wide</span>
       <strong>{{ referralError ? '—' : pendingReferralCount }}</strong>
       <small>{{ referralError || 'View referral requests' }}</small>
     </a>
     <a class="summary-card" routerLink="/dentist/notification">
-      <span>Unread notifications</span>
+      <span>Unread notifications · Account-wide</span>
       <strong>{{ unreadCount }}</strong>
       <small>View all notifications</small>
     </a>
@@ -51,6 +61,7 @@
           [attr.aria-pressed]="selectedDate === day.date" (click)="selectDate(day.date)">
           <span>{{ (day.date + 'T00:00:00Z') | date:'EEE, MMM d':'UTC' }}</span>
           <strong>{{ day.count }} patient{{ day.count === 1 ? '' : 's' }}</strong>
+          <small>{{ day.clinicNames }}</small>
           @if (day.date === todayStr) { <small>Today</small> }
         </button>
       } @empty {
@@ -87,6 +98,7 @@
             @if (day.appointments.length > 0) {
               <span class="calendar-count">{{ day.appointments.length }} <span class="appointment-word">appt{{ day.appointments.length === 1 ? '' : 's' }}</span></span>
               <span class="calendar-time">{{ day.appointments[0].startTime }}</span>
+              <span class="calendar-clinic">{{ day.clinicNames }}</span>
             }
           </button>
         }
@@ -142,6 +154,7 @@
             <div class="appointment-info">
               <a [routerLink]="['/dentist/appointment/details', appointment._id]">{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</a>
               <p>{{ formatDate(appointment.date) }} · {{ appointment.startTime }}–{{ appointment.endTime }}</p>
+              <p>{{ appointment.clinic.name }}</p>
             </div>
             <span class="status" [class.pending]="appointment.status === 'pending'">{{ appointment.status }}</span>
           </article>
@@ -151,7 +164,7 @@
 
     <section class="panel" aria-labelledby="notifications-title">
       <div class="section-header">
-        <div><h2 id="notifications-title">Notifications <span class="unread-badge">{{ unreadCount }} unread</span></h2><p>Recent appointment updates</p></div>
+        <div><h2 id="notifications-title">Notifications <span class="unread-badge">{{ unreadCount }} unread</span></h2><p>Account-wide · Recent appointment updates</p></div>
         <a routerLink="/dentist/notification">View all</a>
       </div>
       @if (notificationError) { <p class="error-message" role="alert">{{ notificationError }}</p> }
