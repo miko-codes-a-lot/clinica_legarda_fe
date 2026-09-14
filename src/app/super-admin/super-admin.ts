@@ -40,6 +40,7 @@ export class SuperAdmin {
 
   menuItems = [
     { label: 'Dashboard', icon: 'dashboard', link: '/super-admin/dashboard' },
+    { label: 'Clinics', icon: 'local_hospital', link: '/super-admin/clinic' },
     { label: 'User', icon: 'group', link: '/super-admin/user' },
     { label: 'Appointments', icon: 'event', link: '/super-admin/appointment' },
   ];

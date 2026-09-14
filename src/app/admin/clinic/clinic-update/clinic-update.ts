@@ -16,7 +16,12 @@ import { AlertService } from '../../../_shared/service/alert.service';
   styleUrl: './clinic-update.css'
 })
 export class ClinicUpdate {
+  get moduleUrl(): string {
+    return this.router.url.startsWith('/super-admin') ? '/super-admin/clinic' : '/admin/clinic';
+  }
+
   isLoading = false
+  loadError = ''
   id!: string
   clinic!: Clinic
   days: Day[] = []
@@ -43,7 +48,11 @@ export class ClinicUpdate {
         this.clinic = clinic
         this.days = days
       },
-      error: (e) => this.alertService.error(e.error.message),
+      error: (e) => {
+        this.loadError = e.error?.message || 'Unable to load or save the clinic.';
+        this.alertService.error(this.loadError);
+        this.isLoading = false;
+      },
       complete: () => this.isLoading = false
     })
   }
@@ -51,8 +60,12 @@ export class ClinicUpdate {
   onSubmit(clinic: Clinic) {
     this.isLoading = true
     this.clinicService.update(this.id, clinic).subscribe({
-      next: () => this.router.navigate(['admin/clinic/details', this.id], { replaceUrl: true }),
-      error: (e) => this.alertService.error(e.error.message)
+      next: () => this.router.navigate([`${this.moduleUrl}/details`, this.id], { replaceUrl: true }),
+      error: (e) => {
+        this.loadError = e.error?.message || 'Unable to load or save the clinic.';
+        this.alertService.error(this.loadError);
+        this.isLoading = false;
+      }
     }).add(() => this.isLoading = false)
   }
 }

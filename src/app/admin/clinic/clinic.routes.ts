@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { Clinic } from './clinic';
+import { AuthGuard } from '../../_shared/guard/auth-guard';
 
 export const CLINIC_ROUTES: Routes = [
   {
@@ -8,7 +9,7 @@ export const CLINIC_ROUTES: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '/admin/clinic/list',
+        redirectTo: 'list',
         pathMatch: 'full'
       },
       {
@@ -21,10 +22,14 @@ export const CLINIC_ROUTES: Routes = [
       },
       {
         path: 'create',
+        canActivate: [AuthGuard],
+        data: { role: 'super-admin' },
         loadComponent: () => import('./clinic-create/clinic-create').then(m => m.ClinicCreate)
       },
       {
         path: 'update/:id',
+        canActivate: [AuthGuard],
+        data: { role: 'super-admin' },
         loadComponent: () => import('./clinic-update/clinic-update').then(m => m.ClinicUpdate)
       },
     ]

@@ -1,6 +1,6 @@
 @if (clinic) {
   <div class="view-header">
-    <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
+    @if (canManage) { <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button> }
   </div>
   <app-list [data]="displayClinic">
     <div class="row-divider"></div>
@@ -13,6 +13,8 @@
       </mat-list-item>
     </div>
   </app-list>
+} @else if (loadError) {
+  <p role="alert">{{ loadError }}</p>
 } @else {
   <p>Fetching details...</p>
 }

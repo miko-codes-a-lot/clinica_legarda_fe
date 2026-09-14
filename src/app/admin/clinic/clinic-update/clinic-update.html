@@ -5,6 +5,8 @@
     [days]="days"
     (onSubmitEvent)="onSubmit($event)"
   ></app-clinic-form>
+} @else if (loadError) {
+  <p role="alert">{{ loadError }}</p>
 } @else {
   <p>Fetching details...</p>
 }

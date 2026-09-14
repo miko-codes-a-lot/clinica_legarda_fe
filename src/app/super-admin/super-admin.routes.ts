@@ -19,6 +19,12 @@ export const SUPER_ADMIN_ROUTES: Routes = [
         loadChildren: () => import('./dashboard/dashboard.route').then(m => m.DASHBOARD_ROUTES)
       },
       {
+        path: 'clinic',
+        canActivate: [AuthGuard],
+        data: { role: 'super-admin' },
+        loadChildren: () => import('../admin/clinic/clinic.routes').then(m => m.CLINIC_ROUTES)
+      },
+      {
         path: 'user',
         canActivate: [AuthGuard],
         data: { role: 'super-admin' },

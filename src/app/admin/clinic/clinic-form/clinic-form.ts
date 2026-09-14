@@ -52,9 +52,9 @@ export class ClinicForm implements OnInit {
   }
 
   ngOnInit(): void {
-    const operatingHours = this.clinic.operatingHours.length == 0
-      ? this.getDefaultClinic().operatingHours
-      : this.clinic.operatingHours
+    const operatingHours = this.clinic.operatingHours?.length
+      ? this.clinic.operatingHours
+      : this.getDefaultClinic().operatingHours
 
     this.rxform = this.fb.nonNullable.group({
       name: [this.clinic.name, Validators.required],
@@ -62,7 +62,7 @@ export class ClinicForm implements OnInit {
       mobileNumber: [this.clinic.mobileNumber, [Validators.required, Validators.pattern(/^\+639\d{9}$/)]],
       emailAddress: [this.clinic.emailAddress, [Validators.required, Validators.email]],
       operatingHours: this.fb.array<FormGroup<RxOperatingHour>>(
-        this.clinic.operatingHours.map(
+        operatingHours.map(
           (o) => this.fb.nonNullable.group({
             day: [o.day, Validators.required],
             startTime: [o.startTime, Validators.required],
@@ -85,7 +85,7 @@ export class ClinicForm implements OnInit {
   private buildClinicFields() {
     this.clinicFields = [
       { name: 'name', label: 'Name', type: 'text'},
-      { name: 'address', label: 'Adress', type: 'text' },
+      { name: 'address', label: 'Address', type: 'text' },
       { name: 'mobileNumber', label: 'Mobile Number', type: 'text', customError: 'Use +639 format only'  },
       { name: 'emailAddress', label: 'Email Address', type: 'email' },
     ];
@@ -93,6 +93,7 @@ export class ClinicForm implements OnInit {
   }
 
   onSubmit() {
+    if (this.rxform.invalid) { this.rxform.markAllAsTouched(); return; }
     const clinic: Clinic = {
       name: this.name.value,
       address: this.address.value,

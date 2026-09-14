@@ -1,10 +1,10 @@
 <app-form
   [form]="rxform"
-  [fields]="clinicFields" 
+  [fields]="clinicFields"
   [isLoading]="isLoading"
   (onSubmitEvent)="onSubmit()"
 >
-  <form [formGroup]="rxform">  
+  <div [formGroup]="rxform">
     <span class="hours">Clinic Hours:</span>
     <div formArrayName="operatingHours" class="operating-hours">
       @for (hour of this.operatingHours.controls; track $index) {
@@ -37,7 +37,7 @@
         </div> <br>
       }
     </div>
-  </form>
+  </div>
 </app-form>
 
 

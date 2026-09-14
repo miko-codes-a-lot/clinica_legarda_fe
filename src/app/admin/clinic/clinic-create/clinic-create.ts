@@ -14,7 +14,12 @@ import { AlertService } from '../../../_shared/service/alert.service';
   styleUrl: './clinic-create.css'
 })
 export class ClinicCreate implements OnInit {
+  get moduleUrl(): string {
+    return this.router.url.startsWith('/super-admin') ? '/super-admin/clinic' : '/admin/clinic';
+  }
+
   isLoading = false
+  loadError = ''
   days: Day[] = []
 
   constructor(
@@ -37,8 +42,12 @@ export class ClinicCreate implements OnInit {
   onSubmit(clinic: Clinic) {
     this.isLoading = true
     this.clinicService.create(clinic).subscribe({
-      next: (c) => this.router.navigate(['admin/clinic/details', c._id], { replaceUrl: true }),
-      error: (e) => this.alertService.error(e.error.message)
+      next: (c) => this.router.navigate([`${this.moduleUrl}/details`, c._id], { replaceUrl: true }),
+      error: (e) => {
+        this.loadError = e.error?.message || 'Unable to load or save the clinic.';
+        this.alertService.error(this.loadError);
+        this.isLoading = false;
+      }
     }).add(() => this.isLoading = false)
   }
 }

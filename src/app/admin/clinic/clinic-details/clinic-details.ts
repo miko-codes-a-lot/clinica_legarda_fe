@@ -1,3 +1,4 @@
+import { AuthService } from '../../../_shared/service/auth-service';
 import { Component } from '@angular/core';
 import { Clinic } from '../../../_shared/model/clinic';
 import { ClinicService } from '../../../_shared/service/clinic-service';
@@ -14,13 +15,21 @@ import { AlertService } from '../../../_shared/service/alert.service';
   styleUrl: './clinic-details.css'
 })
 export class ClinicDetails {
+  get moduleUrl(): string {
+    return this.router.url.startsWith('/super-admin') ? '/super-admin/clinic' : '/admin/clinic';
+  }
+
   isLoading = false
+  loadError = ''
   id!: string
   clinic?: Clinic
   displayClinic: Record<string, any> = {};
 
 
+  get canManage(): boolean { return this.authService.currentUserValue?.role === 'super-admin'; }
+
   constructor(
+    private readonly authService: AuthService,
     private readonly clinicService: ClinicService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
@@ -44,12 +53,17 @@ export class ClinicDetails {
         }
         this.clinic = c
       },
-      error: (e) => this.alertService.error(e.error.message)
+      error: (e) => {
+        this.loadError = e.error?.message || 'Unable to load or save the clinic.';
+        this.alertService.error(this.loadError);
+        this.isLoading = false;
+      }
     }).add(() => this.isLoading = false)
   }
 
   onUpdate() {
-    this.router.navigate(['/admin/clinic/update', this.id])
+    if (!this.canManage) return;
+    this.router.navigate([`${this.moduleUrl}/update`, this.id])
   }
 
   // onAddBranch() {
