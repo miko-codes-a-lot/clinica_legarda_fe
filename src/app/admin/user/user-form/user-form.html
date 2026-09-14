@@ -4,12 +4,12 @@
   [isLoading]="isLoading"
   (onSubmitEvent)="onSubmit()">
 
-  <form [formGroup]="rxform">
+  <div [formGroup]="rxform">
     @if (rxform.get('role')?.value === 'dentist') {
       @if (assignedClinics.value.length === 0) {
         <p><i>Please select at least one clinic</i></p>
       } @else {
-        <button type="button" (click)="onAddSchedule()" [disabled]="!selectedClinic || operatingHours.length >= selectedClinic.operatingHours.length" matButton="outlined">Add Schedule</button>
+        <button type="button" (click)="onAddSchedule()" [disabled]="operatingHours.length >= days.length" matButton="outlined">Add Schedule</button>
 
         <!-- adjust the design of this -->
         <div formArrayName="operatingHours" class="schedule">
@@ -57,5 +57,5 @@
         }
       }
     }
-  </form>
+  </div>
 </app-form>

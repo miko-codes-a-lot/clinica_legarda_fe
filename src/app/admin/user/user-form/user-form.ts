@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 import { FormComponent } from '../../../_shared/component/form/form.component';
 import { FormField } from '../../../_shared/component/form/form-field.interface';
 import { Clinic } from '../../../_shared/model/clinic';
@@ -13,7 +13,7 @@ import { buildStaffUserPayload } from '../../../_shared/model/staff-user-payload
 import { assignedClinicIds, User, UserStatus } from '../../../_shared/model/user';
 import { ClinicService } from '../../../_shared/service/clinic-service';
 import { applyPHMobilePrefix } from '../../../utils/forms/form-custom-format';
-import { passwordMatchValidator, timeRangeValidator, withinClinicHoursValidator } from '../../../utils/forms/form-custom-validator';
+import { passwordMatchValidator, timeRangeValidator } from '../../../utils/forms/form-custom-validator';
 import { PASSWORD_REQUIREMENTS_MESSAGE, strongPasswordValidators } from '../../../utils/forms/password-policy';
 import { RxStaffUserForm } from './rx-user-form.interface';
 import { UserPayload } from './user-payload';
@@ -33,7 +33,6 @@ export class UserForm implements OnInit, OnChanges {
 
   rxform!: FormGroup<RxStaffUserForm>;
   userFields: FormField[] = [];
-  selectedClinic: Clinic | undefined;
   hide = signal(true);
 
   constructor(
@@ -94,7 +93,6 @@ export class UserForm implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['clinics']) {
       this.buildUserFields();
-      this.syncSelectedClinic();
     }
   }
 
@@ -133,7 +131,6 @@ export class UserForm implements OnInit, OnChanges {
           .filter((clinic): clinic is Clinic & { _id: string } => !!clinic._id)
           .map(clinic => ({ value: clinic._id, label: clinic.name })),
         customError: 'Select at least one clinic.',
-        selectionChange: event => this.onClinicChange(event as MatSelectChange),
       });
     }
 
@@ -150,43 +147,19 @@ export class UserForm implements OnInit, OnChanges {
     }
     this.assignedClinics.updateValueAndValidity({ emitEvent: false });
     this.buildUserFields();
-    this.syncSelectedClinic();
-  }
-
-  private syncSelectedClinic(): void {
-    const selectedId = this.rxform?.controls.clinics.value[0];
-    this.selectedClinic = this.clinics.find(clinic => clinic._id === selectedId);
-  }
-
-  onClinicChange(event: MatSelectChange): void {
-    const selectedIds = Array.isArray(event.value)
-      ? event.value.filter((id): id is string => typeof id === 'string')
-      : [];
-    this.selectedClinic = this.clinics.find(clinic => clinic._id === selectedIds[0]);
   }
 
   onAddSchedule(): void {
     const usedDays = this.operatingHours.controls.map(group => group.controls.day.value);
-    const nextSchedule = this.selectedClinic?.operatingHours.find(schedule => !usedDays.includes(schedule.day));
+    const nextDay = this.days.find(day => !usedDays.includes(day.code));
 
-    if (!nextSchedule || !this.selectedClinic) return;
+    if (!nextDay) return;
 
-    const clinicHours = this.selectedClinic.operatingHours;
     const newGroup = this.fb.nonNullable.group({
-      day: [nextSchedule.day, Validators.required],
-      startTime: [nextSchedule.startTime, Validators.required],
-      endTime: [nextSchedule.endTime, Validators.required],
-    }, { validators: [timeRangeValidator, withinClinicHoursValidator(clinicHours)] });
-
-    newGroup.controls.day.valueChanges.subscribe(selectedDay => {
-      const defaultSchedule = clinicHours.find(day => day.day === selectedDay);
-      if (defaultSchedule) {
-        newGroup.patchValue({
-          startTime: defaultSchedule.startTime,
-          endTime: defaultSchedule.endTime,
-        });
-      }
-    });
+      day: [nextDay.code, Validators.required],
+      startTime: ['', Validators.required],
+      endTime: ['', Validators.required],
+    }, { validators: timeRangeValidator });
 
     this.operatingHours.push(newGroup);
   }
@@ -214,6 +187,11 @@ export class UserForm implements OnInit, OnChanges {
   }
 
   onSubmit(): void {
+    if (this.rxform.invalid) {
+      this.rxform.markAllAsTouched();
+      return;
+    }
+
     const user = buildStaffUserPayload({
       firstName: this.firstName.value,
       middleName: this.middleName.value,
