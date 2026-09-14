@@ -1,4 +1,5 @@
 import jsPDF, { CellConfig } from 'jspdf';
+import { formatReportDate } from '../../../_shared/model/analytics-report';
 
 interface GraphData {
   readonly labels?: readonly string[];
@@ -14,26 +15,25 @@ export interface DashboardReportTable {
 }
 
 export interface DashboardReport {
+  readonly title?: string;
   readonly clinic: string;
   readonly week: string;
   readonly tables: readonly DashboardReportTable[];
 }
 
-interface DashboardReportInput {
+export interface DashboardReportInput {
+  readonly title: string;
   readonly clinic: string;
-  readonly weekStart: Date;
+  readonly weekOf: string;
+  readonly weekEnd: string;
   readonly services: GraphData;
   readonly appointments: GraphData;
   readonly serviceTrend: GraphData;
   readonly declinedReferrals: GraphData;
-  readonly today: Date;
-  readonly metrics: { readonly totalAppointments: number; readonly recordsUpdated: number; readonly queueCount: number };
-  readonly queue: readonly { readonly time: string; readonly patient: string; readonly services: string }[];
+  readonly today: string;
+  readonly metrics: { readonly totalAppointments: number; readonly appointmentsUpdated: number; readonly queueCount: number };
+  readonly queue: readonly { readonly time: string; readonly patient: string; readonly services: string; readonly clinic: string }[];
   readonly notifications: readonly { readonly type: string; readonly message: string; readonly timestamp: string; readonly status: string }[];
-}
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function distributionRows(graph: GraphData): string[][] {
@@ -47,13 +47,14 @@ function distributionRows(graph: GraphData): string[][] {
 
 export function createDashboardReport(input: DashboardReportInput): DashboardReport {
   const dateAt = (index: number): string => {
-    const date = new Date(input.weekStart);
-    date.setDate(date.getDate() + index);
-    return formatDate(date);
+    const date = new Date(`${input.weekOf}T00:00:00Z`);
+    date.setUTCDate(date.getUTCDate() + index);
+    return formatReportDate(date.toISOString().slice(0, 10));
   };
-  const week = `${dateAt(0)} - ${dateAt(6)}`;
+  const week = `${formatReportDate(input.weekOf)} - ${formatReportDate(input.weekEnd)}`;
   const weeklyScope = `${input.clinic}; ${week}`;
   return {
+    title: input.title,
     clinic: input.clinic,
     week,
     tables: [
@@ -62,15 +63,15 @@ export function createDashboardReport(input: DashboardReportInput): DashboardRep
         scope: input.clinic,
         headers: ['Metric', 'Value', 'Period'],
         rows: [
-          ['Total Appointments', String(input.metrics.totalAppointments), 'All dates; confirmed appointments'],
-          ['Records Updated', String(input.metrics.recordsUpdated), `Since ${dateAt(0)}`],
-          ["Today's Queue", String(input.metrics.queueCount), formatDate(input.today)],
+          ['Total Appointments', String(input.metrics.totalAppointments), `${week}; all statuses`],
+          ['Appointments updated', String(input.metrics.appointmentsUpdated), `${week}; updated in Manila time`],
+          ["Today's Queue", String(input.metrics.queueCount), formatReportDate(input.today)],
         ],
         columnWidths: [0.38, 0.12, 0.5],
       },
       {
         title: 'Preferred Services Distribution',
-        scope: `${input.clinic}; all dates; confirmed appointments`,
+        scope: `${weeklyScope}; all statuses`,
         headers: ['Service', 'Appointments', 'Share'],
         rows: distributionRows(input.services),
         columnWidths: [0.6, 0.2, 0.2],
@@ -78,7 +79,7 @@ export function createDashboardReport(input: DashboardReportInput): DashboardRep
       {
         title: 'Weekly Appointment Trend',
         scope: weeklyScope,
-        headers: ['Date', 'Day', 'Scheduled Appointments', 'Completed Appointments'],
+        headers: ['Date', 'Day', 'Total Appointments', 'Completed Appointments'],
         rows: (input.appointments.labels ?? []).map((label, index) => [
           dateAt(index), label, ...input.appointments.datasets.map(dataset => String(dataset.data[index] ?? 0)),
         ]),
@@ -95,22 +96,22 @@ export function createDashboardReport(input: DashboardReportInput): DashboardRep
         columnWidths: [0.25, 0.1, 0.45, 0.2],
       },
       {
-        title: 'No. of Declined Service and Reasons',
-        scope: 'All clinics; all dates; rejected referrals',
+        title: 'Declined Referrals by Reason',
+        scope: `${weeklyScope}; receiving appointment; rejected referrals`,
         headers: ['Reason', 'Declined Referrals', 'Share'],
         rows: distributionRows(input.declinedReferrals),
         columnWidths: [0.6, 0.2, 0.2],
       },
       {
         title: "Today's Appointment Queue",
-        scope: `${input.clinic}; ${formatDate(input.today)}; confirmed appointments`,
-        headers: ['Time', 'Patient Name', 'Service'],
-        rows: input.queue.map(row => [row.time, row.patient, row.services]),
-        columnWidths: [0.15, 0.4, 0.45],
+        scope: `${input.clinic}; ${formatReportDate(input.today)}; confirmed appointments`,
+        headers: ['Time', 'Patient Name', 'Service', 'Clinic'],
+        rows: input.queue.map(row => [row.time, row.patient, row.services, row.clinic]),
+        columnWidths: [0.12, 0.28, 0.35, 0.25],
       },
       {
-        title: 'Recent Notifications',
-        scope: 'Latest 10 notifications for this account; all clinics',
+        title: 'Recent Notifications (account-wide)',
+        scope: 'Latest 10 notifications for this account; independent of selected clinic',
         headers: ['Type', 'Message', 'Date', 'Status'],
         rows: input.notifications.map(row => [row.type, row.message, row.timestamp, row.status]),
         columnWidths: [0.17, 0.45, 0.25, 0.13],
@@ -121,7 +122,7 @@ export function createDashboardReport(input: DashboardReportInput): DashboardRep
 
 /** Uses textContent so clinic, service, and reason names remain literal text. */
 export function renderDashboardReport(document: Document, report: DashboardReport): void {
-  document.title = 'Admin Dashboard Report';
+  document.title = report.title ?? 'Staff Dashboard Report';
   document.body.replaceChildren();
   const style = document.createElement('style');
   style.textContent = `
@@ -144,7 +145,7 @@ export function renderDashboardReport(document: Document, report: DashboardRepor
     parent.append(element);
     return element;
   };
-  appendText(document.body, 'h1', 'Admin Dashboard Report');
+  appendText(document.body, 'h1', report.title ?? 'Staff Dashboard Report');
   appendText(document.body, 'p', `Selected clinic: ${report.clinic} | Week: ${report.week}`);
   for (const data of report.tables) {
     const section = document.createElement('section');
@@ -180,7 +181,7 @@ export function createDashboardPdf(report: DashboardReport): jsPDF {
   const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
   const margin = 36;
   const width = pdf.internal.pageSize.getWidth() - margin * 2;
-  pdf.setProperties({ title: 'Admin Dashboard Report' });
+  pdf.setProperties({ title: report.title ?? 'Staff Dashboard Report' });
   report.tables.forEach((table, index) => {
     if (index > 0) pdf.addPage();
     pdf.setFontSize(10);
@@ -189,7 +190,7 @@ export function createDashboardPdf(report: DashboardReport): jsPDF {
     const tableTop = 80 + (context.length + scope.length) * 12;
     pdf.setHeaderFunction(() => {
       pdf.setFont('helvetica', 'bold').setFontSize(17);
-      pdf.text('Admin Dashboard Report', margin, margin);
+      pdf.text(report.title ?? 'Staff Dashboard Report', margin, margin);
       pdf.setFont('helvetica', 'normal').setFontSize(10);
       pdf.text(context, margin, 54);
       pdf.setFont('helvetica', 'bold').setFontSize(13);
