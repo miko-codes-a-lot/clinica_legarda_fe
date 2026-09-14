@@ -146,6 +146,16 @@ export class AppointmentService {
     return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/reject`, {}, { withCredentials: true }).pipe(tap(() => this.changes.next()));
   }
 
+  completeAppointment(appointmentId: string): Observable<Appointment> {
+    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/complete`, {}, { withCredentials: true })
+      .pipe(tap(() => this.changes.next()));
+  }
+
+  noShowAppointment(appointmentId: string): Observable<Appointment> {
+    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/no-show`, {}, { withCredentials: true })
+      .pipe(tap(() => this.changes.next()));
+  }
+
   cancelAppointment(appointmentId: string, reason?: string) {
     return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/cancel`, { reason }, { withCredentials: true }).pipe(tap(() => this.changes.next()));
   }

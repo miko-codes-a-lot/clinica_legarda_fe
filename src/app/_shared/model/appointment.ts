@@ -21,6 +21,9 @@ export interface AppointmentHistory {
   timestamp: Date
   action: string
   reason?: string
+  actorId?: string
+  actorRole?: string
+  actorName?: string
 }
 
 export interface Appointment {

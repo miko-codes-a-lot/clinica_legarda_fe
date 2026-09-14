@@ -32,6 +32,36 @@ describe('Appointment change requests', () => {
     expect(changes).toHaveBeenCalledTimes(1);
   });
 
+  for (const outcome of ['complete', 'no-show'] as const) {
+    it(`returns the saved ${outcome} record and refreshes only after success`, () => {
+      const changes = jasmine.createSpy('changes');
+      const saved = jasmine.createSpy('saved');
+      service.changes$.subscribe(changes);
+      const save = () => outcome === 'complete'
+        ? service.completeAppointment('a1') : service.noShowAppointment('a1');
+      save().subscribe(saved);
+      const request = http.expectOne(`/appointments/a1/${outcome}`);
+      expect(request.request.method).toBe('PATCH');
+      expect(request.request.withCredentials).toBeTrue();
+      expect(changes).not.toHaveBeenCalled();
+      const appointment = {
+        _id: 'a1', status: outcome === 'complete' ? 'completed' : 'no_show',
+        history: [{ action: 'Appointment outcome recorded.', actorRole: 'dentist' }],
+        clinic: { _id: 'c1' }, referral: { _id: 'r1', status: 'confirmed' },
+      };
+      request.flush(appointment);
+      expect(saved).toHaveBeenCalledOnceWith(appointment);
+      expect(changes).toHaveBeenCalledTimes(1);
+
+      save().subscribe({ error: () => undefined });
+      http.expectOne(`/appointments/a1/${outcome}`).flush(
+        { message: 'Appointment already has an outcome.' },
+        { status: 409, statusText: 'Conflict' },
+      );
+      expect(changes).toHaveBeenCalledTimes(1);
+    });
+  }
+
   it('preserves a selected calendar day and reason when rescheduling', () => {
     const date = new Date(2026, 8, 16);
     const payload = { date, startTime: '11:00', endTime: '12:00', reason: 'Travel plans changed' };
