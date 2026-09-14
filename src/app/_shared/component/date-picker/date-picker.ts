@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, forwardRef, Input, OnChanges } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ReactiveFormsModule, ValidationErrors, Validator } from '@angular/forms';
 import { FloatLabelType, MatFormFieldModule } from '@angular/material/form-field';
 import { DateFilterFn, MatDatepickerModule } from '@angular/material/datepicker';
@@ -6,10 +6,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatNativeDateModule } from '@angular/material/core';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
-import { User } from '../../model/user';
-import { AppointmentStatus } from '../../model/appointment';
-import { TimeUtil } from '../../../utils/time-util';
+import { bookingSlots, DentistBookingSchedule } from '../../model/booking-availability';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-date-picker',
@@ -37,221 +35,62 @@ import { TimeUtil } from '../../../utils/time-util';
   templateUrl: './date-picker.html',
   styleUrl: './date-picker.css'
 })
-export class DatePicker implements ControlValueAccessor, Validator, OnDestroy, OnInit {
-  @Input() label: string = '';
-  @Input() placeholder: string = '';
-  @Input() hint: string = '';
+export class DatePicker implements ControlValueAccessor, Validator, OnChanges {
+  @Input() label = '';
+  @Input() placeholder = '';
+  @Input() hint = '';
   @Input() appearance: 'fill' | 'outline' = 'fill';
   @Input() floatLabel: FloatLabelType = 'auto';
   @Input() minDate: Date | null = null;
   @Input() maxDate: Date | null = null;
-  @Input() touchUi: boolean = false;
+  @Input() touchUi = false;
   @Input() startView: 'month' | 'year' | 'multi-year' = 'month';
-  // @Input() dateFilter: DateFilterFn<Date | null> = () => true;
-  @Input() required: boolean = false;
-  @Input() errorMessage: string = 'Please select a valid date';
-  @Input() _dentist!: User
-
-  @Input()
-  set dentist(value: User) {
-    // always ensure arrays exist
-    this._dentist = {
-      ...value,
-      operatingHours: value?.operatingHours || [],
-      appointments: value?.appointments || []
-    };
-
-    // if you need to recalc available dates
-    if (this._dentist) {
-      // trigger date/time recalculation if necessary
-      this.onDentistChanged();
-    }
-  }
+  @Input() required = false;
+  @Input() errorMessage = 'Please select an available date';
+  @Input() serviceDuration = 60;
+  @Input() timeSlotInterval = 30;
+  @Input() dentist: DentistBookingSchedule = { operatingHours: [], appointments: [] };
 
   value: Date | null = null;
-  disabled: boolean = false;
-  showError: boolean = false;
-
-
-  private destroy$ = new Subject<void>();
-  private onChange = (value: Date | null) => {};
+  disabled = false;
+  showError = false;
+  private onChange = (_value: Date | null) => {};
   private onTouched = () => {};
+  private validatorChanged = () => {};
 
-
-
-  ngOnInit(): void {
-    // // { day: 'friday', startTime: '09:00', endTime: '18:00' },
-    // // mock a fully booked day for the dentist
-    // this.dentist.appointments = [
-    //   {
-    //     _id: '',
-    //     clinic: {} as any,
-    //     patient: {} as User,
-    //     dentist: {} as User,
-    //     services: [],
-    //     date: new Date(),
-    //     startTime: '09:00',
-    //     endTime: '18:00',
-    //     status: AppointmentStatus.CONFIRMED,
-    //     notes: {
-    //       patientNotes: '',
-    //       clinicNotes: '',
-    //     },
-    //     history: []
-    //   }
-    // ]
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next()
-    this.destroy$.complete()
-  }
-
-  writeValue(value: Date | null): void {
-    this.value = value
-  }
-
-  registerOnChange(fn: (value: Date | null) => void): void {
-    this.onChange = fn
-  }
-
-  registerOnTouched(fn: () => void): void {
-    this.onTouched = fn
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled
-  }
+  ngOnChanges(): void { this.validatorChanged(); }
+  writeValue(value: Date | null): void { this.value = value; }
+  registerOnChange(fn: (value: Date | null) => void): void { this.onChange = fn; }
+  registerOnTouched(fn: () => void): void { this.onTouched = fn; }
+  registerOnValidatorChange(fn: () => void): void { this.validatorChanged = fn; }
+  setDisabledState(isDisabled: boolean): void { this.disabled = isDisabled; }
 
   validate(control: AbstractControl): ValidationErrors | null {
-    if (this.required && !control.value) {
-      return { required: true };
-    }
-
-    if (control.value && !this.isDate(control.value)) {
-      return { matDatepickerParse: true };
-    }
-
-    if (control.value && this.minDate && this.dateOnlyTime(control.value) < this.dateOnlyTime(this.minDate)) {
+    if (!control.value) return this.required ? { required: true } : null;
+    if (!this.isDate(control.value)) return { matDatepickerParse: true };
+    if (this.minDate && this.dateOnlyTime(control.value) < this.dateOnlyTime(this.minDate)) {
       return { matDatepickerMin: { min: this.minDate, actual: control.value } };
     }
-
-    if (control.value && this.maxDate && this.dateOnlyTime(control.value) > this.dateOnlyTime(this.maxDate)) {
+    if (this.maxDate && this.dateOnlyTime(control.value) > this.dateOnlyTime(this.maxDate)) {
       return { matDatepickerMax: { max: this.maxDate, actual: control.value } };
     }
-
-    if (control.value && this.dateFilter && !this.dateFilter(control.value)) {
-      return { matDatepickerFilter: true };
-    }
-
-    return null;
+    return this.dateFilter(control.value) ? null : { matDatepickerFilter: true };
   }
 
   isDate(value: unknown): value is Date {
-    return value instanceof Date && !isNaN(value.getTime());
+    return value instanceof Date && !Number.isNaN(value.getTime());
   }
 
-  dayNameToNumber: Record<string, number>= {
-    sunday: 0,
-    monday: 1,
-    tuesday: 2,
-    wednesday: 3,
-    thursday: 4,
-    friday: 5,
-    saturday: 6,
-  }
+  dateFilter: DateFilterFn<Date | null> = date => !!date && this.isDate(date) &&
+    bookingSlots(this.dentist, date, this.serviceDuration, this.timeSlotInterval).some(slot => slot.available);
 
-  dateFilter = (date: Date | null): boolean => {
-    if (!date || !this.isDate(date)) return false
-
-    const day = date.getDay()
-
-    // // mock available days of the dentist
-    // const operatingHours = this.dentist.operatingHours.filter((_, i) => i < 5)
-    const operatingHours = this._dentist.operatingHours
-    const days = operatingHours.map(o => this.dayNameToNumber[o.day])
-    
-    // disable if dentist does not operate on this day
-    if (!days.includes(day)) return false
-
-    // disable if dentist is fully booked for the day
-    if (this.isFullyBooked(date)) return false
-
-    // match the current to previous days/date
-    if (this.isPastDate(date)) {
-      return false
-    }
-
-    return true
-  }
-
-  private isFullyBooked(date: Date): boolean {
-    const dayName = this.getDayNameFromDate(date)
-    const daySchedule = this._dentist.operatingHours.find(oh => oh.day === dayName)
-
-    if (!daySchedule) return true // if no schedule, consider it fully booked
-
-    // get all the appointment for this specific date
-    const appointments = this._dentist.appointments.filter(appointment => {
-      const appointmentDate = new Date(appointment.date)
-      return this.isSameDate(appointmentDate, date) &&
-        (appointment.status !== AppointmentStatus.CANCELLED &&
-          appointment.status !== AppointmentStatus.REJECTED)
-    })
-
-    const totalBookedMinutes = appointments.reduce((total, appointment) => {
-      const startMinutes = TimeUtil.timeToMinutes(appointment.startTime)
-      const endMinutes = TimeUtil.timeToMinutes(appointment.endTime)
-      return total + (endMinutes - startMinutes)
-    }, 0)
-
-    const dayStartMinutes = TimeUtil.timeToMinutes(daySchedule.startTime);
-    const dayEndMinutes = TimeUtil.timeToMinutes(daySchedule.endTime);
-    const totalAvailableMinutes = dayEndMinutes - dayStartMinutes;
-    
-    // considered fully book if 90% or more of the time is occupied
-    const occupancyThreshold = 0.9
-    return totalBookedMinutes > (totalAvailableMinutes * occupancyThreshold)
-  }
-
-  private isSameDate(date1: Date, date2: Date): boolean {
-    return date1.getFullYear() === date2.getFullYear() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate();
-  }
-
-  private getDayNameFromDate(date: Date): string {
-    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    return dayNames[date.getDay()];
-  }
-
-  onDateChange(event: any): void {
-    this.value = event.value
-    this.onChange(this.value)
-    this.onTouched()
-  }
-
-  isPastDate(dateToCheck: Date): boolean {
-    return this.dateOnlyTime(dateToCheck) < this.dateOnlyTime(new Date());
+  onDateChange(event: Pick<MatDatepickerInputEvent<Date>, 'value'>): void {
+    this.value = event.value;
+    this.onChange(this.value);
+    this.onTouched();
   }
 
   private dateOnlyTime(date: Date): number {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-  }
-
-  private onDentistChanged() {
-    // reset current value if the new dentist doesn't work on the previously selected day
-    if (this.value) {
-      const day = this.value.getDay();
-      const operatingDays = this._dentist.operatingHours.map(h => this.dayNameToNumber[h.day]);
-      if (!operatingDays.includes(day)) {
-        this.writeValue(null);
-        this.onChange(null);
-      }
-    }
-  }
-
-  get dentist(): User {
-    return this._dentist;
   }
 }

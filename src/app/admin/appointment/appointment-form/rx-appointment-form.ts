@@ -5,7 +5,7 @@ export interface RxAppointmentForm {
   patient: FormControl<string>
   dentist: FormControl<string>
   services: FormControl<string[]>
-  date: FormControl<Date>
+  date: FormControl<Date | null>
   time: FormControl<string>
   patientNotes: FormControl<string>;
 }

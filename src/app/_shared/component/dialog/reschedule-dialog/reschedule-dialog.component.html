@@ -6,11 +6,16 @@
   <!-- Show current appointment details -->
   <div class="current-appointment-info" style="margin-bottom: 1rem;">
     <strong>Current Appointment:</strong><br />
-    Date: {{ data.date | date: 'fullDate' }}<br />
+    Date: {{ data.date | date: 'fullDate':'UTC' }}<br />
     Time: {{ data.startTime }} - {{ data.endTime }}
   </div>
 
-  <!-- Date picker -->
+  @if (isLoading) { <p>Loading availability...</p> }
+  @if (loadError) {
+    <p role="alert">{{ loadError }}</p>
+    <button mat-button type="button" (click)="loadAvailability()">Retry</button>
+  }
+  @if (pickerDentist) {
   <app-date-picker
     formControlName="date"
     label="New Appointment Day"
@@ -19,6 +24,7 @@
     [minDate]="minDate"
     [maxDate]="maxDate"
     [required]="true"
+    [serviceDuration]="serviceDuration"
   ></app-date-picker>
 
   <br />
@@ -33,6 +39,7 @@
     [timeSlotInterval]="30"
     [required]="true"
   ></app-time-picker>
+  }
 
   <mat-form-field appearance="outline">
     <mat-label>Reason for rescheduling</mat-label>
@@ -44,5 +51,5 @@
 
 <div mat-dialog-actions align="end">
   <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="form.invalid">Save</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="form.invalid || isLoading || !pickerDentist">Save</button>
 </div>

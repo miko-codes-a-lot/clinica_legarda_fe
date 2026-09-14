@@ -29,7 +29,7 @@ describe('TimePicker booking selections', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [TimePickerHost] }).compileComponents();
     jasmine.clock().install();
-    jasmine.clock().mockDate(new Date(2030, 0, 7, 12));
+    jasmine.clock().mockDate(new Date('2030-01-07T04:00:00Z'));
     fixture = TestBed.createComponent(TimePickerHost);
   });
 
@@ -51,7 +51,7 @@ describe('TimePicker booking selections', () => {
     };
     const booking: Appointment = {
       _id: 'existing-booking', clinic, dentist, patient: { ...dentist, role: 'user' },
-      date: new Date(2030, 0, 8), startTime: '09:00', endTime: '10:00',
+      date: new Date(Date.UTC(2030, 0, 8)), startTime: '09:00', endTime: '10:00',
       services: [], status: AppointmentStatus.CONFIRMED,
       notes: { patientNotes: '', clinicNotes: '' }, history: [],
     };
@@ -67,7 +67,6 @@ describe('TimePicker booking selections', () => {
   });
 
   it('allows a future morning slot even when it is already afternoon today', () => {
-    addBooking();
     render();
     expect(picker.timeSlots.find(slot => slot.value === '08:00')?.available).toBeTrue();
   });

@@ -5,6 +5,7 @@ import { Observable, Subject, tap } from 'rxjs';
 import { AppointmentPayload } from '../../admin/appointment/appointment-payload';
 import { HttpClient } from '@angular/common/http';
 import { MockService } from './mock-service';
+import { AppointmentAvailability } from '../model/booking-availability';
 
 export interface RescheduleAppointmentPayload {
   date: Date | string;
@@ -86,8 +87,11 @@ export class AppointmentService {
     return this.http.get<Appointment[]>(url, { withCredentials: true });
   }
 
+  getAvailability(dentistId: string): Observable<AppointmentAvailability[]> {
+    return this.http.get<AppointmentAvailability[]>(`${this.baseUrl}/availability/${dentistId}`, { withCredentials: true });
+  }
+
   getOne(id: string): Observable<Appointment> {
-    console.log('test id: ', id);
     return this.http.get<Appointment>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 
@@ -158,7 +162,6 @@ export class AppointmentService {
     ).pipe(tap(() => this.changes.next()));
   }
   updateDentistNotes(appointmentId: string, notes: string): Observable<Appointment> {
-    console.log('notes', notes)
     return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/notes`, {
       clinicNotes: notes
     });

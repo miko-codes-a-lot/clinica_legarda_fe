@@ -21,6 +21,8 @@ export interface User {
   clinic?: Clinic
   clinics?: (Clinic | string)[]
   operatingHours: OperatingHour[]
+  appointmentBufferMinutes?: number
+  maxWorkingMinutesPerDay?: number
   appointments: Appointment[]
   role: string
   status?: UserStatus

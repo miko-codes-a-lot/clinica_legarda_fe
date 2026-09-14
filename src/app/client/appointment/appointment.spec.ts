@@ -30,7 +30,7 @@ describe('Patient appointment booking form', () => {
     fixture.componentRef.setInput('appointment', TestBed.inject(AppointmentService).getEmptyNonNullDoc());
     fixture.componentRef.setInput('clinics', [{
       _id: 'clinic-1', name: 'Clinic', address: 'Manila', mobileNumber: '',
-      emailAddress: '', operatingHours: [], dentists: [],
+      emailAddress: '', operatingHours: TestBed.inject(MockService).mockClinicBase().operatingHours, dentists: [],
     }]);
     fixture.componentRef.setInput('dentalServices', [{ _id: 'service-1', name: 'Cleaning', duration: 30 }]);
     fixture.detectChanges();
@@ -48,8 +48,9 @@ describe('Patient appointment booking form', () => {
     const component = fixture.componentInstance;
     const dentist = TestBed.inject(MockService).mockUserBase();
     component.clinic.setValue('clinic-1');
-    http.expectOne('/users').flush([{ ...dentist, _id: 'dentist-1', clinic: 'clinic-1', status: 'confirmed' }]);
+    http.expectOne('/users').flush([{ ...dentist, _id: 'dentist-1', clinic: 'clinic-1', role: 'dentist', status: 'confirmed' }]);
     component.dentist.setValue('dentist-1');
+    http.expectOne('/appointments/availability/dentist-1').flush([]);
     component.services.setValue(['service-1']);
     fixture.detectChanges();
 

@@ -59,9 +59,8 @@ export class AppointmentCreate {
 
   onSubmit(appointment: AppointmentPayload) {
     this.isLoading = true
-    console.log('appointment on save', appointment);
     this.appointmentService.create(appointment).subscribe({
-      next: (c) => this.router.navigate(['admin/appointment/details', c._id], { replaceUrl: true }),
+      next: (c) => this.router.navigate(['/dentist/appointment/details', c._id], { replaceUrl: true }),
       error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }

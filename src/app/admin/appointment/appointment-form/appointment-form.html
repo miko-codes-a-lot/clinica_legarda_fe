@@ -7,26 +7,33 @@
       <app-form
         [form]="rxform"
         [fields]="appointmentFields" 
-        [isLoading]="isLoading"
+        [isLoading]="bookingUnavailable"
         (onSubmitEvent)="onSubmit()"
       >
+        @if (availabilityLoading) {
+          <p role="status">Checking dentist availability...</p>
+        }
+        @if (availabilityError) {
+          <p role="alert">{{ availabilityError }}</p>
+        }
         <form [formGroup]="rxform">
-            @if (selectedDentist) {
+            @if (bookingSchedule) {
               <app-date-picker 
                 formControlName="date"
                 label="Appointment Day"
                 placeholder="Choose a date"
-                [dentist]="selectedDentist"
+                [dentist]="bookingSchedule"
                 [minDate]="minDate"
                 [maxDate]="maxDate"
+                [serviceDuration]="serviceDuration()"
               >
               </app-date-picker> <br>
 
               <app-time-picker
                 label="Appointment Time"
-                [dentist]="selectedDentist"
+                [dentist]="bookingSchedule"
                 [selectedDate]="date.value"
-                [serviceDuration]="60"
+                [serviceDuration]="serviceDuration()"
                 [timeSlotInterval]="30"
                 [required]="true"
                 formControlName="time"
@@ -117,7 +124,7 @@
 
             <div class="info-row">
               <span class="label">Date</span>
-              <span class="value">{{ appt.date | date:'mediumDate' }}</span>
+              <span class="value">{{ appt.date | date:'mediumDate':'UTC' }}</span>
             </div>
 
             <div class="info-row">

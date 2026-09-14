@@ -10,7 +10,9 @@ import { DatePicker } from '../../date-picker/date-picker';
 import { TimePicker } from '../../time-picker/time-picker';
 import { AlertService } from '../../../service/alert.service';
 import { User } from '../../../model/user';
-import { OperatingHour } from '../../../model/operating-hour';
+import { Clinic } from '../../../model/clinic';
+import { bookingSlots, DentistBookingSchedule } from '../../../model/booking-availability';
+import { BookingAvailabilityService } from '../../../service/booking-availability-service';
 
 export interface RescheduleDialogResult {
   date: string;
@@ -23,8 +25,9 @@ export interface RescheduleDialogData {
   date: Date | string;
   startTime: string;
   endTime: string;
-  operatingHours: OperatingHour[];
-  dentist?: User;
+  appointmentId: string;
+  clinic: Clinic;
+  dentist: User;
 }
 
 @Component({
@@ -37,12 +40,15 @@ export interface RescheduleDialogData {
 })
 export class RescheduleDialogComponent implements OnInit, OnDestroy {
   private dateChanges?: Subscription;
+  private availabilityRequest?: Subscription;
   readonly form: FormGroup<{
     date: FormControl<Date | null>;
     time: FormControl<string>;
     reason: FormControl<string>;
   }>;
-  pickerDentist!: User;
+  pickerDentist?: DentistBookingSchedule;
+  isLoading = false;
+  loadError = '';
   readonly minDate = new Date(new Date().setHours(0, 0, 0, 0));
   readonly maxDate = new Date(new Date().setMonth(new Date().getMonth() + 3));
   serviceDuration = 60;
@@ -52,6 +58,7 @@ export class RescheduleDialogComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<RescheduleDialogComponent, RescheduleDialogResult>,
     private readonly alertService: AlertService,
     @Inject(MAT_DIALOG_DATA) public data: RescheduleDialogData,
+    private readonly availability: BookingAvailabilityService,
   ) {
     this.form = fb.group({
       date: new FormControl<Date | null>(null, Validators.required),
@@ -62,30 +69,45 @@ export class RescheduleDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.dateChanges = this.form.controls.date.valueChanges.subscribe(() => this.form.controls.time.reset());
-    this.pickerDentist = this.data.dentist ?? {
-      firstName: '', middleName: '', lastName: '', emailAddress: '', mobileNumber: '',
-      address: '', operatingHours: this.data.operatingHours, appointments: [], role: 'dentist',
-    };
     const minutes = (time: string) => {
       const [hour, minute] = time.split(':').map(Number);
       return hour * 60 + minute;
     };
     const duration = minutes(this.data.endTime) - minutes(this.data.startTime);
     if (duration > 0) this.serviceDuration = duration;
+    this.loadAvailability();
+  }
+
+  loadAvailability(): void {
+    this.availabilityRequest?.unsubscribe();
+    this.pickerDentist = undefined;
+    this.loadError = '';
+    this.isLoading = true;
+    this.availabilityRequest = this.availability.load(this.data.dentist, this.data.clinic, this.data.appointmentId).subscribe({
+      next: schedule => { this.pickerDentist = schedule; this.isLoading = false; },
+      error: () => {
+        this.loadError = 'Availability could not be loaded. Please try again.';
+        this.isLoading = false;
+      },
+    });
   }
 
   onCancel() { this.dialogRef.close(); }
 
-  ngOnDestroy() { this.dateChanges?.unsubscribe(); }
+  ngOnDestroy() { this.dateChanges?.unsubscribe(); this.availabilityRequest?.unsubscribe(); }
 
   onSave() {
     this.form.markAllAsTouched();
-    if (this.form.invalid) {
+    if (this.isLoading || !this.pickerDentist || this.form.invalid) {
       this.alertService.error('Please select a date and time and enter a reason.');
       return;
     }
     const { date, time, reason } = this.form.getRawValue();
     if (!date || Number.isNaN(date.getTime())) return;
+    if (!bookingSlots(this.pickerDentist, date, this.serviceDuration).some(slot => slot.value === time && slot.available)) {
+      this.alertService.error('Please select an available appointment time.');
+      return;
+    }
     const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     const currentDate = this.data.date instanceof Date
       ? this.data.date.toISOString().slice(0, 10) : this.data.date.slice(0, 10);

@@ -112,8 +112,7 @@ export class MyAppointment {
       width: '450px',
       data: {
         date: appointment.date, startTime: appointment.startTime, endTime: appointment.endTime,
-        operatingHours: appointment.dentist?.operatingHours?.length
-          ? appointment.dentist.operatingHours : appointment.clinic?.operatingHours || [],
+        appointmentId: appointment._id, dentist: appointment.dentist, clinic: appointment.clinic,
       },
     });
     dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
