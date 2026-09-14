@@ -8,8 +8,14 @@
     @if (user.role === 'dentist') {
       <div class="custom-list">
         <mat-list-item>
-          <span class="item-title" matListItemTitle>{{ user.clinic?.name }}</span>
-          <span class="item-line" matListItemLine>Clinic</span>
+          <span class="item-title" matListItemTitle>
+            @for (clinic of clinicAssignments; track clinic._id; let last = $last) {
+              {{ clinic.name }}{{ last ? '' : ', ' }}
+            } @empty {
+              No assigned clinics
+            }
+          </span>
+          <span class="item-line" matListItemLine>Clinics</span>
         </mat-list-item>
         <b></b>
         <mat-list-item>

@@ -15,3 +15,7 @@ export interface RxUserForm {
   operatingHours: FormArray<FormGroup<RxOperatingHour>>
   role: FormControl<string>
 }
+
+export interface RxStaffUserForm extends Omit<RxUserForm, 'clinic'> {
+  clinics: FormControl<string[]>
+}

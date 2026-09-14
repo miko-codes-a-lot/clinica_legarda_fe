@@ -10,7 +10,7 @@ export interface FormField {
   validators?: ValidatorFn[];
   customError?: string;    // optional custom error message
   selectionChange?: (event: any) => void;
-  multiple: boolean;       // multiple select
+  multiple?: boolean;      // multiple select
   disabled?: boolean;
   readonly?: boolean;
   maxlength?: number;

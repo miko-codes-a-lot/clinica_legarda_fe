@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { map, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { User } from '../model/user';
-import { UserPayload } from '../../admin/user/user-form/user-payload';
+import { StaffUserPayload } from '../model/staff-user-payload';
 
 @Injectable({
   providedIn: 'root'
@@ -20,11 +20,11 @@ export class UserService {
     return this.http.get<User>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 
-  create(user: UserPayload): Observable<User> {
+  create(user: StaffUserPayload): Observable<User> {
     return this.http.post<User>(this.baseUrl, user, { withCredentials: true });
   }
 
-  update(id: string, user: UserPayload): Observable<User> {
+  update(id: string, user: StaffUserPayload): Observable<User> {
     return this.http.put<User>(`${this.baseUrl}/${id}`, user, { withCredentials: true });
   }
 
@@ -32,7 +32,7 @@ export class UserService {
      return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 
-  createPublic(user: UserPayload): Observable<User> {
+  createPublic(user: StaffUserPayload): Observable<User> {
     return this.http.post<User>(`${this.baseUrl}/register`, user);
   }
   

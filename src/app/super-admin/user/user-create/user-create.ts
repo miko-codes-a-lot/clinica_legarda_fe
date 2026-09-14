@@ -9,6 +9,7 @@ import { Clinic } from '../../../_shared/model/clinic';
 import { forkJoin } from 'rxjs';
 import { UserPayload } from '../user-form/user-payload';
 import { AlertService } from '../../../_shared/service/alert.service';
+import { UserStatus } from '../../../_shared/model/user';
 
 @Component({
   selector: 'app-user-create',
@@ -47,7 +48,7 @@ export class UserCreate implements OnInit {
 
   onSubmit(user: UserPayload) {
     this.isLoading = true
-    this.userService.create(user).subscribe({
+    this.userService.create({ ...user, status: UserStatus.CONFIRMED }).subscribe({
       next: (u) => this.router.navigate(['super-admin/user/details', u._id], { replaceUrl: true }),
       error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)

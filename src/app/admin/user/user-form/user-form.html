@@ -6,11 +6,10 @@
 
   <form [formGroup]="rxform">
     @if (rxform.get('role')?.value === 'dentist') {
-      <!-- the clinic value in rx has no data on update-->
-      @if (!this.rxform.get('clinic')?.value) {
-        <p><i>Please select a clinic</i></p>
+      @if (assignedClinics.value.length === 0) {
+        <p><i>Please select at least one clinic</i></p>
       } @else {
-        <button type="button" (click)="onAddSchedule()" [disabled]="operatingHours.length >= (selectedClinic?.operatingHours?.length || 0)" matButton="outlined">Add Schedule</button>
+        <button type="button" (click)="onAddSchedule()" [disabled]="!selectedClinic || operatingHours.length >= selectedClinic.operatingHours.length" matButton="outlined">Add Schedule</button>
 
         <!-- adjust the design of this -->
         <div formArrayName="operatingHours" class="schedule">

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../../_shared/service/user-service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { User } from '../../../_shared/model/user';
+import { assignedClinics, User } from '../../../_shared/model/user';
+import { Clinic } from '../../../_shared/model/clinic';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { ListComponent } from '../../../_shared/component/list/list.component';
@@ -56,5 +57,9 @@ export class UserDetails implements OnInit {
 
   onUpdate() {
     this.router.navigate(['/admin/user/update', this.id])
+  }
+
+  get clinicAssignments(): Clinic[] {
+    return this.user ? assignedClinics(this.user) : [];
   }
 }
