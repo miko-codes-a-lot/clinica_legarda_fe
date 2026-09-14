@@ -12,6 +12,7 @@ export interface UserSimple {
     address: string
     password?: string
     clinic?: Clinic
+    clinics?: (Clinic | string)[]
     operatingHours: OperatingHour[]
     role: string
     username: string
