@@ -5,11 +5,12 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { catchError, EMPTY, finalize, forkJoin, startWith, Subject, switchMap } from 'rxjs';
+import { catchError, distinctUntilChanged, EMPTY, finalize, forkJoin, map, startWith, Subject, switchMap } from 'rxjs';
 import { Appointment, AppointmentStatus } from '../model/appointment';
 import { Clinic } from '../model/clinic';
 import { filterAppointments } from '../model/appointment-filters';
 import { AppointmentService } from '../service/appointment-service';
+import { AuthService } from '../service/auth-service';
 import { ClinicService } from '../service/clinic-service';
 import { GenericTableComponent } from '../component/table/generic-table.component';
 import { appointmentDateKey, formatAppointmentDate } from '../../dentist/appointment/appointment-schedule';
@@ -24,6 +25,7 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
   @Input() area: 'admin' | 'super-admin' = 'admin';
   private readonly destroyRef = inject(DestroyRef);
   private readonly appointmentService = inject(AppointmentService);
+  private readonly authService = inject(AuthService);
   private readonly clinicService = inject(ClinicService);
   private readonly router = inject(Router);
   private readonly refreshRequests = new Subject<void>();
@@ -57,20 +59,36 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
   readonly disableEdit = (appointment: Appointment) => appointment.status !== AppointmentStatus.PENDING;
 
   ngOnInit(): void {
-    this.refreshRequests.pipe(
-      startWith(undefined),
-      switchMap(() => {
-        this.isLoading = true;
+    this.authService.currentUser$.pipe(
+      map(user => ({ id: user?._id ?? '', role: user?.role ?? '' })),
+      distinctUntilChanged((previous, current) => previous.id === current.id && previous.role === current.role),
+      switchMap(actor => {
+        this.appointments = [];
+        this.clinics = [];
+        this.selectedClinic = 'all';
+        this.selectedStatus = 'all';
+        this.dataSource.filter = '';
         this.loadError = '';
-        return forkJoin({
-          appointments: this.appointmentService.getAll(),
-          clinics: this.clinicService.getAll(),
-        }).pipe(
-          catchError(() => {
-            this.loadError = 'Appointments could not be loaded. Please retry.';
-            return EMPTY;
+        this.isLoading = false;
+        this.applyFilters();
+        if (!actor.id || (actor.role !== 'admin' && actor.role !== 'super-admin')) return EMPTY;
+
+        return this.refreshRequests.pipe(
+          startWith(undefined),
+          switchMap(() => {
+            this.isLoading = true;
+            this.loadError = '';
+            return forkJoin({
+              appointments: this.appointmentService.getAll(),
+              clinics: this.clinicService.getAll(),
+            }).pipe(
+              catchError(() => {
+                this.loadError = 'Appointments could not be loaded. Please retry.';
+                return EMPTY;
+              }),
+              finalize(() => this.isLoading = false),
+            );
           }),
-          finalize(() => this.isLoading = false),
         );
       }),
       takeUntilDestroyed(this.destroyRef),
