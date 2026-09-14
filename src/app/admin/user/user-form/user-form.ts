@@ -142,8 +142,10 @@ export class UserForm implements OnInit, OnChanges {
   private syncRoleState(): void {
     if (this.role.value === 'dentist') {
       this.assignedClinics.setValidators(Validators.required);
+      this.operatingHours.enable({ emitEvent: false });
     } else {
       this.assignedClinics.clearValidators();
+      this.operatingHours.disable({ emitEvent: false });
     }
     this.assignedClinics.updateValueAndValidity({ emitEvent: false });
     this.buildUserFields();

@@ -86,4 +86,26 @@ describe('staff user schedule form', () => {
 
     expect(submissions).toBe(0);
   });
+
+  it('ignores dentist schedule validation for other roles and restores it when switched back', () => {
+    const component = createForm(
+      dentist(['clinic-a']),
+      [clinic('clinic-a', 'monday')],
+    );
+    component.onAddSchedule();
+    expect(component.rxform.invalid).toBeTrue();
+
+    component.role.setValue('admin');
+
+    expect(component.operatingHours.disabled).toBeTrue();
+    expect(component.rxform.valid).toBeTrue();
+
+    component.role.setValue('dentist');
+
+    expect(component.operatingHours.enabled).toBeTrue();
+    expect(component.operatingHours.getRawValue()).toEqual([
+      { day: 'monday', startTime: '', endTime: '' },
+    ]);
+    expect(component.rxform.invalid).toBeTrue();
+  });
 });
