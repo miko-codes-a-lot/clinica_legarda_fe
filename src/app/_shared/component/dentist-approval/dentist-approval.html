@@ -1,0 +1,13 @@
+<section aria-label="Dentist approval">
+  <p aria-live="polite"><strong>Account status:</strong> {{ statusLabel }}</p>
+  @if (canApprove) {
+    <p>This dentist needs approval before patients can book at their assigned clinics.</p>
+    <button mat-raised-button color="primary" type="button"
+      [disabled]="isApproving" (click)="approveDentist()">
+      {{ isApproving ? 'Approving...' : 'Approve dentist' }}
+    </button>
+  }
+  @if (approvalError) {
+    <p role="alert">{{ approvalError }}</p>
+  }
+</section>

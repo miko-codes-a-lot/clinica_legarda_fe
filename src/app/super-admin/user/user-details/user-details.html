@@ -1,6 +1,9 @@
 @if (user) {
   <div class="view-header">
     <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
+    @if (user.role === 'dentist') {
+      <app-dentist-approval [user]="user" (approved)="setUser($event)"></app-dentist-approval>
+    }
   </div>
 
   <app-list [data]="displayUser">

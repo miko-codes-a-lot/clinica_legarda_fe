@@ -37,6 +37,10 @@ export class UserService {
     return this.http.put<User>(`${this.baseUrl}/${id}`, user, { withCredentials: true });
   }
 
+  approveDentist(id: string): Observable<User> {
+    return this.http.patch<User>(`${this.baseUrl}/${id}/approve-dentist`, {}, { withCredentials: true });
+  }
+
   delete(id: string): Observable<void> {
      return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }

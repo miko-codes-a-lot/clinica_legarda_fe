@@ -8,10 +8,11 @@ import { MatListModule } from '@angular/material/list';
 import { ListComponent } from '../../../_shared/component/list/list.component';
 import { MatIconModule } from '@angular/material/icon';
 import { AlertService } from '../../../_shared/service/alert.service';
+import { DentistApproval } from '../../../_shared/component/dentist-approval/dentist-approval';
 
 @Component({
   selector: 'app-user-details',
-  imports: [MatButtonModule, MatListModule, ListComponent, MatIconModule],
+  imports: [MatButtonModule, MatListModule, ListComponent, MatIconModule, DentistApproval],
   templateUrl: './user-details.html',
   styleUrl: './user-details.css'
 })
@@ -19,7 +20,7 @@ export class UserDetails implements OnInit {
   isLoading = false
   id!: string
   user?: User
-  displayUser: Record<string, any> = {};
+  displayUser: Record<string, string | undefined> = {};
 
   constructor(
     private readonly userService: UserService,
@@ -34,27 +35,15 @@ export class UserDetails implements OnInit {
     this.id = this.route.snapshot.params['id']
     
     this.userService.getOne(this.id).subscribe({
-      next: (u) => {
-        // set the data to display
-        const { firstName, middleName, lastName, emailAddress, mobileNumber, address, role } = u;
-
-        this.displayUser = {
-          firstName,
-          middleName,
-          lastName,
-          emailAddress,
-          mobileNumber,
-          address,
-          role,
-        }
-        this.user = u
-      },
+      next: (user) => this.setUser(user),
       error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
 
-  isActionDisabled() {
-    return this.user && this.user.status != null && ['confirmed', 'rejected'].includes(this.user.status);
+  setUser(user: User): void {
+    const { firstName, middleName, lastName, emailAddress, mobileNumber, address, role } = user;
+    this.displayUser = { firstName, middleName, lastName, emailAddress, mobileNumber, address, role };
+    this.user = user;
   }
 
   onUpdate() {
