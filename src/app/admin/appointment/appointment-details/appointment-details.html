@@ -102,6 +102,14 @@
     </ng-template>
   </div>
 
+  @if (canCancel) {
+    <div class="action-buttons">
+      <button mat-stroked-button color="warn" (click)="cancelAppointment()" [disabled]="isBusy">
+        <mat-icon>cancel</mat-icon> Cancel
+      </button>
+    </div>
+  }
+
 } @else {
   <p>Fetching details...</p>
 }

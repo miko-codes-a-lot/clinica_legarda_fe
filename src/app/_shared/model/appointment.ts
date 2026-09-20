@@ -38,6 +38,7 @@ export interface Appointment {
   status: AppointmentStatus
   notes: AppointmentNote
   history: AppointmentHistory[],
+  createdBy?: string
   referral?: Referral
   createdAt?: string,
   updatedAt?: string

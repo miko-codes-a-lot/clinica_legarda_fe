@@ -157,9 +157,11 @@
       <button mat-stroked-button (click)="rescheduleAppointment()" [disabled]="isBusy">
         <mat-icon>event</mat-icon> Reschedule
       </button>
-      <button mat-stroked-button color="warn" (click)="cancelAppointment()" [disabled]="isBusy">
-        <mat-icon>cancel</mat-icon> Cancel
-      </button>
+      @if (canCancel) {
+        <button mat-stroked-button color="warn" (click)="cancelAppointment()" [disabled]="isBusy">
+          <mat-icon>cancel</mat-icon> Cancel
+        </button>
+      }
     </div>
   }
 

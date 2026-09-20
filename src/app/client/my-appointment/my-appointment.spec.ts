@@ -21,10 +21,11 @@ describe('Patient appointment changes', () => {
     const appointments = TestBed.inject(AppointmentService);
     appointment = appointments.getEmptyNonNullDoc();
     appointment._id = 'a1';
+    appointment.createdBy = 'p1';
     appointment.patient._id = 'p1';
     appointment.dentist._id = 'd1';
     component = TestBed.runInInjectionContext(() => new MyAppointment(
-      { currentUser$: of({ _id: 'p1' }) } as unknown as AuthService,
+      { currentUser$: of({ _id: 'p1' }), currentUserValue: { _id: 'p1' } } as unknown as AuthService,
       appointments,
       { open: () => ({ afterClosed: () => of(dialogResult) }) } as unknown as MatDialog,
       TestBed.inject(ReasonService),
@@ -32,6 +33,13 @@ describe('Patient appointment changes', () => {
     ));
   });
   afterEach(() => http.verify());
+  it('does not send a cancellation for an appointment created by someone else', () => {
+    appointment.createdBy = 'staff-1';
+    expect(component.canCancel(appointment)).toBeFalse();
+    dialogResult = 'Work conflict';
+    component.onCancel(appointment);
+    http.expectNone('/appointments/a1/cancel');
+  });
   it('does not cancel when the reason dialog is dismissed', () => {
     dialogResult = undefined;
     component.onCancel(appointment);

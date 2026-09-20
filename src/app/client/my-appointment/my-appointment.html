@@ -55,9 +55,11 @@
                 <button class="btn-reschedule" (click)="onReschedule(appointment)" [disabled]="isLoading">
                   <mat-icon>event_repeat</mat-icon> Reschedule
                 </button>
-                <button class="btn-cancel" (click)="onCancel(appointment)" [disabled]="isLoading">
-                  <mat-icon>cancel</mat-icon> Cancel
-                </button>
+                @if (canCancel(appointment)) {
+                  <button class="btn-cancel" (click)="onCancel(appointment)" [disabled]="isLoading">
+                    <mat-icon>cancel</mat-icon> Cancel
+                  </button>
+                }
               }
             </div>
           </div>
@@ -101,9 +103,11 @@
               <mat-icon>hourglass_empty</mat-icon> Pending
             </span>
             <div class="actions">
-              <button class="btn-cancel" (click)="onCancel(appointment)" [disabled]="isLoading">
-                <mat-icon>cancel</mat-icon> Cancel
-              </button>
+              @if (canCancel(appointment)) {
+                <button class="btn-cancel" (click)="onCancel(appointment)" [disabled]="isLoading">
+                  <mat-icon>cancel</mat-icon> Cancel
+                </button>
+              }
             </div>
           </div>
         </div>

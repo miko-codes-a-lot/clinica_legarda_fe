@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import { Appointment, AppointmentStatus } from '../../../_shared/model/appointment';
 import { Referral, ReferralStatus } from '../../../_shared/model/referral';
+import { AuthService } from '../../../_shared/service/auth-service';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
 import { AlertService } from '../../../_shared/service/alert.service';
 import { dentistAppointment } from '../appointment-test-fixtures';
@@ -17,11 +18,13 @@ describe('Dentist appointment details', () => {
 
   beforeEach(async () => {
     storedAppointment = dentistAppointment();
+    storedAppointment.createdBy = storedAppointment.dentist._id;
     returnReferralId = false;
     await TestBed.configureTestingModule({
       imports: [AppointmentDetails],
       providers: [
         provideRouter([]),
+        { provide: AuthService, useValue: { currentUserValue: { _id: storedAppointment.dentist._id } } },
         { provide: ActivatedRoute, useValue: { snapshot: { params: { id: storedAppointment._id } } } },
         { provide: AlertService, useValue: { error: () => undefined, success: () => undefined } },
         { provide: AppointmentService, useValue: {

@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../_shared/service/auth-service';
 import { AppointmentService } from '../../_shared/service/appointment-service';
 import { ReasonService } from '../../_shared/service/reason-service';
+import { canCancelAppointment } from '../../_shared/model/appointment-permissions';
 import { Appointment, AppointmentStatus } from '../../_shared/model/appointment';
 import { appointmentActorLabel, appointmentHasEnded, appointmentStatusLabel } from '../../_shared/model/appointment-history';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,7 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { CancelAppointmentDialogComponent } from '../../_shared/component/dialog/cancel-appointment-dialog/cancel-appointment-dialog.component';
+import { AppointmentReasonDialogComponent, AppointmentReasonDialogData } from '../../_shared/component/dialog/appointment-reason-dialog/appointment-reason-dialog.component';
 import { RescheduleDialogComponent, RescheduleDialogData, RescheduleDialogResult } from '../../_shared/component/dialog/reschedule-dialog/reschedule-dialog.component';
 import { Reason } from '../../_shared/model/reason';
 import { AlertService } from '../../_shared/service/alert.service';
@@ -90,9 +91,14 @@ export class MyAppointment {
     });
   }
 
+  canCancel(appointment: Appointment): boolean {
+    return canCancelAppointment(appointment, this.authService.currentUserValue?._id);
+  }
+
   onCancel(appointment: Appointment) {
-    this.dialog.open<CancelAppointmentDialogComponent, undefined, string>(CancelAppointmentDialogComponent, {
-      width: '450px',
+    if (!this.canCancel(appointment) || this.isLoading) return;
+    this.dialog.open<AppointmentReasonDialogComponent, AppointmentReasonDialogData, string>(AppointmentReasonDialogComponent, {
+      width: '450px', data: { action: 'cancel' },
     }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(reason => {
       if (!reason?.trim()) return;
       this.isLoading = true;

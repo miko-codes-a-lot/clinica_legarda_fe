@@ -2,6 +2,8 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, finalize, interval, Observable, of, switchMap, tap } from 'rxjs';
+import { AuthService } from '../../../_shared/service/auth-service';
+import { canCancelAppointment } from '../../../_shared/model/appointment-permissions';
 import { Appointment } from '../../../_shared/model/appointment';
 import { appointmentActorLabel, appointmentStatusLabel, isAppointmentHistory } from '../../../_shared/model/appointment-history';
 import { AppointmentService } from '../../../_shared/service/appointment-service';
@@ -12,7 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { NotesDialogComponent } from '../../../_shared/component/dialog/notes-dialog/notes-dialog.component';
-import { CancelAppointmentDialogComponent } from '../../../_shared/component/dialog/cancel-appointment-dialog/cancel-appointment-dialog.component';
+import { AppointmentReasonDialogComponent, AppointmentReasonDialogData } from '../../../_shared/component/dialog/appointment-reason-dialog/appointment-reason-dialog.component';
 import { ConfirmDialogComponent } from '../../../_shared/component/dialog/confirm-dialog/confirm-dialog.component';
 import { RescheduleDialogComponent, RescheduleDialogData, RescheduleDialogResult } from '../../../_shared/component/dialog/reschedule-dialog/reschedule-dialog.component';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
@@ -27,6 +29,7 @@ import { compareAppointmentSchedule, formatAppointmentDate, requiresAppointmentO
   styleUrl: './appointment-details.css',
 })
 export class AppointmentDetails {
+  private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   isLoading = false;
   isSaving = false;
@@ -97,7 +100,7 @@ export class AppointmentDetails {
 
   declineAppointment(): void {
     if (!this.appointment || this.isActionDisabled()) return;
-    this.saveAppointment(this.appointmentService.rejectAppointment(this.appointment._id), 'Appointment rejected successfully!');
+    this.requestReason('reject');
   }
 
   openNotesDialog(): void {
@@ -130,16 +133,28 @@ export class AppointmentDetails {
     return this.appointment?.status === 'pending' || this.appointment?.status === 'confirmed';
   }
 
+  get canCancel(): boolean {
+    return canCancelAppointment(this.appointment, this.authService.currentUserValue?._id);
+  }
+
   cancelAppointment(): void {
-    if (!this.appointment || !this.isActive || this.isBusy) return;
+    if (!this.canCancel || this.isBusy) return;
+    this.requestReason('cancel');
+  }
+
+  private requestReason(action: 'cancel' | 'reject'): void {
+    if (!this.appointment) return;
     const appointmentId = this.appointment._id;
     this.isDialogOpen = true;
-    this.dialog.open<CancelAppointmentDialogComponent, undefined, string>(CancelAppointmentDialogComponent, {
-      width: '460px', maxWidth: '95vw',
+    this.dialog.open<AppointmentReasonDialogComponent, AppointmentReasonDialogData, string>(AppointmentReasonDialogComponent, {
+      width: '460px', maxWidth: '95vw', data: { action },
     }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(reason => {
       this.isDialogOpen = false;
       if (reason?.trim()) {
-        this.saveAppointment(this.appointmentService.cancelAppointment(appointmentId, reason.trim()), 'Appointment cancelled successfully!');
+        const request = action === 'cancel'
+          ? this.appointmentService.cancelAppointment(appointmentId, reason.trim())
+          : this.appointmentService.rejectAppointment(appointmentId, reason.trim());
+        this.saveAppointment(request, action === 'cancel' ? 'Appointment cancelled successfully!' : 'Appointment rejected successfully!');
       }
     });
   }

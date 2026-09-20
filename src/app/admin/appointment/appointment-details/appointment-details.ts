@@ -1,4 +1,9 @@
-import { Component } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
+import { AuthService } from '../../../_shared/service/auth-service';
+import { canCancelAppointment } from '../../../_shared/model/appointment-permissions';
+import { AppointmentReasonDialogComponent, AppointmentReasonDialogData } from '../../../_shared/component/dialog/appointment-reason-dialog/appointment-reason-dialog.component';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { Appointment } from '../../../_shared/model/appointment';
 import { appointmentActorLabel, appointmentStatusLabel } from '../../../_shared/model/appointment-history';
 import { formatAppointmentDate } from '../../../dentist/appointment/appointment-schedule';
@@ -20,6 +25,9 @@ selector: 'app-appointment-details',
   styleUrl: './appointment-details.css'
 })
 export class AppointmentDetails {
+  private readonly authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
+  isDialogOpen = false;
   readonly actorLabel = appointmentActorLabel;
   isLoading = false
   id!: string
@@ -70,7 +78,7 @@ export class AppointmentDetails {
   }
 
   openNotesDialog() {
-    if (!this.appointment) return;
+    if (!this.appointment || this.isBusy) return;
 
     const dialogRef = this.dialog.open(NotesDialogComponent, {
       data: { clinicNotes: this.appointment.notes.clinicNotes }
@@ -95,6 +103,44 @@ export class AppointmentDetails {
           });
         }
       }
+    });
+  }
+
+  get isBusy(): boolean {
+    return this.isLoading || this.isDialogOpen;
+  }
+
+  get canCancel(): boolean {
+    return canCancelAppointment(this.appointment, this.authService.currentUserValue?._id);
+  }
+
+  cancelAppointment(): void {
+    if (!this.canCancel || this.isBusy) return;
+    this.requestReason('cancel');
+  }
+
+  private requestReason(action: 'cancel'): void {
+    if (!this.appointment) return;
+    const appointmentId = this.appointment._id;
+    this.isDialogOpen = true;
+    this.dialog.open<AppointmentReasonDialogComponent, AppointmentReasonDialogData, string>(AppointmentReasonDialogComponent, {
+      width: '460px', maxWidth: '95vw', data: { action },
+    }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(reason => {
+      this.isDialogOpen = false;
+      if (!reason?.trim()) return;
+      this.isLoading = true;
+      const request = this.appointmentService.cancelAppointment(appointmentId, reason.trim());
+      request.pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isLoading = false),
+      ).subscribe({
+        next: appointment => {
+          this.appointment = appointment;
+          this.displayAppointment['status'] = appointmentStatusLabel(appointment.status);
+          this.alertService.success('Appointment cancelled successfully!');
+        },
+        error: () => this.alertService.error('The appointment could not be updated. Please try again.'),
+      });
     });
   }
 }

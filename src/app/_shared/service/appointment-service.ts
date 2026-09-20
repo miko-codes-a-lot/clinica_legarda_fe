@@ -142,8 +142,8 @@ export class AppointmentService {
     return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/approve`, {}, { withCredentials: true }).pipe(tap(() => this.changes.next()));
   }
 
-  rejectAppointment(appointmentId: string) {
-    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/reject`, {}, { withCredentials: true }).pipe(tap(() => this.changes.next()));
+  rejectAppointment(appointmentId: string, reason: string) {
+    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/reject`, { reason }, { withCredentials: true }).pipe(tap(() => this.changes.next()));
   }
 
   completeAppointment(appointmentId: string): Observable<Appointment> {

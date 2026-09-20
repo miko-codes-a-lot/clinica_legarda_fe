@@ -48,7 +48,4 @@ export class Dashboard {
     this.alertService.error(`Reschedule ${appointment.service}`);
   }
 
-  cancelAppointment(appointment: any) {
-    this.alertService.error(`Cancel ${appointment.service}`);
-  }
 }

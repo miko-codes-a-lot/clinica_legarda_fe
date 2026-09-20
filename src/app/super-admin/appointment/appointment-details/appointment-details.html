@@ -92,9 +92,9 @@
       </article>
     } @empty { <p>No history available.</p> }
   </section>
-  @if (appointment.status === 'confirmed') {
+  @if (canCancel) {
     <div class="action-buttons">
-      <button mat-stroked-button color="warn" (click)="cancelAppointment()" [disabled]="isLoading">
+      <button mat-stroked-button color="warn" (click)="cancelAppointment()" [disabled]="isBusy">
         <mat-icon>cancel</mat-icon> Cancel
       </button>
     </div>
