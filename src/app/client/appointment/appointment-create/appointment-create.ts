@@ -86,7 +86,7 @@ export class AppointmentCreate {
     this.isLoading = true
 
     this.appointmentService.create(appointment).subscribe({
-      next: (c) => this.router.navigate(['/app/my-appointment/details', c._id], { replaceUrl: true }),
+      next: () => this.router.navigate(['/app/my-appointment'], { replaceUrl: true }),
       error: (e) => {
         this.alertService.error(e.error.message)
       }

@@ -80,11 +80,8 @@ export const CLIENT_ROUTES: Routes = [
       },
       {
         path: 'my-appointment/details/:id',
-        canActivate: [AuthGuard],
-        loadComponent: () =>
-          import('./appointment-details/appointment-details').then(
-            (m) => m.AppointmentDetails,
-          ),
+        redirectTo: '/app/my-appointment',
+        pathMatch: 'full',
       },
       {
         path: 'user-settings',
