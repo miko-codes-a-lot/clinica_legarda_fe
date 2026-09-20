@@ -38,7 +38,7 @@ interface TimeSlot {
       <mat-label *ngIf="label">{{ label }}</mat-label>
       <mat-select
         [value]="value"
-        [disabled]="disabled"
+        [disabled]="disabled || !selectedDate || !timeSlots.length"
         [placeholder]="placeholder"
         (selectionChange)="onTimeChange($event)"
       >
@@ -52,7 +52,9 @@ interface TimeSlot {
           <span *ngIf="!slot.available" class="unavailable-text"> (Unavailable)</span>
         </mat-option>
       </mat-select>
-      <mat-hint *ngIf="hint">{{ hint }}</mat-hint>
+      <mat-hint *ngIf="!selectedDate">Select an appointment day first.</mat-hint>
+      <mat-hint *ngIf="selectedDate && !timeSlots.length">No appointment times for this day. Please choose another day.</mat-hint>
+      <mat-hint *ngIf="selectedDate && timeSlots.length && hint">{{ hint }}</mat-hint>
       <mat-error *ngIf="showError">
         {{ errorMessage }}
       </mat-error>

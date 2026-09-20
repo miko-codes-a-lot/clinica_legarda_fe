@@ -1,4 +1,4 @@
-<mat-form-field [appearance]="appearance" [floatLabel]="floatLabel">
+<mat-form-field [appearance]="appearance" [floatLabel]="floatLabel" (click)="picker.open()">
   <mat-label *ngIf="label">{{ label }}</mat-label>
   <input
     matInput
@@ -11,6 +11,8 @@
     [matDatepickerFilter]="dateFilter"
     (dateInput)="onDateChange($event)"
     (dateChange)="onDateChange($event)"
+    (keydown.enter)="picker.open(); $event.preventDefault()"
+    (keydown.space)="picker.open(); $event.preventDefault()"
     readonly
   />
   <mat-hint *ngIf="hint">{{ hint }}</mat-hint>
