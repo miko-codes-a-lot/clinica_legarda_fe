@@ -1,3 +1,6 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
+import { StatusBadge } from '../../../_shared/ui/status-badge/status-badge';
+import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -28,7 +31,7 @@ interface CalendarDay {
   selector: 'app-dentist-home',
   templateUrl: './homepage-index.html',
   styleUrl: './homepage-index.css',
-  imports: [CommonModule, RouterLink],
+  imports: [PageHeader, StatusBadge, EmptyState, CommonModule, RouterLink],
   providers: [DentistAppointmentFeed],
 })
 export class HomepageIndex implements OnInit {

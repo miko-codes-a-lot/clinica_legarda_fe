@@ -1,33 +1,13 @@
-<div class="profile-container">
-
-  <!-- Profile Header -->
-  <section class="profile-header">
-    <img [src]="user.profileImage" alt="{{ user.firstName }} {{ user.lastName }}">
-    <div class="profile-info">
-      <h2>{{ user.firstName }} {{ user.lastName }}</h2>
-      <p>{{ user.email }}</p>
-      <p>Member since: {{ user.memberSince | date:'longDate' }}</p>
+<div class="ui-page max-w-4xl">
+  <app-page-header title="Your profile" eyebrow="Patient portal" description="Review the contact information associated with your account.">
+    <a class="ui-button" routerLink="/app/user-settings/update">Edit profile</a>
+  </app-page-header>
+  <section class="ui-card p-6">
+    <div class="mb-6 flex flex-wrap items-center gap-4 border-b border-brand-100 pb-6">
+      @if (user.profileImage) { <img class="size-16 rounded-full object-cover" [src]="user.profileImage" [alt]="user.firstName + ' ' + user.lastName"> } @else { <div class="grid size-16 shrink-0 place-items-center rounded-full bg-brand-50 text-xl font-semibold text-brand-700" aria-hidden="true">{{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}</div> }
+      <div class="min-w-0"><h2 class="ui-section-title break-words">{{ user.firstName }} {{ user.lastName }}</h2><p class="ui-muted mt-1 break-words text-sm">{{ user.email }}</p></div>
     </div>
+    <h2 class="ui-section-title mb-5">Personal details</h2>
+    <dl class="grid gap-6 sm:grid-cols-2"><div><dt class="ui-label">Phone number</dt><dd class="mt-2 break-words text-sm text-ink">{{ user.mobileNumber || 'Not provided' }}</dd></div><div><dt class="ui-label">Email address</dt><dd class="mt-2 break-words text-sm text-ink">{{ user.email || 'Not provided' }}</dd></div><div class="sm:col-span-2"><dt class="ui-label">Address</dt><dd class="mt-2 whitespace-pre-wrap break-words text-sm text-ink">{{ user.address || 'Not provided' }}</dd></div></dl>
   </section>
-
-  <!-- Personal Details -->
-  <section class="profile-details">
-    <h3>Personal Details</h3>
-    <div class="details-grid">
-      <div class="detail-item">
-        <span class="label">Phone:</span>
-        <span class="value">{{ user.mobileNumber }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="label">Email:</span>
-        <span class="value">{{ user.email }}</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Actions -->
-  <section class="profile-actions">
-    <button (click)="editProfile()">Edit Profile</button>
-  </section>
-
 </div>

@@ -1,11 +1,12 @@
+import { RouterLink } from '@angular/router';
+import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { AuthService } from '../../_shared/service/auth-service';
 import { AlertService } from '../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-profile',
-  imports: [DatePipe],
+  imports: [PageHeader, RouterLink],
   templateUrl: './profile.html',
   styleUrl: './profile.css'
 })

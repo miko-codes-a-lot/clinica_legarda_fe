@@ -1,3 +1,5 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
+import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
 import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Appointment } from '../../../_shared/model/appointment';
@@ -20,7 +22,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 @Component({
   selector: 'app-appointment-create',
   standalone: true,
-  imports: [CommonModule, AppointmentPage, MatProgressSpinnerModule, RouterLink],
+  imports: [PageHeader, EmptyState, CommonModule, AppointmentPage, MatProgressSpinnerModule, RouterLink],
   templateUrl: './appointment-create.html',
   styleUrls: ['./appointment-create.css'],
 

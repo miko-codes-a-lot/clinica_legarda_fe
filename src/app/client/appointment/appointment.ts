@@ -1,3 +1,5 @@
+import { PageHeader } from '../../_shared/ui/page-header/page-header';
+import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subscription } from 'rxjs';
 import { bookingSlots, DentistBookingSchedule, isBookableDentist, pickerDateFromStored } from '../../_shared/model/booking-availability';
@@ -43,7 +45,7 @@ import { AlertService } from '../../_shared/service/alert.service';
 @Component({
   selector: 'app-appointment',
   standalone: true,
-  imports: [
+  imports: [PageHeader, EmptyState,
     ReactiveFormsModule,
     TimePicker,
     DatePicker,

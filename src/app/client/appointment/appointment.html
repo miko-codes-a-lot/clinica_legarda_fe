@@ -1,120 +1,33 @@
-
-  <div class="appointment-hero">
-    <h1>Book an Appointment</h1>
-    <p>Schedule your visit at <strong>Clinica Legarda</strong>.</p>
-  </div>
+<div class="ui-page max-w-5xl">
+  <app-page-header title="Book an appointment" eyebrow="Patient portal" description="Choose your clinic, services, and an available schedule for your visit." />
   @if (!user) {
-    <div class="container">
-      <div class="login-required">
-        <h2>You must log in to book an appointment</h2>
-        <p>Please sign in to continue.</p>
-        <a [routerLink]="'/app/login'" class="btn-service">Proceed to Login</a>
-      </div>
-    </div>
+    <div class="ui-card"><app-empty-state title="Sign in to book an appointment" description="Please sign in to continue." icon="login"><a routerLink="/app/login" class="ui-button">Proceed to login</a></app-empty-state></div>
   } @else {
-    <app-form
-      [form]="rxform"
-      [fields]="appointmentFields" 
-      [isLoading]="bookingUnavailable"
-      (onSubmitEvent)="onSubmit()"
-    >
-      @if (availabilityLoading) {
-        <p role="status">Checking dentist availability...</p>
-      }
-      @if (availabilityError) {
-        <p role="alert">{{ availabilityError }}</p>
-      }
-      <form [formGroup]="rxform">
+    <section class="ui-card p-5 sm:p-7" aria-label="Appointment booking form">
+      <div class="mb-5 border-b border-brand-100 pb-5"><h2 class="ui-section-title">Visit details</h2><p class="ui-muted mt-2 text-sm">Select up to three services per visit. Available dates and times depend on the selected dentist and total service duration.</p></div>
+      <app-form [framed]="false" submitLabel="Book appointment" busyLabel="Book appointment" [form]="rxform" [fields]="appointmentFields" [isLoading]="bookingUnavailable" (onSubmitEvent)="onSubmit()">
+        @if (availabilityLoading) { <p class="ui-muted my-3 text-sm" role="status">Checking dentist availability…</p> }
+        @if (availabilityError) { <p class="my-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">{{ availabilityError }}</p> }
+        <div [formGroup]="rxform">
           @if (bookingSchedule) {
-            <app-date-picker 
-              formControlName="date"
-              label="Appointment Day"
-              placeholder="Choose a date"
-              [dentist]="bookingSchedule"
-              [minDate]="minDate"
-              [maxDate]="maxDate"
-              [serviceDuration]="serviceDuration()"
-            >
-            </app-date-picker> <br>
-
-            <app-time-picker
-              label="Appointment Time"
-              [dentist]="bookingSchedule"
-              [selectedDate]="date.value"
-              [serviceDuration]="serviceDuration()"
-              [timeSlotInterval]="30"
-              [required]="true"
-              formControlName="time"
-            >
-            </app-time-picker>
-            <div class="summary">
-              <p><strong>Total Duration:</strong> {{ getFormattedDuration() }}</p>
-              <p><strong>Time:</strong> {{ getAppointmentTimeRange() }}</p>
+            <div class="mt-4 border-t border-brand-100 pt-5"><h2 class="ui-section-title mb-4">Choose your schedule</h2>
+              <div class="ui-form-grid"><app-date-picker class="min-w-0" formControlName="date" label="Appointment day" placeholder="Choose a date" [dentist]="bookingSchedule" [minDate]="minDate" [maxDate]="maxDate" [serviceDuration]="serviceDuration()" /><app-time-picker class="min-w-0" label="Appointment time" [dentist]="bookingSchedule" [selectedDate]="date.value" [serviceDuration]="serviceDuration()" [timeSlotInterval]="30" [required]="true" formControlName="time" /></div>
+              <dl class="mb-5 grid gap-3 rounded-xl border border-brand-100 bg-brand-50 p-4 text-sm sm:grid-cols-2"><div><dt class="ui-label">Total duration</dt><dd class="mt-1 font-semibold text-brand-900">{{ getFormattedDuration() }}</dd></div><div><dt class="ui-label">Appointment time</dt><dd class="mt-1 font-semibold text-brand-900">{{ getAppointmentTimeRange() }}</dd></div></dl>
             </div>
           }
-      </form>
-      @if (isChangeBranch) {
-        <div class="referral-card">
-          <div class="referral-header">
-            <mat-icon>swap_horiz</mat-icon>
-            <div>
-              <h3>Clinic Transfer Required</h3>
-              <p>
-                You are switching from
-                <strong>{{ latestPatientAppointment?.clinic?.name }}</strong>.
-                A referral is required to proceed.
-              </p>
-            </div>
-          </div>
-
-          <form [formGroup]="rxReferralForm" class="referral-form">
-            <!-- this part -->
-            <!-- Referring Dentist -->
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Referring Dentist</mat-label>
-              <mat-select formControlName="fromDoctorId" required>
-                <mat-option value="" disabled>
-                  Select a referring dentist
-                </mat-option>
-
-                @for (opt of selectReferringDentist; track opt.value) {
-                  <mat-option [value]="opt.value">
-                    {{ opt.label }}
-                  </mat-option>
-                }
-              </mat-select>
-              <mat-hint>
-                From your previous clinic
-              </mat-hint>
-            </mat-form-field>
-
-            <!-- Reason -->
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Reason for Referral</mat-label>
-              <mat-select formControlName="reason" required>
-                <mat-option value="" disabled>Select a reason</mat-option>
-                <mat-option *ngFor="let r of reasons" [value]="r.value">
-                  {{ r.label }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <div class="referral-note">
-              <mat-icon>info</mat-icon>
-              <span>
-                The receiving clinic will review and confirm this referral.
-              </span>
-            </div>
-
-          </form>
         </div>
-      }
-
-      @if (services.errors?.['maxlength']) {
-        <div class="error-text-maxvisit">
-          Maximum of 3 services per visit/consultation only.
-        </div>
-      }
-
-    </app-form>
+        @if (isChangeBranch) {
+          <section class="my-5 rounded-xl border border-amber-200 bg-amber-50 p-5" aria-labelledby="referral-title">
+            <div class="mb-5 flex items-start gap-3"><mat-icon class="shrink-0 text-amber-800" aria-hidden="true">swap_horiz</mat-icon><div><h2 id="referral-title" class="ui-section-title">Clinic transfer required</h2><p class="mt-2 text-sm text-amber-900">You are switching from <strong>{{ latestPatientAppointment?.clinic?.name }}</strong>. A referral is required to proceed.</p></div></div>
+            <div [formGroup]="rxReferralForm" class="ui-form-grid">
+              <mat-form-field appearance="outline" class="w-full"><mat-label>Referring dentist</mat-label><mat-select formControlName="fromDoctorId" required><mat-option value="" disabled>Select a referring dentist</mat-option>@for (opt of selectReferringDentist; track opt.value) { <mat-option [value]="opt.value">{{ opt.label }}</mat-option> }</mat-select><mat-hint>From your previous clinic</mat-hint></mat-form-field>
+              <mat-form-field appearance="outline" class="w-full"><mat-label>Reason for referral</mat-label><mat-select formControlName="reason" required><mat-option value="" disabled>Select a reason</mat-option><mat-option *ngFor="let reason of reasons" [value]="reason.value">{{ reason.label }}</mat-option></mat-select></mat-form-field>
+            </div>
+            <p class="mt-2 flex items-start gap-2 text-sm text-amber-900"><mat-icon class="shrink-0" aria-hidden="true">info</mat-icon><span>The receiving clinic will review and confirm this referral.</span></p>
+          </section>
+        }
+        @if (services.errors?.['maxlength']) { <p class="my-4 text-sm font-medium text-red-800" role="alert">Maximum of 3 services per visit/consultation only.</p> }
+      </app-form>
+    </section>
   }
+</div>

@@ -1,26 +1,11 @@
 @if (isInitializing) {
-  <div class="loading-container" role="status">
-    <mat-spinner diameter="32" aria-label="Loading appointment booking"></mat-spinner>
-    <span>Loading appointment booking...</span>
-  </div>
+  <div class="ui-page"><div class="ui-card flex items-center justify-center gap-3 p-8" role="status"><mat-spinner diameter="32" aria-label="Loading appointment booking" /><span class="ui-muted">Loading appointment booking…</span></div></div>
 } @else if (!user) {
-  <div class="container">
-    <div class="login-required">
-      <h2>You must log in to book an appointment</h2>
-      <p>Please sign in to continue.</p>
-      <a [routerLink]="'/app/login'" class="btn-service">Proceed to Login</a>
-    </div>
-  </div>
+  <div class="ui-page max-w-5xl"><app-page-header title="Book an appointment" eyebrow="Patient portal" /><div class="ui-card"><app-empty-state title="Sign in to book an appointment" description="Please sign in to continue." icon="login"><a routerLink="/app/login" class="ui-button">Proceed to login</a></app-empty-state></div></div>
 } @else if (loadError) {
-  <p role="alert">Unable to load appointment booking. Please refresh to try again.</p>
+  <div class="ui-page max-w-5xl"><app-page-header title="Book an appointment" eyebrow="Patient portal" /><p class="ui-card border-red-200 bg-red-50 p-5 text-sm text-red-800" role="alert">Unable to load appointment booking. Please refresh to try again.</p></div>
 } @else if (clinics.length !== 0) {
-  <app-appointment
-    [isLoading]="isLoading"
-    [dentalServices]="dentalServices"
-    [clinics]="clinics"
-    [appointment]="initDoc"
-    (onSubmitEvent)="onSubmit($event)">
-  </app-appointment>
+  <app-appointment [isLoading]="isLoading" [dentalServices]="dentalServices" [clinics]="clinics" [appointment]="initDoc" (onSubmitEvent)="onSubmit($event)" />
 } @else {
-  <p>No clinics are available for booking at the moment.</p>
+  <div class="ui-page max-w-5xl"><app-page-header title="Book an appointment" eyebrow="Patient portal" /><div class="ui-card"><app-empty-state title="No clinics available for booking" description="Please check back later or contact the clinic." icon="event_busy" /></div></div>
 }

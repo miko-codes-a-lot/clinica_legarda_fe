@@ -1,134 +1,34 @@
-<mat-card class="account-card">
-  <mat-card-content>
-    <form [formGroup]="profileForm" (ngSubmit)="onSave()" class="account-form">
-
-      <!-- Profile Picture -->
-      <section class="section profile-section">
-        <h2 class="section-title">Account</h2>
-        <p class="section-subtitle">Manage your profile details and preferences.</p>
-      </section>
-
-      <mat-divider></mat-divider>
-
-      <!-- Full Name -->
-      <section class="section">
-        <h2 class="section-title">Full Name</h2>
-        <div class="form-grid">
-          <mat-form-field appearance="outline" class="field">
-            <mat-label>First Name</mat-label>
-            <input matInput formControlName="firstName" />
-            <mat-error>
-              <app-form-control-errors [control]="profileForm.get('firstName')"></app-form-control-errors>
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="field">
-            <mat-label>Middle Name</mat-label>
-            <input matInput formControlName="middleName" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="field">
-            <mat-label>Last Name</mat-label>
-            <input matInput formControlName="lastName" />
-            <mat-error>
-              <app-form-control-errors [control]="profileForm.get('lastName')"></app-form-control-errors>
-            </mat-error>
-          </mat-form-field>
+<div class="ui-page max-w-5xl">
+  <app-page-header title="Edit your account" eyebrow="Patient portal" description="Keep your name and contact information up to date." />
+  <section class="ui-card p-5 sm:p-7">
+    <form [formGroup]="profileForm" (ngSubmit)="onSave()" [attr.aria-busy]="isLoading">
+      <section class="mb-6 border-b border-brand-100 pb-5">
+        <h2 class="ui-section-title mb-4">Full name</h2>
+        <div class="ui-form-grid lg:grid-cols-3">
+          <mat-form-field appearance="outline" class="w-full"><mat-label>First name</mat-label><input matInput formControlName="firstName" autocomplete="given-name"><mat-error><app-form-control-errors [control]="profileForm.get('firstName')" /></mat-error></mat-form-field>
+          <mat-form-field appearance="outline" class="w-full"><mat-label>Middle name</mat-label><input matInput formControlName="middleName" autocomplete="additional-name"></mat-form-field>
+          <mat-form-field appearance="outline" class="w-full"><mat-label>Last name</mat-label><input matInput formControlName="lastName" autocomplete="family-name"><mat-error><app-form-control-errors [control]="profileForm.get('lastName')" /></mat-error></mat-form-field>
         </div>
       </section>
-
-      <mat-divider></mat-divider>
-
-      <!-- Contact Info -->
-      <section class="section">
-        <h2 class="section-title">Contact Information</h2>
-        <div class="form-grid">
-          <mat-form-field appearance="outline" class="field full-width">
-            <mat-label>Email Address</mat-label>
-            <input matInput type="email" formControlName="emailAddress" />
-            <mat-error>
-              <app-form-control-errors [control]="profileForm.get('emailAddress')"></app-form-control-errors>
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="field">
-            <mat-label>Mobile Number</mat-label>
-            <input matInput type="tel" formControlName="mobileNumber" maxlength="13" />
-            <mat-error>
-              <app-form-control-errors [control]="profileForm.get('mobileNumber')"></app-form-control-errors>
-            </mat-error>
-          </mat-form-field>
-
-          <!-- Address Field -->
-          <mat-form-field appearance="outline" class="field full-width">
-            <mat-label>Address</mat-label>
-            <textarea matInput formControlName="address" rows="2"></textarea>
-            <mat-error>
-              <app-form-control-errors [control]="profileForm.get('address')"></app-form-control-errors>
-            </mat-error>
-          </mat-form-field>
+      <section class="mb-6">
+        <h2 class="ui-section-title mb-4">Contact information</h2>
+        <div class="ui-form-grid">
+          <mat-form-field appearance="outline" class="w-full"><mat-label>Email address</mat-label><input matInput type="email" formControlName="emailAddress" autocomplete="email"><mat-error><app-form-control-errors [control]="profileForm.get('emailAddress')" /></mat-error></mat-form-field>
+          <mat-form-field appearance="outline" class="w-full"><mat-label>Mobile number</mat-label><input matInput type="tel" formControlName="mobileNumber" maxlength="13" autocomplete="tel"><mat-error><app-form-control-errors [control]="profileForm.get('mobileNumber')" /></mat-error></mat-form-field>
+          <mat-form-field appearance="outline" class="w-full sm:col-span-2"><mat-label>Address</mat-label><textarea matInput formControlName="address" rows="3" autocomplete="street-address"></textarea><mat-error><app-form-control-errors [control]="profileForm.get('address')" /></mat-error></mat-form-field>
         </div>
       </section>
-
-      <!-- Operating Hours -->
-      <section class="section" *ngIf="isDentist">
-        <div class="header-row">
-          <h2 class="section-title">Operating Hours</h2>
-          <button mat-flat-button color="accent" type="button" (click)="onAddSchedule()"
-            [disabled]="operatingHours.length >= (clinicOperatingHours.value?.length || 0)">
-            Add Schedule
-          </button>
-        </div>
-
-        <div formArrayName="operatingHours" class="schedule">
-          <mat-card class="hour-card" *ngFor="let hour of operatingHours.controls; let i = index" [formGroupName]="i">
-            <div class="hour-grid">
-              <mat-form-field appearance="outline" class="field full-width">
-                <mat-label>Day</mat-label>
-                <mat-select formControlName="day">
-                  <mat-option *ngFor="let day of days" [value]="day.code" [disabled]="getSelectedDays(i).includes(day.code)">
-                    {{ day.label }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="field half-width">
-                <mat-label>From</mat-label>
-                <input matInput type="time" formControlName="startTime" />
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="field half-width">
-                <mat-label>To</mat-label>
-                <input matInput type="time" formControlName="endTime" />
-              </mat-form-field>
-            </div>
-
-            <div class="schedule-errors">
-              <mat-error *ngIf="hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)">
-                End time must be after start time.
-              </mat-error>
-              <mat-error *ngIf="hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)">
-                Time must be within the clinic's operating hours.
-              </mat-error>
-            </div>
-
-            <button mat-stroked-button color="warn" type="button" (click)="removeOperatingHour(i)">
-              Remove
-            </button>
-          </mat-card>
+      <section *ngIf="isDentist" class="mb-6 border-t border-brand-100 pt-5">
+        <div class="ui-toolbar mb-4"><h2 class="ui-section-title">Operating hours</h2><button class="ui-button-secondary" type="button" (click)="onAddSchedule()" [disabled]="isLoading || operatingHours.length >= (clinicOperatingHours.value?.length || 0)">Add schedule</button></div>
+        <div formArrayName="operatingHours" class="space-y-4">
+          <div class="rounded-xl border border-brand-100 bg-canvas p-4" *ngFor="let hour of operatingHours.controls; let i = index" [formGroupName]="i">
+            <div class="ui-form-grid lg:grid-cols-3"><mat-form-field appearance="outline" class="w-full"><mat-label>Day</mat-label><mat-select formControlName="day"><mat-option *ngFor="let day of days" [value]="day.code" [disabled]="getSelectedDays(i).includes(day.code)">{{ day.label }}</mat-option></mat-select></mat-form-field><mat-form-field appearance="outline" class="w-full"><mat-label>From</mat-label><input matInput type="time" formControlName="startTime"></mat-form-field><mat-form-field appearance="outline" class="w-full"><mat-label>To</mat-label><input matInput type="time" formControlName="endTime"></mat-form-field></div>
+            <div class="mb-3 text-sm text-red-800"><mat-error *ngIf="hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)">End time must be after start time.</mat-error><mat-error *ngIf="hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)">Time must be within the clinic's operating hours.</mat-error></div>
+            <button class="ui-button-danger" type="button" (click)="removeOperatingHour(i)" [disabled]="isLoading">Remove schedule</button>
+          </div>
         </div>
       </section>
-
-      <!-- Save / Logout Buttons -->
-      <div class="button-group">
-        <button [disabled]="!profileForm.valid" mat-raised-button color="primary" class="save-btn" type="submit">
-          Save Changes
-        </button>
-        <button mat-stroked-button color="warn" class="logout-btn" type="button" (click)="cancelEdit()">
-          Cancel
-        </button>
-      </div>
-
+      <div class="flex flex-wrap gap-2 border-t border-brand-100 pt-5"><button [disabled]="!profileForm.valid || isLoading" class="ui-button" type="submit">{{ isLoading ? 'Saving…' : 'Save changes' }}</button><button class="ui-button-secondary" type="button" (click)="cancelEdit()" [disabled]="isLoading">Cancel</button></div>
     </form>
-  </mat-card-content>
-</mat-card>
+  </section>
+</div>

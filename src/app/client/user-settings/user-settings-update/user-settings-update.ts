@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, OnInit, ChangeDetectorRef   } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -29,7 +30,7 @@ Chart.register(...registerables);
   selector: 'app-user-settings-update',
   templateUrl: './user-settings-update.html',
   styleUrl: './user-settings-update.css',
-  imports: [MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatIconModule, MatSelectModule, FormControlErrorsComponent, CommonModule],
+  imports: [PageHeader, MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatIconModule, MatSelectModule, FormControlErrorsComponent, CommonModule],
 })
 export class UserSettingsUpdate implements OnInit {
   profileForm!: FormGroup;
@@ -233,19 +234,16 @@ onSave() {
 
 
     this.userService.update(this.id, userData).subscribe({
-      next: (res) => {
-        this.router.navigate(['/admin/user-settings']).then(() => {
-          window.location.reload();
-        });
+      next: () => {
+        this.alertService.success('Successfully updated');
+        this.router.navigate(['/app/user-settings/index']);
       },
       error: (err) => {
-        this.alertService.error(err.error.message)
+        this.alertService.error(err.error.message);
+        this.isLoading = false;
       },
-      complete: () => {
-        this.alertService.error('Successfully Updated')
-        this.router.navigate(['/app/user-settings/index'])
-        this.isLoading = false
-      }
+      complete: () => { this.isLoading = false; }
+
     });
   } else {
     console.warn('Form invalid or missing ID:', this.profileForm.value);

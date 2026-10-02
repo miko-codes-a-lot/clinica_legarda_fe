@@ -1,3 +1,6 @@
+import { PageHeader } from '../ui/page-header/page-header';
+import { StatusBadge } from '../ui/status-badge/status-badge';
+import { EmptyState } from '../ui/empty-state/empty-state';
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild, ElementRef, Input, DestroyRef, inject } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -31,7 +34,7 @@ Chart.register(...registerables);
 
 @Component({
   selector: 'app-staff-dashboard',
-  imports: [
+  imports: [PageHeader, StatusBadge, EmptyState,
     CommonModule,
     MatCardModule,
     MatIconModule,
@@ -166,7 +169,7 @@ export class StaffDashboard {
         labels: services,
         datasets: [{
           data: counts,
-          backgroundColor: ['#3f51b5', '#ff4081', '#4caf50', '#ff9800'],
+          backgroundColor: ['#087563', '#44ab92', '#0a4a41', '#b45309'],
           borderWidth: 2,
           borderColor: '#ffffff'
         }]
@@ -222,16 +225,16 @@ export class StaffDashboard {
           {
             label: 'Total Appointments',
             data: trendData.scheduled,
-            borderColor: '#3f51b5',
-            backgroundColor: 'rgba(63, 81, 181, 0.1)',
+            borderColor: '#087563',
+            backgroundColor: 'rgba(8, 117, 99, 0.1)',
             tension: 0.4,
             fill: true
           },
           {
             label: 'Completed Appointments',
             data: trendData.completed,
-            borderColor: '#4caf50',
-            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+            borderColor: '#44ab92',
+            backgroundColor: 'rgba(68, 171, 146, 0.1)',
             tension: 0.4,
             fill: true
           }
@@ -329,7 +332,7 @@ export class StaffDashboard {
   }
 
   private getServiceTrendData(): { labels: string[], datasets: { label: string, data: number[], backgroundColor: string }[] } {
-    const colors = ['#3f51b5', '#ff4081', '#4caf50', '#ff9800', '#9c27b0', '#00bcd4', '#ffc107'];
+    const colors = ['#087563', '#44ab92', '#0a4a41', '#b45309', '#647472', '#79cdb6', '#b42318'];
     return {
       labels: this.report?.trend.labels ?? [],
       datasets: Object.entries(this.report?.trend.serviceTrend ?? {}).map(([label, data], index) => ({
@@ -361,7 +364,7 @@ export class StaffDashboard {
         labels,
         datasets: [{
           data: counts,
-          backgroundColor: ['#f44336', '#ff9800', '#9c27b0', '#3f51b5', '#4caf50'],
+          backgroundColor: ['#b42318', '#b45309', '#647472', '#087563', '#44ab92'],
           borderWidth: 2,
           borderColor: '#fff'
         }]

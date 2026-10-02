@@ -1,3 +1,7 @@
+import { RouterLink } from '@angular/router';
+import { PageHeader } from '../../_shared/ui/page-header/page-header';
+import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
+import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
 import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { take } from 'rxjs';
@@ -23,7 +27,7 @@ import { AlertService } from '../../_shared/service/alert.service';
 @Component({
   selector: 'app-my-appointment',
   standalone: true,
-  imports: [
+  imports: [RouterLink, PageHeader, StatusBadge, EmptyState,
     CommonModule,
     ReactiveFormsModule,
     MatIconModule,

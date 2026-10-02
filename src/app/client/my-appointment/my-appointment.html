@@ -1,226 +1,69 @@
-<div class="appointments-page">
-
-  <!-- Hero -->
-  <section class="appointments-hero">
-    <h1>My Appointments</h1>
-    <p>View and manage your dental appointments with Clinica Legarda.</p>
-  </section>
-
-  @if (isLoading) { <p role="status">Updating appointments…</p> }
-  <section class="appointments-section" [attr.aria-busy]="isLoading">
-
-    <!-- Confirmed -->
-    <div class="appointment-group">
-      <h2 class="group-title confirmed-title">
-        <mat-icon>check_circle</mat-icon> Confirmed Appointments
-      </h2>
-
-      <div *ngIf="hasConfirmedAppointments; else noConfirmed">
-         <div *ngFor="let appointment of confirmedAppointments" class="appointment-card confirmed">
-
-          <div class="appointment-date">
-            <span class="date">{{ appointment.date | date:'mediumDate':'+0000' }}</span>
-            <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
-          </div>
-
-          <div class="appointment-details">
-            <h3>Services:</h3>
-            <ul>
-              <li *ngFor="let s of appointment.services">{{ s.name }}</li>
-            </ul>
-            <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
-            <p>Clinic: {{ appointment.clinic.name }} — {{ appointment.clinic.address }}</p>
-            <ng-container *ngTemplateOutlet="activity; context: { $implicit: appointment }"></ng-container>
-
-            <!-- Patient Notes -->
-            <p *ngIf="appointment.notes.patientNotes">
-              <strong>Patient Notes:</strong> {{ appointment.notes.patientNotes }}
-            </p>
-
-            <!-- Dentist Notes -->
-            <p *ngIf="appointment.notes.clinicNotes">
-              <strong>Dentist Notes:</strong> {{ appointment.notes.clinicNotes }}
-            </p>
-            @if (appointment.referral?.status === 'pending') {
-              <p>Referral Status: <strong>{{ appointment.referral?.status }}</strong></p>
-            }
-          </div>
-
-          <div class="appointment-status">
-            <span class="status-badge confirmed">
-              <mat-icon>check_circle</mat-icon> Confirmed
-            </span>
-            <div class="actions">
-              @if(!isAppointmentPast(appointment)) {
-                <button class="btn-reschedule" (click)="onReschedule(appointment)" [disabled]="isLoading">
-                  <mat-icon>event_repeat</mat-icon> Reschedule
-                </button>
-                @if (canCancel(appointment)) {
-                  <button class="btn-cancel" (click)="onCancel(appointment)" [disabled]="isLoading">
-                    <mat-icon>cancel</mat-icon> Cancel
-                  </button>
-                }
-              }
-            </div>
-          </div>
-
-        </div>
+<div class="ui-page max-w-6xl">
+  <app-page-header title="My appointments" eyebrow="Patient portal" description="View your visits, appointment activity, and scheduling options.">
+    <a class="ui-button" routerLink="/app/appointment"><mat-icon aria-hidden="true">add</mat-icon> Book a visit</a>
+  </app-page-header>
+  @if (isLoading) { <p class="ui-muted mb-5 text-sm" role="status">Updating appointments…</p> }
+  <div class="space-y-6" [attr.aria-busy]="isLoading">
+    <section aria-labelledby="confirmed-title">
+      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-brand-600" aria-hidden="true">check_circle</mat-icon><h2 id="confirmed-title" class="ui-section-title">Confirmed appointments</h2></div>
+      <div class="space-y-4" *ngIf="hasConfirmedAppointments; else noConfirmed">
+        <ng-container *ngFor="let appointment of confirmedAppointments"><ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'confirmed' }"></ng-container></ng-container>
       </div>
-
-      <ng-template #noConfirmed>
-        <p class="no-appointments">No confirmed appointments yet.</p>
-      </ng-template>
-    </div>
-
-
-    <!-- Pending -->
-    <div class="appointment-group">
-      <h2 class="group-title pending-title">
-        <mat-icon>hourglass_empty</mat-icon> Pending Appointments
-      </h2>
-
-      <div *ngIf="hasPendingAppointments; else noPending">
-        <div *ngFor="let appointment of pendingAppointments" class="appointment-card pending">
-          <div class="appointment-date">
-            <span class="date">{{ appointment.date | date:'mediumDate':'+0000' }}</span>
-            <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
-          </div>
-          <div class="appointment-details">
-            <h3>Services:</h3>
-            <ul>
-              <li *ngFor="let s of appointment.services">{{ s.name }}</li>
-            </ul>
-            <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
-            <p>Clinic: {{ appointment.clinic.name }} — {{ appointment.clinic.address }}</p>
-            <ng-container *ngTemplateOutlet="activity; context: { $implicit: appointment }"></ng-container>
-            <!-- Patient Notes -->
-            <p *ngIf="appointment.notes.patientNotes">
-              <strong>Patient Notes:</strong> {{ appointment.notes.patientNotes }}
-            </p>
-          </div>
-          <div class="appointment-status">
-            <span class="status-badge pending">
-              <mat-icon>hourglass_empty</mat-icon> Pending
-            </span>
-            <div class="actions">
-              @if (canCancel(appointment)) {
-                <button class="btn-cancel" (click)="onCancel(appointment)" [disabled]="isLoading">
-                  <mat-icon>cancel</mat-icon> Cancel
-                </button>
-              }
-            </div>
-          </div>
-        </div>
+      <ng-template #noConfirmed><div class="ui-card"><app-empty-state title="No confirmed appointments yet" description="Confirmed visits will appear here." icon="event_available" /></div></ng-template>
+    </section>
+    <section aria-labelledby="pending-title">
+      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-brand-600" aria-hidden="true">hourglass_empty</mat-icon><h2 id="pending-title" class="ui-section-title">Pending appointments</h2></div>
+      <div class="space-y-4" *ngIf="hasPendingAppointments; else noPending">
+        <ng-container *ngFor="let appointment of pendingAppointments"><ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'pending' }"></ng-container></ng-container>
       </div>
-
-      <ng-template #noPending>
-        <p class="no-appointments">No pending appointments yet.</p>
-      </ng-template>
-    </div>
-
-    <!-- Rejected -->
-    <div class="appointment-group">
-      <h2 class="group-title rejected-title">
-        <mat-icon>cancel</mat-icon> Rejected Appointments
-      </h2>
-      <div *ngIf="hasRejectedAppointments; else noRejected">
-        <div *ngFor="let appointment of rejectedAppointments" class="appointment-card rejected">
-          <div class="appointment-date">
-            <span class="date">{{ appointment.date | date:'mediumDate':'+0000' }}</span>
-            <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
-          </div>
-          <div class="appointment-details">
-            <h3>Services:</h3>
-            <ul>
-              <li *ngFor="let s of appointment.services">{{ s.name }}</li>
-            </ul>
-            <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
-            <p>Clinic: {{ appointment.clinic.name }} — {{ appointment.clinic.address }}</p>
-            <ng-container *ngTemplateOutlet="activity; context: { $implicit: appointment }"></ng-container>
-            @if(appointment.referral?.status === 'rejected') {
-              <b>Rejected By the Referring Dentist</b>
-              <p>- Reason for Rejection: {{ getReasonLabel(appointment.referral?.reasonOfDecline) }}</p>
-            }
-          </div>
-          <div class="appointment-status">
-            <span class="status-badge rejected">
-              <mat-icon>cancel</mat-icon> Rejected
-            </span>
-          </div>
-        </div>
+      <ng-template #noPending><div class="ui-card"><app-empty-state title="No pending appointments yet" icon="pending_actions" /></div></ng-template>
+    </section>
+    <section aria-labelledby="finished-title">
+      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-brand-600" aria-hidden="true">history</mat-icon><h2 id="finished-title" class="ui-section-title">Completed and no-show appointments</h2></div>
+      <div class="space-y-4">@for (appointment of finishedAppointments; track appointment._id) { <ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'finished' }"></ng-container> } @empty { <div class="ui-card"><app-empty-state title="No completed or no-show appointments" icon="history" /></div> }</div>
+    </section>
+    <section aria-labelledby="rejected-title">
+      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-muted" aria-hidden="true">cancel</mat-icon><h2 id="rejected-title" class="ui-section-title">Rejected appointments</h2></div>
+      <div class="space-y-4" *ngIf="hasRejectedAppointments; else noRejected">
+        <ng-container *ngFor="let appointment of rejectedAppointments"><ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'rejected' }"></ng-container></ng-container>
       </div>
-      <ng-template #noRejected><p class="no-appointments">No rejected appointments.</p></ng-template>
-    </div>
-
-    <!-- Cancelled -->
-    <div class="appointment-group">
-      <h2 class="group-title cancelled-title">
-        <mat-icon>block</mat-icon> Cancelled Appointments
-      </h2>
-      <div *ngIf="hasCancelledAppointments; else noCancelled">
-        <div *ngFor="let appointment of cancelledAppointments" class="appointment-card cancelled">
-          <div class="appointment-date">
-            <span class="date">{{ appointment.date | date:'mediumDate':'+0000' }}</span>
-            <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
-          </div>
-          <div class="appointment-details">
-            <h3>Services:</h3>
-            <ul>
-              <li *ngFor="let s of appointment.services">{{ s.name }}</li>
-            </ul>
-            <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
-            <p>Clinic: {{ appointment.clinic.name }} — {{ appointment.clinic.address }}</p>
-            <ng-container *ngTemplateOutlet="activity; context: { $implicit: appointment }"></ng-container>
-          </div>
-          <div class="appointment-status">
-            <span class="status-badge cancelled">
-              <mat-icon>block</mat-icon> Cancelled
-            </span>
-          </div>
-        </div>
+      <ng-template #noRejected><div class="ui-card"><app-empty-state title="No rejected appointments" icon="event_busy" /></div></ng-template>
+    </section>
+    <section aria-labelledby="cancelled-title">
+      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-muted" aria-hidden="true">block</mat-icon><h2 id="cancelled-title" class="ui-section-title">Cancelled appointments</h2></div>
+      <div class="space-y-4" *ngIf="hasCancelledAppointments; else noCancelled">
+        <ng-container *ngFor="let appointment of cancelledAppointments"><ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'cancelled' }"></ng-container></ng-container>
       </div>
-      <ng-template #noCancelled><p class="no-appointments">No cancelled appointments.</p></ng-template>
-    </div>
-
-
-    <div class="appointment-group">
-      <h2 class="group-title"><mat-icon>history</mat-icon> Completed and no-show appointments</h2>
-      @for (appointment of finishedAppointments; track appointment._id) {
-        <article class="appointment-card" [class.completed]="appointment.status === AppointmentStatus.COMPLETED"
-                 [class.no-show]="appointment.status === AppointmentStatus.NO_SHOW">
-          <div class="appointment-date">
-            <span class="date">{{ appointment.date | date:'mediumDate':'+0000' }}</span>
-            <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
-          </div>
-          <div class="appointment-details">
-            <h3>Services:</h3>
-            <ul>@for (service of appointment.services; track service._id) { <li>{{ service.name }}</li> }</ul>
-            <p>Dentist: {{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</p>
-            <p>Clinic: {{ appointment.clinic.name }} — {{ appointment.clinic.address }}</p>
-            @if (appointment.notes.patientNotes) { <p><strong>Patient notes:</strong> {{ appointment.notes.patientNotes }}</p> }
-            @if (appointment.notes.clinicNotes) { <p><strong>Dentist notes:</strong> {{ appointment.notes.clinicNotes }}</p> }
-            <ng-container *ngTemplateOutlet="activity; context: { $implicit: appointment }"></ng-container>
-          </div>
-          <div class="appointment-status">
-            <span class="status-badge">{{ statusLabel(appointment.status) }}</span>
-          </div>
-        </article>
-      } @empty { <p class="no-appointments">No completed or no-show appointments.</p> }
-    </div>
-
-  </section>
+      <ng-template #noCancelled><div class="ui-card"><app-empty-state title="No cancelled appointments" icon="event_busy" /></div></ng-template>
+    </section>
+  </div>
 </div>
 
-<ng-template #activity let-appointment>
-  <details class="appointment-activity">
-    <summary>Appointment activity</summary>
-    @for (entry of appointment.history; track $index) {
-      <div class="activity-entry">
-        <strong>{{ entry.action }}</strong>
-        <p>{{ entry.timestamp | date:'MMM d, yyyy, h:mm a':'+0800' }}</p>
-        @if (actorLabel(entry)) { <p>By {{ actorLabel(entry) }}</p> }
-        @if (entry.reason) { <p class="change-reason"><strong>Reason:</strong> {{ entry.reason }}</p> }
+<ng-template #visit let-appointment let-mode="mode">
+  <article class="ui-card overflow-hidden">
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-brand-100 bg-brand-50 px-5 py-4">
+      <div><p class="font-semibold text-ink">{{ appointment.date | date:'mediumDate':'+0000' }}</p><p class="ui-muted mt-1 text-sm">{{ appointment.startTime }} – {{ appointment.endTime }} · Clinic time</p></div>
+      <app-status-badge [status]="appointment.status" />
+    </div>
+    <div class="p-5">
+      <div class="grid gap-5 md:grid-cols-2">
+        <div><h3 class="ui-label mb-2">Services</h3><ul class="flex flex-wrap gap-2"><li *ngFor="let service of appointment.services" class="rounded-lg border border-brand-100 px-3 py-1.5 text-sm text-brand-800">{{ service.name }}</li></ul></div>
+        <dl class="space-y-3 text-sm"><div><dt class="ui-label">Dentist</dt><dd class="mt-1 break-words text-ink">{{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</dd></div><div><dt class="ui-label">Clinic</dt><dd class="mt-1 break-words text-ink">{{ appointment.clinic.name }}</dd><dd class="ui-muted mt-1 break-words">{{ appointment.clinic.address }}</dd></div></dl>
       </div>
-    } @empty { <p>No appointment activity yet.</p> }
-  </details>
+      @if ((mode === 'confirmed' || mode === 'pending' || mode === 'finished') && appointment.notes.patientNotes) { <div class="mt-5 rounded-xl bg-canvas p-4 text-sm"><h3 class="ui-label mb-2">Patient notes</h3><p class="whitespace-pre-wrap break-words text-ink">{{ appointment.notes.patientNotes }}</p></div> }
+      @if ((mode === 'confirmed' || mode === 'finished') && appointment.notes.clinicNotes) { <div class="mt-4 rounded-xl bg-canvas p-4 text-sm"><h3 class="ui-label mb-2">Dentist notes</h3><p class="whitespace-pre-wrap break-words text-ink">{{ appointment.notes.clinicNotes }}</p></div> }
+      @if (mode === 'confirmed' && appointment.referral?.status === 'pending') { <div class="mt-4 flex flex-wrap items-center gap-2 text-sm"><span class="ui-label">Referral status</span><app-status-badge [status]="appointment.referral?.status || ''" /></div> }
+      @if (mode === 'rejected' && appointment.referral?.status === 'rejected') { <div class="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"><p class="font-semibold">Rejected by the referring dentist</p><p class="mt-2 break-words">Reason for rejection: {{ getReasonLabel(appointment.referral?.reasonOfDecline) }}</p></div> }
+      <details class="mt-5 border-t border-brand-100 pt-4">
+        <summary class="cursor-pointer text-sm font-semibold text-brand-800">Appointment activity</summary>
+        <div class="mt-4 space-y-4 border-l-2 border-brand-100 pl-4">
+          @for (entry of appointment.history; track $index) { <div class="text-sm"><p class="font-semibold capitalize text-ink">{{ entry.action }}</p><p class="ui-muted mt-1 text-xs">{{ entry.timestamp | date:'MMM d, yyyy, h:mm a':'+0800' }}</p>@if (actorLabel(entry)) { <p class="ui-muted mt-1">By {{ actorLabel(entry) }}</p> }@if (entry.reason) { <p class="mt-2 whitespace-pre-wrap break-words text-ink"><strong>Reason:</strong> {{ entry.reason }}</p> }</div> } @empty { <p class="ui-muted text-sm">No appointment activity yet.</p> }
+        </div>
+      </details>
+      @if (mode === 'confirmed' && !isAppointmentPast(appointment)) {
+        <div class="mt-5 flex flex-wrap gap-2 border-t border-brand-100 pt-4"><button type="button" class="ui-button-secondary" (click)="onReschedule(appointment)" [disabled]="isLoading"><mat-icon aria-hidden="true">event_repeat</mat-icon> Reschedule</button>@if (canCancel(appointment)) { <button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><mat-icon aria-hidden="true">cancel</mat-icon> Cancel appointment</button> }</div>
+      }
+      @if (mode === 'pending' && canCancel(appointment)) { <div class="mt-5 border-t border-brand-100 pt-4"><button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><mat-icon aria-hidden="true">cancel</mat-icon> Cancel appointment</button></div> }
+    </div>
+  </article>
 </ng-template>

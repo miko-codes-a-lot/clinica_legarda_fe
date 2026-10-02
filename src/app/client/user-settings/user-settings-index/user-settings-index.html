@@ -1,91 +1,45 @@
-<div class="user-profile-container">
-  <h2>User Details</h2>
-
-  <mat-card class="user-card">
-    <div class="tab-header">
-      <button mat-button (click)="activeTab = 'profile'" [class.active]="activeTab === 'profile'">
-        <mat-icon>person</mat-icon>
-        Profile
-      </button>
-      <button mat-button (click)="activeTab = 'history'" [class.active]="activeTab === 'history'">
-        <mat-icon>history</mat-icon>
-        Medical History
-      </button>
+<div class="ui-page max-w-6xl">
+  <app-page-header title="Your account" eyebrow="Patient portal" description="Manage your personal details and review your appointment history." />
+  <section class="ui-card overflow-hidden">
+    <nav class="flex flex-wrap gap-2 border-b border-brand-100 p-3" aria-label="Account sections">
+      <button type="button" class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold" (click)="activeTab = 'profile'" [attr.aria-pressed]="activeTab === 'profile'" aria-controls="account-profile" [ngClass]="activeTab === 'profile' ? 'bg-brand-800 text-white' : 'text-muted hover:bg-brand-50'"><mat-icon aria-hidden="true">person</mat-icon> Profile</button>
+      <button type="button" class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold" (click)="activeTab = 'history'" [attr.aria-pressed]="activeTab === 'history'" aria-controls="account-history" [ngClass]="activeTab === 'history' ? 'bg-brand-800 text-white' : 'text-muted hover:bg-brand-50'"><mat-icon aria-hidden="true">history</mat-icon> Appointment history</button>
+    </nav>
+    <div *ngIf="activeTab === 'profile'" id="account-profile" class="p-5 sm:p-7">
+      <div class="mb-7 flex flex-wrap items-center gap-4 border-b border-brand-100 pb-6">
+        <button type="button" class="group relative size-20 shrink-0 overflow-hidden rounded-full bg-brand-50" (click)="openAvatarModal()" aria-label="Change your profile picture">
+          <img *ngIf="avatarUrl; else defaultAvatar" class="size-full object-cover" [src]="avatarUrl" alt="Your profile picture">
+          <ng-template #defaultAvatar><span class="grid size-full place-items-center text-2xl font-semibold text-brand-700">{{ (user.firstName.charAt(0) || '') + (user.lastName.charAt(0) || '') }}</span></ng-template>
+          <span class="absolute inset-x-0 bottom-0 bg-brand-900/90 py-1 text-[10px] font-semibold text-white">Change photo</span>
+        </button>
+        <div class="min-w-0 flex-1"><h2 class="ui-section-title break-words">{{ user.firstName }} {{ user.middleName || '' }} {{ user.lastName }}</h2><p class="ui-muted mt-2 break-words text-sm">{{ user.emailAddress }}</p></div>
+      </div>
+      <h3 class="ui-section-title mb-5">Personal details</h3>
+      <dl class="grid gap-6 text-sm sm:grid-cols-2 lg:grid-cols-3">
+        <div><dt class="ui-label">Phone number</dt><dd class="mt-2 break-words text-ink">{{ user.mobileNumber || 'Not provided' }}</dd></div>
+        <div><dt class="ui-label">Username</dt><dd class="mt-2 break-words text-ink">{{ user.username || 'Not provided' }}</dd></div>
+        <div><dt class="ui-label">Account role</dt><dd class="mt-2 capitalize text-ink">{{ user.role || 'Not provided' }}</dd></div>
+        <div class="sm:col-span-2 lg:col-span-3"><dt class="ui-label">Address</dt><dd class="mt-2 whitespace-pre-wrap break-words text-ink">{{ user.address || 'Not provided' }}</dd></div>
+        <div><dt class="ui-label">Joined</dt><dd class="mt-2 text-ink">{{ user.createdAt ? (user.createdAt | date:'mediumDate') : 'Not available' }}</dd></div>
+        <div><dt class="ui-label">Last updated</dt><dd class="mt-2 text-ink">{{ user.updatedAt ? (user.updatedAt | date:'mediumDate') : 'Not available' }}</dd></div>
+      </dl>
+      <div class="mt-7 flex flex-wrap gap-2 border-t border-brand-100 pt-5"><button type="button" class="ui-button" (click)="editUser()" [disabled]="isLoading">Edit details</button><button type="button" class="ui-button-secondary" (click)="logout()" [disabled]="isLoading">{{ isLoading ? 'Please wait…' : 'Sign out' }}</button></div>
     </div>
-
-    <div *ngIf="activeTab === 'profile'" class="user-card-content">
-
-      <!-- Profile Picture -->
-      <div class="profile-picture clickable" (click)="openAvatarModal()">
-        <img *ngIf="avatarUrl; else defaultAvatar" [src]="avatarUrl" alt="User Picture">
-        <ng-template #defaultAvatar>
-          <div class="default-avatar">
-            {{ (user.firstName.charAt(0) || '') + (user.lastName.charAt(0) || '') }}
-          </div>
-        </ng-template>
-      </div>
-
-      <!-- User Info -->
-      <div class="user-info">
-        <h3>{{ user.firstName }} {{ user.middleName || '' }} {{ user.lastName }}</h3>
-        <p class="email">{{ user.emailAddress }}</p>
-
-        <div class="user-details">
-          <div class="detail-item">
-            <mat-icon>phone</mat-icon>
-            <span>{{ user.mobileNumber || 'N/A' }}</span>
-          </div>
-          <div class="detail-item">
-            <mat-icon>place</mat-icon>
-            <span>{{ user.address || 'N/A' }}</span>
-          </div>
-          <div class="detail-item">
-            <mat-icon>badge</mat-icon>
-            <span>{{ user.role || 'N/A' }}</span>
-          </div>
-          <div class="detail-item">
-            <mat-icon>account_circle</mat-icon>
-            <span>{{ user.username || 'N/A' }}</span>
-          </div>
-          <div class="detail-item">
-            <mat-icon>calendar_today</mat-icon>
-            <span>Joined: {{ user.createdAt | date:'mediumDate' }}</span>
-          </div>
-          <div class="detail-item">
-            <mat-icon>update</mat-icon>
-            <span>Updated: {{ user.updatedAt | date:'mediumDate' }}</span>
-          </div>
-        </div>
-
-        <div class="action-buttons">
-          <button mat-raised-button color="primary" class="edit-btn" (click)="editUser()">
-            Edit Details
-          </button>
-          <button mat-stroked-button color="warn" class="logout-btn" (click)="logout()">
-            Logout
-          </button>
-        </div>
-      </div>
+    <div *ngIf="activeTab === 'history'" id="account-history" class="min-w-0 p-5 sm:p-7">
+      <div class="ui-toolbar mb-5"><div><h2 class="ui-section-title">Appointment history</h2><p class="ui-muted mt-2 text-sm">Review your past visits and recorded appointment outcomes.</p></div></div>
+      <div *ngIf="latestAppointments.length; else noHistory" class="min-w-0"><app-generic-table [displayedColumns]="displayedColumns" [columnDefs]="columnDefs" [dataSource]="dataSource" [isLoading]="isLoading" [ngClass]="{'expanded-table': activeTab === 'history'}" /></div>
+      <ng-template #noHistory><app-empty-state title="No appointment history found" description="Past visits will appear here when available." icon="history" /></ng-template>
     </div>
-
-    <!-- MEDICAL HISTORY TAB -->
-    <div *ngIf="activeTab === 'history'" class="history-container">
-      <h3>Appointment history</h3>
-
-      <div *ngIf="latestAppointments.length; else noHistory">
-        <app-generic-table
-          [displayedColumns]="displayedColumns"
-          [columnDefs]="columnDefs"
-          [dataSource]="dataSource"
-          [isLoading]="isLoading"
-          [ngClass]="{'expanded-table': activeTab === 'history'}"
-        ></app-generic-table>
-      </div>
-
-      <ng-template #noHistory>
-        <p>No appointment history found.</p>
-      </ng-template>
+  </section>
 </div>
 
-  </mat-card>
-</div>
+<ng-template #avatarModal>
+  <h2 mat-dialog-title>Profile picture</h2>
+  <mat-dialog-content>
+    <p class="ui-muted mb-5 text-sm">Choose a picture for your account.</p>
+    @if (avatarUrl) { <img class="mx-auto mb-5 size-28 rounded-full object-cover" [src]="avatarUrl" alt="Profile picture preview"> }
+    <label class="ui-label mb-2 block" for="patient-profile-picture">Select an image</label>
+    <input id="patient-profile-picture" class="ui-input w-full text-sm" type="file" accept="image/*" (change)="onAvatarChange($event)">
+  </mat-dialog-content>
+  <mat-dialog-actions align="end"><button type="button" class="ui-button-secondary" (click)="closeAvatarModal()">Cancel</button><button type="button" class="ui-button" [disabled]="!selectedFile" (click)="onUpload()">Upload picture</button></mat-dialog-actions>
+</ng-template>

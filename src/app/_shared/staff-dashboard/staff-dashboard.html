@@ -1,262 +1,132 @@
-<div class="admin-dashboard">
-  <div class="dashboard-header">
-    <mat-card class="header-card">
-      <mat-card-content>
-        <div class="header-content">
-        <div class="title-section">
-
-          <div class="left">
-            <h1>{{ title }}</h1>
-            <p class="week-info">
-              {{ weekLabel }}
-            </p>
-          </div>
-
-          <div class="report-actions">
-            <button mat-raised-button (click)="printTables()" [disabled]="!canExport || isExporting">
-              Print Tables
-            </button>
-            <button mat-raised-button color="primary" (click)="exportToPDF()" [disabled]="!canExport || isExporting">
-              Export PDF
-            </button>
-          </div>
-
+<div class="ui-page">
+  <app-page-header [title]="title" eyebrow="Clinic operations" [description]="weekLabel">
+    <button type="button" class="ui-button-secondary" (click)="printTables()" [disabled]="!canExport || isExporting">
+      <mat-icon aria-hidden="true">print</mat-icon> Print tables
+    </button>
+    <button type="button" class="ui-button" (click)="exportToPDF()" [disabled]="!canExport || isExporting">
+      <mat-icon aria-hidden="true">download</mat-icon> {{ isExporting ? 'Exporting…' : 'Export PDF' }}
+    </button>
+    <div class="relative">
+      <button mat-icon-button type="button" (click)="toggleNotifications()" class="ui-icon-button"
+        aria-label="Toggle account-wide notifications" [attr.aria-expanded]="showNotifications" aria-controls="dashboard-notifications">
+        <mat-icon [matBadge]="unreadNotificationsCount$ | async" matBadgeColor="warn"
+          [matBadgeHidden]="(unreadNotificationsCount$ | async) === 0">notifications</mat-icon>
+      </button>
+      <section *ngIf="showNotifications" id="dashboard-notifications" aria-label="Account-wide notifications"
+        class="ui-card absolute right-0 top-full z-40 mt-3 w-[min(24rem,calc(100vw-3rem))] overflow-hidden">
+        <div class="flex items-center justify-between gap-3 border-b border-brand-100 px-5 py-4">
+          <h2 class="ui-section-title">Account-wide notifications</h2>
+          <button mat-icon-button type="button" (click)="toggleNotifications()" aria-label="Close notifications"><mat-icon>close</mat-icon></button>
         </div>
-          <div class="notification-badge">
-            <button mat-icon-button (click)="toggleNotifications()" class="notification-btn" aria-label="Toggle account-wide notifications">
-              <mat-icon 
-                [matBadge]="unreadNotificationsCount$ | async" 
-                matBadgeColor="warn" 
-                [matBadgeHidden]="(unreadNotificationsCount$ | async) === 0">
-                notifications
-              </mat-icon>
-            </button>
-            <div class="notification-dropdown" [class.show]="showNotifications" *ngIf="showNotifications">
-              <div class="notification-header">
-                <h4>Account-wide notifications</h4>
-                <button mat-icon-button (click)="toggleNotifications()" class="close-btn" aria-label="Close notifications">
-                  <mat-icon>close</mat-icon>
-                </button>
-              </div>
-              <div class="notification-list" *ngIf="notifications$ | async as notifications">
-                <div *ngFor="let notification of notifications" class="notification-item" [class.unread]="!notification.read">
-                  <div class="notification-content">
-                    <div class="notification-type">
-                      <mat-chip [class]="'type-chip ' + getNotificationTypeClass(notification.type)"
-                        (click)="redirectToDetails(notification.link)"
-                      >
-                        {{ formatNotificationType(notification.type) }}
-                      </mat-chip>
-                    </div>
-                    <div class="notification-message">{{ notification.message }}</div>
-                    <div class="notification-time">{{ formatTimestamp(notification.createdAt) }}</div>
-                  </div>
-                  <div class="notification-actions">
-                    <button *ngIf="!notification.read" mat-button color="primary" (click)="markAsRead(notification._id)" class="mark-read-btn">
-                      Mark as Read
-                    </button>
-                    <mat-icon *ngIf="notification.read" class="read-icon">check_circle</mat-icon>
-                  </div>
-                </div>
-                <div *ngIf="notifications.length === 0" class="no-notifications">
-                  <mat-icon>notifications_none</mat-icon>
-                  <p>No notifications</p>
-                </div>
-              </div>
+        <div class="max-h-96 overflow-y-auto" *ngIf="notifications$ | async as notifications">
+          <article *ngFor="let notification of notifications" class="flex flex-wrap items-start gap-3 border-b border-brand-100 p-4"
+            [class.bg-brand-50]="!notification.read">
+            <div class="min-w-0 flex-1">
+              <button type="button" class="ui-button-ghost mb-2 px-0 text-xs" (click)="redirectToDetails(notification.link)">
+                {{ formatNotificationType(notification.type) }}
+              </button>
+              <p class="break-words text-sm text-ink">{{ notification.message }}</p>
+              <p class="ui-muted mt-2 text-xs">{{ formatTimestamp(notification.createdAt) }}</p>
             </div>
-          </div>
+            <button *ngIf="!notification.read" type="button" class="ui-button-ghost text-xs" (click)="markAsRead(notification._id)">Mark as read</button>
+            <app-status-badge *ngIf="notification.read" status="Read" />
+          </article>
+          <app-empty-state *ngIf="notifications.length === 0" title="No notifications" icon="notifications_none" />
         </div>
-      </mat-card-content>
-    </mat-card>
+      </section>
+    </div>
+  </app-page-header>
+
+  <div class="mb-5 space-y-3">
+    <div *ngIf="reportError" class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+      <p>{{ reportError }}</p>
+      <button *ngIf="state.status === 'error'" type="button" class="ui-button-secondary mt-3" (click)="retryReport()">Retry report</button>
+    </div>
+    <p *ngIf="state.status === 'loading'" class="ui-muted" role="status">Loading report…</p>
+    <div *ngIf="clinicError" class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+      {{ clinicError }} <button type="button" class="ui-button-secondary ml-2" (click)="loadClinics()">Retry clinic choices</button>
+    </div>
+    <p *ngIf="notificationError" class="text-sm text-red-800" role="alert">{{ notificationError }}</p>
   </div>
 
-  <p *ngIf="reportError" class="report-error" role="alert">{{ reportError }}</p>
-  <button *ngIf="state.status === 'error'" mat-button (click)="retryReport()">Retry report</button>
-  <p *ngIf="state.status === 'loading'" role="status">Loading report…</p>
-  <p *ngIf="clinicError" role="alert">{{ clinicError }} <button mat-button (click)="loadClinics()">Retry clinic choices</button></p>
-  <p *ngIf="notificationError" role="alert">{{ notificationError }}</p>
-  <p *ngIf="weeklyReport?.totalAppointments === 0" role="status">No appointments scheduled for this clinic scope this week.</p>
-  <div class="metrics-section">
-    <div class="clinic-selector">
-      <mat-form-field appearance="outline">
-        <mat-label>Select Clinic</mat-label>
+  <section class="ui-card mb-6 p-5" aria-label="Report clinic scope">
+    <div class="ui-toolbar">
+      <div><h2 class="ui-section-title">Weekly overview</h2><p class="ui-muted mt-1 text-sm">Appointment activity for the selected clinic scope.</p></div>
+      <mat-form-field appearance="outline" class="w-full sm:w-72">
+        <mat-label>Select clinic</mat-label>
         <mat-select [(value)]="selectedClinic" (selectionChange)="onClinicChange($event.value)">
-          <mat-option *ngFor="let clinic of clinics" [value]="clinic._id">
-            {{ clinic.name }}
-          </mat-option>
+          <mat-option *ngFor="let clinic of clinics" [value]="clinic._id">{{ clinic.name }}</mat-option>
         </mat-select>
       </mat-form-field>
     </div>
-    <div class="metrics-grid">
-      <mat-card class="metric-card">
-        <mat-card-content>
-          <div class="metric-content">
-            <mat-icon class="metric-icon appointments">event</mat-icon>
-            <div class="metric-info">
-              <h3>{{ weeklyReport?.totalAppointments ?? '—' }}</h3>
-              <p>Total Appointments</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="metric-card">
-        <mat-card-content>
-          <div class="metric-content">
-            <mat-icon class="metric-icon records">assignment</mat-icon>
-            <div class="metric-info">
-              <h3>{{ weeklyReport?.appointmentsUpdated ?? '—' }}</h3>
-              <p>Appointments updated</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="metric-card">
-        <mat-card-content>
-          <div class="metric-content">
-            <mat-icon class="metric-icon queue">schedule</mat-icon>
-            <div class="metric-info">
-              <h3>{{ report ? appointmentQueue.length : '—' }}</h3>
-              <p>Today's Queue</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
+    <p *ngIf="weeklyReport?.totalAppointments === 0" class="ui-muted mt-3 text-sm" role="status">No appointments scheduled for this clinic scope this week.</p>
+  </section>
+
+  <div class="mb-6 grid gap-4 sm:grid-cols-3">
+    <section class="ui-card p-5">
+      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Total appointments</h2><mat-icon class="text-brand-600" aria-hidden="true">event</mat-icon></div>
+      <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ weeklyReport?.totalAppointments ?? '—' }}</p>
+      <p class="ui-muted mt-2 text-xs">This report week</p>
+    </section>
+    <section class="ui-card p-5">
+      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Appointments updated</h2><mat-icon class="text-brand-600" aria-hidden="true">assignment</mat-icon></div>
+      <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ weeklyReport?.appointmentsUpdated ?? '—' }}</p>
+      <p class="ui-muted mt-2 text-xs">This report week</p>
+    </section>
+    <section class="ui-card p-5">
+      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Today's queue</h2><mat-icon class="text-brand-600" aria-hidden="true">schedule</mat-icon></div>
+      <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ report ? appointmentQueue.length : '—' }}</p>
+      <p class="ui-muted mt-2 text-xs">Confirmed appointments</p>
+    </section>
   </div>
-  <div class="charts-section" [hidden]="!report">
-    <div class="charts-grid">
-      <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Preferred Services Distribution</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="chart-container">
-            <canvas #servicesChart></canvas>
-          </div>
-          <p *ngIf="(weeklyReport?.preferredServices | keyvalue)?.length === 0">No services in this report week.</p>
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Weekly Appointment Trend</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="chart-container">
-            <canvas #appointmentTrendChart></canvas>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-    <div class="charts-grid">
-      <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Service Trend per Day</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="chart-container">
-            <canvas #serviceTrendChart></canvas>
-          </div>
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Declined Referrals by Reason</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="chart-container">
-            <canvas #declinedReferralChart></canvas>
-          </div>
-          <p *ngIf="(weeklyReport?.declinedReferrals | keyvalue)?.length === 0">No declined referrals in this report week.</p>
-        </mat-card-content>
-      </mat-card>
-    </div>
+
+  <div class="mb-6 grid gap-5 xl:grid-cols-2" [hidden]="!report">
+    <section class="ui-card min-w-0 p-5"><h2 class="ui-section-title mb-5">Preferred services distribution</h2>
+      <div class="chart-container"><canvas #servicesChart aria-label="Preferred services distribution chart" role="img"></canvas></div>
+      <p *ngIf="(weeklyReport?.preferredServices | keyvalue)?.length === 0" class="ui-muted mt-3 text-sm">No services in this report week.</p>
+    </section>
+    <section class="ui-card min-w-0 p-5"><h2 class="ui-section-title mb-5">Weekly appointment trend</h2>
+      <div class="chart-container"><canvas #appointmentTrendChart aria-label="Weekly appointment trend chart" role="img"></canvas></div>
+    </section>
+    <section class="ui-card min-w-0 p-5"><h2 class="ui-section-title mb-5">Service trend per day</h2>
+      <div class="chart-container"><canvas #serviceTrendChart aria-label="Service trend per day chart" role="img"></canvas></div>
+    </section>
+    <section class="ui-card min-w-0 p-5"><h2 class="ui-section-title mb-5">Declined referrals by reason</h2>
+      <div class="chart-container"><canvas #declinedReferralChart aria-label="Declined referrals by reason chart" role="img"></canvas></div>
+      <p *ngIf="(weeklyReport?.declinedReferrals | keyvalue)?.length === 0" class="ui-muted mt-3 text-sm">No declined referrals in this report week.</p>
+    </section>
   </div>
-  <div class="tables-section">
-    <div class="tables-grid">
-      <mat-card class="table-card">
-        <mat-card-header>
-          <mat-card-title>Today's Appointment Queue — {{ todayLabel }}</mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="limit-height-card-content">
-          <mat-table [dataSource]="appointmentQueue" class="appointment-table">
-            <ng-container matColumnDef="time">
-              <mat-header-cell *matHeaderCellDef>Time</mat-header-cell>
-              <mat-cell *matCellDef="let appointment">
-                <mat-icon class="time-icon">access_time</mat-icon>
-                {{ appointment.time }}
-              </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="patientName">
-              <mat-header-cell *matHeaderCellDef>Patient Name</mat-header-cell>
-              <mat-cell *matCellDef="let appointment">
-                <mat-icon class="patient-icon">person</mat-icon>
-                {{ appointment.patientName }}
-              </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="service">
-              <mat-header-cell *matHeaderCellDef>Service</mat-header-cell>
-              <mat-cell *matCellDef="let appointment">
-                <div class="services-wrapper">
-                  {{ appointment.service }}
-                </div>
-              </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="clinicName">
-              <mat-header-cell *matHeaderCellDef>Clinic</mat-header-cell>
-              <mat-cell *matCellDef="let appointment">{{ appointment.clinicName }}</mat-cell>
-            </ng-container>
-            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+  <div class="grid gap-5 2xl:grid-cols-2">
+    <section class="ui-card min-w-0 overflow-hidden">
+      <div class="border-b border-brand-100 p-5"><p class="ui-eyebrow mb-2">Clinic schedule</p><h2 class="ui-section-title">Today's appointment queue</h2><p class="ui-muted mt-1 text-sm">{{ todayLabel }}</p></div>
+      <div class="dashboard-table-scroll">
+        <mat-table [dataSource]="appointmentQueue" class="dashboard-table">
+          <ng-container matColumnDef="time"><mat-header-cell *matHeaderCellDef>Time</mat-header-cell><mat-cell *matCellDef="let appointment">{{ appointment.time }}</mat-cell></ng-container>
+          <ng-container matColumnDef="patientName"><mat-header-cell *matHeaderCellDef>Patient</mat-header-cell><mat-cell *matCellDef="let appointment">{{ appointment.patientName }}</mat-cell></ng-container>
+          <ng-container matColumnDef="service"><mat-header-cell *matHeaderCellDef>Service</mat-header-cell><mat-cell *matCellDef="let appointment">{{ appointment.service }}</mat-cell></ng-container>
+          <ng-container matColumnDef="clinicName"><mat-header-cell *matHeaderCellDef>Clinic</mat-header-cell><mat-cell *matCellDef="let appointment">{{ appointment.clinicName }}</mat-cell></ng-container>
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+      </div>
+      <app-empty-state *ngIf="report && appointmentQueue.length === 0" title="No confirmed appointments today" description="There are no appointments in today's queue for this clinic scope." icon="event_available" />
+    </section>
+    <ng-container *ngIf="notifications$ | async as notifications">
+      <section class="ui-card min-w-0 overflow-hidden" *ngIf="!showNotifications">
+        <div class="border-b border-brand-100 p-5"><p class="ui-eyebrow mb-2">Account-wide</p><h2 class="ui-section-title">Recent notifications</h2></div>
+        <div class="dashboard-table-scroll" *ngIf="notifications.length > 0">
+          <mat-table [dataSource]="notifications" class="dashboard-table">
+            <ng-container matColumnDef="type"><mat-header-cell *matHeaderCellDef>Type</mat-header-cell><mat-cell *matCellDef="let notification"><button type="button" class="ui-button-ghost px-0 text-left text-xs" (click)="redirectToDetails(notification.link)">{{ formatNotificationType(notification.type) }}</button></mat-cell></ng-container>
+            <ng-container matColumnDef="message"><mat-header-cell *matHeaderCellDef>Message</mat-header-cell><mat-cell *matCellDef="let notification">{{ notification.message }}</mat-cell></ng-container>
+            <ng-container matColumnDef="timestamp"><mat-header-cell *matHeaderCellDef>Date</mat-header-cell><mat-cell *matCellDef="let notification">{{ formatTimestamp(notification.createdAt) }}</mat-cell></ng-container>
+            <ng-container matColumnDef="status"><mat-header-cell *matHeaderCellDef>Status</mat-header-cell><mat-cell *matCellDef="let notification"><button *ngIf="!notification.read" type="button" class="ui-button-ghost text-xs" (click)="markAsRead(notification._id)">Mark as read</button><app-status-badge *ngIf="notification.read" status="Read" /></mat-cell></ng-container>
+            <mat-header-row *matHeaderRowDef="notificationColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: notificationColumns;" [class.bg-brand-50]="!row.read"></mat-row>
           </mat-table>
-          <p *ngIf="report && appointmentQueue.length === 0">No confirmed appointments today for this clinic scope.</p>
-        </mat-card-content>
-      </mat-card>
-      <ng-container *ngIf="notifications$ | async as notifications">
-        <mat-card class="table-card" *ngIf="!showNotifications">
-          <mat-card-header>
-            <mat-card-title>Recent Notifications (account-wide)</mat-card-title>
-          </mat-card-header>
-          <mat-card-content class="limit-height-card-content">
-            <mat-table [dataSource]="notifications" class="notifications-table">
-              <ng-container matColumnDef="type">
-                <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
-                <mat-cell *matCellDef="let notification">
-                  <mat-chip
-                    [class]="'type-chip ' + getNotificationTypeClass(notification.type)"
-                    (click)="redirectToDetails(notification.link)"
-                  >
-                    {{ formatNotificationType(notification.type) }}
-                  </mat-chip>
-                </mat-cell>
-              </ng-container>
-
-              <ng-container matColumnDef="message">
-                <mat-header-cell *matHeaderCellDef>Message</mat-header-cell>
-                <mat-cell *matCellDef="let notification">{{ notification.message }}</mat-cell>
-              </ng-container>
-
-              <ng-container matColumnDef="timestamp">
-                <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
-                <mat-cell *matCellDef="let notification">{{ formatTimestamp(notification.createdAt) }}</mat-cell>
-              </ng-container>
-
-              <ng-container matColumnDef="status">
-                <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
-                <mat-cell *matCellDef="let notification">
-                  <button *ngIf="!notification.read" mat-button color="primary" (click)="markAsRead(notification._id)" class="mark-read-btn">
-                    Mark as Read
-                  </button>
-                  <mat-icon *ngIf="notification.read" class="read-icon">check_circle</mat-icon>
-                </mat-cell>
-              </ng-container>
-
-              <mat-header-row *matHeaderRowDef="notificationColumns"></mat-header-row>
-              <mat-row *matRowDef="let row; columns: notificationColumns;" [class.unread-row]="!row.read"></mat-row>
-            </mat-table>
-          </mat-card-content>
-        </mat-card>
-      </ng-container>
-
-    </div>
+        </div>
+        <app-empty-state *ngIf="notifications.length === 0" title="No notifications" description="Appointment updates will appear here." icon="notifications_none" />
+      </section>
+    </ng-container>
   </div>
 </div>
