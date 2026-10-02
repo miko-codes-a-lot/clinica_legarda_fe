@@ -31,6 +31,7 @@ export class SuperAdmin {
 
   menuItems = [
     { label: 'Patient records', icon: 'folder_shared', link: '/super-admin/care/patients' },
+    { label: 'Treatment queue', icon: 'groups', link: '/super-admin/care/queue' },
     { label: 'Dashboard', icon: 'dashboard', link: '/super-admin/dashboard' },
     { label: 'Clinics', icon: 'local_hospital', link: '/super-admin/clinic' },
     { label: 'User', icon: 'group', link: '/super-admin/user' },

@@ -1,5 +1,5 @@
 <div class="ui-page">
-  <app-page-header [title]="record ? record.patient.firstName + ' ' + record.patient.lastName : 'Patient record'" eyebrow="Patient care"><a class="ui-button-secondary" [routerLink]="[roleBase, 'care', 'patients']">Back to records</a></app-page-header>
+  <app-page-header [title]="record ? record.patient.firstName + ' ' + record.patient.lastName : 'Patient record'" eyebrow="Patient care">@if (record) { <a class="ui-button" [routerLink]="[roleBase, 'care', 'check-in']" [queryParams]="{ patient: record.patient._id }">Check in patient</a> }<a class="ui-button-secondary" [routerLink]="[roleBase, 'care', 'patients']">Back to records</a></app-page-header>
   @if (loading) { <p role="status" class="ui-muted py-8">Loading care history…</p> }
   @if (error) { <p role="alert" class="ui-alert-error">{{ error }}</p> }
   @if (!loading && !error && record; as data) {

@@ -24,6 +24,7 @@ export class Dentist {
 
   menuItems = [
     { label: 'Patient records', icon: 'folder_shared', link: '/dentist/care/patients' },
+    { label: 'Treatment queue', icon: 'groups', link: '/dentist/care/queue' },
     { label: 'Home', icon: 'home', link: '/dentist/homepage' },
     { label: 'Profile', icon: 'person', link: '/dentist/profile' },
     { label: 'Appointments', icon: 'event', link: '/dentist/appointment' },
