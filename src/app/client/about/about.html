@@ -1,68 +1,72 @@
-<div class="about-container">
-
-  <!-- Hero Section -->
-  <section class="about-hero">
-    <h1>About Clinica Legarda</h1>
-    <p>Your smile, our passion — providing quality dental care since 1990.</p>
-  </section>
-
-  <!-- Our Story -->
-  <section class="about-story">
-    <div class="about-text">
-      <h2>Our Story</h2>
-      <p>
-        At <strong>Clinica Legarda</strong>, dental care is more than just treatment — 
-        it’s about creating trust, confidence, and lasting relationships with our patients. 
-        Since our establishment in 1990, we have been committed to providing high-quality, 
-        affordable, and personalized dental services. Our team combines expertise, modern technology, 
-        and compassion to ensure every patient leaves with a brighter smile and a positive experience.
+<div class="ui-page">
+  <app-page-header eyebrow="About the clinic" title="Welcome to Clinica Legarda" description="A place to connect with your clinic and plan your care." />
+  <section class="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
+    <div class="ui-card overflow-hidden bg-brand-50 p-6 sm:p-8">
+      <img src="/assets/images/clinic.svg" alt="Illustration of a dental clinic" width="720" height="480" class="h-auto w-full">
+    </div>
+    <div>
+      <p class="ui-eyebrow mb-3">
+        Our approach
       </p>
-    </div>
-    <div class="about-image">
-      <img src="/assets/images/clinic.svg" alt="Illustration of a dental clinic" width="720" height="480">
-    </div>
-  </section>
-
-  <!-- Mission -->
-  <section class="about-mission">
-    <h2>Our Mission</h2>
-    <p>
-      To deliver exceptional dental care that blends advanced technology, personalized service, 
-      and a warm, caring approach. We aim to make every patient feel comfortable, informed, 
-      and confident in their dental health. Clinica Legarda sets the standard for dental excellence, 
-      ensuring healthy smiles for families across the community.
-    </p>
-  </section>
-
-  <!-- Team -->
-  <section class="about-team">
-    <h2>Meet Our Team</h2>
-    <div class="team-grid">
-      <div class="team-member">
-        <img src="/assets/images/doctor1.svg" width="140" height="140" loading="lazy" alt="Dr. Juan Legarda initials" />
-        <h3>Dr. Juan Legarda</h3>
-        <p>
-          Founder & Chief Dentist — With over three decades of experience, Dr. Juan Legarda has dedicated 
-          his life to providing compassionate care and innovative dental solutions.
-        </p>
-      </div>
-      <div class="team-member">
-        <img src="/assets/images/doctor2.svg" width="140" height="140" loading="lazy" alt="Dr. Juan Cruz initials" />
-        <h3>Dr. Juan Cruz</h3>
-        <p>
-          Orthodontics Specialist — Dr. Juan specializes in creating beautiful, healthy smiles 
-          through personalized orthodontic treatments for patients of all ages.
-        </p>
-      </div>
-      <div class="team-member">
-        <img src="/assets/images/doctor3.svg" width="140" height="140" loading="lazy" alt="Dr. Jose Ramirez initials" />
-        <h3>Dr. Jose Ramirez</h3>
-        <p>
-          Cosmetic Dentistry — Dr. Jose brings artistry and precision to every smile makeover, 
-          helping patients achieve confidence and radiance.
-        </p>
-      </div>
+      <h2 class="text-2xl font-semibold leading-tight tracking-tight text-brand-950 sm:text-3xl">
+        Care begins with a conversation.
+      </h2>
+      <p class="ui-muted mt-5">
+        At Clinica Legarda, we aim to make each visit welcoming and help patients feel informed about their care.
+      </p>
+      <p class="ui-muted mt-4">
+        Our patient portal brings clinic information and appointment management together, so you can prepare for your visit and follow your appointment updates.
+      </p>
+      <a routerLink="/app/contact-us" class="ui-button-secondary mt-6">
+        Get in touch
+        <span class="material-icons !text-lg" aria-hidden="true">
+          arrow_forward
+        </span>
+      </a>
     </div>
   </section>
-
+  <section class="mt-12 grid gap-5 md:grid-cols-3">
+    <article class="ui-card p-6">
+      <p class="ui-eyebrow mb-3">
+        01 · Learn
+      </p>
+      <h2 class="ui-section-title">
+        Explore our services
+      </h2>
+      <p class="ui-muted mt-3 text-sm">
+        Find an overview of available services before choosing your next appointment.
+      </p>
+      <a routerLink="/app/service" class="mt-5 inline-block text-sm font-semibold text-brand-700">
+        View services →
+      </a>
+    </article>
+    <article class="ui-card p-6">
+      <p class="ui-eyebrow mb-3">
+        02 · Plan
+      </p>
+      <h2 class="ui-section-title">
+        Find your clinic
+      </h2>
+      <p class="ui-muted mt-3 text-sm">
+        See branch contact information and operating hours supplied by the clinic.
+      </p>
+      <a routerLink="/app/contact-us" class="mt-5 inline-block text-sm font-semibold text-brand-700">
+        Find a branch →
+      </a>
+    </article>
+    <article class="ui-card p-6">
+      <p class="ui-eyebrow mb-3">
+        03 · Connect
+      </p>
+      <h2 class="ui-section-title">
+        Manage your visit
+      </h2>
+      <p class="ui-muted mt-3 text-sm">
+        Sign in to book an appointment and view updates in your patient account.
+      </p>
+      <a routerLink="/app/appointment" class="mt-5 inline-block text-sm font-semibold text-brand-700">
+        Book a visit →
+      </a>
+    </article>
+  </section>
 </div>

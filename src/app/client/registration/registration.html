@@ -1,7 +1,16 @@
-<h2 class="page-title">Registration</h2>
-<app-form
-  [form]="rxform"
-  [fields]="userFields" 
-  [isLoading]="isLoading"
-  (onSubmitEvent)="onSubmit()">
-</app-form>
+<section class="ui-page max-w-5xl">
+  <header class="mb-7">
+    <p class="ui-eyebrow mb-3">
+      Patient portal
+    </p>
+    <h1 class="ui-title">
+      Create your account
+    </h1>
+    <p class="ui-muted mt-3 max-w-2xl">
+      Enter your details to register with Clinica Legarda and manage your appointments.
+    </p>
+  </header>
+  <div class="ui-card p-5 sm:p-8">
+    <app-form [framed]="false" submitLabel="Create account" busyLabel="Creating…" [form]="rxform" [fields]="userFields" [isLoading]="isLoading" (onSubmitEvent)="onSubmit()" />
+  </div>
+</section>

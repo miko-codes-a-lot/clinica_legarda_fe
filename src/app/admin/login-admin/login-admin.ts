@@ -1,13 +1,14 @@
+import { AuthLayout } from '../../_shared/ui/auth-layout/auth-layout';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RxLogin } from '../../_shared/model/reactive/rx-login';
 import { AuthService } from '../../_shared/service/auth-service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AlertService } from '../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-login-admin',
-  imports: [ReactiveFormsModule],
+  imports: [AuthLayout, ReactiveFormsModule, RouterLink],
   templateUrl: './login-admin.html',
   styleUrl: './login-admin.css'
 })

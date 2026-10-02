@@ -1,22 +1,50 @@
-<div class="services-page">
-  <!-- Hero -->
-  <section class="services-hero">
-    <h1>Our Services</h1>
-    <p>
-      At <strong>Clinica Legarda</strong>, we provide a wide range of medical and dental services
-      to keep you and your family healthy.
-    </p>
+<div class="ui-page">
+  <app-page-header eyebrow="Clinica Legarda" title="Our services" description="Plan your dental visit and choose an available service when you book." />
+  @if (!isSignedIn) {
+    <section class="ui-card grid items-center gap-6 sm:grid-cols-[1fr_auto]">
+      <div><p class="ui-eyebrow mb-3">Dental care</p><h2 class="ui-section-title">Find the services for your visit</h2><p class="ui-muted mt-3 max-w-xl">Sign in to view the clinic’s available services and appointment durations, then choose your clinic and dentist when you book.</p></div>
+      <div class="flex flex-wrap gap-3 sm:flex-col"><a routerLink="/app/login" class="ui-button">Sign in to view services</a><a routerLink="/app/appointment" class="ui-button-secondary">Book an appointment</a></div>
+    </section>
+  } @else {
+  @if (isLoading) { <p class="ui-card text-sm text-muted" role="status">Loading services…</p> }
+  @if (loadError) { <div class="ui-card" role="alert"><p class="text-sm text-red-700">{{ loadError }}</p><button type="button" class="ui-button-secondary mt-4" (click)="loadServices()">Try again</button></div> }
+  <section aria-label="Available services" class="grid gap-5 md:grid-cols-3">
+    @for (service of services; track service._id) {
+    <article class="ui-card flex flex-col p-6 sm:p-8">
+      <span class="mb-6 flex size-14 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+        <span class="material-icons !text-3xl" aria-hidden="true">
+          health_and_safety
+        </span>
+      </span>
+      <h2 class="ui-section-title">
+        {{ service.name }}
+      </h2>
+      <p class="ui-muted mb-8 mt-3 text-sm">
+        Appointment duration: {{ service.duration }} minutes.
+      </p>
+      <a routerLink="/app/appointment" class="ui-button-secondary mt-auto" [attr.aria-label]="'Book an appointment for ' + service.name">
+        Book an appointment
+        <span class="material-icons !text-lg" aria-hidden="true">
+          arrow_forward
+        </span>
+      </a>
+    </article>
+    } @empty {
+      @if (!isLoading && !loadError) { <div class="ui-card md:col-span-3"><app-empty-state title="No services listed yet" description="Contact the clinic for help planning your visit." /></div> }
+    }
   </section>
-
-  <!-- Services Grid -->
-  <section class="services-grid">
-    <div class="service-card" *ngFor="let service of services">
-      <div class="service-icon-wrapper">
-        <span class="material-icons service-icon">{{ service.icon }}</span>
-      </div>
-      <h3>{{ service.title }}</h3>
-      <p>{{ service.description }}</p>
-      <a [routerLink]="'/app/appointment'" class="btn-service">Book Now</a>
+  }
+  <aside class="mt-8 flex flex-col gap-4 rounded-xl border border-brand-100 bg-brand-50 p-6 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h2 class="text-base font-semibold text-brand-900">
+        Need help planning your visit?
+      </h2>
+      <p class="ui-muted mt-2 text-sm">
+        Contact your preferred branch for questions about available care and schedules.
+      </p>
     </div>
-  </section>
+    <a routerLink="/app/contact-us" class="ui-button-ghost shrink-0">
+      Contact the clinic →
+    </a>
+  </aside>
 </div>

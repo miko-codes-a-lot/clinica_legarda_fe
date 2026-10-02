@@ -1,12 +1,12 @@
-<div class="chatbot-container">
-  <div class="chat-header">
+<section class="chatbot-container" aria-label="Clinic chat">
+  <header class="chat-header">
     <h3>Dental Assistant</h3>
 
     <button class="close-button" (click)="closeChat()" aria-label="Close Chat">
       &times;
     </button>
-  </div>
-  <div class="chat-messages" #chatMessages (click)="onMessagesClick($event)" (scroll)="onMessagesScroll()">
+  </header>
+  <div class="chat-messages" role="log" aria-label="Chat messages" aria-live="polite" #chatMessages (click)="onMessagesClick($event)" (scroll)="onMessagesScroll()">
     @for (message of messages; track message.id) {
       <div class="message-row" [ngClass]="{'user-row': message.sender === 'user', 'bot-row': message.sender === 'bot'}">
         @if (message.sender === 'bot') {
@@ -30,6 +30,7 @@
   </div>
   <form class="chat-input" (ngSubmit)="sendMessage()">
     <input
+      aria-label="Your message"
       type="text"
       name="userInput"
       [(ngModel)]="userInput"
@@ -37,8 +38,8 @@
       placeholder="Type your question..."
       autocomplete="off"
     />
-    <button type="submit" [disabled]="isSending || !userInput.trim()" aria-label="Send">
+    <button type="submit" [disabled]="isSending || !userInput.trim()" aria-label="Send message">
       <span class="material-icons">send</span>
     </button>
   </form>
-</div>
+</section>

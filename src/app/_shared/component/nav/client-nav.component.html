@@ -1,25 +1,40 @@
-<div class="nav-container">
-  <!-- Logo / Brand -->
-  <a routerLink="/" class="nav-logo">
-    <span>Clinica Legarda</span>
-  </a>
-
-  <!-- Main navigation links -->
-  <div class="nav-menu">
-    <a
-      *ngFor="let item of menuItems"
-      [routerLink]="!item.link || disabled ? null : item.link"
-      routerLinkActive="active"
-      (click)="item.onClick ? item.onClick() : null"
-      class="nav-link"
-    >
-      <span class="material-icons nav-icon">{{ item.icon }}</span>
-      <span>{{ item.label }}</span>
+<header class="public-header">
+  <div class="nav-inner">
+    <a routerLink="/app/home" class="nav-brand" (click)="mobileOpen = false" aria-label="Clinica Legarda home">
+      <app-clinic-brand subtitle="Patient care" />
     </a>
+    <button type="button" class="ui-icon-button menu-toggle" (click)="mobileOpen = !mobileOpen" [attr.aria-expanded]="mobileOpen" aria-controls="public-navigation" [attr.aria-label]="mobileOpen ? 'Close navigation menu' : 'Open navigation menu'">
+      <span class="material-icons" aria-hidden="true">
+        {{ mobileOpen ? 'close' : 'menu' }}
+      </span>
+    </button>
+    <div id="public-navigation" class="menu-panel" [class.is-open]="mobileOpen">
+      <nav aria-label="Main navigation" class="nav-menu">
+        @for (item of menuItems; track item.label) {
+          @if (item.link) {
+        <a [routerLink]="disabled ? null : item.link" routerLinkActive="active" ariaCurrentWhenActive="page" [attr.aria-disabled]="disabled" [attr.tabindex]="disabled ? -1 : null" (click)="mobileOpen = false" class="nav-link">
+          <span class="material-icons nav-icon" aria-hidden="true">
+            {{ item.icon }}
+          </span>
+          <span>
+            {{ item.label }}
+          </span>
+        </a>
+        } @else {
+        <button type="button" [disabled]="disabled" (click)="item.onClick ? item.onClick() : null; mobileOpen = false" class="nav-link">
+          <span class="material-icons nav-icon" aria-hidden="true">
+            {{ item.icon }}
+          </span>
+          <span>
+            {{ item.label }}
+          </span>
+        </button>
+        }
+        }
+      </nav>
+      <div class="nav-account" (click)="mobileOpen = false">
+        <ng-content />
+      </div>
+    </div>
   </div>
-
-  <!-- Right slot (Login / Logout / Profile) -->
-  <div class="nav-right">
-    <ng-content></ng-content>
-  </div>
-</div>
+</header>

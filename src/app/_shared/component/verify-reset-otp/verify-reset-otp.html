@@ -1,38 +1,43 @@
-<div class="otp-container">
-  <div class="otp-card">
-    <h2>Verify Reset Code</h2>
-    <p class="otp-subtitle">
-      We sent a 6-digit code to the phone number on file for <strong>{{ emailAddress }}</strong>.
+<app-auth-layout title="Verify your reset code" eyebrow="Account recovery" description="Confirm your code before choosing a new password.">
+  <p class="mb-6 rounded-xl bg-brand-50 px-4 py-3 text-sm leading-6 text-brand-900">
+    We sent a 6-digit code to the phone number on file for
+    <strong class="break-all">
+      {{ emailAddress }}
+    </strong>
+    .
+  </p>
+  @if (rxform) {
+  <form [formGroup]="rxform" (ngSubmit)="onSubmit()" class="space-y-5" [attr.aria-busy]="isLoading">
+    <div>
+      <label for="reset-otp" class="ui-label">
+        Verification code
+      </label>
+      <input id="reset-otp" type="text" class="ui-input text-center text-xl tracking-[.35em]" maxlength="6" placeholder="000000" formControlName="code" autocomplete="one-time-code" inputmode="numeric" [attr.aria-invalid]="code.touched && code.invalid">
+      @if (code.touched && code.invalid) {
+      <p class="mt-2 text-xs text-red-700" role="alert">
+        Enter the 6-digit code.
+      </p>
+      }
+    </div>
+    <button type="submit" class="ui-button w-full" [disabled]="!rxform.valid || isLoading">
+      {{ isLoading ? 'Verifying…' : 'Verify code' }}
+    </button>
+  </form>
+  }
+  <div class="mt-6 text-center">
+    <p class="text-xs text-muted">
+      Didn’t receive the code?
     </p>
-
-    <form [formGroup]="rxform" (ngSubmit)="onSubmit()" class="otp-form">
-      <div class="form-group">
-        <label for="code">Enter OTP Code</label>
-        <input
-          id="code"
-          type="text"
-          maxlength="6"
-          placeholder="000000"
-          formControlName="code"
-          autocomplete="one-time-code"
-          inputmode="numeric"
-        />
-      </div>
-
-      <button type="submit" [disabled]="!rxform.valid || isLoading">
-        {{ isLoading ? 'Verifying...' : 'Verify' }}
-      </button>
-    </form>
-
-    <p class="resend-prompt">
-      Didn't receive the code?
-      <button class="resend-btn" (click)="onResend()" [disabled]="resendCooldown > 0">
-        {{ resendCooldown > 0 ? 'Resend in ' + resendCooldown + 's' : 'Resend OTP' }}
-      </button>
-    </p>
-
-    <p class="back-link">
-      <a routerLink="/app/login">Back to Login</a>
-    </p>
+    <button type="button" class="ui-button-ghost mt-1 text-brand-700" (click)="onResend()" [disabled]="resendCooldown > 0">
+      {{ resendCooldown > 0 ? 'Resend in ' + resendCooldown + 's' : 'Resend code' }}
+    </button>
   </div>
-</div>
+  <div class="mt-4 border-t border-brand-100 pt-5">
+    <a routerLink="/app/login" class="ui-button-ghost w-full">
+      <span class="material-icons !text-lg" aria-hidden="true">
+        arrow_back
+      </span>
+      Back to sign in
+    </a>
+  </div>
+</app-auth-layout>

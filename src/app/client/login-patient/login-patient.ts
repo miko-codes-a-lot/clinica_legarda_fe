@@ -1,3 +1,4 @@
+import { AuthLayout } from '../../_shared/ui/auth-layout/auth-layout';
 import { Component, Input } from '@angular/core';
 import { RxLogin } from '../../_shared/model/reactive/rx-login';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,7 +9,7 @@ import { AlertService } from '../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-login-patient',
-  imports: [ReactiveFormsModule, RouterModule],
+  imports: [AuthLayout, ReactiveFormsModule, RouterModule],
   templateUrl: './login-patient.html',
   styleUrl: './login-patient.css'
 })

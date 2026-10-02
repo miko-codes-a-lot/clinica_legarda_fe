@@ -1,34 +1,58 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { catchError, distinctUntilChanged, EMPTY, map, of, startWith, Subject, switchMap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { PageHeader } from '../../_shared/ui/page-header/page-header';
+import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
+import { DentalService as DentalServiceRecord } from '../../_shared/model/dental-service';
+import { AuthService } from '../../_shared/service/auth-service';
+import { DentalServicesService } from '../../_shared/service/dental-services-service';
 
 @Component({
   selector: 'app-dental-service',
-  imports: [CommonModule, RouterModule],
+  imports: [PageHeader, EmptyState, CommonModule, RouterModule],
   templateUrl: './dental-service.html',
-  styleUrl: './dental-service.css'
+  styleUrl: './dental-service.css',
 })
-export class DentalService {
-  services = [
-    {
-      icon: 'medical_services',
-      title: 'General Consultation',
-      description: 'Comprehensive medical check-ups and personalized advice.'
-    },
-    // {
-    //   icon: 'science',
-    //   title: 'Laboratory Tests',
-    //   description: 'Accurate diagnostic testing to guide effective treatment.'
-    // },
-    {
-      icon: 'health_and_safety',
-      title: 'Dental Care',
-      description: 'From cleaning to orthodontics, we ensure a healthy smile.'
-    },
-    {
-      icon: 'child_friendly',
-      title: 'Pediatrics',
-      description: 'Gentle and expert care tailored for children’s needs.'
-    }
-  ];
+export class DentalService implements OnInit {
+  services: DentalServiceRecord[] = [];
+  isLoading = false;
+  isSignedIn = false;
+  loadError = '';
+  private readonly refreshRequests = new Subject<void>();
+  private readonly auth = inject(AuthService);
+  private readonly catalog = inject(DentalServicesService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  ngOnInit(): void {
+    this.auth.currentUser$.pipe(
+      map(user => user?._id || ''),
+      distinctUntilChanged(),
+      switchMap(userId => {
+        this.isSignedIn = !!userId;
+        this.services = [];
+        this.loadError = '';
+        this.isLoading = !!userId;
+        if (!userId) return of([]);
+        return this.refreshRequests.pipe(startWith(undefined), switchMap(() => {
+          this.isLoading = true;
+          this.loadError = '';
+          return this.catalog.getAll().pipe(catchError(() => {
+            this.loadError = 'We could not load the services. Please try again.';
+            this.isLoading = false;
+            return EMPTY;
+          }));
+        }));
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(services => {
+      this.services = services;
+      this.isLoading = false;
+    });
+  }
+
+  loadServices(): void {
+    if (this.isSignedIn && !this.isLoading) this.refreshRequests.next();
+  }
 }

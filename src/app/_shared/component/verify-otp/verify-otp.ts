@@ -1,3 +1,4 @@
+import { AuthLayout } from '../../ui/auth-layout/auth-layout';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,7 +9,7 @@ import { AlertService } from '../../service/alert.service';
 
 @Component({
   selector: 'app-verify-otp',
-  imports: [ReactiveFormsModule],
+  imports: [AuthLayout, ReactiveFormsModule],
   templateUrl: './verify-otp.html',
   styleUrl: './verify-otp.css'
 })

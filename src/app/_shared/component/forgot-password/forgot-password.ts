@@ -1,3 +1,4 @@
+import { AuthLayout } from '../../ui/auth-layout/auth-layout';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -7,7 +8,7 @@ import { AlertService } from '../../service/alert.service';
 
 @Component({
   selector: 'app-forgot-password',
-  imports: [ReactiveFormsModule, RouterModule],
+  imports: [AuthLayout, ReactiveFormsModule, RouterModule],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.css'
 })

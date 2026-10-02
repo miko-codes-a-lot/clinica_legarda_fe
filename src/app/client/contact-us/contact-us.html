@@ -1,45 +1,112 @@
-<div class="contact-page">
-  <h1>Contact Us</h1>
-  <p>Have a question or want to book an appointment? We’d love to hear from you!</p>
-
-  <div class="contact-container">
-
-    <!-- Branches & Schedule -->
-    <div class="branches-container">
-      <h2>Our Branches & Schedule</h2>
-
-      <div class="branch-card" *ngFor="let clinic of clinics">
-        <h3>{{ clinic.name }}</h3>
-        <p>
-          <span class="material-icons">location_on</span>
-          {{ clinic.address }}
+<div class="ui-page">
+  <app-page-header eyebrow="Find your clinic" title="Contact us" description="Branch contact details and opening hours to help you plan your visit." />
+  @if (isLoading) { <p role="status" class="ui-card text-sm text-muted">Loading clinic branches…</p> }
+  @if (loadError) { <div class="ui-card mb-5" role="alert"><p class="text-sm text-red-700">{{ loadError }}</p><button type="button" class="ui-button-secondary mt-4" (click)="loadClinics()">Try again</button></div> }
+  <section aria-label="Clinic branches" class="grid items-start gap-6 lg:grid-cols-2">
+    @for (clinic of clinics; track clinic._id) {
+    <article class="ui-card min-w-0 overflow-hidden p-0 sm:p-0">
+      <header class="border-b border-brand-100 bg-brand-50 px-6 py-5">
+        <p class="ui-eyebrow mb-2">
+          Clinic branch
         </p>
-        <p>
-          <span class="material-icons">phone</span>
-          {{ clinic.mobileNumber }}
-        </p>
-        <p>
-          <span class="material-icons">email</span>
-          {{ clinic.emailAddress }}
-        </p>
-
-        <table class="schedule-table">
-          <thead>
-            <tr>
-              <th>Day</th>
-              <th>Open</th>
-              <th>Close</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let hour of clinic.operatingHours">
-              <td>{{ hour.day | titlecase }}</td>
-              <td>{{ formatTimeToAMPM(hour.startTime) }}</td>
-              <td>{{ formatTimeToAMPM(hour.endTime) }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <h2 class="ui-section-title break-words">
+          {{ clinic.name }}
+        </h2>
+      </header>
+      <div class="p-6">
+        <dl class="space-y-4 text-sm">
+          <div class="flex gap-3">
+            <span class="material-icons !text-xl text-brand-600" aria-hidden="true">
+              location_on
+            </span>
+            <div class="min-w-0">
+              <dt class="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
+                Address
+              </dt>
+              <dd class="break-words leading-6 text-ink">
+                {{ clinic.address }}
+              </dd>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <span class="material-icons !text-xl text-brand-600" aria-hidden="true">
+              phone
+            </span>
+            <div class="min-w-0">
+              <dt class="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
+                Phone
+              </dt>
+              <dd>
+                <a [href]="'tel:' + clinic.mobileNumber" class="break-all text-brand-700 underline underline-offset-4">
+                  {{ clinic.mobileNumber }}
+                </a>
+              </dd>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <span class="material-icons !text-xl text-brand-600" aria-hidden="true">
+              mail_outline
+            </span>
+            <div class="min-w-0">
+              <dt class="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
+                Email
+              </dt>
+              <dd>
+                <a [href]="'mailto:' + clinic.emailAddress" class="break-all text-brand-700 underline underline-offset-4">
+                  {{ clinic.emailAddress }}
+                </a>
+              </dd>
+            </div>
+          </div>
+        </dl>
+        <div class="mt-6 border-t border-brand-100 pt-5">
+          <h3 class="mb-3 text-sm font-semibold text-ink">
+            Opening hours
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[15rem] text-left text-sm">
+              <caption class="sr-only">
+                {{ clinic.name }} operating hours
+              </caption>
+              <thead class="bg-canvas text-xs text-muted">
+                <tr>
+                  <th scope="col" class="rounded-l-lg px-3 py-2 font-medium">
+                    Day
+                  </th>
+                  <th scope="col" class="px-3 py-2 font-medium">
+                    Open
+                  </th>
+                  <th scope="col" class="rounded-r-lg px-3 py-2 font-medium">
+                    Close
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (hour of clinic.operatingHours; track hour.day) {
+                <tr class="border-b border-brand-50">
+                  <th scope="row" class="px-3 py-3 font-medium text-ink">
+                    {{ hour.day | titlecase }}
+                  </th>
+                  <td class="px-3 py-3 text-muted">
+                    {{ formatTimeToAMPM(hour.startTime) }}
+                  </td>
+                  <td class="px-3 py-3 text-muted">
+                    {{ formatTimeToAMPM(hour.endTime) }}
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
+    </article>
+    } @empty {
+    @if (!isLoading && !loadError) {
+    <div class="ui-card lg:col-span-2">
+      <app-empty-state title="Branch details are not available yet" description="Please check back for clinic contact information and opening hours." icon="location_on" />
     </div>
-  </div>
+    }
+    }
+  </section>
 </div>

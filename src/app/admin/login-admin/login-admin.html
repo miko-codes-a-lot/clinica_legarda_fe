@@ -1,18 +1,40 @@
-<div class="login-container">
-  <div class="login-card">
-    <h2>Clinica Legarda - Admin Panel</h2>
-    <form [formGroup]="rxform" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" placeholder="Enter username" formControlName="username">
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" placeholder="Enter password" formControlName="password">
-      </div>
-
-      <button type="submit" [disabled]="!rxform.valid || isLoading">Login</button>
-    </form>
+<app-auth-layout title="Staff sign in" eyebrow="Clinic workspace" description="Sign in with your staff account to access your clinic workspace.">
+  <form [formGroup]="rxform" (ngSubmit)="onSubmit()" class="space-y-5" [attr.aria-busy]="isLoading">
+    <div>
+      <label for="staff-username" class="ui-label">
+        Username
+      </label>
+      <input id="staff-username" type="text" class="ui-input" placeholder="Enter your username" formControlName="username" autocomplete="username" [attr.aria-invalid]="username.touched && username.invalid">
+      @if (username.touched && username.hasError('required')) {
+      <p class="mt-2 text-xs text-red-700" role="alert">
+        Enter your username.
+      </p>
+      }
+    </div>
+    <div>
+      <label for="staff-password" class="ui-label">
+        Password
+      </label>
+      <input id="staff-password" type="password" class="ui-input" placeholder="Enter your password" formControlName="password" autocomplete="current-password" [attr.aria-invalid]="password.touched && password.invalid">
+      @if (password.touched && password.hasError('required')) {
+      <p class="mt-2 text-xs text-red-700" role="alert">
+        Enter your password.
+      </p>
+      }
+    </div>
+    <button type="submit" class="ui-button w-full" [disabled]="!rxform.valid || isLoading">
+      {{ isLoading ? 'Signing in…' : 'Sign in to workspace' }}
+      <span class="material-icons !text-lg" aria-hidden="true">
+        arrow_forward
+      </span>
+    </button>
+  </form>
+  <div class="mt-7 border-t border-brand-100 pt-6">
+    <a routerLink="/app/home" class="ui-button-ghost w-full">
+      <span class="material-icons !text-lg" aria-hidden="true">
+        arrow_back
+      </span>
+      Return to the clinic website
+    </a>
   </div>
-</div>
+</app-auth-layout>

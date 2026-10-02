@@ -1,9 +1,11 @@
+import { RouterLink } from '@angular/router';
+import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-faq',
-  imports: [CommonModule],
+  imports: [PageHeader, CommonModule, RouterLink],
   templateUrl: './faq.html',
   styleUrl: './faq.css'
 })
@@ -12,26 +14,25 @@ export class Faq {
     {
       question: 'What services does Clinica Legarda offer?',
       answer:
-        // 'We provide general consultations, laboratory tests, dental care, and pediatrics. More services will be added soon!',
-        'We provide general consultations, dental care, and pediatrics. More services will be added soon!',
+        'Sign in to your patient account to view available dental services and appointment durations. Contact your preferred branch for help choosing your care.',
       open: false
     },
     {
       question: 'How can I book an appointment?',
       answer:
-        'You can book online through our Appointment page, or call us directly at (02) 123-4567.',
+        'You can book online through our Appointment page. Sign in to your patient account to choose your appointment details.',
       open: false
     },
     {
       question: 'Do you accept walk-ins?',
       answer:
-        'Yes, we accept walk-ins, but we recommend booking in advance to secure your preferred time slot.',
+        'Please contact your preferred clinic branch to ask about walk-in availability and its current schedule.',
       open: false
     },
     {
       question: 'Where is Clinica Legarda located?',
       answer:
-        'We are located at 123 Legarda Street, Manila, Philippines. Check our Contact Us page for a map and directions.',
+        'Visit our Contact Us page for current branch addresses, contact information and opening hours.',
       open: false
     }
   ];

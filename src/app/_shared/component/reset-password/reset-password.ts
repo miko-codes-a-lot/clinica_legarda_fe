@@ -1,3 +1,4 @@
+import { AuthLayout } from '../../ui/auth-layout/auth-layout';
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -9,7 +10,7 @@ import { PASSWORD_REQUIREMENTS_MESSAGE, strongPasswordValidators } from '../../.
 
 @Component({
   selector: 'app-reset-password',
-  imports: [ReactiveFormsModule, RouterModule],
+  imports: [AuthLayout, ReactiveFormsModule, RouterModule],
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.css'
 })

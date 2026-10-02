@@ -1,66 +1,92 @@
-<!-- create a module - client nav -->
-<!-- add here the component -->
-
-<!-- the nav -->
-<app-client-nav
-  [disabled]="isLoading"
-  [menuItems]="navigations"
->
-
-  @if (user) {
-    <ul class="nav-user-inline">
-      <!-- <li>
-        <a routerLink="/app/dashboard" class="nav-link-inline">
-          <span class="material-icons nav-icon-inline">dashboard</span>
-          Dashboard
-        </a>
-      </li> -->
-      <li>
-        <!-- /app/profile -->
-        <a routerLink="/app/user-settings/index" class="nav-link-inline">
-          <span class="material-icons nav-icon-inline">person</span>
-          Profile
-        </a>
-      </li>
-      <li>
-        <a routerLink="/app/my-appointment" class="nav-link-inline">
-          <span class="material-icons nav-icon-inline">schedule</span>
-          My Appointment
-        </a>
-      </li>
-    </ul>
-  }
-  <ul class="nav-auth">
-    @if (!user) {
-      <li>
-        <a [routerLink]="!isLoading ? '/app/login' : null" class="nav-link-auth">
-          <span class="material-icons nav-icon-auth">login</span>
-          Login
-        </a>
-      </li>
+<a href="#main-content" class="skip-link" (click)="$event.preventDefault(); mainContent.focus(); mainContent.scrollIntoView()">
+  Skip to content
+</a>
+<app-client-nav [disabled]="isLoading" [menuItems]="navigations">
+  <div class="flex flex-wrap items-center gap-2">
+    @if (user) {
+    <a routerLink="/app/user-settings/index" class="ui-button-ghost !px-3 !text-xs">
+      <span class="material-icons !text-base" aria-hidden="true">
+        person
+      </span>
+      Profile
+    </a>
+    <a routerLink="/app/my-appointment" class="ui-button-ghost !px-3 !text-xs">
+      <span class="material-icons !text-base" aria-hidden="true">
+        schedule
+      </span>
+      My appointments
+    </a>
+    <button type="button" (click)="onClickLogout()" [disabled]="isLoading" class="ui-button-secondary !px-3 !text-xs">
+      Sign out
+    </button>
     } @else {
-      <li>
-        <a [routerLink]="null" (click)="onClickLogout()" class="nav-link-auth">
-          <span class="material-icons nav-icon-auth">logout</span>
-          Logout
-        </a>
-      </li>
+    <a [routerLink]="!isLoading ? '/app/login' : null" [attr.aria-disabled]="isLoading" class="ui-button !px-4 !text-xs">
+      Patient login
+    </a>
     }
-  </ul>
+  </div>
 </app-client-nav>
-
-<!-- the page -->
-<router-outlet />
-
-
-<!-- chatbot floating -->
+<main #mainContent id="main-content" tabindex="-1" class="min-h-[60vh] outline-none">
+  <router-outlet />
+</main>
+<footer class="border-t border-brand-100 bg-white">
+  <div class="mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:px-8 md:grid-cols-[1.4fr_1fr_1fr]">
+    <div>
+      <a routerLink="/app/home" class="inline-block text-brand-900" aria-label="Clinica Legarda home">
+        <app-clinic-brand subtitle="Patient care" />
+      </a>
+      <p class="ui-muted mt-4 max-w-sm text-sm">
+        Plan your next visit, manage appointments and find your clinic’s contact details in one place.
+      </p>
+    </div>
+    <div>
+      <h2 class="mb-3 text-sm font-semibold text-ink">
+        Plan your visit
+      </h2>
+      <div class="flex flex-col items-start gap-3 text-sm text-muted">
+        <a routerLink="/app/service" class="hover:text-brand-700">
+          Services
+        </a>
+        <a routerLink="/app/appointment" class="hover:text-brand-700">
+          Book an appointment
+        </a>
+        <a routerLink="/app/contact-us" class="hover:text-brand-700">
+          Branches & opening hours
+        </a>
+      </div>
+    </div>
+    <div>
+      <h2 class="mb-3 text-sm font-semibold text-ink">
+        Helpful links
+      </h2>
+      <div class="flex flex-col items-start gap-3 text-sm text-muted">
+        <a routerLink="/app/faq" class="hover:text-brand-700">
+          Frequently asked questions
+        </a>
+        <a routerLink="/app/privacy-policy" class="hover:text-brand-700">
+          Privacy policy
+        </a>
+        <a routerLink="/admin/login" class="hover:text-brand-700">
+          Staff login
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="mx-auto max-w-7xl border-t border-brand-100 px-5 py-5 text-xs text-muted sm:px-8">
+    Clinica Legarda · Appointment & patient portal
+  </div>
+</footer>
 <div class="chatbot-container">
   @if (isChatOpen) {
-    <app-chatbot (chatClosed)="isChatOpen = false"></app-chatbot>
+  <app-chatbot (chatClosed)="isChatOpen = false" />
   } @else {
-    <button class="chatbot-button" (click)="isChatOpen = true" title="Chat with us">
-      <span class="material-icons">chat</span>
-    </button>
+  <button type="button" class="ui-button shadow-md" (click)="isChatOpen = true" aria-label="Open clinic chat">
+    <span class="material-icons !text-xl" aria-hidden="true">
+      chat_bubble_outline
+    </span>
+    <span class="hidden sm:inline">
+      Clinic chat
+    </span>
+  </button>
   }
 </div>
-

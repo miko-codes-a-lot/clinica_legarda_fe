@@ -1,40 +1,45 @@
-<div class="login-container">
-  <div class="login-card">
-    <h2>Clinica Legarda</h2>
-    <p class="login-subtitle">Welcome back! Please login to your account.</p>
-
-    <form [formGroup]="rxform" (ngSubmit)="onSubmit()" class="login-form">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input
-          id="username"
-          type="text"
-          placeholder="Enter your username"
-          formControlName="username"
-        />
+<app-auth-layout title="Welcome back" eyebrow="Patient portal" description="Sign in to book your next visit and manage your appointments.">
+  <form [formGroup]="rxform" (ngSubmit)="onSubmit()" class="space-y-5" [attr.aria-busy]="isLoading">
+    <div>
+      <label for="patient-username" class="ui-label">
+        Username
+      </label>
+      <input id="patient-username" type="text" class="ui-input" placeholder="Enter your username" formControlName="username" autocomplete="username" [attr.aria-invalid]="username.touched && username.invalid">
+      @if (username.touched && username.hasError('required')) {
+      <p class="mt-2 text-xs text-red-700" role="alert">
+        Enter your username.
+      </p>
+      }
+    </div>
+    <div>
+      <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <label for="patient-password" class="ui-label mb-0">
+          Password
+        </label>
+        <a routerLink="/app/forgot-password" class="text-xs font-semibold text-brand-700 underline underline-offset-4">
+          Forgot password?
+        </a>
       </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          placeholder="Enter your password"
-          formControlName="password"
-        />
-      </div>
-
-      <button type="submit" [disabled]="!rxform.valid || isLoading">Login</button>
-    </form>
-
-    <!-- Registration -->
-    <p class="register-prompt">
-      Don't have an account?
-      <button class="register-btn" (click)="goToRegister()">Register</button>
+      <input id="patient-password" type="password" class="ui-input" placeholder="Enter your password" formControlName="password" autocomplete="current-password" [attr.aria-invalid]="password.touched && password.invalid">
+      @if (password.touched && password.hasError('required')) {
+      <p class="mt-2 text-xs text-red-700" role="alert">
+        Enter your password.
+      </p>
+      }
+    </div>
+    <button type="submit" class="ui-button w-full" [disabled]="!rxform.valid || isLoading">
+      {{ isLoading ? 'Signing in…' : 'Sign in' }}
+      <span class="material-icons !text-lg" aria-hidden="true">
+        arrow_forward
+      </span>
+    </button>
+  </form>
+  <div class="mt-7 border-t border-brand-100 pt-6 text-center">
+    <p class="text-sm text-muted">
+      New to Clinica Legarda?
     </p>
-
-    <p class="login-footer">
-      Forgot your password? <a routerLink="/app/forgot-password">Reset here</a>
-    </p>
+    <button type="button" class="ui-button-secondary mt-3 w-full" (click)="goToRegister()">
+      Create a patient account
+    </button>
   </div>
-</div>
+</app-auth-layout>

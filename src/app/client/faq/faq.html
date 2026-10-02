@@ -1,16 +1,37 @@
-<div class="faq-page">
-  <h1>Frequently Asked Questions</h1>
-  <p>Here are some common questions from our patients.</p>
-
-  <div class="faq-list">
-    <div class="faq-item" *ngFor="let faq of faqs; let i = index">
-      <button class="faq-question" (click)="toggleFaq(i)">
-        {{ faq.question }}
-        <span class="icon">{{ faq.open ? '−' : '+' }}</span>
-      </button>
-      <div class="faq-answer" *ngIf="faq.open">
-        <p>{{ faq.answer }}</p>
+<div class="ui-page max-w-4xl">
+  <app-page-header eyebrow="Patient information" title="Frequently asked questions" description="A few helpful answers before your next visit." />
+  <div class="ui-card overflow-hidden p-0 sm:p-0">
+    @for (faq of faqs; track faq.question; let i = $index) {
+    <section class="border-b border-brand-100 last:border-b-0">
+      <h2>
+        <button type="button" class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm font-semibold text-ink hover:bg-brand-50 sm:text-base" (click)="toggleFaq(i)" [attr.aria-expanded]="faq.open" [attr.aria-controls]="'faq-answer-' + i" [id]="'faq-question-' + i">
+          <span>
+            {{ faq.question }}
+          </span>
+          <span class="material-icons shrink-0 !text-xl text-brand-600" aria-hidden="true">
+            {{ faq.open ? 'remove' : 'add' }}
+          </span>
+        </button>
+      </h2>
+      <div [hidden]="!faq.open" [id]="'faq-answer-' + i" role="region" [attr.aria-labelledby]="'faq-question-' + i" class="px-6 pb-6">
+        <p class="ui-muted max-w-3xl text-sm">
+          {{ faq.answer }}
+        </p>
       </div>
-    </div>
+    </section>
+    }
   </div>
+  <aside class="mt-7 flex flex-col items-start gap-4 rounded-xl bg-brand-50 p-6 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h2 class="text-base font-semibold text-brand-900">
+        Still have a question?
+      </h2>
+      <p class="ui-muted mt-2 text-sm">
+        Contact your preferred clinic branch for help.
+      </p>
+    </div>
+    <a routerLink="/app/contact-us" class="ui-button-secondary shrink-0">
+      Contact us
+    </a>
+  </aside>
 </div>
