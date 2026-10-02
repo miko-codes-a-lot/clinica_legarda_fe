@@ -42,6 +42,7 @@ describe('Rescheduling date and time selection', () => {
     fixture.detectChanges();
     http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url.endsWith('/appointments/availability/dentist-1')).flush([]);
+    http.expectOne(request => request.url.endsWith('/clinic-closures/availability') && request.params.get('clinic') === 'clinic-1').flush([]);
     fixture.detectChanges();
     return TestbedHarnessEnvironment.documentRootLoader(fixture);
   }

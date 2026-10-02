@@ -64,3 +64,14 @@ describe('booking availability', () => {
     expect(slots.at(-1)?.value).toBe('11:00');
   });
 });
+
+describe('Closure availability', () => {
+  it('removes closure overlap from shared booking and reschedule slots, keeping adjacent intervals', () => {
+    const schedule = createBookingSchedule(dentist, clinic, [], undefined, [{ startDate: '2026-09-21', endDate: '2026-09-21', startTime: '09:30', endTime: '10:30' }]);
+    const slots = bookingSlots(schedule, day, 30, 30, now);
+    expect(slots.find(slot => slot.value === '09:00')?.available).toBeTrue();
+    expect(slots.find(slot => slot.value === '09:30')?.available).toBeFalse();
+    expect(slots.find(slot => slot.value === '10:00')?.available).toBeFalse();
+    expect(slots.find(slot => slot.value === '10:30')?.available).toBeTrue();
+  });
+});

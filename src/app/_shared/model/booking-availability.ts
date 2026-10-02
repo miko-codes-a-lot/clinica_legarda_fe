@@ -1,3 +1,4 @@
+import { ClosureInterval } from '../../care/closures/closure.models';
 import { AppointmentStatus } from './appointment';
 import { Clinic } from './clinic';
 import { OperatingHour } from './operating-hour';
@@ -16,6 +17,7 @@ export interface AppointmentAvailability {
 export interface DentistBookingSchedule {
   operatingHours: readonly OperatingHour[];
   appointments: readonly AppointmentAvailability[];
+  closures?: readonly ClosureInterval[];
   appointmentBufferMinutes?: number;
   maxWorkingMinutesPerDay?: number;
 }
@@ -56,6 +58,7 @@ export function createBookingSchedule(
   clinic: Pick<Clinic, 'operatingHours'>,
   appointments: readonly AppointmentAvailability[],
   excludeAppointmentId?: string,
+  closures: readonly ClosureInterval[] = [],
 ): DentistBookingSchedule {
   const operatingHours = dentist.operatingHours.flatMap(hours => {
     const clinicHours = clinic.operatingHours?.find(candidate => candidate.day === hours.day);
@@ -66,6 +69,7 @@ export function createBookingSchedule(
   });
   return {
     operatingHours,
+    closures,
     appointments: appointments.filter(appointment => !excludeAppointmentId || appointment._id !== excludeAppointmentId),
     appointmentBufferMinutes: dentist.appointmentBufferMinutes ?? 15,
     maxWorkingMinutesPerDay: dentist.maxWorkingMinutesPerDay ?? 480,
@@ -106,7 +110,9 @@ export function bookingSlots(
     const overlaps = occupied.some(appointment =>
       start < timeMinutes(appointment.endTime) + buffer && start + duration + buffer > timeMinutes(appointment.startTime),
     );
-    slots.push({ value: minutesTime(start), available: withinCapacity && !overlaps &&
+    const closed = schedule.closures?.some(closure => dateKey >= closure.startDate && dateKey <= closure.endDate &&
+      start < (closure.endTime === '24:00' ? 1440 : timeMinutes(closure.endTime)) && start + duration > timeMinutes(closure.startTime));
+    slots.push({ value: minutesTime(start), available: withinCapacity && !overlaps && !closed &&
       (dateKey > today || (dateKey === today && start >= currentMinutes)) });
   }
   return slots;

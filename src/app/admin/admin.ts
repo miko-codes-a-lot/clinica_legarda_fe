@@ -31,6 +31,7 @@ export class Admin {
 
   menuItems = [
     { label: 'Patient records', icon: 'folder_shared', link: '/admin/care/patients' },
+    { label: 'Clinic closures', icon: 'event_busy', link: '/admin/care/closures' },
     { label: 'Treatment queue', icon: 'groups', link: '/admin/care/queue' },
     { label: 'Dashboard', icon: 'dashboard', link: '/admin/dashboard' },
     { label: 'User', icon: 'group', link: '/admin/user' },

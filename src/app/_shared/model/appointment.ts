@@ -1,3 +1,4 @@
+import { AppointmentDisruption } from '../../care/closures/closure.models';
 import { Clinic } from "./clinic"
 import { Referral } from "./referral"
 import { DentalService } from "./dental-service"
@@ -37,6 +38,7 @@ export interface Appointment {
   endTime: string
   status: AppointmentStatus
   isWalkIn?: boolean
+  disruption?: AppointmentDisruption;
   careCase?: string
   notes: AppointmentNote
   history: AppointmentHistory[],

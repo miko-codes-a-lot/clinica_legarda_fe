@@ -1,3 +1,6 @@
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ClosuresApiService } from '../closures/closures-api.service';
+import { AuthService } from '../../_shared/service/auth-service';
 import { Component, DestroyRef, inject, Input, OnChanges, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -9,9 +12,11 @@ import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
 
 @Component({
   selector: 'app-appointment-care-links',
-  imports: [RouterLink, StatusBadge],
+  imports: [RouterLink, StatusBadge, ReactiveFormsModule],
   template: `
     @if (appointment; as data) {
+      @if (data.disruption && !flagResolved) { <section class="ui-card my-5 border-danger/30"><h2 class="ui-section-title mb-2">Clinic closure review needed</h2><p class="ui-muted mb-3">{{ data.disruption.message }}</p>@if (canResolve) { <label class="ui-label">Resolution reason<textarea class="ui-textarea" [formControl]="resolutionReason" maxlength="500" placeholder="Clinic reopened; original appointment can proceed"></textarea></label><button class="ui-button-secondary mt-3" type="button" [disabled]="resolving || resolutionReason.invalid" (click)="resolveFlag()">{{ resolving ? 'Saving…' : 'Clear flag after reopening' }}</button><p class="ui-muted mt-2 text-sm">Rescheduling to an open interval also resolves this flag. All overlapping closures must be reopened before keeping this schedule.</p> }@if (resolutionError) { <p class="ui-alert-error mt-3" role="alert">{{ resolutionError }}</p> }</section> }
+      @if (flagResolved) { <p role="status" class="ui-muted my-3">Closure flag resolved.</p> }
       <section class="ui-card my-5">
         <h2 class="ui-section-title mb-3">Patient care</h2>
         @if (loading) { <p class="ui-muted" role="status">Loading linked visit…</p> }
@@ -34,6 +39,16 @@ export class AppointmentCareLinks implements OnInit, OnChanges {
   private readonly router = inject(Router);
   private readonly requests = new Subject<string>();
   readonly base = `/${this.router.url.split('/')[1]}/care`;
+  private readonly closures = inject(ClosuresApiService);
+  private readonly auth = inject(AuthService);
+  readonly resolutionReason = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(500)] });
+  flagResolved = false; resolving = false; resolutionError = '';
+  get canResolve() { return ['admin', 'super-admin'].includes(this.auth.currentUserValue?.role ?? ''); }
+  resolveFlag() {
+    if (!this.appointment?._id || !this.canResolve || this.resolving || this.resolutionReason.invalid) return;
+    this.resolving = true; this.resolutionError = '';
+    this.closures.clear(this.appointment._id, this.resolutionReason.value).pipe(finalize(() => this.resolving = false), takeUntilDestroyed(this.destroyRef)).subscribe({ next: () => this.flagResolved = true, error: error => this.resolutionError = careError(error) });
+  }
   visit: CareVisit | null = null;
   loading = false;
   error = '';
@@ -45,6 +60,6 @@ export class AppointmentCareLinks implements OnInit, OnChanges {
     }), takeUntilDestroyed(this.destroyRef)).subscribe(visits => this.visit = visits[0] ?? null);
     this.refresh();
   }
-  ngOnChanges(): void { this.refresh(); }
+  ngOnChanges(): void { this.flagResolved = false; this.resolutionError = ''; this.refresh(); }
   refresh(): void { if (this.appointment?._id) this.requests.next(this.appointment._id); }
 }
