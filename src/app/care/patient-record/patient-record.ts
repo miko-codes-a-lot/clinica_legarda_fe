@@ -1,3 +1,4 @@
+import { PatientLedgerView } from '../ledger/ledger';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -9,7 +10,7 @@ import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
 import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
 
-@Component({ selector: 'app-patient-record', imports: [CommonModule, RouterLink, PageHeader, EmptyState, StatusBadge], templateUrl: './patient-record.html' })
+@Component({ selector: 'app-patient-record', imports: [CommonModule, RouterLink, PageHeader, EmptyState, StatusBadge, PatientLedgerView], templateUrl: './patient-record.html' })
 export class PatientRecordPage implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly api = inject(CareApiService);
