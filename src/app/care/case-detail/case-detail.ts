@@ -1,3 +1,4 @@
+import { ClinicDate } from '../clinic-date';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -10,7 +11,7 @@ import { assignedClinicIds } from '../../_shared/model/user';
 import { CareApiService, careError } from '../care-api.service';
 import { TreatmentCaseDetail } from '../care.models';
 
-@Component({ selector: 'app-case-detail', imports: [CommonModule, RouterLink, PageHeader, StatusBadge], templateUrl: './case-detail.html' })
+@Component({ selector: 'app-case-detail', imports: [ClinicDate, CommonModule, RouterLink, PageHeader, StatusBadge], templateUrl: './case-detail.html' })
 export class CaseDetail implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly api = inject(CareApiService);

@@ -1,3 +1,4 @@
+import { ClinicDate } from '../clinic-date';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -18,7 +19,7 @@ function treatmentGroup(value?: VisitTreatment) {
     notes: new FormControl(value?.notes ?? '', { nonNullable: true, validators: Validators.maxLength(4000) }),
   });
 }
-@Component({ selector: 'app-visit-detail', imports: [CommonModule, ReactiveFormsModule, RouterLink, PageHeader, StatusBadge], templateUrl: './visit-detail.html' })
+@Component({ selector: 'app-visit-detail', imports: [ClinicDate, CommonModule, ReactiveFormsModule, RouterLink, PageHeader, StatusBadge], templateUrl: './visit-detail.html' })
 export class VisitDetail implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly api = inject(CareApiService);
@@ -58,8 +59,8 @@ export class VisitDetail implements OnInit {
     if (this.canEdit) this.form.enable(); else this.form.disable();
     this.form.markAsPristine();
   }
-  addTreatment(): void { if (this.canEdit && this.treatments.length < 50) this.treatments.push(treatmentGroup()); }
-  removeTreatment(index: number): void { if (this.canEdit) this.treatments.removeAt(index); }
+  addTreatment(): void { if (this.canEdit && this.treatments.length < 50) { this.treatments.push(treatmentGroup()); this.form.markAsDirty(); } }
+  removeTreatment(index: number): void { if (this.canEdit) { this.treatments.removeAt(index); this.form.markAsDirty(); } }
   save(complete = false): void {
     if (!this.visit || !this.canEdit || this.saving) return;
     if (complete && !this.form.controls.summary.value.trim()) this.form.controls.summary.setErrors({ required: true });

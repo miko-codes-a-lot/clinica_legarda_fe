@@ -1,3 +1,4 @@
+import { selectLinkedVisit } from './linked-visit';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ClosuresApiService } from '../closures/closures-api.service';
 import { AuthService } from '../../_shared/service/auth-service';
@@ -24,7 +25,8 @@ import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
         @if (visit && (visit.state === 'waiting' || visit.state === 'in_progress')) { <p class="ui-muted mb-3">This patient is checked in. Use the visit record to complete care, or resolve the queue visit before changing the appointment.</p> }
         <div class="flex flex-wrap items-center gap-3">
           @if (visit) { <app-status-badge [status]="visit.state" /><a class="ui-button" [routerLink]="[base, 'visits', visit._id]">Open visit record</a> }
-          @else if (!loading && !error && canCheckIn) { <a class="ui-button" [routerLink]="[base, 'check-in']" [queryParams]="{ patient: data.patient._id, clinic: data.clinic._id, dentist: data.dentist._id, appointment: data._id }">Check in appointment</a> }
+          @if (!visit && !loading && !error && canCheckIn) { <a class="ui-button" [routerLink]="[base, 'check-in']" [queryParams]="{ patient: data.patient._id, clinic: data.clinic._id, dentist: data.dentist._id, appointment: data._id }">Check in appointment</a> }
+          @if (!visit && cancelledVisit) { <a class="ui-button-secondary" [routerLink]="[base, 'visits', cancelledVisit._id]">Cancelled intake record</a> }
           @if (data.careCase) { <a class="ui-button-secondary" [routerLink]="[base, 'cases', data.careCase]">Linked treatment case</a> }
           <a class="ui-button-secondary" [routerLink]="[base, 'patients', data.patient._id]" [queryParams]="{ clinic: data.clinic._id }">Patient record</a>
         </div>
@@ -50,6 +52,7 @@ export class AppointmentCareLinks implements OnInit, OnChanges {
     this.closures.clear(this.appointment._id, this.resolutionReason.value).pipe(finalize(() => this.resolving = false), takeUntilDestroyed(this.destroyRef)).subscribe({ next: () => this.flagResolved = true, error: error => this.resolutionError = careError(error) });
   }
   visit: CareVisit | null = null;
+  cancelledVisit: CareVisit | null = null;
   loading = false;
   error = '';
   get canCheckIn(): boolean { return this.appointment?.status === AppointmentStatus.CONFIRMED && new Date(this.appointment.date).toISOString().slice(0, 10) === clinicToday(); }
@@ -57,7 +60,7 @@ export class AppointmentCareLinks implements OnInit, OnChanges {
     this.requests.pipe(switchMap(appointment => {
       this.loading = true; this.error = '';
       return this.api.visits({ appointment }).pipe(catchError(error => { this.error = careError(error); return of([]); }), finalize(() => this.loading = false));
-    }), takeUntilDestroyed(this.destroyRef)).subscribe(visits => this.visit = visits[0] ?? null);
+    }), takeUntilDestroyed(this.destroyRef)).subscribe(visits => { const selected = selectLinkedVisit(visits); this.visit = selected.current; this.cancelledVisit = selected.current ? null : selected.latest; });
     this.refresh();
   }
   ngOnChanges(): void { this.flagResolved = false; this.resolutionError = ''; this.refresh(); }

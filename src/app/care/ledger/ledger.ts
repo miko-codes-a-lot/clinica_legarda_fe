@@ -1,3 +1,4 @@
+import { ClinicDate } from '../clinic-date';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, Input, OnChanges } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -14,7 +15,7 @@ import { LedgerApiService } from './ledger-api.service';
 import { InstallmentPlan, LedgerEntry, PatientLedger } from './ledger.models';
 import { formatPesos, monthlyInstallments, parsePesos } from './ledger-rules';
 const text = (value = '', required = false, max = 500) => new FormControl(value, { nonNullable: true, validators: [Validators.maxLength(max), ...(required ? [Validators.required] : [])] });
-@Component({ selector: 'app-patient-ledger', imports: [CommonModule, ReactiveFormsModule, EmptyState, StatusBadge], templateUrl: './ledger.html' })
+@Component({ selector: 'app-patient-ledger', imports: [ClinicDate, CommonModule, ReactiveFormsModule, EmptyState, StatusBadge], templateUrl: './ledger.html' })
 export class PatientLedgerView implements OnChanges {
   @Input({ required: true }) patient = '';
   @Input() clinic = '';
