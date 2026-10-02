@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { AuthService } from '../../../_shared/service/auth-service';
 import { Component } from '@angular/core';
 import { Clinic } from '../../../_shared/model/clinic';
@@ -10,7 +11,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-clinic-details',
-  imports: [ ListComponent, MatListModule, MatButtonModule ], // RouterLink
+  imports: [PageHeader,  ListComponent, MatListModule, MatButtonModule ], // RouterLink
   templateUrl: './clinic-details.html',
   styleUrl: './clinic-details.css'
 })

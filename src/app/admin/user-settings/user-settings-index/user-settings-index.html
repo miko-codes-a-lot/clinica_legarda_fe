@@ -1,103 +1,40 @@
-<div class="user-profile-container">
-  <h2>User Profile</h2>
-
-  <mat-card class="user-card">
-    <div class="user-card-content">
-
-    <!-- Profile Picture -->
-    <div class="profile-picture clickable" (click)="openAvatarModal()">
-      <!-- Show image if avatarUrl exists, else fallback to initials -->
-      <img *ngIf="avatarUrl; else defaultAvatar"  [src]="avatarUrl" alt="User Picture">
-
-      <ng-template #defaultAvatar>
-        <div class="default-avatar">
-          {{ (user.firstName.charAt(0) || '') + (user.lastName.charAt(0) || '') }}
-        </div>
-      </ng-template>
-    </div>
-
-    <!-- Avatar Upload Modal -->
-    <ng-template #avatarModal>
-      <h2 mat-dialog-title class="dialog-title">
-        Upload Profile Picture
-      </h2>
-
-      <mat-dialog-content class="dialog-content">
-        <!-- Drag & Drop / Preview Area -->
-        <div class="upload-container">
-          <label for="avatarInput" class="upload-label">
-            <mat-icon>cloud_upload</mat-icon>
-            <span>Click or drag to upload image</span>
-          </label>
-          <input
-            id="avatarInput"
-            type="file"
-            accept="image/*"
-            (change)="onAvatarChange($event)"
-            class="file-input"
-          >
-
-          <!-- Preview -->
-          <!-- <div *ngIf="avatarUrl" class="preview">
-            <img [src]="avatarUrl" alt="Avatar Preview">
-          </div> -->
-
-          <!-- Upload Button -->
-        </div>
-      </mat-dialog-content>
-
-      <mat-dialog-actions align="end" class="dialog-actions">
-        <button mat-stroked-button color="warn" class="cancel-btn" (click)="closeAvatarModal()">Cancel</button>
-        <button mat-raised-button color="primary" class="save-btn" (click)="onUpload()">Save</button>
-      </mat-dialog-actions>
-
-    </ng-template>
-
-      <!-- User Info -->
-      <div class="user-info">
-        <h3>{{ user.firstName }} {{ user.middleName || '' }} {{ user.lastName }}</h3>
-        <p class="email">{{ user.emailAddress }}</p>
-
-        <div class="user-details">
-          <div class="detail-item">
-            <mat-icon>phone</mat-icon>
-            <span>{{ user.mobileNumber || 'N/A' }}</span>
-          </div>
-          <div class="detail-item">
-            <mat-icon>place</mat-icon>
-            <span>{{ user.address || 'N/A' }}</span>
-          </div>
-          <div class="detail-item">
-            <mat-icon>badge</mat-icon>
-            <span>{{ user.role || 'N/A' }}</span>
-          </div>
-          <div class="detail-item">
-            <mat-icon>account_circle</mat-icon>
-            <span>{{ user.username || 'N/A' }}</span>
-          </div>
-          <div class="detail-item">
-            <mat-icon>calendar_today</mat-icon>
-            <span>Joined: {{ user.createdAt | date:'mediumDate' }}</span>
-          </div>
-          <div class="detail-item">
-            <mat-icon>update</mat-icon>
-            <span>Updated: {{ user.updatedAt | date:'mediumDate' }}</span>
-          </div>
-        </div>
-
-        <div class="action-buttons">
-          <button mat-raised-button color="primary" class="edit-btn" (click)="editUser()">
-            Edit Details
-          </button>
-          <button mat-stroked-button color="warn" class="logout-btn" (click)="logout()">
-            Logout
-          </button>
-        </div>
+<section class="ui-page max-w-5xl">
+  <app-page-header title="My account" eyebrow="Account" description="Your profile and contact information.">
+    <button type="button" class="ui-button" (click)="editUser()">Edit details</button>
+    <button type="button" class="ui-button-secondary" (click)="logout()" [disabled]="isLoading">{{ isLoading ? 'Signing out...' : 'Sign out' }}</button>
+  </app-page-header>
+  <article class="ui-card p-5 sm:p-8">
+    <div class="flex flex-col items-start gap-6 sm:flex-row">
+      <button type="button" class="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-brand-100 bg-brand-50 text-3xl font-semibold text-brand-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600" aria-label="Change profile picture" (click)="openAvatarModal()">
+        <img *ngIf="avatarUrl; else defaultAvatar" [src]="avatarUrl" alt="Your profile picture" class="h-full w-full object-cover">
+        <ng-template #defaultAvatar>{{ (user.firstName.charAt(0) || '') + (user.lastName.charAt(0) || '') }}</ng-template>
+      </button>
+      <div class="min-w-0 flex-1">
+        <h2 class="text-2xl font-semibold break-words text-ink">{{ user.firstName }} {{ user.middleName || '' }} {{ user.lastName }}</h2>
+        <p class="ui-muted mt-2 break-words">{{ user.emailAddress }}</p>
+        <dl class="mt-6 grid gap-5 sm:grid-cols-2">
+          <div class="min-w-0"><dt class="ui-label mb-1">Mobile number</dt><dd class="break-words text-sm">{{ user.mobileNumber || 'N/A' }}</dd></div>
+          <div class="min-w-0"><dt class="ui-label mb-1">Address</dt><dd class="whitespace-pre-wrap break-words text-sm">{{ user.address || 'N/A' }}</dd></div>
+          <div><dt class="ui-label mb-1">Role</dt><dd class="text-sm capitalize">{{ user.role || 'N/A' }}</dd></div>
+          <div class="min-w-0"><dt class="ui-label mb-1">Username</dt><dd class="break-words text-sm">{{ user.username || 'N/A' }}</dd></div>
+          <div><dt class="ui-label mb-1">Joined</dt><dd class="text-sm">{{ user.createdAt | date:'mediumDate' }}</dd></div>
+          <div><dt class="ui-label mb-1">Last updated</dt><dd class="text-sm">{{ user.updatedAt | date:'mediumDate' }}</dd></div>
+        </dl>
       </div>
     </div>
-  </mat-card>
-
-  <a class="return-dashboard" routerLink="/admin/dashboard/index">
-    <mat-icon>arrow_back</mat-icon> Return to Dashboard
-  </a>
-</div>
+  </article>
+  <a class="ui-button-ghost mt-5" routerLink="/admin/dashboard/index"><mat-icon>arrow_back</mat-icon> Return to dashboard</a>
+  <ng-template #avatarModal>
+    <h2 mat-dialog-title>Upload profile picture</h2>
+    <mat-dialog-content>
+      <div class="rounded-xl border border-dashed border-brand-200 bg-brand-50/40 p-5">
+        <label for="avatarInput" class="ui-label mb-3 flex items-center gap-2"><mat-icon>cloud_upload</mat-icon> Choose an image</label>
+        <input id="avatarInput" type="file" accept="image/*" (change)="onAvatarChange($event)" class="block w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-brand-100 file:px-3 file:py-2 file:font-medium file:text-brand-800">
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button type="button" class="ui-button-secondary" (click)="closeAvatarModal()">Cancel</button>
+      <button type="button" class="ui-button" (click)="onUpload()">Save</button>
+    </mat-dialog-actions>
+  </ng-template>
+</section>

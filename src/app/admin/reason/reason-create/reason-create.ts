@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, OnInit } from '@angular/core';
 import { ReasonForm } from '../reason-form/reason-form';
 import { ReasonService } from '../../../_shared/service/reason-service';
@@ -8,7 +9,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-reason-create',
-  imports: [ReasonForm],
+  imports: [PageHeader, ReasonForm],
   templateUrl: './reason-create.html',
   styleUrl: './reason-create.css'
 })

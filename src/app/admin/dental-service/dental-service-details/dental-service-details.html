@@ -1,8 +1,10 @@
-@if (dentalService) {
-  <div class="view-header">
-    <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
-  </div>
-  <app-list [data]="displayDentalService"></app-list>
-} @else {
-  <p>Fetching details...</p>
-}
+<section class="ui-page max-w-5xl">
+  <app-page-header title="Dental service details" eyebrow="Management" description="Review the saved information.">
+    @if (dentalService) { <button type="button" class="ui-button" (click)="onUpdate()">Edit</button> }
+  </app-page-header>
+  @if (dentalService) {
+    <app-list [data]="displayDentalService" />
+  } @else {
+    <p class="ui-card p-5 text-sm text-muted" role="status">Fetching details...</p>
+  }
+</section>

@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -46,7 +47,7 @@ interface User {
   selector: 'app-profile-index',
   templateUrl: './profile-index.html',
   styleUrls: ['./profile-index.css'],
-  imports: [
+  imports: [PageHeader,
     MatCardModule,
     MatDividerModule,
     ReactiveFormsModule,

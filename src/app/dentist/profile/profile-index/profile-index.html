@@ -1,227 +1,93 @@
-<mat-card class="account-card">
-  <mat-card-header class="account-header">
-    <div>
-      <h1 class="page-title">Account Settings</h1>
-      <p class="page-subtitle">Update your profile, contact details, and working hours.</p>
-    </div>
-  </mat-card-header>
-
-  <mat-divider></mat-divider>
-
-  <mat-card-content>
-    <form [formGroup]="profileForm" (ngSubmit)="onSave()" class="account-form">
-
-      <!-- === PROFILE SECTION === -->
-      <section class="section profile-section">
-        <div class="profile-wrapper">
-
-          <div class="profile-picture-container">
-            <!-- Profile Picture -->
-            <div class="profile-picture clickable" (click)="openAvatarModal()">
-              <!-- Show uploaded avatar if exists -->
-               @if (avatarUrl) {
-                <img  [src]="avatarUrl" alt="User Picture" />
-               } @else {
-                <div class="default-avatar">
-                  {{ (user?.firstName?.charAt(0) || '') + (user?.lastName?.charAt(0) || '') }}
-                </div>
-               }
-
-              <!-- Initials fallback like Gmail -->
-              <ng-template #initialsAvatar>
-                <div class="default-avatar">
-                  {{ (user?.firstName?.charAt(0) || '') + (user?.lastName?.charAt(0) || '') }}
-                </div>
-              </ng-template>
-
-              <!-- Optional edit overlay -->
-              <div class="avatar-overlay" (click)="fileInput.click()">
-                <mat-icon>edit</mat-icon>
-              </div>
-
-              <!-- Hidden file input for avatar upload -->
-              <input type="file" #fileInput hidden (change)="onAvatarChange($event)" />
-            </div>
-
-          </div>
-
-          <!-- Avatar Upload Modal -->
-          <ng-template #avatarModal>
-            <h2 mat-dialog-title class="dialog-title">
-              Upload Profile Picture
-            </h2>
-
-            <mat-dialog-content class="dialog-content">
-              <div class="upload-container">
-                <!-- Drag & Drop / Click Upload Area -->
-                <label for="avatarInput" class="upload-label">
-                  <mat-icon class="upload-icon">cloud_upload</mat-icon>
-                  <span class="upload-text">Click or drag to upload image</span>
-                </label>
-                <input
-                  id="avatarInput"
-                  type="file"
-                  accept="image/*"
-                  (change)="onAvatarChange($event)"
-                  class="file-input"
-                >
-
-                <!-- Preview -->
-                <!-- <div *ngIf="avatarUrl" class="preview">
-                  <img [src]="avatarUrl" alt="Avatar Preview">
-                  <button mat-icon-button color="warn" class="remove-btn" (click)="removeAvatar()">
-                    <mat-icon>close</mat-icon>
-                  </button>
-                </div> -->
-              </div>
-            </mat-dialog-content>
-
-            <mat-dialog-actions align="end" class="dialog-actions">
-              <button mat-stroked-button color="warn" class="cancel-btn" (click)="closeAvatarModal()">Cancel</button>
-              <button mat-raised-button color="primary" class="save-btn" [disabled]="!avatarUrl" (click)="onUpload()">Save</button>
-            </mat-dialog-actions>
-          </ng-template>
-
-
-
-          <div class="profile-info">
-            <h2>{{ profileForm.value.firstName }} {{ profileForm.value.lastName }}</h2>
-            <p>{{ profileForm.value.emailAddress }}</p>
-            <p *ngIf="profileForm.value.address">{{ profileForm.value.address }}</p>
-          </div>
-        </div>
-      </section>
-
-      <mat-divider></mat-divider>
-
-      <!-- === PERSONAL DETAILS === -->
-      <section class="section">
-        <h2 class="section-title">Full Name</h2>
-        <div class="form-grid">
-          <mat-form-field appearance="outline" class="field">
-            <mat-label>First name</mat-label>
-            <input matInput formControlName="firstName" />
-            <mat-error>
-              <app-form-control-errors [control]="profileForm.get('firstName')"></app-form-control-errors>
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="field">
-            <mat-label>Middle name</mat-label>
-            <input matInput formControlName="middleName" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="field">
-            <mat-label>Last name</mat-label>
-            <input matInput formControlName="lastName" />
-            <mat-error>
-              <app-form-control-errors [control]="profileForm.get('lastName')"></app-form-control-errors>
-            </mat-error>
-          </mat-form-field>
-        </div>
-      </section>
-
-      <mat-divider></mat-divider>
-
-      <!-- === CONTACT INFO === -->
-      <section class="section">
-        <h2 class="section-title">Contact Information</h2>
-        <div class="form-grid">
-          <mat-form-field appearance="outline" class="field full-width">
-            <mat-label>Email address</mat-label>
-            <input matInput type="email" formControlName="emailAddress" />
-            <mat-error>
-              <app-form-control-errors [control]="profileForm.get('emailAddress')"></app-form-control-errors>
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="field">
-            <mat-label>Mobile number</mat-label>
-            <input matInput type="tel" formControlName="mobileNumber" maxLength="13" />
-            <mat-error>
-              <app-form-control-errors [control]="profileForm.get('mobileNumber')"></app-form-control-errors>
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="field full-width">
-            <mat-label>Address</mat-label>
-            <input matInput formControlName="address" placeholder="Enter your address" />
-          </mat-form-field>
-        </div>
-      </section>
-
-      <mat-divider></mat-divider>
-
-      <!-- === ROLE === -->
-      <section class="section">
-        <h2 class="section-title">Role</h2>
-        <mat-form-field appearance="outline" class="field full-width">
-          <mat-label>Role</mat-label>
-          <input matInput formControlName="role" readonly placeholder="Ex. Dentist, Admin" />
-        </mat-form-field>
-      </section>
-
-      <mat-divider></mat-divider>
-
-      <!-- === OPERATING HOURS === -->
-      <section class="section">
-        <div class="header-row">
-          <h2 class="section-title">Operating Hours</h2>
-          <button mat-flat-button color="accent" type="button" (click)="onAddSchedule()"
-            [disabled]="operatingHours.length >= (clinicOperatingHours.value?.length || 0)">
-            <mat-icon>add</mat-icon> Add Schedule
+<section class="ui-page max-w-4xl">
+  <app-page-header title="My account" eyebrow="Account" description="Update your profile, contact details, and working hours." />
+  <form [formGroup]="profileForm" (ngSubmit)="onSave()" class="space-y-5">
+    <section class="ui-card p-5 sm:p-6" aria-labelledby="profile-summary-title">
+      <div class="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+        <div class="relative h-24 w-24 shrink-0">
+          <button type="button" class="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-brand-100 bg-brand-50 text-3xl font-semibold text-brand-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600" aria-label="Change profile picture" (click)="openAvatarModal()">
+            @if (avatarUrl) { <img [src]="avatarUrl" alt="Your profile picture" class="h-full w-full object-cover"> }
+            @else { {{ (user?.firstName?.charAt(0) || '') + (user?.lastName?.charAt(0) || '') }} }
           </button>
+          <button type="button" class="ui-icon-button absolute -right-2 -bottom-2 border border-brand-100 bg-white shadow-sm" aria-label="Select a profile image" (click)="fileInput.click()"><mat-icon>edit</mat-icon></button>
+          <input type="file" #fileInput hidden (change)="onAvatarChange($event)">
         </div>
-
-        <div formArrayName="operatingHours" class="schedule">
-          @for (hour of operatingHours.controls; track hour.value.day; let i = $index) {
-            <mat-card class="hour-card" [formGroupName]="i">
-              <div class="hour-grid">
-                <mat-form-field appearance="outline" class="field full-width">
-                  <mat-label>Day</mat-label>
-                  <mat-select formControlName="day">
-                    @for (day of days; track day.code) {
-                      <mat-option [value]="day.code" [disabled]="getSelectedDays(i).includes(day.code)">
-                        {{ day.label }}
-                      </mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline" class="field half-width">
-                  <mat-label>From</mat-label>
-                  <input matInput type="time" formControlName="startTime" />
-                </mat-form-field>
-
-                <mat-form-field appearance="outline" class="field half-width">
-                  <mat-label>To</mat-label>
-                  <input matInput type="time" formControlName="endTime" />
-                </mat-form-field>
-              </div>
-
-              <div class="schedule-errors">
-                @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
-                  <mat-error>End time must be after start time.</mat-error>
-                }
-                @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) {
-                  <mat-error>Time must be within clinic hours.</mat-error>
-                }
-              </div>
-
-              <button mat-stroked-button color="warn" type="button" (click)="removeOperatingHour(i)">
-                <mat-icon>delete</mat-icon> Remove
-              </button>
-            </mat-card>
-          }
+        <div class="min-w-0">
+          <h2 id="profile-summary-title" class="ui-section-title break-words">{{ profileForm.value.firstName }} {{ profileForm.value.lastName }}</h2>
+          <p class="ui-muted mt-2 break-words">{{ profileForm.value.emailAddress }}</p>
+          <p *ngIf="profileForm.value.address" class="ui-muted mt-1 whitespace-pre-wrap break-words">{{ profileForm.value.address }}</p>
         </div>
-      </section>
-
-      <!-- === BUTTONS === -->
-      <div class="button-group">
-        <button [disabled]="!profileForm.valid" mat-raised-button color="primary" type="submit">
-          <mat-icon>save</mat-icon> Save Changes
-        </button>
       </div>
-    </form>
-  </mat-card-content>
-</mat-card>
+    </section>
+    <section class="ui-card p-5 sm:p-6" aria-labelledby="profile-name-title">
+      <h2 id="profile-name-title" class="ui-section-title mb-5">Full name</h2>
+      <div class="ui-form-grid">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>First name</mat-label><input matInput formControlName="firstName">
+          <mat-error><app-form-control-errors [control]="profileForm.get('firstName')" /></mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-full"><mat-label>Middle name</mat-label><input matInput formControlName="middleName"></mat-form-field>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Last name</mat-label><input matInput formControlName="lastName">
+          <mat-error><app-form-control-errors [control]="profileForm.get('lastName')" /></mat-error>
+        </mat-form-field>
+      </div>
+    </section>
+    <section class="ui-card p-5 sm:p-6" aria-labelledby="profile-contact-title">
+      <h2 id="profile-contact-title" class="ui-section-title mb-5">Contact information</h2>
+      <div class="ui-form-grid">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Email address</mat-label><input matInput type="email" formControlName="emailAddress">
+          <mat-error><app-form-control-errors [control]="profileForm.get('emailAddress')" /></mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Mobile number</mat-label><input matInput type="tel" formControlName="mobileNumber" maxLength="13">
+          <mat-error><app-form-control-errors [control]="profileForm.get('mobileNumber')" /></mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-full sm:col-span-2"><mat-label>Address</mat-label><input matInput formControlName="address" placeholder="Enter your address"></mat-form-field>
+      </div>
+    </section>
+    <section class="ui-card p-5 sm:p-6" aria-labelledby="profile-role-title">
+      <h2 id="profile-role-title" class="ui-section-title mb-5">Role</h2>
+      <mat-form-field appearance="outline" class="w-full"><mat-label>Role</mat-label><input matInput formControlName="role" readonly placeholder="Ex. Dentist, Admin"></mat-form-field>
+    </section>
+    <section class="ui-card p-5 sm:p-6" aria-labelledby="profile-hours-title">
+      <div class="ui-toolbar mb-5">
+        <h2 id="profile-hours-title" class="ui-section-title">Operating hours</h2>
+        <button type="button" class="ui-button-secondary" (click)="onAddSchedule()" [disabled]="operatingHours.length >= (clinicOperatingHours.value?.length || 0)"><mat-icon>add</mat-icon> Add schedule</button>
+      </div>
+      <div formArrayName="operatingHours" class="space-y-4">
+        @for (hour of operatingHours.controls; track hour.value.day; let i = $index) {
+          <div class="rounded-xl border border-brand-100 bg-canvas p-4" [formGroupName]="i">
+            <div class="ui-form-grid">
+              <mat-form-field appearance="outline" class="w-full sm:col-span-2">
+                <mat-label>Day</mat-label>
+                <mat-select formControlName="day">@for (day of days; track day.code) { <mat-option [value]="day.code" [disabled]="getSelectedDays(i).includes(day.code)">{{ day.label }}</mat-option> }</mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="w-full"><mat-label>From</mat-label><input matInput type="time" formControlName="startTime"></mat-form-field>
+              <mat-form-field appearance="outline" class="w-full"><mat-label>To</mat-label><input matInput type="time" formControlName="endTime"></mat-form-field>
+            </div>
+            <div class="mt-2 space-y-1 text-sm">
+              @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) { <mat-error>End time must be after start time.</mat-error> }
+              @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) { <mat-error>Time must be within clinic hours.</mat-error> }
+            </div>
+            <button type="button" class="ui-button-danger mt-3" (click)="removeOperatingHour(i)"><mat-icon>delete</mat-icon> Remove</button>
+          </div>
+        }
+      </div>
+    </section>
+    <button [disabled]="!profileForm.valid" class="ui-button" type="submit"><mat-icon>save</mat-icon> Save changes</button>
+  </form>
+  <ng-template #avatarModal>
+    <h2 mat-dialog-title>Upload profile picture</h2>
+    <mat-dialog-content>
+      <div class="rounded-xl border border-dashed border-brand-200 bg-brand-50/40 p-5">
+        <label for="avatarInput" class="ui-label mb-3 flex items-center gap-2"><mat-icon>cloud_upload</mat-icon> Choose an image</label>
+        <input id="avatarInput" type="file" accept="image/*" (change)="onAvatarChange($event)" class="block w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-brand-100 file:px-3 file:py-2 file:font-medium file:text-brand-800">
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button type="button" class="ui-button-secondary" (click)="closeAvatarModal()">Cancel</button>
+      <button type="button" class="ui-button" [disabled]="!avatarUrl" (click)="onUpload()">Save</button>
+    </mat-dialog-actions>
+  </ng-template>
+</section>

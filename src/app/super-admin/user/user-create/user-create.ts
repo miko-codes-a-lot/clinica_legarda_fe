@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, OnInit } from '@angular/core';
 import { UserForm } from '../user-form/user-form';
 import { UserService } from '../../../_shared/service/user-service';
@@ -13,7 +14,7 @@ import { UserStatus } from '../../../_shared/model/user';
 
 @Component({
   selector: 'app-user-create',
-  imports: [UserForm],
+  imports: [PageHeader, UserForm],
   templateUrl: './user-create.html',
   styleUrl: './user-create.css'
 })

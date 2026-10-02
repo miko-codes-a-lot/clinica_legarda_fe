@@ -1,9 +1,12 @@
-@if (dentalService) {
-  <app-dental-service-form
-      [isLoading]="isLoading"
-      [dentalService]="dentalService"
-      (onSubmitEvent)="onSubmit($event)"
-  ></app-dental-service-form>
-} @else {
-  <p>Fetching data...</p>
-}
+<section class="ui-page max-w-4xl">
+  <app-page-header title="Edit dental service" eyebrow="Management" description="Manage services available for appointments." />
+  @if (dentalService) {
+    <app-dental-service-form
+        [isLoading]="isLoading"
+        [dentalService]="dentalService"
+        (onSubmitEvent)="onSubmit($event)"
+    ></app-dental-service-form>
+  } @else {
+    <p class="ui-card p-5 text-sm text-muted" role="status">Fetching data...</p>
+  }
+</section>

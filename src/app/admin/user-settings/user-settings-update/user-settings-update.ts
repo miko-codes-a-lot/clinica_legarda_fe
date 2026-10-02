@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, OnInit, ChangeDetectorRef   } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -28,7 +29,7 @@ Chart.register(...registerables);
   selector: 'app-user-settings-update',
   templateUrl: './user-settings-update.html',
   styleUrl: './user-settings-update.css',
-  imports: [MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatIconModule, MatSelectModule, FormControlErrorsComponent, CommonModule],
+  imports: [PageHeader, MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatIconModule, MatSelectModule, FormControlErrorsComponent, CommonModule],
 })
 export class UserSettingsUpdate implements OnInit {
   profileForm!: FormGroup;

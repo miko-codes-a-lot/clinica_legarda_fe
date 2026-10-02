@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
 import { Clinic } from '../../../_shared/model/clinic';
 import { ClinicService } from '../../../_shared/service/clinic-service';
@@ -11,7 +12,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-clinic-update',
-  imports: [ClinicForm],
+  imports: [PageHeader, ClinicForm],
   templateUrl: './clinic-update.html',
   styleUrl: './clinic-update.css'
 })

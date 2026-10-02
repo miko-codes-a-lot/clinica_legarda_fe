@@ -1,6 +1,9 @@
-<app-user-form
-  [isLoading]="isLoading"
-  [days]="days"
-  [clinics]="clinics"
-  (onSubmitEvent)="onSubmit($event)">
-</app-user-form>
+<section class="ui-page max-w-4xl">
+  <app-page-header title="Create user" eyebrow="Management" description="Manage staff details, roles, and clinic assignments." />
+  <app-user-form
+    [isLoading]="isLoading"
+    [days]="days"
+    [clinics]="clinics"
+    (onSubmitEvent)="onSubmit($event)">
+  </app-user-form>
+</section>

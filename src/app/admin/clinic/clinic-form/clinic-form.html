@@ -1,44 +1,31 @@
-<app-form
-  [form]="rxform"
-  [fields]="clinicFields"
-  [isLoading]="isLoading"
-  (onSubmitEvent)="onSubmit()"
->
-  <div [formGroup]="rxform">
-    <span class="hours">Clinic Hours:</span>
-    <div formArrayName="operatingHours" class="operating-hours">
+<app-form [form]="rxform" [fields]="clinicFields" [isLoading]="isLoading" (onSubmitEvent)="onSubmit()">
+  <section [formGroup]="rxform" class="mt-6 border-t border-brand-100 pt-6" aria-labelledby="clinic-hours-form-title">
+    <h2 id="clinic-hours-form-title" class="ui-section-title">Operating hours</h2>
+    <p class="ui-muted mt-1 mb-4">Set the start and end time for each clinic day.</p>
+    <div formArrayName="operatingHours" class="space-y-4">
       @for (hour of this.operatingHours.controls; track $index) {
-        <div [formGroupName]="$index">
-          <div class="form-with-error">
-            <div class="form-grid">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Day</mat-label>
-                <mat-select formControlName="day" [id]="'day' + $index">
-                  @for (day of getDayOptions($index); track day.code) {
-                    <mat-option [value]="day.code">{{ day.label }}</mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="half-width">
-                <mat-label>Start Time</mat-label>
-                <input matInput type="time" formControlName="startTime" [id]="'startTime' + $index">
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="half-width">
-                <mat-label>End Time</mat-label>
-                <input matInput type="time" formControlName="endTime" [id]="'endTime' + $index">
-              </mat-form-field>
-            </div>
-            @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
-              <div class="error">
-                Time must be between the start and end time.
-              </div>
-            }
+        <div [formGroupName]="$index" class="rounded-xl border border-brand-100 bg-canvas p-4">
+          <div class="ui-form-grid">
+            <mat-form-field appearance="outline" class="w-full sm:col-span-2">
+              <mat-label>Day</mat-label>
+              <mat-select formControlName="day" [id]="'day' + $index">
+                @for (day of getDayOptions($index); track day.code) { <mat-option [value]="day.code">{{ day.label }}</mat-option> }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Start time</mat-label>
+              <input matInput type="time" formControlName="startTime" [id]="'startTime' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>End time</mat-label>
+              <input matInput type="time" formControlName="endTime" [id]="'endTime' + $index">
+            </mat-form-field>
           </div>
-        </div> <br>
+          @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
+            <p class="mt-2 text-sm text-red-700" role="alert">Time must be between the start and end time.</p>
+          }
+        </div>
       }
     </div>
-  </div>
+  </section>
 </app-form>
-
-
-

@@ -1,3 +1,5 @@
+import { StatusBadge } from '../../../_shared/ui/status-badge/status-badge';
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../_shared/service/auth-service';
@@ -20,7 +22,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
 selector: 'app-appointment-details',
-  imports: [ListComponent, MatListModule, MatButtonModule, MatIconModule, CommonModule],
+  imports: [StatusBadge, PageHeader, ListComponent, MatListModule, MatButtonModule, MatIconModule, CommonModule],
   templateUrl: './appointment-details.html',
   styleUrl: './appointment-details.css'
 })

@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, OnInit } from '@angular/core';
 import { UserForm } from '../user-form/user-form';
 import { User } from '../../../_shared/model/user';
@@ -13,7 +14,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-user-update',
-  imports: [UserForm],
+  imports: [PageHeader, UserForm],
   templateUrl: './user-update.html',
   styleUrl: './user-update.css'
 })

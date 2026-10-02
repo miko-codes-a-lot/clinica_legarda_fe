@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
 import { Reason } from '../../../_shared/model/reason';
 import { ReasonService } from '../../../_shared/service/reason-service';
@@ -10,7 +11,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-reason-update',
-  imports: [ReasonForm],
+  imports: [PageHeader, ReasonForm],
   templateUrl: './reason-update.html',
   styleUrl: './reason-update.css'
 })

@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, OnInit } from '@angular/core';
 import { ClinicForm } from '../clinic-form/clinic-form';
 import { ClinicService } from '../../../_shared/service/clinic-service';
@@ -9,7 +10,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-clinic-create',
-  imports: [ClinicForm],
+  imports: [PageHeader, ClinicForm],
   templateUrl: './clinic-create.html',
   styleUrl: './clinic-create.css'
 })

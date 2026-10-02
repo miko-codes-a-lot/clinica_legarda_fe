@@ -1,114 +1,76 @@
-@if (appointment) {
-  <div class="view-header">
-    <button mat-raised-button color="primary" (click)="onUpdate()" [disabled]="isClinicEditDisabled()">Edit</button>
-  </div>
-  <app-list [data]="displayAppointment">
-    <div class="custom-list">
-      <mat-list-item>
-        <span class="item-title" matListItemTitle><strong>Service/s:</strong></span>
+<section class="ui-page max-w-5xl">
+  <app-page-header title="Appointment details" eyebrow="Appointments" description="Review the visit, clinical notes, and appointment activity.">
+    @if (appointment) {
+      <app-status-badge [status]="appointment.status" />
+      <button type="button" class="ui-button-secondary" (click)="onUpdate()" [disabled]="isClinicEditDisabled()">Edit appointment</button>
+    }
+  </app-page-header>
+  @if (appointment) {
+    <app-list [data]="displayAppointment" />
+    <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="services-title">
+      <h2 id="services-title" class="ui-section-title mb-4">Services</h2>
+      <ul class="flex flex-wrap gap-2">
         @for (service of appointment.services; track service._id) {
-          <span class="item-line" matListItemLine>{{ service.name }}</span>
-        }
-      </mat-list-item>
-    </div>
-    <div class="row-divider"></div>
-    <div class="notes-section">
-      <div class="note-item clinic-notes">
-        <div class="note-header">
-          <strong>Clinic Notes:</strong>
-          <button mat-icon-button color="primary" (click)="openNotesDialog()" [disabled]="isClinicNotesDisabled()">
+          <li class="max-w-full rounded-lg bg-brand-50 px-3 py-2 text-sm font-medium text-brand-800 break-words">{{ service.name }}</li>
+        } @empty { <li class="ui-muted">No services recorded.</li> }
+      </ul>
+    </section>
+    <div class="mt-5 grid gap-5 lg:grid-cols-2">
+      <section class="ui-card min-w-0 p-5 sm:p-6" aria-labelledby="clinic-notes-title">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <h2 id="clinic-notes-title" class="ui-section-title">Clinic notes</h2>
+          <button type="button" class="ui-icon-button" aria-label="Edit clinic notes" (click)="openNotesDialog()" [disabled]="isClinicNotesDisabled()">
             <mat-icon>edit</mat-icon>
           </button>
         </div>
-        <div class="note-body">
-          {{ appointment.notes.clinicNotes || 'No notes yet' }}
-        </div>
-      </div>
-
-      <div class="note-item patient-notes">
-        <div class="note-header">
-          <strong>Patient Notes:</strong>
-        </div>
-        <div class="note-body">
-          {{ appointment.notes.patientNotes || 'No notes yet' }}
-        </div>
-      </div>
+        <p class="whitespace-pre-wrap break-words text-sm leading-7 text-muted">{{ appointment.notes.clinicNotes || 'No notes yet' }}</p>
+      </section>
+      <section class="ui-card min-w-0 p-5 sm:p-6" aria-labelledby="patient-notes-title">
+        <h2 id="patient-notes-title" class="ui-section-title mb-4">Patient notes</h2>
+        <p class="whitespace-pre-wrap break-words text-sm leading-7 text-muted">{{ appointment.notes.patientNotes || 'No notes yet' }}</p>
+      </section>
     </div>
-
     @if (appointment.referral) {
-      <div class="row-divider"></div>
-
-      <div class="referral-section">
-        <div class="referral-header">
-          <h3>Referral Details</h3>
-          <span class="referral-status"
-                [class.confirmed]="appointment.referral.status === 'confirmed'">
-            {{ appointment.referral.status }}
-          </span>
+      <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="referral-title">
+        <div class="ui-toolbar mb-5">
+          <h2 id="referral-title" class="ui-section-title">Referral details</h2>
+          <app-status-badge [status]="appointment.referral.status" />
         </div>
-
-        <div class="referral-card">
-          <div class="referral-row">
-            <span class="label">Reason</span>
-            <span class="value">
-              {{ appointment.referral.reason || 'No reason provided' }}
-            </span>
-          </div>
-
-          <div class="referral-row">
-            <span class="label">Referred From Clinic</span>
-            <span class="value">
-              {{ appointment.referral.fromClinicId.name }}
-            </span>
-          </div>
-
-          <div class="referral-row">
-            <span class="label">Clinic Address</span>
-            <span class="value">
-              {{ appointment.referral.fromClinicId.address }}
-            </span>
-          </div>
-
-          <div class="referral-row">
-            <span class="label">Referred By</span>
-            <span class="value">
-              {{ appointment.referral.fromDoctorId.firstName }}
-              {{ appointment.referral.fromDoctorId.lastName }}
-            </span>
-          </div>
-        </div>
-      </div>
+        <dl class="grid gap-5 sm:grid-cols-2">
+          <div class="min-w-0"><dt class="ui-label mb-1">Reason</dt><dd class="whitespace-pre-wrap break-words text-sm text-ink">{{ appointment.referral.reason || 'No reason provided' }}</dd></div>
+          <div class="min-w-0"><dt class="ui-label mb-1">Referred from clinic</dt><dd class="break-words text-sm text-ink">{{ appointment.referral.fromClinicId.name }}</dd></div>
+          <div class="min-w-0"><dt class="ui-label mb-1">Clinic address</dt><dd class="break-words text-sm text-ink">{{ appointment.referral.fromClinicId.address }}</dd></div>
+          <div class="min-w-0"><dt class="ui-label mb-1">Referred by</dt><dd class="break-words text-sm text-ink">{{ appointment.referral.fromDoctorId.firstName }} {{ appointment.referral.fromDoctorId.lastName }}</dd></div>
+        </dl>
+      </section>
     }
-  </app-list>
-
-  <section class="history-section">
-    <h3>Appointment history</h3>
-    @for (entry of appointment.history; track $index) {
-      <article>
-        <strong>{{ entry.action }}</strong>
-        <p>{{ entry.timestamp | date:'medium':'+0800' }}</p>
-        @if (actorLabel(entry)) { <p>By {{ actorLabel(entry) }}</p> }
-        @if (entry.reason) { <p><strong>Reason:</strong> {{ entry.reason }}</p> }
-      </article>
-    } @empty { <p>No history available.</p> }
-  </section>
-  @if (canCancel) {
-    <div class="action-buttons">
-      <button mat-stroked-button color="warn" (click)="cancelAppointment()" [disabled]="isBusy">
-        <mat-icon>cancel</mat-icon> Cancel
-      </button>
-    </div>
+    <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="activity-title">
+      <h2 id="activity-title" class="ui-section-title mb-5">Appointment activity</h2>
+      <ol class="space-y-3">
+        @for (entry of appointment.history; track $index) {
+          <li class="rounded-xl border border-brand-100 bg-canvas p-4">
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+              <strong class="break-words text-sm font-semibold text-ink">{{ entry.action }}</strong>
+              <time class="shrink-0 text-xs text-muted">{{ entry.timestamp | date:'medium':'+0800' }}</time>
+            </div>
+            @if (actorLabel(entry)) { <p class="mt-2 break-words text-sm text-muted">By {{ actorLabel(entry) }}</p> }
+            @if (entry.reason) { <p class="mt-2 whitespace-pre-wrap break-words text-sm text-muted"><strong class="font-medium text-ink">Reason:</strong> {{ entry.reason }}</p> }
+          </li>
+        } @empty { <li class="ui-muted">No appointment activity yet.</li> }
+      </ol>
+    </section>
+    @if (canCancel) {
+      <section class="ui-card mt-5 p-5 sm:p-6" aria-label="Appointment actions">
+        <button type="button" class="ui-button-danger" (click)="cancelAppointment()" [disabled]="isBusy"><mat-icon>cancel</mat-icon> Cancel appointment</button>
+      </section>
+    }
+    @if (appointment.status === 'pending') {
+      <section class="ui-card mt-5 flex flex-wrap gap-3 p-5 sm:p-6" aria-label="Appointment decision">
+        <button type="button" class="ui-button" (click)="approveAppointment()" [disabled]="isActionDisabled()"><mat-icon>check</mat-icon> Approve</button>
+        <button type="button" class="ui-button-danger" (click)="declineAppointment()" [disabled]="isActionDisabled()"><mat-icon>close</mat-icon> Reject</button>
+      </section>
+    }
+  } @else {
+    <p class="ui-card p-5 text-sm text-muted" role="status">Fetching details...</p>
   }
-  @if (appointment.status === 'pending') {
-    <div class="action-buttons">
-      <button mat-flat-button color="primary" (click)="approveAppointment()" [disabled]="isActionDisabled()">
-        <mat-icon>check</mat-icon> Approve
-      </button>
-      <button mat-stroked-button color="warn" (click)="declineAppointment()" [disabled]="isActionDisabled()">
-        <mat-icon>close</mat-icon> Reject
-      </button>
-    </div>
-  }
-} @else {
-  <p>Fetching details...</p>
-}
+</section>

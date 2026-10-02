@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
 import { DentalService } from '../../../_shared/model/dental-service';
 import { DentalServicesService } from '../../../_shared/service/dental-services-service';
@@ -9,7 +10,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-dental-service-details',
-  imports: [ListComponent, MatListModule, MatButtonModule],
+  imports: [PageHeader, ListComponent, MatListModule, MatButtonModule],
   templateUrl: './dental-service-details.html',
   styleUrl: './dental-service-details.css'
 })

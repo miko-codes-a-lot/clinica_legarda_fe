@@ -1,20 +1,23 @@
-@if (clinic) {
-  <div class="view-header">
-    @if (canManage) { <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button> }
-  </div>
-  <app-list [data]="displayClinic">
-    <div class="row-divider"></div>
-    <div class="custom-list">
-      <mat-list-item >
-        <span class="item-title" matListItemTitle>Clinic Schedule:</span>
+<section class="ui-page max-w-5xl">
+  <app-page-header title="Clinic details" eyebrow="Management" description="Clinic information and weekly operating hours.">
+    @if (clinic && canManage) { <button type="button" class="ui-button" (click)="onUpdate()">Edit clinic</button> }
+  </app-page-header>
+  @if (clinic) {
+    <app-list [data]="displayClinic" />
+    <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="clinic-hours-title">
+      <h2 id="clinic-hours-title" class="ui-section-title mb-4">Operating hours</h2>
+      <dl class="grid gap-3 sm:grid-cols-2">
         @for (oh of clinic.operatingHours; track oh.day) {
-          <span class="item-line" matListItemLine>{{ oh.day }} - {{ oh.startTime }} - {{ oh.endTime }}</span>
-        }
-      </mat-list-item>
-    </div>
-  </app-list>
-} @else if (loadError) {
-  <p role="alert">{{ loadError }}</p>
-} @else {
-  <p>Fetching details...</p>
-}
+          <div class="flex flex-wrap justify-between gap-2 rounded-xl border border-brand-100 bg-brand-50/40 p-4 text-sm">
+            <dt class="font-semibold capitalize text-ink">{{ oh.day }}</dt>
+            <dd class="text-muted">{{ oh.startTime }} – {{ oh.endTime }}</dd>
+          </div>
+        } @empty { <p class="ui-muted">No operating hours recorded.</p> }
+      </dl>
+    </section>
+  } @else if (loadError) {
+    <p class="ui-card border-red-200 bg-red-50 p-5 text-sm text-red-800" role="alert">{{ loadError }}</p>
+  } @else {
+    <p class="ui-card p-5 text-sm text-muted" role="status">Fetching details...</p>
+  }
+</section>

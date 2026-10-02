@@ -1,3 +1,4 @@
+import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subscription } from 'rxjs';
 import { bookingSlots, DentistBookingSchedule, isBookableDentist, pickerDateFromStored } from '../../../_shared/model/booking-availability';
@@ -37,7 +38,7 @@ import { AuthService } from '../../../_shared/service/auth-service';
 
 @Component({
   selector: 'app-appointment-form',
-  imports: [
+  imports: [EmptyState,
     ReactiveFormsModule,
     TimePicker,
     DatePicker,

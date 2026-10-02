@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
 import { Reason } from '../../../_shared/model/reason';
 import { ReasonService } from '../../../_shared/service/reason-service';
@@ -9,7 +10,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-reason-details',
-  imports: [ ListComponent, MatListModule, MatButtonModule ], // RouterLink
+  imports: [PageHeader,  ListComponent, MatListModule, MatButtonModule ], // RouterLink
   templateUrl: './reason-details.html',
   styleUrl: './reason-details.css'
 })

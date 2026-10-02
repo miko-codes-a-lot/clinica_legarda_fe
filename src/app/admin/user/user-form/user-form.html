@@ -1,61 +1,50 @@
-<app-form
-  [form]="rxform"
-  [fields]="userFields" 
-  [isLoading]="isLoading"
-  (onSubmitEvent)="onSubmit()">
-
+<app-form [form]="rxform" [fields]="userFields" [isLoading]="isLoading" (onSubmitEvent)="onSubmit()">
   <div [formGroup]="rxform">
     @if (rxform.get('role')?.value === 'dentist') {
-      @if (assignedClinics.value.length === 0) {
-        <p><i>Please select at least one clinic</i></p>
-      } @else {
-        <button type="button" (click)="onAddSchedule()" [disabled]="operatingHours.length >= days.length" matButton="outlined">Add Schedule</button>
-
-        <!-- adjust the design of this -->
-        <div formArrayName="operatingHours" class="schedule">
-          @for (hour of this.operatingHours.controls; track $index) {
-            <div [formGroupName]="$index">
-              <!-- make this card instead of form-grid -->
-              <div class="form-with-error">
-                <div class="form-grid">
-                  <mat-form-field appearance="outline" class="full-width">
+      <section class="mt-6 border-t border-brand-100 pt-6" aria-labelledby="dentist-schedule-title">
+        <div class="ui-toolbar mb-4">
+          <div>
+            <h2 id="dentist-schedule-title" class="ui-section-title">Working hours</h2>
+            <p class="ui-muted mt-1">Working hours must fit the assigned clinic hours.</p>
+          </div>
+          @if (assignedClinics.value.length !== 0) {
+            <button type="button" class="ui-button-secondary" (click)="onAddSchedule()" [disabled]="operatingHours.length >= days.length">Add schedule</button>
+          }
+        </div>
+        @if (assignedClinics.value.length === 0) {
+          <p class="rounded-xl bg-brand-50 p-4 text-sm text-brand-800" role="status">Please select at least one clinic.</p>
+        } @else {
+          <div formArrayName="operatingHours" class="space-y-4">
+            @for (hour of this.operatingHours.controls; track $index) {
+              <div [formGroupName]="$index" class="rounded-xl border border-brand-100 bg-canvas p-4">
+                <div class="ui-form-grid">
+                  <mat-form-field appearance="outline" class="w-full sm:col-span-2">
                     <mat-label>Day</mat-label>
                     <mat-select formControlName="day" [id]="'day' + $index">
-                      @for (day of getAvailableDays($index); track day.code) {
-                        <mat-option [value]="day.code">{{ day.label }}</mat-option>
-                      }
+                      @for (day of getAvailableDays($index); track day.code) { <mat-option [value]="day.code">{{ day.label }}</mat-option> }
                     </mat-select>
                   </mat-form-field>
-
-                  <mat-form-field appearance="outline" class="half-width">
+                  <mat-form-field appearance="outline" class="w-full">
                     <mat-label>From</mat-label>
                     <input matInput type="time" formControlName="startTime" [id]="'startTime' + $index">
                   </mat-form-field>
-
-                  <mat-form-field appearance="outline" class="half-width">
+                  <mat-form-field appearance="outline" class="w-full">
                     <mat-label>To</mat-label>
                     <input matInput type="time" formControlName="endTime" [id]="'endTime' + $index">
                   </mat-form-field>
                 </div>
-                  @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
-                    <div class="error">
-                      Time must be between the start and end time.
-                    </div>
-                  }
-                  @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) {
-                    <div class="error">
-                      Time must be within the clinic's operating hours.
-                    </div>
-                  }
+                @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
+                  <p class="mt-2 text-sm text-red-700" role="alert">Time must be between the start and end time.</p>
+                }
+                @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) {
+                  <p class="mt-2 text-sm text-red-700" role="alert">Time must be within the clinic's operating hours.</p>
+                }
               </div>
-            </div>
-          }
-        </div>
-
-        @if (operatingHours.length === 0) {
-          <p><i>Please add a schedule</i></p>
+            }
+          </div>
+          @if (operatingHours.length === 0) { <p class="ui-muted mt-4" role="status">Please add a schedule.</p> }
         }
-      }
+      </section>
     }
   </div>
 </app-form>

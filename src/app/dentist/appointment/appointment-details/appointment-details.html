@@ -1,170 +1,113 @@
-@if (loadError) {
-  <p role="alert">{{ loadError }} <button type="button" (click)="loadAppointment()" [disabled]="isBusy">Try again</button></p>
-}
-@if (appointment) {
-  <div class="view-header">
-    <h2 class="page-title">Appointment</h2>
-  </div>
-
-  @if (requiresOutcome(appointment, reminderNow)) {
-    <div class="outcome-reminder" role="status">
-      <strong>Outcome required</strong>
-      <p>This confirmed appointment has passed its scheduled end in Manila time. Record Completed or No show, or update the appointment as needed.</p>
+<section class="ui-page max-w-6xl">
+  <app-page-header title="Appointment details" eyebrow="Clinical workspace" description="Review the visit, record clinical notes, and manage its outcome.">
+    @if (appointment) { <app-status-badge [status]="appointment.status" /> }
+  </app-page-header>
+  @if (loadError) {
+    <div class="ui-card mb-5 flex flex-wrap items-center justify-between gap-3 border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+      <p>{{ loadError }}</p>
+      <button type="button" class="ui-button-secondary" (click)="loadAppointment()" [disabled]="isBusy">Try again</button>
     </div>
   }
-
-  <app-list [data]="displayAppointment">
-    <div class="custom-list">
-      <mat-list-item>
-        <span class="item-title" matListItemTitle><strong>Service/s:</strong></span>
+  @if (appointment) {
+    @if (requiresOutcome(appointment, reminderNow)) {
+      <div class="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900" role="status">
+        <strong class="font-semibold">Outcome required</strong>
+        <p class="mt-1 leading-6">This confirmed appointment has passed its scheduled end in Manila time. Record Completed or No show, or update the appointment as needed.</p>
+      </div>
+    }
+    <app-list [data]="displayAppointment" />
+    <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="services-title">
+      <h2 id="services-title" class="ui-section-title mb-4">Services</h2>
+      <ul class="flex flex-wrap gap-2">
         @for (service of appointment.services; track service._id) {
-          <span class="item-line" matListItemLine>{{ service.name }}</span>
-        }
-      </mat-list-item>
-    </div>
-
-    <div class="row-divider"></div>
-
-    <div class="notes-section">
-      <div class="note-item clinic-notes">
-        <div class="note-header">
-          <strong>Clinic Notes:</strong>
-          <button mat-icon-button color="primary" aria-label="Edit clinic notes" (click)="openNotesDialog()" [disabled]="isClinicNotesDisabled()">
+          <li class="max-w-full rounded-lg bg-brand-50 px-3 py-2 text-sm font-medium text-brand-800 break-words">{{ service.name }}</li>
+        } @empty { <li class="ui-muted">No services recorded.</li> }
+      </ul>
+    </section>
+    <div class="mt-5 grid gap-5 lg:grid-cols-2">
+      <section class="ui-card min-w-0 p-5 sm:p-6" aria-labelledby="clinic-notes-title">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <h2 id="clinic-notes-title" class="ui-section-title">Clinic notes</h2>
+          <button type="button" class="ui-icon-button" aria-label="Edit clinic notes" (click)="openNotesDialog()" [disabled]="isClinicNotesDisabled()">
             <mat-icon>edit</mat-icon>
           </button>
         </div>
-        <div class="note-body">
-          {{ appointment.notes.clinicNotes || 'No notes yet' }}
-        </div>
-      </div>
-
-      <div class="note-item patient-notes">
-        <div class="note-header">
-          <strong>Patient Notes:</strong>
-        </div>
-        <div class="note-body">
-          {{ appointment.notes.patientNotes || 'No notes yet' }}
-        </div>
-      </div>
+        <p class="whitespace-pre-wrap break-words text-sm leading-7 text-muted">{{ appointment.notes.clinicNotes || 'No notes yet' }}</p>
+      </section>
+      <section class="ui-card min-w-0 p-5 sm:p-6" aria-labelledby="patient-notes-title">
+        <h2 id="patient-notes-title" class="ui-section-title mb-4">Patient notes</h2>
+        <p class="whitespace-pre-wrap break-words text-sm leading-7 text-muted">{{ appointment.notes.patientNotes || 'No notes yet' }}</p>
+      </section>
     </div>
-   <!-- Referral Section -->
-  @if (appointment.referral) {
-    <div class="row-divider"></div>
-
-    <div class="referral-section">
-      <div class="referral-header">
-        <h3>Referral Details</h3>
-        <span class="referral-status"
-              [class.confirmed]="appointment.referral.status === 'confirmed'">
-          {{ appointment.referral.status }}
-        </span>
-      </div>
-
-      <div class="referral-card">
-        <div class="referral-row">
-          <span class="label">Reason</span>
-          <span class="value">
-            {{ appointment.referral.reason || 'No reason provided' }}
-          </span>
+    @if (appointment.referral) {
+      <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="referral-title">
+        <div class="ui-toolbar mb-5">
+          <h2 id="referral-title" class="ui-section-title">Referral details</h2>
+          <app-status-badge [status]="appointment.referral.status" />
         </div>
-
-        <div class="referral-row">
-          <span class="label">Referred From Clinic</span>
-          <span class="value">
-            {{ appointment.referral.fromClinicId.name }}
-          </span>
-        </div>
-
-        <div class="referral-row">
-          <span class="label">Clinic Address</span>
-          <span class="value">
-            {{ appointment.referral.fromClinicId.address }}
-          </span>
-        </div>
-
-        <div class="referral-row">
-          <span class="label">Referred By</span>
-          <span class="value">
-            {{ appointment.referral.fromDoctorId.firstName }}
-            {{ appointment.referral.fromDoctorId.lastName }}
-          </span>
-        </div>
-      </div>
-    </div>
-  }
-
-  </app-list>
-
-<section class="appointment-activity" aria-labelledby="activity-title">
-    <h3 id="activity-title">Appointment activity</h3>
-    @for (entry of appointment.history; track $index) {
-      <article class="activity-entry">
-        <strong>{{ entry.action }}</strong>
-        <time>{{ entry.timestamp | date:'MMM d, yyyy, h:mm a':'+0800' }}</time>
-        @if (actorLabel(entry); as actor) { <p><strong>Changed by:</strong> {{ actor }}</p> }
-        @if (entry.reason) { <p><strong>Reason:</strong> {{ entry.reason }}</p> }
-      </article>
-    } @empty { <p>No appointment activity yet.</p> }
-  </section>
-
-<!-- Previous Appointments History -->
-  <div class="row-divider"></div>
-  <div class="history-body">
-    <h3 class="history-title">Previous Appointments/History</h3>
-    @if (historyError) {
-      <p role="alert">{{ historyError }} <button type="button" (click)="loadAppointment()" [disabled]="isBusy">Try again</button></p>
+        <dl class="grid gap-5 sm:grid-cols-2">
+          <div class="min-w-0"><dt class="ui-label mb-1">Reason</dt><dd class="whitespace-pre-wrap break-words text-sm text-ink">{{ appointment.referral.reason || 'No reason provided' }}</dd></div>
+          <div class="min-w-0"><dt class="ui-label mb-1">Referred from clinic</dt><dd class="break-words text-sm text-ink">{{ appointment.referral.fromClinicId.name }}</dd></div>
+          <div class="min-w-0"><dt class="ui-label mb-1">Clinic address</dt><dd class="break-words text-sm text-ink">{{ appointment.referral.fromClinicId.address }}</dd></div>
+          <div class="min-w-0"><dt class="ui-label mb-1">Referred by</dt><dd class="break-words text-sm text-ink">{{ appointment.referral.fromDoctorId.firstName }} {{ appointment.referral.fromDoctorId.lastName }}</dd></div>
+        </dl>
+      </section>
     }
-
-    <div *ngIf="appointmentHistory && appointmentHistory.length; else noHistory">
-      <app-generic-table
-        [displayedColumns]="displayedColumns"
-        [columnDefs]="columnDefs"
-        [dataSource]="dataSource"
-        [isLoading]="isLoading"
-      ></app-generic-table>
-    </div>
-
-    <ng-template #noHistory>
-      <p class="text-gray-500">No previous appointments found.</p>
-    </ng-template>
-  </div>
-
-  @if (actionError) {
-    <p class="action-feedback" role="alert">
-      {{ actionError }}
-      <button type="button" (click)="loadAppointment()" [disabled]="isBusy">Reload appointment</button>
-    </p>
+    <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="activity-title">
+      <h2 id="activity-title" class="ui-section-title mb-5">Appointment activity</h2>
+      <ol class="space-y-3">
+        @for (entry of appointment.history; track $index) {
+          <li class="rounded-xl border border-brand-100 bg-canvas p-4">
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+              <strong class="break-words text-sm font-semibold text-ink">{{ entry.action }}</strong>
+              <time class="shrink-0 text-xs text-muted">{{ entry.timestamp | date:'medium':'+0800' }}</time>
+            </div>
+            @if (actorLabel(entry)) { <p class="mt-2 break-words text-sm text-muted">By {{ actorLabel(entry) }}</p> }
+            @if (entry.reason) { <p class="mt-2 whitespace-pre-wrap break-words text-sm text-muted"><strong class="font-medium text-ink">Reason:</strong> {{ entry.reason }}</p> }
+          </li>
+        } @empty { <li class="ui-muted">No appointment activity yet.</li> }
+      </ol>
+    </section>
+    <section class="mt-6" aria-label="Previous appointments">
+      @if (historyError) {
+        <div class="ui-card mb-4 flex flex-wrap items-center justify-between gap-3 border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+          <p>{{ historyError }}</p>
+          <button type="button" class="ui-button-secondary" (click)="loadAppointment()" [disabled]="isBusy">Try again</button>
+        </div>
+      }
+      @if (appointmentHistory && appointmentHistory.length) {
+        <app-generic-table title="Previous appointments" [displayedColumns]="displayedColumns" [columnDefs]="columnDefs" [dataSource]="dataSource" [isLoading]="isLoading" />
+      } @else {
+        <div class="ui-card"><app-empty-state title="No previous appointments" description="Earlier visits will appear here when available." icon="history" /></div>
+      }
+    </section>
+    @if (actionError) {
+      <div class="ui-card mt-5 flex flex-wrap items-center justify-between gap-3 border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+        <p>{{ actionError }}</p>
+        <button type="button" class="ui-button-secondary" (click)="loadAppointment()" [disabled]="isBusy">Reload appointment</button>
+      </div>
+    }
+    @if (isSaving) { <p class="mt-5 text-sm text-muted" role="status">Saving appointment...</p> }
+    @if (isActive) {
+      <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="appointment-actions-title">
+        <h2 id="appointment-actions-title" class="ui-section-title mb-4">Appointment actions</h2>
+        <div class="flex flex-wrap gap-3">
+          @if (appointment.status === 'pending') {
+            <button type="button" class="ui-button" (click)="approveAppointment()" [disabled]="isBusy"><mat-icon>check</mat-icon> Approve</button>
+            <button type="button" class="ui-button-danger" (click)="declineAppointment()" [disabled]="isBusy"><mat-icon>close</mat-icon> Reject</button>
+          }
+          @if (appointment.status === 'confirmed') {
+            <button type="button" class="ui-button" (click)="completeAppointment()" [disabled]="isBusy"><mat-icon>task_alt</mat-icon> Completed</button>
+            <button type="button" class="ui-button-secondary" (click)="noShowAppointment()" [disabled]="isBusy"><mat-icon>person_off</mat-icon> No show</button>
+          }
+          <button type="button" class="ui-button-secondary" (click)="rescheduleAppointment()" [disabled]="isBusy"><mat-icon>event</mat-icon> Reschedule</button>
+          @if (canCancel) {
+            <button type="button" class="ui-button-danger" (click)="cancelAppointment()" [disabled]="isBusy"><mat-icon>cancel</mat-icon> Cancel</button>
+          }
+        </div>
+      </section>
+    }
+  } @else {
+    @if (!loadError) { <p class="ui-card p-5 text-sm text-muted" role="status">Fetching details...</p> }
   }
-  @if (isSaving) { <p class="action-feedback" role="status">Saving appointment...</p> }
-  @if (isActive) {
-    <div class="action-buttons">
-      @if (appointment.status === 'pending') {
-        <button mat-flat-button color="primary" (click)="approveAppointment()" [disabled]="isBusy">
-          <mat-icon>check</mat-icon> Approve
-        </button>
-        <button mat-stroked-button color="warn" (click)="declineAppointment()" [disabled]="isBusy">
-          <mat-icon>close</mat-icon> Reject
-        </button>
-      }
-      @if (appointment.status === 'confirmed') {
-        <button mat-flat-button color="primary" (click)="completeAppointment()" [disabled]="isBusy">
-          <mat-icon>task_alt</mat-icon> Completed
-        </button>
-        <button mat-stroked-button (click)="noShowAppointment()" [disabled]="isBusy">
-          <mat-icon>person_off</mat-icon> No show
-        </button>
-      }
-      <button mat-stroked-button (click)="rescheduleAppointment()" [disabled]="isBusy">
-        <mat-icon>event</mat-icon> Reschedule
-      </button>
-      @if (canCancel) {
-        <button mat-stroked-button color="warn" (click)="cancelAppointment()" [disabled]="isBusy">
-          <mat-icon>cancel</mat-icon> Cancel
-        </button>
-      }
-    </div>
-  }
-
-} @else {
-  @if (!loadError) { <p>Fetching details...</p> }
-}
+</section>

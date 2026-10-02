@@ -1,3 +1,5 @@
+import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
 import { Appointment } from '../../../_shared/model/appointment';
 import { PatientDirectoryEntry } from '../../../_shared/model/user-directory';
@@ -15,7 +17,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-appointment-create',
-  imports: [AppointmentForm],
+  imports: [EmptyState, PageHeader, AppointmentForm],
   templateUrl: './appointment-create.html',
   styleUrl: './appointment-create.css'
 })

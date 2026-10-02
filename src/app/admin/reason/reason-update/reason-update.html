@@ -1,9 +1,12 @@
-@if (reason) {
-  <app-reason-form
-    [isLoading]="isLoading"
-    [reason]="reason"
-    (onSubmitEvent)="onSubmit($event)"
-  ></app-reason-form>
-} @else {
-  <p>Fetching details...</p>
-}
+<section class="ui-page max-w-4xl">
+  <app-page-header title="Edit reason" eyebrow="Management" description="Manage the reasons available for referral decisions." />
+  @if (reason) {
+    <app-reason-form
+      [isLoading]="isLoading"
+      [reason]="reason"
+      (onSubmitEvent)="onSubmit($event)"
+    ></app-reason-form>
+  } @else {
+    <p class="ui-card p-5 text-sm text-muted" role="status">Fetching details...</p>
+  }
+</section>

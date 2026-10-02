@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../../_shared/service/user-service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,7 +13,7 @@ import { DentistApproval } from '../../../_shared/component/dentist-approval/den
 
 @Component({
   selector: 'app-user-details',
-  imports: [MatButtonModule, MatListModule, ListComponent, DentistApproval],
+  imports: [PageHeader, MatButtonModule, MatListModule, ListComponent, DentistApproval],
   templateUrl: './user-details.html',
   styleUrl: './user-details.css'
 })

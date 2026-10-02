@@ -1,3 +1,6 @@
+import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
+import { StatusBadge } from '../../../_shared/ui/status-badge/status-badge';
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -24,7 +27,7 @@ import { compareAppointmentSchedule, formatAppointmentDate, requiresAppointmentO
 
 @Component({
   selector: 'app-appointment-details',
-  imports: [ListComponent, MatListModule, MatButtonModule, MatIconModule, CommonModule, GenericTableComponent],
+  imports: [EmptyState, StatusBadge, PageHeader, ListComponent, MatListModule, MatButtonModule, MatIconModule, CommonModule, GenericTableComponent],
   templateUrl: './appointment-details.html',
   styleUrl: './appointment-details.css',
 })

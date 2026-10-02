@@ -1,8 +1,10 @@
-@if (reason) {
-  <div class="view-header">
-    <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
-  </div>
-  <app-list [data]="displayReason"></app-list>
-} @else {
-  <p>Fetching details...</p>
-}
+<section class="ui-page max-w-5xl">
+  <app-page-header title="Reason details" eyebrow="Management" description="Review the saved information.">
+    @if (reason) { <button type="button" class="ui-button" (click)="onUpdate()">Edit</button> }
+  </app-page-header>
+  @if (reason) {
+    <app-list [data]="displayReason" />
+  } @else {
+    <p class="ui-card p-5 text-sm text-muted" role="status">Fetching details...</p>
+  }
+</section>

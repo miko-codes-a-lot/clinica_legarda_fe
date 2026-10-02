@@ -1,1 +1,4 @@
-<app-reason-form [isLoading]="isLoading" (onSubmitEvent)="onSubmit($event)"></app-reason-form>
+<section class="ui-page max-w-4xl">
+  <app-page-header title="Create reason" eyebrow="Management" description="Manage the reasons available for referral decisions." />
+  <app-reason-form [isLoading]="isLoading" (onSubmitEvent)="onSubmit($event)"></app-reason-form>
+</section>

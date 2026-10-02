@@ -1,12 +1,15 @@
-@if (user && days.length > 0) {
-  <app-user-form
-    [isLoading]="isLoading"
-    [days]="days"
-    [user]="user"
-    [clinics]="clinics"
-    [canAssignAdminClinics]="true"
-    (onSubmitEvent)="onSubmit($event)"
-  ></app-user-form>
-} @else {
-  <p>Fetching details...</p>
-}
+<section class="ui-page max-w-4xl">
+  <app-page-header title="Edit user" eyebrow="Management" description="Manage staff details, roles, and clinic assignments." />
+  @if (user && days.length > 0) {
+    <app-user-form
+      [isLoading]="isLoading"
+      [days]="days"
+      [user]="user"
+      [clinics]="clinics"
+      [canAssignAdminClinics]="true"
+      (onSubmitEvent)="onSubmit($event)"
+    ></app-user-form>
+  } @else {
+    <p class="ui-card p-5 text-sm text-muted" role="status">Fetching details...</p>
+  }
+</section>

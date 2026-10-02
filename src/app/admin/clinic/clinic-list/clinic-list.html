@@ -1,5 +1,8 @@
-@if (loadError) { <p role="alert">{{ loadError }}</p> }
-@if (!isLoading && !loadError && !dataSource.data.length) { <p>No clinics yet.</p> }
+@if (loadError) {
+  <div class="mx-auto max-w-7xl px-4 pt-7 sm:px-7 lg:px-9">
+    <p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">{{ loadError }}</p>
+  </div>
+}
 <app-generic-table
   [title]="title"
   [createButtonLabel]="createLabel"

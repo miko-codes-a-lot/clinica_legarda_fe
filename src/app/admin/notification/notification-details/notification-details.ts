@@ -1,3 +1,5 @@
+import { CommonModule } from '@angular/common';
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
 import { Notification } from '../../../_shared/model/notification';
 import { NotificationService } from '../../../_shared/service/notification-service';
@@ -9,7 +11,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-notification-details',
-  imports: [MatProgressSpinner],
+  imports: [CommonModule, PageHeader, MatProgressSpinner],
   templateUrl: './notification-details.html',
   styleUrl: './notification-details.css'
 })

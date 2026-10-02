@@ -1,3 +1,4 @@
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, OnInit } from '@angular/core';
 import { DentalService } from '../../../_shared/model/dental-service';
 import { DentalServicesService } from '../../../_shared/service/dental-services-service';
@@ -8,7 +9,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-dental-service-create',
-  imports: [DentalServiceForm],
+  imports: [PageHeader, DentalServiceForm],
   templateUrl: './dental-service-create.html',
   styleUrl: './dental-service-create.css'
 })

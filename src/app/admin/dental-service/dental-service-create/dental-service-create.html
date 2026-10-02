@@ -1,5 +1,8 @@
-<app-dental-service-form
-  [isLoading]="isLoading"
-  [dentalService]="initDoc"
-  (onSubmitEvent)="onSubmit($event)">
-</app-dental-service-form>
+<section class="ui-page max-w-4xl">
+  <app-page-header title="Create dental service" eyebrow="Management" description="Manage services available for appointments." />
+  <app-dental-service-form
+    [isLoading]="isLoading"
+    [dentalService]="initDoc"
+    (onSubmitEvent)="onSubmit($event)">
+  </app-dental-service-form>
+</section>

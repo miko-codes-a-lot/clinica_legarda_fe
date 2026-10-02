@@ -1,67 +1,39 @@
-<div class="clinic-filter">
-  <label for="dentist-appointment-clinic">Clinic</label>
-  <select #clinicSelect id="dentist-appointment-clinic" [value]="selectedClinic" (change)="selectClinic(clinicSelect.value)">
-    <option value="all">All my clinics</option>
-    @for (clinic of clinicOptions; track clinic.id) {
-      <option [value]="clinic.id">{{ clinic.name }}</option>
-    }
-  </select>
-</div>
-
-<!-- Daily Summary Card -->
-<mat-card class="daily-summary-card">
-
-  <mat-card-header class="summary-header">
-    <mat-card-title class="summary-title">
-      <mat-icon color="primary">calendar_today</mat-icon>
-      Doctor's Confirmed Schedules
-    </mat-card-title>
-  </mat-card-header>
-
-  <mat-card-content>
-    <div class="daily-summary-container">
-      <div 
-        class="day-card" 
-        *ngFor="let date of dailyDates"
-        [class.today]="date === todayStr"
-      >
-        <div class="date">{{ (date + 'T00:00:00Z') | date:'EEE, MMM d':'UTC' }}</div>
-        <div class="count">
-          {{ dailyAppointments[date].length }} patient{{ dailyAppointments[date].length > 1 ? 's' : '' }}
-        </div>
-        <small>{{ dailyClinicNames[date] }}</small>
-      </div>
-      <div *ngIf="dailyDates.length === 0" class="no-appointments">
-        No upcoming appointments
-      </div>
+<section class="ui-page pb-0 lg:pb-0">
+  <div class="mb-5 flex flex-col gap-2 sm:max-w-sm">
+    <label for="dentist-appointment-clinic" class="ui-label">Clinic</label>
+    <select #clinicSelect id="dentist-appointment-clinic" class="ui-input" [value]="selectedClinic" (change)="selectClinic(clinicSelect.value)">
+      <option value="all">All my clinics</option>
+      @for (clinic of clinicOptions; track clinic.id) { <option [value]="clinic.id">{{ clinic.name }}</option> }
+    </select>
+  </div>
+  <section class="ui-card mb-6 p-5 sm:p-6" aria-labelledby="confirmed-schedule-title">
+    <div class="mb-4 flex items-center gap-3">
+      <mat-icon class="text-brand-700">calendar_today</mat-icon>
+      <h2 id="confirmed-schedule-title" class="ui-section-title">Confirmed schedule</h2>
     </div>
-  </mat-card-content>
-</mat-card>
-
-
-<div class="table-title">
-  <h2>Appointments</h2>
-</div>
-
-@if (errorMessage) {
-  <div class="load-error" role="alert">{{ errorMessage }} <button type="button" (click)="refresh()">Try again</button></div>
-}
-<div class="status-filters" role="group" aria-label="Filter appointments by status">
-  @for (filter of statusFilters; track filter.value) {
-    <button type="button" [attr.data-status]="filter.value" [attr.aria-pressed]="selectedStatus === filter.value"
-      [class.active]="selectedStatus === filter.value" (click)="selectStatus(filter.value)">
-      {{ filter.label }} <span>{{ statusCounts[filter.value] }}</span>
-    </button>
+    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <article class="min-w-0 rounded-xl border border-brand-100 bg-canvas p-4" *ngFor="let date of dailyDates" [class.border-brand-500]="date === todayStr" [class.bg-brand-50]="date === todayStr">
+        <h3 class="text-sm font-semibold text-ink">{{ (date + 'T00:00:00Z') | date:'EEE, MMM d':'UTC' }}</h3>
+        <p class="mt-2 text-2xl font-semibold text-brand-800">{{ dailyAppointments[date].length }} <span class="text-sm font-normal text-muted">patient{{ dailyAppointments[date].length > 1 ? 's' : '' }}</span></p>
+        <p class="mt-2 break-words text-xs leading-5 text-muted">{{ dailyClinicNames[date] }}</p>
+      </article>
+      <p *ngIf="dailyDates.length === 0" class="ui-muted sm:col-span-2">No upcoming appointments</p>
+    </div>
+  </section>
+  @if (errorMessage) {
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+      <p>{{ errorMessage }}</p><button type="button" class="ui-button-secondary" (click)="refresh()">Try again</button>
+    </div>
   }
-</div>
-@if (!isLoading && !errorMessage && dataSource.data.length === 0) {
-  <p class="empty-filter" role="status">No {{ selectedStatus === 'all' ? '' : statusLabel(selectedStatus).toLowerCase() }} appointments found.</p>
-}
-<app-generic-table
-  [displayedColumns]="displayedColumns"
-  [columnDefs]="columnDefs"
-  [dataSource]="dataSource"
-  [isLoading]="isLoading"
-  [rowClassFn]="outcomeRowClass"
-  (details)="onDetails($event)"
-></app-generic-table>
+  <div class="mb-5 flex flex-wrap gap-2" role="group" aria-label="Filter appointments by status">
+    @for (filter of statusFilters; track filter.value) {
+      <button type="button" class="ui-button-secondary aria-pressed:bg-brand-700 aria-pressed:text-white" [attr.data-status]="filter.value" [attr.aria-pressed]="selectedStatus === filter.value" [class.active]="selectedStatus === filter.value" (click)="selectStatus(filter.value)">
+        {{ filter.label }} <span class="rounded-md bg-brand-50 px-1.5 text-xs text-brand-800">{{ statusCounts[filter.value] }}</span>
+      </button>
+    }
+  </div>
+  @if (!isLoading && !errorMessage && dataSource.data.length === 0) {
+    <p class="ui-muted mb-4" role="status">No {{ selectedStatus === 'all' ? '' : statusLabel(selectedStatus).toLowerCase() }} appointments found.</p>
+  }
+</section>
+<app-generic-table title="Appointments" [displayedColumns]="displayedColumns" [columnDefs]="columnDefs" [dataSource]="dataSource" [isLoading]="isLoading" [rowClassFn]="outcomeRowClass" (details)="onDetails($event)" />

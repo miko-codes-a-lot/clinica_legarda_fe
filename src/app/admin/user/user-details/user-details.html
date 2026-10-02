@@ -1,37 +1,38 @@
-@if (user) {
-  <div class="view-header">
-    <button mat-raised-button color="primary" (click)="onUpdate()">Edit</button>
-    @if (user.role === 'dentist') {
-      <app-dentist-approval [user]="user" (approved)="setUser($event)"></app-dentist-approval>
+<section class="ui-page max-w-5xl">
+  <app-page-header title="User details" eyebrow="Management" description="Profile, clinic access, and working hours.">
+    @if (user) {
+      <button type="button" class="ui-button" (click)="onUpdate()">Edit user</button>
+      @if (user.role === 'dentist') {
+        <app-dentist-approval [user]="user" (approved)="setUser($event)" />
+      }
     }
-  </div>
-
-  <app-list [data]="displayUser">
-    <!-- custom -->
+  </app-page-header>
+  @if (user) {
+    <app-list [data]="displayUser" />
     @if (user.role === 'dentist' || user.role === 'admin') {
-      <div class="custom-list">
-        <mat-list-item>
-          <span class="item-title" matListItemTitle>
-            @for (clinic of clinicAssignments; track clinic._id; let last = $last) {
-              {{ clinic.name }}{{ last ? '' : ', ' }}
-            } @empty {
-              No assigned clinics
-            }
-          </span>
-          <span class="item-line" matListItemLine>Clinics</span>
-        </mat-list-item>
-        @if (user.role === 'dentist') {
-          <mat-list-item>
-            <span class="item-title" matListItemTitle>Schedule:</span>
+      <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="assigned-clinics-title">
+        <h2 id="assigned-clinics-title" class="ui-section-title mb-4">Assigned clinics</h2>
+        <ul class="grid gap-3 sm:grid-cols-2">
+          @for (clinic of clinicAssignments; track clinic._id) {
+            <li class="min-w-0 rounded-xl border border-brand-100 bg-brand-50/40 p-4 text-sm font-medium break-words">{{ clinic.name }}</li>
+          } @empty { <li class="ui-muted">No assigned clinics</li> }
+        </ul>
+      </section>
+      @if (user.role === 'dentist') {
+        <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="working-hours-title">
+          <h2 id="working-hours-title" class="ui-section-title mb-4">Working hours</h2>
+          <dl class="grid gap-3 sm:grid-cols-2">
             @for (oh of user.operatingHours; track oh.day) {
-              <span class="item-line" matListItemLine>{{ oh.day }} - {{ oh.startTime }} - {{ oh.endTime }}</span>
-            }
-          </mat-list-item>
-        }
-      </div>
+              <div class="flex flex-wrap justify-between gap-2 rounded-xl border border-brand-100 p-4 text-sm">
+                <dt class="font-semibold capitalize">{{ oh.day }}</dt>
+                <dd class="text-muted">{{ oh.startTime }} – {{ oh.endTime }}</dd>
+              </div>
+            } @empty { <p class="ui-muted">No working hours recorded.</p> }
+          </dl>
+        </section>
+      }
     }
-  </app-list>
-
-} @else {
-  <p>Fetching details...</p>
-}
+  } @else {
+    <p class="ui-card p-5 text-sm text-muted" role="status">Fetching details...</p>
+  }
+</section>

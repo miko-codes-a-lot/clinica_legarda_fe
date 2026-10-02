@@ -1,3 +1,5 @@
+import { StatusBadge } from '../../../_shared/ui/status-badge/status-badge';
+import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -19,7 +21,7 @@ import { formatAppointmentDate } from '../../appointment/appointment-schedule';
 
 @Component({
   selector: 'app-referral-request-details',
-  imports: [ListComponent, MatButtonModule, MatIconModule, CommonModule],
+  imports: [StatusBadge, PageHeader, ListComponent, MatButtonModule, MatIconModule, CommonModule],
   templateUrl: './referral-request-details.html',
   styleUrl: './referral-request-details.css',
 })
