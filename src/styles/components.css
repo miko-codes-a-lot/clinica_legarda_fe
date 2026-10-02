@@ -20,6 +20,6 @@
   .ui-auth-card { @apply w-full rounded-3xl border border-stroke bg-surface p-6 shadow-card sm:p-9; }
   .ui-status { @apply inline-flex items-center rounded-full bg-neutral-soft px-2.5 py-1 text-[11px] font-semibold capitalize leading-none text-neutral; }
   .ui-status[data-status="confirmed"], .ui-status[data-status="approved"], .ui-status[data-status="completed"], .ui-status[data-status="accepted"] { @apply bg-tint-strong text-accent; }
-  .ui-status[data-status="pending"], .ui-status[data-status="referred"] { @apply bg-warning-soft text-warning; }
+  .ui-status[data-status="pending"], .ui-status[data-status="referred"], .ui-status[data-status="walk_in"] { @apply bg-warning-soft text-warning; }
   .ui-status[data-status="cancelled"], .ui-status[data-status="rejected"], .ui-status[data-status="declined"] { @apply bg-danger-soft text-danger; }
 }

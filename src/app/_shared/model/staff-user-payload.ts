@@ -17,6 +17,7 @@ export interface StaffUserPayload {
   username?: string;
   profilePicture?: string;
   status?: UserStatus;
+  isWalkIn?: boolean;
 }
 
 export interface StaffUserFormValue {
@@ -31,6 +32,7 @@ export interface StaffUserFormValue {
   clinics: string[];
   operatingHours: OperatingHour[];
   role: string;
+  isWalkIn?: boolean;
 }
 
 export function buildStaffUserPayload(value: StaffUserFormValue): StaffUserPayload {
@@ -48,5 +50,6 @@ export function buildStaffUserPayload(value: StaffUserFormValue): StaffUserPaylo
     clinics: isDentist || value.role === 'admin' ? value.clinics : [],
     operatingHours: isDentist ? value.operatingHours : [],
     role: value.role,
+    ...(value.isWalkIn !== undefined ? { isWalkIn: value.role === 'user' && value.isWalkIn } : {}),
   };
 }

@@ -36,7 +36,7 @@ export class UserSettingsUpdate implements OnInit {
   profileForm!: FormGroup;
   avatarUrl: string = 'assets/images/default-dentist.png'; // default profile pic
 
-  user: { _id?: string; clinic?: any; role?: string; username?: string; operatingHours?: any[] } = {};
+  user: { _id?: string; clinic?: any; role?: string; username?: string; operatingHours?: any[]; isWalkIn?: boolean } = {};
   isDentist = false
   isLoading = false
   id = ''
@@ -95,6 +95,10 @@ export class UserSettingsUpdate implements OnInit {
           this.user = user;
           this.id = user._id;
           this.profileForm.patchValue(user);
+          if (user.role === 'user' && user.isWalkIn) {
+            this.profileForm.get('mobileNumber')?.setValidators(Validators.pattern(/^\+639\d{9}$/));
+            this.profileForm.get('mobileNumber')?.updateValueAndValidity();
+          }
           if (user.role === 'dentist') {
             this.isDentist == true
           } else {
@@ -102,7 +106,7 @@ export class UserSettingsUpdate implements OnInit {
           }
           // dentist available days/hours
           const operatingHoursArray = this.fb.array(
-            user.operatingHours.map(o =>
+            (user.operatingHours ?? []).map(o =>
               this.fb.group({
                 day: [o.day, Validators.required],
                 startTime: [o.startTime, Validators.required],
@@ -136,7 +140,7 @@ export class UserSettingsUpdate implements OnInit {
 
           this.profileForm.setControl('operatingHours', operatingHoursArray);
 
-          this.selectedDays = new Set(user.operatingHours.map(o => o.day));
+          this.selectedDays = new Set((user.operatingHours ?? []).map(o => o.day));
           this.operatingHours.valueChanges.subscribe((hours) => {
             this.selectedDays = new Set(hours.map((h: any) => h.day).filter(Boolean));
           });
@@ -230,11 +234,13 @@ onSave() {
       operatingHours: formValue.operatingHours || [],
       role: formValue.role || this.user.role,
       username: this.user.username,
+      isWalkIn: this.user.role === 'user' && !!this.user.isWalkIn,
     };
 
 
     this.userService.update(this.id, userData).subscribe({
       next: () => {
+        this.authService.checkAuthStatus();
         this.alertService.success('Successfully updated');
         this.router.navigate(['/app/user-settings/index']);
       },

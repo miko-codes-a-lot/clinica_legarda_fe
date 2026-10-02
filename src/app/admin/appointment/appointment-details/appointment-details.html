@@ -2,6 +2,7 @@
   <app-page-header title="Appointment details" eyebrow="Appointments" description="Review the visit, clinical notes, and appointment activity.">
     @if (appointment) {
       <app-status-badge [status]="appointment.status" />
+      @if (appointment.isWalkIn) { <app-status-badge status="walk_in" /> }
       <button type="button" class="ui-button-secondary" (click)="onUpdate()" [disabled]="isClinicEditDisabled()">Edit appointment</button>
     }
   </app-page-header>

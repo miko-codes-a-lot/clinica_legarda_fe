@@ -9,6 +9,7 @@
   </app-page-header>
   @if (user) {
     <app-list [data]="displayUser" />
+    @if (user.role === 'user') { <app-patient-account-access [user]="user" /> }
     @if (user.role === 'dentist' || user.role === 'admin') {
       <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="assigned-clinics-title">
         <h2 id="assigned-clinics-title" class="ui-section-title mb-4">Assigned clinics</h2>

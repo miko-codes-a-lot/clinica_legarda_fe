@@ -51,7 +51,7 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
     { value: AppointmentStatus.CANCELLED, label: 'Cancelled' },
     { value: AppointmentStatus.REJECTED, label: 'Rejected' },
   ];
-  readonly displayedColumns = ['_id', 'clinic', 'patient', 'dentist', 'date', 'time', 'status', 'actions'];
+  readonly displayedColumns = ['_id', 'clinic', 'patient', 'dentist', 'date', 'time', 'visitType', 'status', 'actions'];
   readonly columnDefs = [
     { key: '_id', label: 'ID', cell: (appointment: Appointment) => appointment._id },
     { key: 'clinic', label: 'Clinic', cell: (appointment: Appointment) => appointment.clinic?.name || 'Unknown clinic' },
@@ -59,6 +59,7 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
     { key: 'dentist', label: 'Dentist', cell: (appointment: Appointment) => this.personName(appointment.dentist) },
     { key: 'date', label: 'Date', cell: (appointment: Appointment) => formatAppointmentDate(appointment.date) },
     { key: 'time', label: 'Time', cell: (appointment: Appointment) => `${appointment.startTime} - ${appointment.endTime}` },
+    { key: 'visitType', label: 'Visit type', cell: (appointment: Appointment) => appointment.isWalkIn ? 'Walk-in' : 'Scheduled' },
     { key: 'status', label: 'Status', cell: (appointment: Appointment) =>
       this.statuses.find(status => status.value === appointment.status)?.label || appointment.status },
   ];

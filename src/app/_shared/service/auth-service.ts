@@ -52,7 +52,7 @@ export class AuthService {
       tap(({ user }) => this.currentUserSubject.next(user)),
       catchError((error: HttpErrorResponse) => {
         let userMessage = 'Something went wrong. Please try again.';
-        if (error.status === 400) {
+        if (error.status === 400 || error.status === 409) {
           userMessage = error.error?.message || 'Invalid OTP code.';
         } else if (error.status === 401) {
           userMessage = 'Session expired. Please sign in again.';

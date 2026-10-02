@@ -34,6 +34,8 @@ import { ReasonService } from '../../../_shared/service/reason-service';
 
 import { AlertService } from '../../../_shared/service/alert.service';
 import { AuthService } from '../../../_shared/service/auth-service';
+import { isStaffBookablePatient } from '../../../_shared/model/user';
+import { FormField } from '../../../_shared/component/form/form-field.interface';
 
 
 @Component({
@@ -64,7 +66,7 @@ export class AppointmentForm {
   selectedDentist?: DentistDirectoryEntry;
 
   rxform!: FormGroup<RxAppointmentForm>;
-  appointmentFields: any[] = [];
+  appointmentFields: FormField[] = [];
 
   minDate = new Date();
 
@@ -112,6 +114,7 @@ export class AppointmentForm {
       date: new FormControl<Date | null>(this.appointment?.date ? pickerDateFromStored(this.appointment.date) : null, Validators.required),
       time: [this.appointment?.startTime || '', Validators.required],
       patientNotes: [this.appointment?.notes?.patientNotes || ''],
+      isWalkIn: [this.appointment?.isWalkIn ?? false],
     });
     if (this.authService.currentUserValue?.role === 'dentist') {
       this.dentist.disable({ emitEvent: false });
@@ -297,10 +300,7 @@ Do you want to proceed?` },
     this.clearDateTime();
   }
   private buildAppointmentFields() {
-    const filteredPatients = this.patients?.filter(
-      p => p.role === 'user'
-      && p.status === 'confirmed'
-    );
+    const filteredPatients = this.patients?.filter(isStaffBookablePatient);
     const customPatients = this.setUsersKey(filteredPatients);
 
     const selectClinic = this.mapToOptions(this.clinics);
@@ -426,6 +426,7 @@ Do you want to proceed?` },
       startTime,
       endTime,
       status: AppointmentStatus.PENDING,
+      isWalkIn: this.rxform.controls.isWalkIn.value,
       notes: {
         clinicNotes: this.appointment?.notes?.clinicNotes || '',
         patientNotes: this.rxform.controls.patientNotes.value || ''
@@ -471,6 +472,8 @@ Do you want to proceed?` },
   get selectedPatient(): PatientDirectoryEntry | undefined {
     return this.patients.find(p => p._id === this.patient.value);
   }
+
+  get hasBookablePatients(): boolean { return this.patients.some(isStaffBookablePatient); }
 
   get latestPatientAppointment(): Appointment | undefined {
     const currentAppointmentData = this.patientAppointments[0];

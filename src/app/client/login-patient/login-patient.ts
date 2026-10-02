@@ -1,5 +1,7 @@
 import { AuthLayout } from '../../_shared/ui/auth-layout/auth-layout';
-import { Component, Input } from '@angular/core';
+import { isOnlineBookablePatient } from '../../_shared/model/user';
+import { Component, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { RxLogin } from '../../_shared/model/reactive/rx-login';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../_shared/service/auth-service';
@@ -13,7 +15,8 @@ import { AlertService } from '../../_shared/service/alert.service';
   templateUrl: './login-patient.html',
   styleUrl: './login-patient.css'
 })
-export class LoginPatient {
+export class LoginPatient implements OnDestroy {
+  private readonly subscriptions = new Subscription();
   rxform!: FormGroup<RxLogin>
   isLoading = false
 
@@ -32,18 +35,20 @@ export class LoginPatient {
       password: ['', Validators.required],
     })
 
-    this.authService.currentUser$.subscribe({
+    this.subscriptions.add(this.authService.currentUser$.subscribe({
       next: (u) => {
-        if (u) {
+        if (u && isOnlineBookablePatient(u)) {
           this.router.navigate(['/app/my-appointment'])
         }
       }
-    })
+    }));
 
-    this.uiStateService.isLoading$.subscribe({
+    this.subscriptions.add(this.uiStateService.isLoading$.subscribe({
       next: (loading) => this.isLoading = loading
-    })
+    }));
   }
+
+  ngOnDestroy(): void { this.subscriptions.unsubscribe(); }
 
   onSubmit() {
     this.uiStateService.setLoading(true)

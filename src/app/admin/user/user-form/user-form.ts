@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, signal } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,7 +25,8 @@ import { UserPayload } from './user-payload';
   templateUrl: './user-form.html',
   styleUrl: './user-form.css'
 })
-export class UserForm implements OnInit, OnChanges {
+export class UserForm implements OnInit, OnChanges, OnDestroy {
+  private readonly subscriptions = new Subscription();
   @Output() onSubmitEvent = new EventEmitter<UserPayload>();
   @Input() isLoading = false;
   @Input() clinics: Clinic[] = [];
@@ -61,6 +63,7 @@ export class UserForm implements OnInit, OnChanges {
       appointments: [],
       operatingHours: [],
       status: UserStatus.PENDING,
+      isWalkIn: false,
     };
   }
 
@@ -71,8 +74,9 @@ export class UserForm implements OnInit, OnChanges {
       firstName: [this.user.firstName, Validators.required],
       middleName: [this.user.middleName],
       lastName: [this.user.lastName, Validators.required],
-      emailAddress: [this.user.emailAddress, [Validators.required, Validators.email]],
-      mobileNumber: [this.user.mobileNumber, [Validators.required, Validators.pattern(/^\+639\d{9}$/)]],
+      emailAddress: [this.user.emailAddress ?? ''],
+      mobileNumber: [this.user.mobileNumber ?? ''],
+      isWalkIn: [this.user.role === 'user' && !!this.user.isWalkIn],
       username: [this.user.username ?? '', Validators.required],
       address: [this.user.address, Validators.required],
       password: [isUpdate ? '' : this.user.password ?? '', isUpdate ? [] : strongPasswordValidators()],
@@ -80,14 +84,15 @@ export class UserForm implements OnInit, OnChanges {
       clinics: [assignedClinicIds(this.user)],
       role: [this.user.role, Validators.required],
       operatingHours: this.fb.array<FormGroup<RxOperatingHour>>(
-        this.user.operatingHours.map(hour => this.createSchedule(hour.day, hour.startTime, hour.endTime))
+        (this.user.operatingHours ?? []).map(hour => this.createSchedule(hour.day, hour.startTime, hour.endTime))
       ),
     }, {
       validators: passwordMatchValidator('password', 'passwordConfirm')
     });
 
-    applyPHMobilePrefix(this.mobileNumber);
-    this.role.valueChanges.subscribe(() => this.syncRoleState());
+    this.subscriptions.add(applyPHMobilePrefix(this.mobileNumber));
+    this.subscriptions.add(this.role.valueChanges.subscribe(() => this.syncRoleState()));
+    this.subscriptions.add(this.isWalkIn.valueChanges.subscribe(() => this.syncContactRequirements()));
     this.syncRoleState();
   }
 
@@ -143,6 +148,8 @@ export class UserForm implements OnInit, OnChanges {
   }
 
   private syncRoleState(): void {
+    if (this.role.value !== 'user') this.isWalkIn.setValue(false, { emitEvent: false });
+    this.syncContactRequirements();
     const isDentist = this.role.value === 'dentist';
     if (isDentist || (this.role.value === 'admin' && this.canAssignAdminClinics)) {
       this.assignedClinics.setValidators(Validators.required);
@@ -157,6 +164,16 @@ export class UserForm implements OnInit, OnChanges {
     this.assignedClinics.updateValueAndValidity({ emitEvent: false });
     this.buildUserFields();
   }
+
+  private syncContactRequirements(): void {
+    const required = this.role.value === 'user' && this.isWalkIn.value ? [] : [Validators.required];
+    this.emailAddress.setValidators([...required, Validators.email]);
+    this.mobileNumber.setValidators([...required, Validators.pattern(/^\+639\d{9}$/)]);
+    this.emailAddress.updateValueAndValidity({ emitEvent: false });
+    this.mobileNumber.updateValueAndValidity({ emitEvent: false });
+  }
+
+  ngOnDestroy(): void { this.subscriptions.unsubscribe(); }
 
   onAddSchedule(): void {
     const usedDays = this.operatingHours.controls.map(group => group.controls.day.value);
@@ -213,6 +230,7 @@ export class UserForm implements OnInit, OnChanges {
       clinics: this.assignedClinics.value,
       operatingHours: this.operatingHours.getRawValue(),
       role: this.role.value,
+      isWalkIn: this.isWalkIn.value,
     });
 
     this.onSubmitEvent.emit(user);
@@ -227,6 +245,7 @@ export class UserForm implements OnInit, OnChanges {
   get username() { return this.rxform.controls.username; }
   get password() { return this.rxform.controls.password; }
   get role() { return this.rxform.controls.role; }
+  get isWalkIn() { return this.rxform.controls.isWalkIn; }
   get assignedClinics() { return this.rxform.controls.clinics; }
   get operatingHours() { return this.rxform.controls.operatingHours; }
 }

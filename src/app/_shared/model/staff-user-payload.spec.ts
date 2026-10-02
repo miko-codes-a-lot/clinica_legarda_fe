@@ -67,3 +67,9 @@ describe('staff user payload', () => {
     expect(payload.operatingHours).toEqual([]);
   });
 });
+
+it('sends a walk-in flag only for patient intake', () => {
+  const value = { ...profile, role: 'user', isWalkIn: true, clinics: [], operatingHours: [] };
+  expect(buildStaffUserPayload(value).isWalkIn).toBeTrue();
+  expect(buildStaffUserPayload({ ...value, role: 'admin' }).isWalkIn).toBeFalse();
+});

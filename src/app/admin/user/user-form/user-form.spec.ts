@@ -160,3 +160,36 @@ describe('admin clinic assignment form', () => {
     expect(submitted).toEqual([['clinic-a', 'clinic-b']]);
   });
 });
+
+describe('identified walk-in intake', () => {
+  const patient = () => ({ ...dentist([]), role: 'user', emailAddress: '', mobileNumber: '' });
+  it('defaults to ordinary intake with required contacts', () => {
+    const form = createForm(patient());
+    expect(form.rxform.get('isWalkIn')?.value).toBeFalse();
+    expect(form.emailAddress.hasError('required')).toBeTrue();
+    expect(form.mobileNumber.hasError('required')).toBeTrue();
+  });
+  it('allows missing contacts only for walk-in patients and emits that intake flag', () => {
+    const form = createForm(patient());
+    form.rxform.get('isWalkIn')?.setValue(true);
+    expect(form.rxform.valid).toBeTrue();
+    const emit = spyOn(form.onSubmitEvent, 'emit');
+    form.onSubmit();
+    expect(emit).toHaveBeenCalledWith(jasmine.objectContaining({ isWalkIn: true, emailAddress: '', mobileNumber: '' }));
+  });
+  it('still validates supplied walk-in contacts', () => {
+    const form = createForm({ ...patient(), isWalkIn: true } as User);
+    expect(form.rxform.valid).toBeTrue();
+    form.emailAddress.setValue('invalid');
+    form.mobileNumber.setValue('+639123');
+    expect(form.rxform.invalid).toBeTrue();
+  });
+  it('removes walk-in privileges and restores contact requirements on a staff role change', () => {
+    const form = createForm(patient());
+    form.rxform.get('isWalkIn')?.setValue(true);
+    form.role.setValue('admin');
+    expect(form.rxform.get('isWalkIn')?.value).toBeFalse();
+    expect(form.emailAddress.hasError('required')).toBeTrue();
+    expect(form.mobileNumber.hasError('required')).toBeTrue();
+  });
+});

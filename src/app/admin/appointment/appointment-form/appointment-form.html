@@ -2,13 +2,18 @@
   <p class="ui-card p-5 text-sm text-muted" role="status">Loading appointment options...</p>
 } @else if (clinics.length === 0) {
   <div class="ui-card"><app-empty-state title="No clinics available" description="Clinic access is needed to schedule an appointment." icon="domain" /></div>
-} @else if (patients.length === 0) {
-  <div class="ui-card"><app-empty-state title="No patients available" description="There are no patients available for you to schedule." icon="person_search" /></div>
+} @else if (!hasBookablePatients) {
+  <div class="ui-card"><app-empty-state title="No eligible patients" description="Select a confirmed patient or ask an administrator to register an identified walk-in patient." icon="person_search" /></div>
 } @else {
   <app-form [form]="rxform" [fields]="appointmentFields" [isLoading]="bookingUnavailable" (onSubmitEvent)="onSubmit()">
     @if (availabilityLoading) { <p class="mb-4 text-sm text-muted" role="status">Checking dentist availability...</p> }
     @if (availabilityError) { <p class="mb-4 rounded-xl bg-danger-soft p-4 text-sm text-danger" role="alert">{{ availabilityError }}</p> }
     <div [formGroup]="rxform" class="mt-5 border-t border-stroke pt-5">
+      <label class="mb-3 flex items-start gap-3 text-sm font-semibold text-ink">
+        <input type="checkbox" formControlName="isWalkIn" class="mt-1 size-4 accent-accent" aria-describedby="walk-in-visit-help">
+        This is a walk-in visit
+      </label>
+      <p id="walk-in-visit-help" class="ui-muted mb-5">Labels this visit as walk-in. Appointment confirmation and dentist availability still apply.</p>
       @if (bookingSchedule) {
         <h2 class="ui-section-title mb-4">Appointment schedule</h2>
         <div class="ui-form-grid">

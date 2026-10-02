@@ -1,4 +1,5 @@
 import { PageHeader } from '../../_shared/ui/page-header/page-header';
+import { isOnlineBookablePatient } from '../../_shared/model/user';
 import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subscription } from 'rxjs';
@@ -67,6 +68,7 @@ export class AppointmentPage {
   @Input() appointment!: Appointment
   @Input() dentalServices: DentalService[] = []
   user: UserSimple | null = null
+  get accountVerified(): boolean { return !!this.user && isOnlineBookablePatient(this.user); }
 
   isChangeBranch = false;
 
@@ -234,7 +236,7 @@ export class AppointmentPage {
   }
 
   get bookingUnavailable(): boolean {
-    return this.isLoading || this.availabilityLoading || this.confirmingClinic || this.savingReferral || !this.bookingSchedule ||
+    return !this.accountVerified || this.isLoading || this.availabilityLoading || this.confirmingClinic || this.savingReferral || !this.bookingSchedule ||
       (this.isChangeBranch && this.rxReferralForm.invalid);
   }
 

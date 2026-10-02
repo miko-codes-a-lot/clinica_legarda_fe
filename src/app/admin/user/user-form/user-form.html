@@ -1,5 +1,15 @@
 <app-form [form]="rxform" [fields]="userFields" [isLoading]="isLoading" (onSubmitEvent)="onSubmit()">
   <div [formGroup]="rxform">
+    @if (role.value === 'user') {
+      <section class="mt-5 rounded-xl border border-stroke bg-tint/40 p-5" aria-label="Patient intake">
+        <label class="flex items-start gap-3 text-sm font-semibold text-ink">
+          <input type="checkbox" formControlName="isWalkIn" class="mt-1 size-4 accent-accent" aria-describedby="walk-in-help">
+          Register as a walk-in patient
+        </label>
+        <p id="walk-in-help" class="ui-muted mt-3">Staff can book for a walk-in patient without online verification. Email and mobile are optional; enter real contact details when available.</p>
+        <p class="ui-muted mt-2">For online booking later, add an email the patient can access and give them their username and initial password. They sign in and verify the email OTP. Their existing records stay with this account.</p>
+      </section>
+    }
     @if (rxform.get('role')?.value === 'dentist') {
       <section class="mt-6 border-t border-stroke pt-6" aria-labelledby="dentist-schedule-title">
         <div class="ui-toolbar mb-4">

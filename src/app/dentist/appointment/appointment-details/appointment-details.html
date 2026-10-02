@@ -1,6 +1,7 @@
 <section class="ui-page max-w-6xl">
   <app-page-header title="Appointment details" eyebrow="Clinical workspace" description="Review the visit, record clinical notes, and manage its outcome.">
-    @if (appointment) { <app-status-badge [status]="appointment.status" /> }
+    @if (appointment) { <app-status-badge [status]="appointment.status" />
+      @if (appointment.isWalkIn) { <app-status-badge status="walk_in" /> } }
   </app-page-header>
   @if (loadError) {
     <div class="ui-card mb-5 flex flex-wrap items-center justify-between gap-3 border-danger-border bg-danger-soft p-4 text-sm text-danger" role="alert">

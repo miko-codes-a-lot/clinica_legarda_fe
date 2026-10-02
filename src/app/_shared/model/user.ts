@@ -6,6 +6,7 @@ export enum UserStatus {
   PENDING = 'pending',
   CONFIRMED = 'confirmed',
   REJECTED = 'rejected',
+  WALK_IN = 'walk_in',
 }
 
 export interface User {
@@ -26,6 +27,15 @@ export interface User {
   appointments: Appointment[]
   role: string
   status?: UserStatus
+  isWalkIn?: boolean
+}
+
+export function isStaffBookablePatient(patient: Pick<User, 'role' | 'status'>): boolean {
+  return patient.role === 'user' && (patient.status === UserStatus.CONFIRMED || patient.status === UserStatus.WALK_IN);
+}
+
+export function isOnlineBookablePatient(patient: Pick<User, 'role' | 'status'>): boolean {
+  return patient.role === 'user' && patient.status === UserStatus.CONFIRMED;
 }
 
 export interface ClinicMembership {

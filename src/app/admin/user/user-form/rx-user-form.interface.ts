@@ -18,4 +18,5 @@ export interface RxUserForm {
 
 export interface RxStaffUserForm extends Omit<RxUserForm, 'clinic'> {
   clinics: FormControl<string[]>
+  isWalkIn: FormControl<boolean>
 }

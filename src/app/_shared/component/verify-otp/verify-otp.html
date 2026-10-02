@@ -6,6 +6,7 @@
     </strong>
     .
   </p>
+  @if (theme !== 'admin') { <p class="ui-muted mb-5">Verifying this email confirms your patient account for online booking, including accounts first registered at the clinic.</p> }
   @if (rxform) {
   <form [formGroup]="rxform" (ngSubmit)="onSubmit()" class="space-y-5" [attr.aria-busy]="isLoading">
     <div>

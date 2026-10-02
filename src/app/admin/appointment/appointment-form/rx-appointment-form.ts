@@ -8,4 +8,5 @@ export interface RxAppointmentForm {
   date: FormControl<Date | null>
   time: FormControl<string>
   patientNotes: FormControl<string>;
+  isWalkIn: FormControl<boolean>;
 }

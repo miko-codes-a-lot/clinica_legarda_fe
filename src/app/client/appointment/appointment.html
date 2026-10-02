@@ -2,6 +2,8 @@
   <app-page-header title="Book an appointment" eyebrow="Patient portal" description="Choose your clinic, services, and an available schedule for your visit." />
   @if (!user) {
     <div class="ui-card"><app-empty-state title="Sign in to book an appointment" description="Please sign in to continue." icon="login"><a routerLink="/app/login" class="ui-button">Proceed to login</a></app-empty-state></div>
+  } @else if (!accountVerified) {
+    <div class="ui-card"><app-empty-state title="Verify your patient account" description="Sign in again and complete the email OTP before booking online. If the clinic created your account without an email, ask staff to add one you can access." icon="verified_user"><a routerLink="/app/login" class="ui-button">Sign in to verify</a></app-empty-state></div>
   } @else {
     <section class="ui-card p-5 sm:p-7" aria-label="Appointment booking form">
       <div class="mb-5 border-b border-stroke pb-5"><h2 class="ui-section-title">Visit details</h2><p class="ui-muted mt-2 text-sm">Select up to three services per visit. Available dates and times depend on the selected dentist and total service duration.</p></div>

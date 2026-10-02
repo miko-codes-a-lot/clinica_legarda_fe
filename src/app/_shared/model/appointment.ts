@@ -36,6 +36,7 @@ export interface Appointment {
   startTime: string
   endTime: string
   status: AppointmentStatus
+  isWalkIn?: boolean
   notes: AppointmentNote
   history: AppointmentHistory[],
   createdBy?: string

@@ -1,6 +1,6 @@
 import { ValidatorFn } from '@angular/forms';
 
-export type FieldType = 'text' | 'email' | 'password' | 'number' | 'select';
+export type FieldType = 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea';
 
 export interface FormField {
   name: string;            // formControlName
@@ -14,4 +14,5 @@ export interface FormField {
   disabled?: boolean;
   readonly?: boolean;
   maxlength?: number;
+  placeholder?: string;
 }

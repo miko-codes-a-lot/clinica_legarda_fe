@@ -9,6 +9,7 @@ export interface AppointmentPayload {
     startTime: string
     endTime: string
     status: AppointmentStatus
+    isWalkIn?: boolean
     notes: AppointmentNote
     history?: AppointmentHistory[]
     referral?: string

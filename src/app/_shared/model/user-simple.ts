@@ -20,4 +20,5 @@ export interface UserSimple {
     createdAt: string 
     updatedAt: string
     status?: UserStatus
+    isWalkIn?: boolean
 }
