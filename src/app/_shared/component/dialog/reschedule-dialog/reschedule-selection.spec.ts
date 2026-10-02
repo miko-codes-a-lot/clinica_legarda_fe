@@ -9,6 +9,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Component } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { UserStatus } from '../../../model/user';
+import { appConfig } from '../../../../app.config';
 import { RescheduleDialogComponent, RescheduleDialogData, RescheduleDialogResult } from './reschedule-dialog.component';
 
 @Component({ template: '' })
@@ -22,8 +23,10 @@ describe('Rescheduling date and time selection', () => {
 
   async function openDialog() {
     TestBed.configureTestingModule({
-      imports: [DialogHost, RescheduleDialogComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      // Importing the dialog here hoists its date adapter into TestBed's root
+      // injector and hides provider-scope failures in the real lazy dialog.
+      imports: [DialogHost],
+      providers: [...appConfig.providers, provideHttpClient(), provideHttpClientTesting()],
     });
     const fixture = TestBed.createComponent(DialogHost);
     const data: RescheduleDialogData = {
@@ -38,7 +41,7 @@ describe('Rescheduling date and time selection', () => {
     });
     fixture.detectChanges();
     http = TestBed.inject(HttpTestingController);
-    http.expectOne('/appointments/availability/dentist-1').flush([]);
+    http.expectOne(request => request.url.endsWith('/appointments/availability/dentist-1')).flush([]);
     fixture.detectChanges();
     return TestbedHarnessEnvironment.documentRootLoader(fixture);
   }
