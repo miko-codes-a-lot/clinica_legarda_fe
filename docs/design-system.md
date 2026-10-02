@@ -54,3 +54,9 @@ Use `bg-surface`, `text-ink`, `text-muted`, `text-accent`, `text-accent-strong`,
 The toggle is included once in public/mobile navigation and shared staff topbar. Standalone staff auth uses `AuthLayout.showThemeToggle`; patient auth already has the public header. Tests cover preference state and failure boundaries; verify visual contrast, calendar/dialog/menu/table/chart surfaces in both themes in the browser.
 
 Patient intake uses the shared staff `UserForm` for admin and super admin: `isWalkIn` starts unchecked and makes patient contacts optional while retaining validation of supplied contacts. `PatientAccountAccess` shares account status and later email-OTP activation guidance between both user details screens. Staff booking uses `isStaffBookablePatient`; patient booking uses `isOnlineBookablePatient`. Appointment `isWalkIn` labels a visit independently of account confirmation.
+
+## Care workspace
+
+The shared `care` routes serve scoped staff patient records, queue/check-in, visit records and treatment cases. `PatientLedgerView` serves staff manual entry forms and patient read-only balances from different projected API endpoints. Clinic closures reuse the same availability rules for booking and rescheduling. Use semantic `ui-card`, `ui-table`, input, alert and button styles for both themes; never render internal notes in the patient portal.
+
+Patient My care receives only published completed summaries and public case/session fields. Print summary isolates the selected visit and uses paper colors. Installment amounts use integer PHP centavos through the exact decimal parser and formatter; do not use floating-point peso calculations.

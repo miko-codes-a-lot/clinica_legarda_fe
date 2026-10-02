@@ -77,3 +77,10 @@
   html, html[data-theme="dark"] { color-scheme: light !important; }
   body { background: white; color: #142c2b; }
 }
+
+@media print {
+  body:has(app-my-care[data-printing="true"]) app-client-nav,
+  body:has(app-my-care[data-printing="true"]) app-client > footer,
+  body:has(app-my-care[data-printing="true"]) app-chatbot,
+  body:has(app-my-care[data-printing="true"]) .skip-link { display: none !important; }
+}

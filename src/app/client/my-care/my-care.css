@@ -1,0 +1,7 @@
+@media print {
+  .care-screen-only { display: none !important; }
+  :host([data-printing="true"]) .care-summary:not(.care-print-selected) { display: none !important; }
+  .care-summary { background: white !important; color: black !important; border: 0; box-shadow: none; padding: 0; }
+  .care-summary * { color: black !important; }
+  .care-summary h3 { margin-top: 1rem; }
+}

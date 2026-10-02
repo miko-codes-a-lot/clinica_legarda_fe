@@ -71,6 +71,11 @@ export const CLIENT_ROUTES: Routes = [
         loadComponent: () => import('./profile/profile').then((m) => m.Profile),
       },
       {
+        path: 'my-care',
+        canActivate: [AuthGuard],
+        loadComponent: () => import('./my-care/my-care').then(m => m.MyCare),
+      },
+      {
         path: 'my-appointment',
         canActivate: [AuthGuard],
         loadComponent: () =>
