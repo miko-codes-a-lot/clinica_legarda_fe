@@ -45,7 +45,7 @@ export function buildStaffUserPayload(value: StaffUserFormValue): StaffUserPaylo
     address: value.address,
     username: value.username,
     ...(value.password ? { password: value.password } : {}),
-    clinics: isDentist ? value.clinics : [],
+    clinics: isDentist || value.role === 'admin' ? value.clinics : [],
     operatingHours: isDentist ? value.operatingHours : [],
     role: value.role,
   };

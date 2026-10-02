@@ -45,13 +45,22 @@ describe('staff user payload', () => {
     expect(payload.password).toBeUndefined();
   });
 
-  it('clears membership and dentist hours for a globally authorized admin role', () => {
+  it('preserves admin memberships without dentist operating hours', () => {
     const payload = buildStaffUserPayload({
       ...profile,
       password: '',
       role: 'admin',
-      clinics: ['main'],
+      clinics: ['main', 'annex'],
       operatingHours,
+    });
+
+    expect(payload.clinics).toEqual(['main', 'annex']);
+    expect(payload.operatingHours).toEqual([]);
+  });
+
+  it('clears staff memberships when switching to a patient', () => {
+    const payload = buildStaffUserPayload({
+      ...profile, role: 'user', clinics: ['main'], operatingHours,
     });
 
     expect(payload.clinics).toEqual([]);

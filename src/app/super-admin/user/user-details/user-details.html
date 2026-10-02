@@ -8,7 +8,7 @@
 
   <app-list [data]="displayUser">
     <!-- custom -->
-    @if (user.role === 'dentist') {
+    @if (user.role === 'dentist' || user.role === 'admin') {
       <div class="custom-list">
         <mat-list-item>
           <span class="item-title" matListItemTitle>
@@ -20,13 +20,14 @@
           </span>
           <span class="item-line" matListItemLine>Clinics</span>
         </mat-list-item>
-        <b></b>
-        <mat-list-item>
-          <span class="item-title" matListItemTitle>Schedule:</span>
-          @for (oh of user.operatingHours; track oh.day) {
-            <span class="item-line" matListItemLine>{{ oh.day }} - {{ oh.startTime }} - {{ oh.endTime }}</span>
-          }
-        </mat-list-item>
+        @if (user.role === 'dentist') {
+          <mat-list-item>
+            <span class="item-title" matListItemTitle>Schedule:</span>
+            @for (oh of user.operatingHours; track oh.day) {
+              <span class="item-line" matListItemLine>{{ oh.day }} - {{ oh.startTime }} - {{ oh.endTime }}</span>
+            }
+          </mat-list-item>
+        }
       </div>
     }
   </app-list>

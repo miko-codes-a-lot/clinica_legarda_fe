@@ -109,3 +109,54 @@ describe('staff user schedule form', () => {
     expect(component.rxform.invalid).toBeTrue();
   });
 });
+
+describe('admin clinic assignment form', () => {
+  function adminForm(assignments: string[], canAssignAdminClinics: boolean): UserForm {
+    const component = Object.assign(new UserForm(new FormBuilder(), {} as ClinicService), {
+      user: { ...dentist(assignments), role: 'admin' },
+      clinics: [clinic('clinic-a', 'monday'), clinic('clinic-b', 'tuesday')],
+      canAssignAdminClinics,
+    });
+    component.ngOnInit();
+    return component;
+  }
+
+  it('offers a clinic multiselect for a super admin editing an admin', () => {
+    const component = adminForm(['clinic-a'], true);
+    expect(component.userFields.find(field => field.name === 'clinics')).toEqual(
+      jasmine.objectContaining({ multiple: true, options: [
+        { value: 'clinic-a', label: 'clinic-a' },
+        { value: 'clinic-b', label: 'clinic-b' },
+      ] }),
+    );
+    expect(component.operatingHours.disabled).toBeTrue();
+  });
+
+  it('requires one or more clinics when a super admin assigns an admin', () => {
+    const component = adminForm([], true);
+    expect(component.rxform.invalid).toBeTrue();
+    component.assignedClinics.setValue(['clinic-a', 'clinic-b']);
+    expect(component.rxform.valid).toBeTrue();
+  });
+
+  it('submits all selected clinics and then the exact remaining assignment', () => {
+    const component = adminForm(['clinic-a'], true);
+    const submitted: string[][] = [];
+    component.onSubmitEvent.subscribe(user => submitted.push(user.clinics ?? []));
+    component.assignedClinics.setValue(['clinic-a', 'clinic-b']);
+    component.onSubmit();
+    component.assignedClinics.setValue(['clinic-b']);
+    component.onSubmit();
+    expect(submitted).toEqual([['clinic-a', 'clinic-b'], ['clinic-b']]);
+  });
+
+  it('hides admin assignment controls from an ordinary admin and preserves saved memberships', () => {
+    const component = adminForm(['clinic-a', 'clinic-b'], false);
+    expect(component.userFields.find(field => field.name === 'clinics')).toBeUndefined();
+    const submitted: string[][] = [];
+    component.onSubmitEvent.subscribe(user => submitted.push(user.clinics ?? []));
+    component.firstName.setValue('Updated');
+    component.onSubmit();
+    expect(submitted).toEqual([['clinic-a', 'clinic-b']]);
+  });
+});

@@ -30,6 +30,7 @@ export class UserForm implements OnInit, OnChanges {
   @Input() clinics: Clinic[] = [];
   @Input() user: User = this.getDefaultUser();
   @Input() days: Day[] = [];
+  @Input() canAssignAdminClinics = false;
 
   rxform!: FormGroup<RxStaffUserForm>;
   userFields: FormField[] = [];
@@ -91,7 +92,9 @@ export class UserForm implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['clinics']) {
+    if (changes['canAssignAdminClinics'] && this.rxform) {
+      this.syncRoleState();
+    } else if (changes['clinics']) {
       this.buildUserFields();
     }
   }
@@ -121,7 +124,7 @@ export class UserForm implements OnInit, OnChanges {
       }
     ];
 
-    if (role === 'dentist') {
+    if (role === 'dentist' || (role === 'admin' && this.canAssignAdminClinics)) {
       fields.push({
         name: 'clinics',
         label: 'Clinics',
@@ -140,11 +143,15 @@ export class UserForm implements OnInit, OnChanges {
   }
 
   private syncRoleState(): void {
-    if (this.role.value === 'dentist') {
+    const isDentist = this.role.value === 'dentist';
+    if (isDentist || (this.role.value === 'admin' && this.canAssignAdminClinics)) {
       this.assignedClinics.setValidators(Validators.required);
-      this.operatingHours.enable({ emitEvent: false });
     } else {
       this.assignedClinics.clearValidators();
+    }
+    if (isDentist) {
+      this.operatingHours.enable({ emitEvent: false });
+    } else {
       this.operatingHours.disable({ emitEvent: false });
     }
     this.assignedClinics.updateValueAndValidity({ emitEvent: false });
