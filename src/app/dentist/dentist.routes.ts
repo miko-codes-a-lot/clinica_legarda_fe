@@ -7,6 +7,7 @@ export const DENTIST_ROUTES: Routes = [
     path: '',
     component: Dentist,
     children: [
+      { path: 'care', canActivate: [AuthGuard], data: { role: 'dentist' }, loadChildren: () => import('../care/care.routes').then(m => m.CARE_ROUTES) },
       {
         path: '',
         redirectTo: '/dentist/homepage',

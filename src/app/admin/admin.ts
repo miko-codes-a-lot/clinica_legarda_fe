@@ -30,6 +30,7 @@ export class Admin {
   showSideNav = true;
 
   menuItems = [
+    { label: 'Patient records', icon: 'folder_shared', link: '/admin/care/patients' },
     { label: 'Dashboard', icon: 'dashboard', link: '/admin/dashboard' },
     { label: 'User', icon: 'group', link: '/admin/user' },
     { label: 'Clinic', icon: 'local_hospital', link: '/admin/clinic' },

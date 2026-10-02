@@ -8,6 +8,7 @@ export const ADMIN_ROUTES: Routes = [
     path: '',
     component: Admin,
     children: [
+      { path: 'care', canActivate: [AuthGuard], data: { role: 'admin' }, loadChildren: () => import('../care/care.routes').then(m => m.CARE_ROUTES) },
       {
         path: 'login',
         component: LoginAdmin

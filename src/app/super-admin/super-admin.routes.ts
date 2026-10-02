@@ -7,6 +7,7 @@ export const SUPER_ADMIN_ROUTES: Routes = [
     path: '',
     component: SuperAdmin,
     children: [
+      { path: 'care', canActivate: [AuthGuard], data: { role: 'super-admin' }, loadChildren: () => import('../care/care.routes').then(m => m.CARE_ROUTES) },
       {
         path: '',
         redirectTo: '/super-admin/dashboard',

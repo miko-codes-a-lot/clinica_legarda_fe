@@ -23,6 +23,7 @@ export class Dentist {
   user: UserSimple | null = null
 
   menuItems = [
+    { label: 'Patient records', icon: 'folder_shared', link: '/dentist/care/patients' },
     { label: 'Home', icon: 'home', link: '/dentist/homepage' },
     { label: 'Profile', icon: 'person', link: '/dentist/profile' },
     { label: 'Appointments', icon: 'event', link: '/dentist/appointment' },

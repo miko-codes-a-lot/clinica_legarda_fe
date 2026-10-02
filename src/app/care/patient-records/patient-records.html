@@ -1,0 +1,20 @@
+<div class="ui-page">
+  <app-page-header title="Patient records" eyebrow="Care workspace" description="Find an identified patient and open their clinic care history." />
+  <form class="ui-card mb-5 grid gap-4 p-5 md:grid-cols-[1fr_16rem_auto] md:items-end" [formGroup]="form" (ngSubmit)="search()">
+    <label class="block"><span class="ui-label">Patient search</span><input class="ui-input mt-2 w-full" formControlName="search" maxlength="100" placeholder="Name, username, phone, email or record ID" type="search" /></label>
+    <label class="block"><span class="ui-label">Clinic</span><select class="ui-input mt-2 w-full" formControlName="clinic"><option value="">All accessible clinics</option>@for (clinic of clinics; track clinic._id) { <option [value]="clinic._id">{{ clinic.name }}</option> }</select></label>
+    <button class="ui-button" type="submit" [disabled]="loading">Search records</button>
+  </form>
+  @if (clinicError) { <p role="alert" class="ui-alert-error mb-4">{{ clinicError }}</p> }
+  @if (error) { <p role="alert" class="ui-alert-error mb-4">{{ error }}</p> }
+  @if (loading) { <p role="status" class="ui-muted py-8">Loading patient records…</p> }
+  @else if (!error && !result.items.length) { <app-empty-state title="No patients found" description="Try a different search or clinic. Only patients within your access are shown." icon="person_search" /> }
+  @else if (!error) {
+    <div class="ui-card overflow-x-auto">
+      <table class="ui-table w-full"><caption class="sr-only">Searchable patient records</caption><thead><tr><th>Patient</th><th>Contact</th><th>Account</th><th><span class="sr-only">Actions</span></th></tr></thead>
+        <tbody>@for (patient of result.items; track patient._id) { <tr><td><p class="font-semibold text-ink">{{ patient.firstName }} {{ patient.lastName }}</p><p class="ui-muted text-xs">{{ patient.username }} · {{ patient._id }}</p></td><td><p>{{ patient.mobileNumber || 'No phone recorded' }}</p><p class="ui-muted">{{ patient.emailAddress || 'No email recorded' }}</p></td><td>{{ patient.status | titlecase }}@if (patient.isWalkIn) { <p class="ui-muted text-xs">Walk-in registration</p> }</td><td><a class="ui-button-secondary whitespace-nowrap" [routerLink]="[base, 'patients', patient._id]" [queryParams]="form.controls.clinic.value ? { clinic: form.controls.clinic.value } : {}">Open record</a></td></tr> }</tbody>
+      </table>
+    </div>
+    <nav aria-label="Patient record pages" class="mt-4 flex flex-wrap items-center justify-between gap-3"><p class="ui-muted">{{ result.total }} patients · Page {{ result.page }} of {{ lastPage }}</p><div class="flex gap-2"><button class="ui-button-secondary" type="button" [disabled]="result.page <= 1" (click)="search(result.page - 1)">Previous</button><button class="ui-button-secondary" type="button" [disabled]="result.page >= lastPage" (click)="search(result.page + 1)">Next</button></div></nav>
+  }
+</div>
