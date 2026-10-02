@@ -1,0 +1,45 @@
+/* Material owns interaction and focus; shared tokens own the visual language. */
+html {
+  --mat-sys-primary: var(--color-brand-600);
+  --mat-sys-on-primary: #fff;
+  --mat-sys-primary-container: var(--color-brand-100);
+  --mat-sys-on-primary-container: var(--color-brand-900);
+  --mat-sys-secondary: var(--color-brand-700);
+  --mat-sys-tertiary: var(--color-brand-600);
+  --mat-sys-surface: #fff;
+  --mat-sys-surface-container: var(--color-canvas);
+  --mat-sys-surface-container-low: #fff;
+  --mat-sys-surface-container-high: var(--color-canvas);
+  --mat-sys-on-surface: var(--color-ink);
+  --mat-sys-on-surface-variant: var(--color-muted);
+  --mat-sys-outline: #c3d1ca;
+  --mat-sys-outline-variant: var(--color-stroke);
+  --mat-sys-body-large-font: var(--font-sans);
+  --mat-sys-body-medium-font: var(--font-sans);
+  --mat-sys-label-large-font: var(--font-sans);
+  --mat-sys-title-medium-font: var(--font-sans);
+}
+.mat-mdc-form-field { width: 100%; font-size: 14px; --mat-form-field-outlined-container-shape: 12px; }
+.mat-mdc-form-field .mdc-notched-outline__notch { border-right-width: 0 !important; }
+.mat-mdc-text-field-wrapper { background: #fff; }
+.mat-mdc-form-field .mdc-text-field--outlined { border-radius: 12px; }
+.mat-mdc-form-field .mdc-notched-outline { --mdc-outlined-text-field-container-shape: 12px; }
+.mat-mdc-form-field-infix { min-width: 0; }
+.mat-mdc-raised-button, .mat-mdc-unelevated-button, .mat-mdc-outlined-button { border-radius: 10px; min-height: 42px; font-weight: 600; letter-spacing: 0; }
+.mat-mdc-raised-button:not(:disabled), .mat-mdc-unelevated-button:not(:disabled) { --mdc-filled-button-container-color: var(--color-brand-600); --mdc-filled-button-label-text-color: white; --mdc-protected-button-container-color: var(--color-brand-600); --mdc-protected-button-label-text-color: white; box-shadow: none; }
+.mat-mdc-table { background: transparent; }
+.mat-mdc-header-row { height: 46px; background: var(--color-canvas); }
+.mat-mdc-header-cell { color: var(--color-muted); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.mat-mdc-row { height: 64px; }
+.mat-mdc-cell { color: var(--color-ink); font-size: 13px; }
+.mat-mdc-header-cell, .mat-mdc-cell { border-bottom-color: var(--color-stroke); padding: 12px 18px; }
+.mat-mdc-paginator { background: transparent; color: var(--color-muted); }
+.mat-mdc-dialog-surface { border-radius: 20px; background: white; }
+.mat-mdc-dialog-title { font-weight: 600; letter-spacing: -.025em; }
+.mat-mdc-menu-panel { border: 1px solid var(--color-stroke); border-radius: 14px; background: white; }
+.mat-mdc-tab-header { --mat-tab-header-active-label-text-color: var(--color-brand-700); --mdc-tab-indicator-active-indicator-color: var(--color-brand-600); }
+.mat-mdc-list-item { --mdc-list-list-item-label-text-color: var(--color-ink); }
+@media (max-width: 640px) {
+  .mat-mdc-header-cell, .mat-mdc-cell { padding: 10px 12px; }
+  .mat-mdc-paginator-container { flex-wrap: wrap; justify-content: center; }
+}

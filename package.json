@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:business": "ng test --watch=false --browsers=ChromeHeadless --include=src/app/_shared/model/staff-user-payload.spec.ts --include=src/app/_shared/model/clinic-membership.spec.ts --include=src/app/_shared/model/appointment-actions.spec.ts --include=src/app/_shared/guard/auth-guard.spec.ts --include=src/app/_shared/service/auth-service.spec.ts --include=src/app/utils/forms/password-policy.integration.spec.ts --include=src/app/_shared/component/dialog/reschedule-dialog/reschedule-selection.spec.ts --include=src/app/_shared/component/dialog/reschedule-dialog/reschedule-dialog.component.spec.ts --include=src/app/admin/user/user-form/user-form.spec.ts --include=src/app/client/client.routes.spec.ts --include=src/app/client/user-settings/user-settings-update/user-settings-update.spec.ts --include=src/app/_shared/model/booking-availability.spec.ts --include=src/app/_shared/model/appointment-filters.spec.ts --include=src/app/_shared/staff-appointment-list/staff-appointment-list-state.spec.ts --include=src/app/admin/dashboard/dashboard-index/dashboard-report.spec.ts"
   },
   "private": true,
   "dependencies": {
@@ -31,6 +32,7 @@
     "@angular/build": "^20.0.1",
     "@angular/cli": "^20.0.1",
     "@angular/compiler-cli": "^20.0.0",
+    "@tailwindcss/postcss": "4.3.3",
     "@types/chart.js": "^2.9.41",
     "@types/jasmine": "~5.1.0",
     "@types/socket.io-client": "^1.4.36",
@@ -40,6 +42,8 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "postcss": "8.5.6",
+    "tailwindcss": "4.3.3",
     "typescript": "~5.8.2"
   }
 }
