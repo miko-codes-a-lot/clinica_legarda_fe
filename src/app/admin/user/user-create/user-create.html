@@ -1,9 +1,17 @@
 <section class="ui-page max-w-4xl">
-  <app-page-header title="Create user" eyebrow="Management" description="Manage staff details, roles, and clinic assignments." />
-  <app-user-form
-    [isLoading]="isLoading"
-    [days]="days"
-    [clinics]="clinics"
-    (onSubmitEvent)="onSubmit($event)">
-  </app-user-form>
+  <app-page-header title="Create user" eyebrow="Management" description="Manage users in your currently assigned clinics." />
+  @if (loadError) {
+    <p class="ui-card p-5 text-sm text-red-800" role="alert">{{ loadError }}</p>
+  } @else if (isLoading && clinics.length === 0) {
+    <p class="ui-card p-5 text-sm text-muted" role="status">Loading user options…</p>
+  } @else if (clinics.length === 0) {
+    <div class="ui-card"><app-empty-state title="No assigned clinics" description="Ask a super admin to assign a clinic before creating users." icon="domain" /></div>
+  } @else {
+    <app-user-form
+      [isLoading]="isLoading"
+      [days]="days"
+      [clinics]="clinics"
+      (onSubmitEvent)="onSubmit($event)">
+    </app-user-form>
+  }
 </section>

@@ -6,7 +6,7 @@ import { DentistDirectoryEntry } from './user-directory';
 
 /** The availability endpoint intentionally excludes patient and clinical details. */
 export interface AppointmentAvailability {
-  _id: string;
+  _id?: string;
   date: Date | string;
   startTime: string;
   endTime: string;
@@ -66,7 +66,7 @@ export function createBookingSchedule(
   });
   return {
     operatingHours,
-    appointments: appointments.filter(appointment => appointment._id !== excludeAppointmentId),
+    appointments: appointments.filter(appointment => !excludeAppointmentId || appointment._id !== excludeAppointmentId),
     appointmentBufferMinutes: dentist.appointmentBufferMinutes ?? 15,
     maxWorkingMinutesPerDay: dentist.maxWorkingMinutesPerDay ?? 480,
   };

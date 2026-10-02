@@ -1,4 +1,5 @@
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
+import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
 import { Component, OnInit } from '@angular/core';
 import { UserForm } from '../user-form/user-form';
 import { User } from '../../../_shared/model/user';
@@ -14,12 +15,13 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-user-update',
-  imports: [PageHeader, UserForm],
+  imports: [PageHeader, EmptyState, UserForm],
   templateUrl: './user-update.html',
   styleUrl: './user-update.css'
 })
 export class UserUpdate implements OnInit {
   isLoading = false
+  loadError = ''
   id!: string
   user!: User
   days: Day[] = []
@@ -41,7 +43,7 @@ export class UserUpdate implements OnInit {
     this.id = this.route.snapshot.params['id']
 
     forkJoin({
-      clinics: this.clinicService.getAll(),
+      clinics: this.clinicService.getAccessible(),
       user: this.userService.getOne(this.id),
       days: this.dayService.getAll(),
     }).subscribe({
@@ -50,9 +52,11 @@ export class UserUpdate implements OnInit {
         this.user = user
         this.days = days
       },
-      error: (e) => this.alertService.error(e.error.message),
-      complete: () => this.isLoading = false,
-    })
+      error: (e) => {
+        this.loadError = e.error?.message || 'Unable to load user details.';
+        this.alertService.error(this.loadError);
+      },
+    }).add(() => this.isLoading = false)
   }
 
   onSubmit(user: UserPayload) {

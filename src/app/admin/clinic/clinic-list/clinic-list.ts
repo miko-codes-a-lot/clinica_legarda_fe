@@ -45,7 +45,7 @@ export class ClinicList implements OnInit {
   ngOnInit(): void {
     this.isLoading = true
 
-    this.clinicService.getAll().subscribe({
+    this.clinicService.getAccessible().subscribe({
       next: (data) => {
         this.dataSource.data = data;
       },

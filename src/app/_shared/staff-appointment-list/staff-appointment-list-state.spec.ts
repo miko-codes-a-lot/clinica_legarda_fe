@@ -22,7 +22,7 @@ describe('Staff appointment account state', () => {
     TestBed.configureTestingModule({ providers: [
       { provide: AuthService, useValue: { currentUser$: users.asObservable() } },
       { provide: Router, useValue: {} },
-      { provide: ClinicService, useValue: { getAll: () => of([appointment.clinic]) } },
+      { provide: ClinicService, useValue: { getAccessible: () => of([appointment.clinic]) } },
       { provide: AppointmentService, useValue: { getAll: () => {
         const request = new Subject<Appointment[]>();
         requests.push(request);

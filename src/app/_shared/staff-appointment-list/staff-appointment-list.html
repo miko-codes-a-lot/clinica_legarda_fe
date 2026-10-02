@@ -1,6 +1,6 @@
 <app-generic-table
   title="Appointments"
-  description="Review appointment requests and filter by clinic or status."
+  [description]="scopeDescription"
   [displayedColumns]="displayedColumns"
   [columnDefs]="columnDefs"
   [dataSource]="dataSource"
@@ -15,7 +15,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Clinic</mat-label>
     <mat-select [value]="selectedClinic" (selectionChange)="selectClinic($event.value)">
-      <mat-option value="all">All clinics</mat-option>
+      <mat-option value="all">{{ allClinicsLabel }}</mat-option>
       @for (clinic of clinics; track clinic._id) {
         <mat-option [value]="clinic._id">{{ clinic.name }}</mat-option>
       }
@@ -33,5 +33,8 @@
   <button class="ui-button-secondary" type="button" (click)="refresh()" [disabled]="isLoading">Refresh</button>
 </div>
 @if (loadError) { <p role="alert">{{ loadError }}</p> }
+@if (area === 'admin' && !isLoading && !loadError && clinics.length === 0) {
+  <p class="ui-muted mt-3 text-sm" role="status">No assigned clinics. Ask a super admin to assign a clinic before accessing appointments.</p>
+}
   </section>
 </app-generic-table>

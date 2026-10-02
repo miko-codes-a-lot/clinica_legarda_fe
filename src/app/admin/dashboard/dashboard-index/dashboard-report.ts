@@ -110,8 +110,8 @@ export function createDashboardReport(input: DashboardReportInput): DashboardRep
         columnWidths: [0.12, 0.28, 0.35, 0.25],
       },
       {
-        title: 'Recent Notifications (account-wide)',
-        scope: 'Latest 10 notifications for this account; independent of selected clinic',
+        title: 'Recent Notifications (authorized clinics)',
+        scope: 'Latest 10 notifications for this account within its authorized clinics; independent of selected clinic',
         headers: ['Type', 'Message', 'Date', 'Status'],
         rows: input.notifications.map(row => [row.type, row.message, row.timestamp, row.status]),
         columnWidths: [0.17, 0.45, 0.25, 0.13],

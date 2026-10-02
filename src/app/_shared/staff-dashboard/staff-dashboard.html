@@ -8,14 +8,14 @@
     </button>
     <div class="relative">
       <button mat-icon-button type="button" (click)="toggleNotifications()" class="ui-icon-button"
-        aria-label="Toggle account-wide notifications" [attr.aria-expanded]="showNotifications" aria-controls="dashboard-notifications">
+        [attr.aria-label]="'Toggle ' + notificationScope.toLowerCase()" [attr.aria-expanded]="showNotifications" aria-controls="dashboard-notifications">
         <mat-icon [matBadge]="unreadNotificationsCount$ | async" matBadgeColor="warn"
           [matBadgeHidden]="(unreadNotificationsCount$ | async) === 0">notifications</mat-icon>
       </button>
-      <section *ngIf="showNotifications" id="dashboard-notifications" aria-label="Account-wide notifications"
+      <section *ngIf="showNotifications" id="dashboard-notifications" [attr.aria-label]="notificationScope"
         class="ui-card absolute right-0 top-full z-40 mt-3 w-[min(24rem,calc(100vw-3rem))] overflow-hidden">
         <div class="flex items-center justify-between gap-3 border-b border-brand-100 px-5 py-4">
-          <h2 class="ui-section-title">Account-wide notifications</h2>
+          <h2 class="ui-section-title">{{ notificationScope }}</h2>
           <button mat-icon-button type="button" (click)="toggleNotifications()" aria-label="Close notifications"><mat-icon>close</mat-icon></button>
         </div>
         <div class="max-h-96 overflow-y-auto" *ngIf="notifications$ | async as notifications">
@@ -51,14 +51,16 @@
 
   <section class="ui-card mb-6 p-5" aria-label="Report clinic scope">
     <div class="ui-toolbar">
-      <div><h2 class="ui-section-title">Weekly overview</h2><p class="ui-muted mt-1 text-sm">Appointment activity for the selected clinic scope.</p></div>
+      <div><h2 class="ui-section-title">Weekly overview</h2><p class="ui-muted mt-1 text-sm">{{ area === 'admin' ? 'Reports include only your currently assigned clinics.' : 'Appointment activity for the selected clinic scope.' }}</p></div>
       <mat-form-field appearance="outline" class="w-full sm:w-72">
         <mat-label>Select clinic</mat-label>
-        <mat-select [(value)]="selectedClinic" (selectionChange)="onClinicChange($event.value)">
+        <mat-select [(value)]="selectedClinic" (selectionChange)="onClinicChange($event.value)" [disabled]="clinicsLoading || !!clinicError || hasNoAssignedClinics">
           <mat-option *ngFor="let clinic of clinics" [value]="clinic._id">{{ clinic.name }}</mat-option>
         </mat-select>
       </mat-form-field>
     </div>
+    <p *ngIf="clinicsLoading" class="ui-muted mt-3 text-sm" role="status">Loading clinic choices…</p>
+    <app-empty-state *ngIf="hasNoAssignedClinics" title="No assigned clinics" description="Ask a super admin to assign a clinic before accessing reports, users, and appointments." icon="domain" />
     <p *ngIf="weeklyReport?.totalAppointments === 0" class="ui-muted mt-3 text-sm" role="status">No appointments scheduled for this clinic scope this week.</p>
   </section>
 
@@ -114,7 +116,7 @@
     </section>
     <ng-container *ngIf="notifications$ | async as notifications">
       <section class="ui-card min-w-0 overflow-hidden" *ngIf="!showNotifications">
-        <div class="border-b border-brand-100 p-5"><p class="ui-eyebrow mb-2">Account-wide</p><h2 class="ui-section-title">Recent notifications</h2></div>
+        <div class="border-b border-brand-100 p-5"><p class="ui-eyebrow mb-2">{{ area === 'admin' ? 'Assigned clinics' : 'Account-wide' }}</p><h2 class="ui-section-title">Recent notifications</h2></div>
         <div class="dashboard-table-scroll" *ngIf="notifications.length > 0">
           <mat-table [dataSource]="notifications" class="dashboard-table">
             <ng-container matColumnDef="type"><mat-header-cell *matHeaderCellDef>Type</mat-header-cell><mat-cell *matCellDef="let notification"><button type="button" class="ui-button-ghost px-0 text-left text-xs" (click)="redirectToDetails(notification.link)">{{ formatNotificationType(notification.type) }}</button></mat-cell></ng-container>

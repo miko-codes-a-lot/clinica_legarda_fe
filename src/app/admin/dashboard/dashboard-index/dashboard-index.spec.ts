@@ -53,14 +53,14 @@ describe('Staff report values and scope', () => {
     expect(formatter).toHaveBeenCalledWith('en-US', jasmine.objectContaining({ timeZone: 'UTC' }));
   });
 
-  it('preserves every today queue entry, clinic context and account-wide notifications', () => {
+  it('preserves every today queue entry, clinic context and authorized account notifications', () => {
     const queue = Array.from({ length: 8 }, (_, index) => ({ ...input.queue[0], patient: `Patient ${index}` }));
     const reportInput = { ...input, clinic: 'All clinics', queue, metrics: { ...input.metrics, queueCount: 8 } };
     expect(table("Today's Appointment Queue", reportInput).rows.length).toBe(8);
     expect(table("Today's Appointment Queue", reportInput).rows[7]).toEqual(['09:00', 'Patient 7', 'Cleaning, Checkup', 'Legarda Clinic']);
     expect(table("Today's Appointment Queue", reportInput).scope).toContain('Sep 8, 2026; confirmed appointments');
-    expect(table('Recent Notifications (account-wide)', reportInput).rows[0]).toEqual(['Status Update', 'Notice', 'Sep 8', 'Unread']);
-    expect(table('Recent Notifications (account-wide)', reportInput).scope).toContain('independent of selected clinic');
+    expect(table('Recent Notifications (authorized clinics)', reportInput).rows[0]).toEqual(['Status Update', 'Notice', 'Sep 8', 'Unread']);
+    expect(table('Recent Notifications (authorized clinics)', reportInput).scope).toContain('independent of selected clinic');
   });
 
   it('keeps empty distributions and seven zero days without inventing completed appointments', () => {

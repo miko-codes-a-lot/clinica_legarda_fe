@@ -46,7 +46,7 @@ export class AppointmentCreate {
 
     forkJoin({
       services: this.dentalServicesService.getAll(),
-      clinics: this.clinicService.getAll(),
+      clinics: this.clinicService.getAccessible(),
       patients: this.userService.getPatients(),
     }).subscribe({
       next: ({ services, clinics, patients }) => {

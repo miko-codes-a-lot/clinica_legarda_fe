@@ -36,6 +36,12 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
   clinics: Clinic[] = [];
   selectedClinic = 'all';
   selectedStatus: 'all' | AppointmentStatus = 'all';
+  get allClinicsLabel(): string { return this.area === 'admin' ? 'All assigned clinics' : 'All clinics'; }
+  get scopeDescription(): string {
+    return this.area === 'admin'
+      ? 'Review appointments in your currently assigned clinics and filter by clinic or status.'
+      : 'Review appointment requests and filter by clinic or status.';
+  }
   readonly dataSource = new MatTableDataSource<Appointment>();
   readonly statuses = [
     { value: AppointmentStatus.PENDING, label: 'Pending' },
@@ -80,9 +86,13 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
             this.loadError = '';
             return forkJoin({
               appointments: this.appointmentService.getAll(),
-              clinics: this.clinicService.getAll(),
+              clinics: this.clinicService.getAccessible(),
             }).pipe(
               catchError(() => {
+                this.appointments = [];
+                this.clinics = [];
+                this.selectedClinic = 'all';
+                this.applyFilters();
                 this.loadError = 'Appointments could not be loaded. Please retry.';
                 return EMPTY;
               }),
@@ -93,7 +103,7 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
       }),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(({ appointments, clinics }) => {
-      this.appointments = appointments;
+      this.appointments = clinics.length === 0 ? [] : appointments;
       this.clinics = clinics;
       if (this.selectedClinic !== 'all' && !clinics.some(clinic => clinic._id === this.selectedClinic)) {
         this.selectedClinic = 'all';

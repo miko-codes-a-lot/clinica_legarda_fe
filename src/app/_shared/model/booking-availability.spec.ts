@@ -1,7 +1,7 @@
 import { Clinic } from './clinic';
 import { User, UserStatus } from './user';
 import { AppointmentStatus } from './appointment';
-import { bookingSlots, createBookingSchedule } from './booking-availability';
+import { AppointmentAvailability, bookingSlots, createBookingSchedule } from './booking-availability';
 
 const clinic: Clinic = {
   _id: 'annex', name: 'Annex', address: '', emailAddress: '', mobileNumber: '', dentists: [],
@@ -14,6 +14,9 @@ const dentist: User = {
   operatingHours: [{ day: 'monday', startTime: '08:00', endTime: '17:00' }],
 };
 const occupied = [{ _id: 'visit', date: '2026-09-21T00:00:00.000Z', startTime: '09:00', endTime: '10:00', status: AppointmentStatus.CONFIRMED }];
+const hiddenOccupancy: AppointmentAvailability = {
+  date: '2026-09-21T00:00:00.000Z', startTime: '09:00', endTime: '10:00', status: AppointmentStatus.CONFIRMED,
+};
 const day = new Date(2026, 8, 21);
 const now = new Date('2026-09-14T00:00:00Z');
 
@@ -30,6 +33,22 @@ describe('booking availability', () => {
   it('excludes the current appointment when proposing a reschedule', () => {
     const schedule = createBookingSchedule(dentist, clinic, occupied, 'visit');
     expect(bookingSlots(schedule, day, 60, 30, now).find(slot => slot.value === '09:00')?.available).toBeTrue();
+  });
+
+  it('retains busy slots whose appointment IDs are hidden from the admin', () => {
+    const schedule = createBookingSchedule(dentist, clinic, [hiddenOccupancy]);
+
+    expect(bookingSlots(schedule, day, 30, 15, now).find(slot => slot.value === '09:00')?.available).toBeFalse();
+    expect(bookingSlots(schedule, day, 30, 15, now).find(slot => slot.value === '10:15')?.available).toBeTrue();
+  });
+
+  it('excludes only the current reschedule ID while retaining hidden outside-clinic occupancy', () => {
+    const ownAppointment = { ...occupied[0], _id: 'own-visit', startTime: '10:30', endTime: '11:00' };
+    const schedule = createBookingSchedule(dentist, clinic, [hiddenOccupancy, ownAppointment], 'own-visit');
+    const slots = bookingSlots(schedule, day, 30, 15, now);
+
+    expect(slots.find(slot => slot.value === '09:00')?.available).toBeFalse();
+    expect(slots.find(slot => slot.value === '10:30')?.available).toBeTrue();
   });
 
   it('applies daily capacity across clinics even when the selected clinic has an open slot', () => {

@@ -5,6 +5,7 @@
 }
 <app-generic-table
   [title]="title"
+  [description]="canManage ? 'Manage all clinics.' : 'Clinics currently assigned to your account.'"
   [createButtonLabel]="createLabel"
   [displayedColumns]="displayedColumns"
   [columnDefs]="columnDefs"
@@ -14,4 +15,8 @@
   (details)="onDetails($event)"
   (update)="onUpdate($event)"
   (create)="onCreate()"
-></app-generic-table>
+>
+  @if (!canManage && !isLoading && !loadError && dataSource.data.length === 0) {
+    <p table-filters class="ui-card mb-5 p-5 text-sm text-muted" role="status">No assigned clinics. Ask a super admin to assign a clinic to your account.</p>
+  }
+</app-generic-table>

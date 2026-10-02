@@ -67,7 +67,9 @@ export class StaffDashboard {
   private viewReady = false;
   state: AnalyticsReportState = { status: 'loading', clinicId: 'all' };
   reasons: Reason[] = [];
-  clinics: Pick<Clinic, '_id' | 'name'>[] = [{ _id: 'all', name: 'All clinics' }];
+  clinics: Pick<Clinic, '_id' | 'name'>[] = [];
+  clinicsLoading = false;
+  private clinicsLoaded = false;
   selectedClinic = 'all';
   isExporting = false;
   reportError = '';
@@ -90,7 +92,13 @@ export class StaffDashboard {
   ) {}
 
   get title(): string { return this.area === 'super-admin' ? 'Super Admin Dashboard' : 'Admin Dashboard'; }
-  get report() { return this.state.status === 'ready' ? this.state.report : undefined; }
+  get allClinicsLabel(): string { return this.area === 'admin' ? 'All assigned clinics' : 'All clinics'; }
+  get hasNoAssignedClinics(): boolean { return this.area === 'admin' && this.clinicsLoaded && this.clinics.length === 1; }
+  get notificationScope(): string { return this.area === 'admin' ? 'Assigned-clinic notifications' : 'Account-wide notifications'; }
+  get report() {
+    return this.clinicsLoaded && !this.hasNoAssignedClinics && this.state.status === 'ready'
+      ? this.state.report : undefined;
+  }
   get weeklyReport() { return this.report?.summary; }
   get appointmentQueue() { return this.report?.queue ?? []; }
   get weekLabel(): string {
@@ -119,7 +127,7 @@ export class StaffDashboard {
     // Keep export notifications current independently of the dropdown's visibility.
     this.notifications$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
     this.notificationService.getAllNotifications().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      error: () => this.notificationError = 'Account-wide notifications could not be refreshed.',
+      error: () => this.notificationError = `${this.notificationScope} could not be refreshed.`,
     });
   }
 
@@ -130,10 +138,20 @@ export class StaffDashboard {
 
   loadClinics(): void {
     this.clinicError = '';
-    this.clinicService.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: clinics => this.clinics = [{ _id: 'all', name: 'All clinics' }, ...clinics],
-      error: () => this.clinicError = 'Clinic choices could not be loaded. All clinics remains available.',
-    });
+    this.clinicsLoading = true;
+    this.clinicsLoaded = false;
+    this.clinics = [];
+    this.clinicService.getAccessible().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: clinics => {
+        this.clinics = [{ _id: 'all', name: this.allClinicsLabel }, ...clinics];
+        this.clinicsLoaded = true;
+        if (this.selectedClinic !== 'all' && !clinics.some(clinic => clinic._id === this.selectedClinic)) {
+          this.selectedClinic = 'all';
+        }
+        this.clinicSelection.next(this.selectedClinic);
+      },
+      error: () => this.clinicError = 'Clinic choices could not be loaded. Retry to check your current clinic access.',
+    }).add(() => this.clinicsLoading = false);
   }
 
   onClinicChange(clinicId: string): void {
@@ -392,7 +410,8 @@ export class StaffDashboard {
     this.declinedReferralChart = new Chart(this.declinedReferralChartRef.nativeElement, config);
   }
   get canExport(): boolean {
-    return this.state.status === 'ready' && this.state.clinicId === this.selectedClinic;
+    return this.clinicsLoaded && !this.clinicsLoading && !this.clinicError && !this.hasNoAssignedClinics
+      && this.state.status === 'ready' && this.state.clinicId === this.selectedClinic;
   }
 
   private dashboardReport(): DashboardReport {

@@ -1,4 +1,5 @@
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
+import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
 import { Component, OnInit } from '@angular/core';
 import { UserForm } from '../user-form/user-form';
 import { UserService } from '../../../_shared/service/user-service';
@@ -13,12 +14,13 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-user-create',
-  imports: [PageHeader, UserForm],
+  imports: [PageHeader, EmptyState, UserForm],
   templateUrl: './user-create.html',
   styleUrl: './user-create.css'
 })
 export class UserCreate implements OnInit {
   isLoading = false
+  loadError = ''
   clinics: Clinic[] = []
   days: Day[] = []
 
@@ -35,19 +37,17 @@ export class UserCreate implements OnInit {
 
     forkJoin({
       days: this.dayService.getAll(),
-      clinics: this.clinicService.getAll(),
+      clinics: this.clinicService.getAccessible(),
     }).subscribe({
       next: ({ days, clinics }) => {
         this.days = days
         this.clinics = clinics
       },
       error: e => {
-        this.alertService.error(
-          e.error?.message || 'Something went wrong'
-        );
+        this.loadError = e.error?.message || 'Unable to load user options.';
+        this.alertService.error(this.loadError);
       },
-      complete: () => this.isLoading = false
-    })
+    }).add(() => this.isLoading = false)
   }
 
   onSubmit(user: UserPayload) {

@@ -50,7 +50,7 @@ export class AppointmentUpdate {
     forkJoin({
       appointment: this.appointmentService.getOne(this.id),
       services: this.dentalServicesService.getAll(),
-      clinics: this.clinicService.getAll(),
+      clinics: this.clinicService.getAccessible(),
       patients: this.userService.getPatients(),
     }).subscribe({
       next: ({ appointment, services, clinics, patients }) => {

@@ -16,6 +16,10 @@ export class ClinicService {
     return this.http.get<Clinic[]>(this.baseUrl);
   }
 
+  getAccessible(): Observable<Clinic[]> {
+    return this.http.get<Clinic[]>(`${this.baseUrl}/accessible`, { withCredentials: true });
+  }
+
   getOne(id: string): Observable<Clinic> {
     return this.http.get<Clinic>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
