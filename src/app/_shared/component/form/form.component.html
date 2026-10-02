@@ -1,5 +1,6 @@
-<div class="form">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+<section [class.ui-card]="framed">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" [attr.aria-busy]="isLoading">
+    <div class="ui-form-grid">
     @for (field of fields; track field.name) {
       <mat-form-field appearance="outline" class="w-full">
         <mat-label>{{ field.label }}</mat-label>
@@ -33,13 +34,10 @@
       </mat-form-field>
     }
 
+    </div>
     <ng-content></ng-content>
-
-    <!-- add a custom button here -->
-    <!-- if button is enable then use it -->
-    <!-- else use the default button -->
-    <button [disabled]="isLoading || !form.valid" mat-raised-button color="primary">
-      Save
-    </button>
+    <div class="mt-6 flex justify-end border-t border-stroke pt-5">
+      <button type="submit" class="ui-button" [disabled]="isLoading || !form.valid">{{ isLoading ? busyLabel : submitLabel }}</button>
+    </div>
   </form>
-</div>
+</section>

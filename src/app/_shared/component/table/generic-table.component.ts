@@ -10,17 +10,21 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
+import { PageHeader } from '../../ui/page-header/page-header';
+import { EmptyState } from '../../ui/empty-state/empty-state';
+import { StatusBadge } from '../../ui/status-badge/status-badge';
 
 
 @Component({
   selector: 'app-generic-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatPaginatorModule, MatProgressSpinnerModule, MatButtonModule, MatSort, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule, RouterLink ],
+  imports: [CommonModule, MatTableModule, MatPaginatorModule, MatProgressSpinnerModule, MatButtonModule, MatSort, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule, RouterLink, PageHeader, EmptyState, StatusBadge ],
   templateUrl: './generic-table.component.html',
   styleUrls: ['./generic-table.component.css']
 })
 export class GenericTableComponent<T> implements AfterViewInit {
   @Input() title = '';
+  @Input() description = 'Search and manage your clinic records.';
   @Input() createButtonLabel = '';
   @Input() createButtonLink = '';
   @Input() displayedColumns: string[] = [];

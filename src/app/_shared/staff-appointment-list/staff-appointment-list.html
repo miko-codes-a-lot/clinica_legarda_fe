@@ -1,5 +1,17 @@
-<h2>Appointments</h2>
-<div class="filters">
+<app-generic-table
+  title="Appointments"
+  description="Review appointment requests and filter by clinic or status."
+  [displayedColumns]="displayedColumns"
+  [columnDefs]="columnDefs"
+  [dataSource]="dataSource"
+  [isLoading]="isLoading"
+  [disableEditFn]="disableEdit"
+  createButtonLabel="Create appointment"
+  (details)="onDetails($event)"
+  (update)="onUpdate($event)"
+  (create)="onCreate()">
+  <section table-filters class="ui-card mb-5" aria-label="Appointment filters">
+<div class="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-start">
   <mat-form-field appearance="outline">
     <mat-label>Clinic</mat-label>
     <mat-select [value]="selectedClinic" (selectionChange)="selectClinic($event.value)">
@@ -18,20 +30,8 @@
       }
     </mat-select>
   </mat-form-field>
-  <button mat-stroked-button (click)="refresh()" [disabled]="isLoading">Refresh</button>
+  <button class="ui-button-secondary" type="button" (click)="refresh()" [disabled]="isLoading">Refresh</button>
 </div>
 @if (loadError) { <p role="alert">{{ loadError }}</p> }
-@if (!isLoading && !loadError && dataSource.data.length === 0) {
-  <p>No appointments match the selected clinic and status.</p>
-}
-<app-generic-table
-  [displayedColumns]="displayedColumns"
-  [columnDefs]="columnDefs"
-  [dataSource]="dataSource"
-  [isLoading]="isLoading"
-  [disableEditFn]="disableEdit"
-  createButtonLabel="Create appointment"
-  (details)="onDetails($event)"
-  (update)="onUpdate($event)"
-  (create)="onCreate()">
+  </section>
 </app-generic-table>

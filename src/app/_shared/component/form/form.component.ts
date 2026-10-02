@@ -28,6 +28,9 @@ export class FormComponent {
   @Input({ required: true }) form!: FormGroup;
   @Input() fields: FormField[] = [];
   @Input() isLoading = false;
+  @Input() framed = true;
+  @Input() submitLabel = 'Save changes';
+  @Input() busyLabel = 'Saving…';
 
   @Output() onSubmitEvent = new EventEmitter<any>();
 

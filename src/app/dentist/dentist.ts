@@ -1,13 +1,8 @@
 import { Component, DestroyRef, inject } from '@angular/core';
-import { BreakpointObserver } from '@angular/cdk/layout';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterOutlet } from '@angular/router';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { NavComponent } from '../_shared/component/nav/nav.component';
+import { StaffShell } from '../_shared/ui/staff-shell/staff-shell';
+import { UserSimple } from '../_shared/model/user-simple';
 import { AuthService } from '../_shared/service/auth-service';
 import { AlertService } from '../_shared/service/alert.service';
 
@@ -16,24 +11,16 @@ import { AlertService } from '../_shared/service/alert.service';
   standalone: true,
   imports: [
     RouterOutlet,
-    MatButtonModule,
-    MatIconModule,
-    MatSidenavModule,
-    MatListModule,
-    MatToolbarModule,
-    NavComponent,
+    StaffShell,
   ],
   templateUrl: './dentist.html',
   styleUrl: './dentist.css'
 })
 export class Dentist {
   private readonly destroyRef = inject(DestroyRef);
-  private readonly breakpoints = inject(BreakpointObserver);
-  isMobile = false;
-  menuOpen = false;
   isLoading = false
   isLoggedIn = false
-  user = {}
+  user: UserSimple | null = null
 
   menuItems = [
     { label: 'Home', icon: 'home', link: '/dentist/homepage' },
@@ -41,11 +28,7 @@ export class Dentist {
     { label: 'Appointments', icon: 'event', link: '/dentist/appointment' },
     { label: 'Referral Request', icon: 'event', link: '/dentist/referral-request' },
     { label: 'Notifications', icon: 'notifications', link: '/dentist/notification' },
-    {
-      label: 'Logout',
-      icon: 'logout',
-      onClick: () => this.onClickLogout()
-    }
+
   ];
 
   constructor(
@@ -56,10 +39,6 @@ export class Dentist {
   ) {}
 
   ngOnInit() {
-    this.breakpoints.observe('(max-width: 767px)').pipe(takeUntilDestroyed(this.destroyRef)).subscribe(state => {
-      this.isMobile = state.matches;
-      this.menuOpen = false;
-    });
     this.authService.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (user) => {
         if (user) {
@@ -72,9 +51,15 @@ export class Dentist {
     })
   }
 
-  closeMobileMenu(): void {
-    if (this.isMobile) this.menuOpen = false;
+  get userName(): string {
+    return this.user ? `${this.user.firstName} ${this.user.lastName}`.trim() : '';
   }
+
+  get activeTitle(): string {
+    return this.menuItems.find(item => this.router.url.startsWith(item.link))?.label || 'Home';
+  }
+
+  goToProfile(): void { this.router.navigate(['/dentist/profile']); }
 
   onClickLogout() {
     this.isLoading = true

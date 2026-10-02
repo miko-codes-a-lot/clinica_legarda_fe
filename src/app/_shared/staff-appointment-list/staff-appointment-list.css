@@ -1,6 +1,1 @@
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 1rem;
-}
+:host { display: block; }

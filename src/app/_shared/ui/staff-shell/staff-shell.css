@@ -1,0 +1,6 @@
+:host { display: block; }
+.workspace-container { height: 100dvh; min-height: 100dvh; background: var(--color-canvas); }
+.workspace-sidebar { width: 256px; background: var(--color-brand-950); color: white; border: 0; border-radius: 0; }
+mat-drawer-content { min-height: 100dvh; }
+
+.workspace-topbar { position: sticky; top: 0; z-index: 20; }

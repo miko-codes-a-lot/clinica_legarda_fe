@@ -1,13 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { NavComponent } from '../_shared/component/nav/nav.component';
+import { StaffShell } from '../_shared/ui/staff-shell/staff-shell';
+import { UserSimple } from '../_shared/model/user-simple';
 import { AuthService } from '../_shared/service/auth-service';
 import { CommonModule } from '@angular/common';
 import { AlertService } from '../_shared/service/alert.service';
@@ -18,21 +14,16 @@ import { AlertService } from '../_shared/service/alert.service';
   imports: [
     CommonModule,
     RouterOutlet,
-    MatSidenavModule,
-    MatListModule,
-    MatToolbarModule,
-    MatMenuModule,
-    MatIconModule,
-    MatButtonModule,
-    NavComponent,
+    StaffShell,
   ],
   templateUrl: './super-admin.html',
   styleUrl: './super-admin.css'
 })
 export class SuperAdmin {
+  private readonly destroyRef = inject(DestroyRef);
   isLoading = false
   isLoggedIn = false
-  user = {}
+  user: UserSimple | null = null
   activeTitle = 'Dashboard'; // default title
   activeIcon = 'dashboard';  // default icon
   showTopNav = false;
@@ -51,10 +42,15 @@ export class SuperAdmin {
     private readonly alertService: AlertService,
   ) {}
 
+  get userName(): string {
+    return this.user ? `${this.user.firstName} ${this.user.lastName}`.trim() : '';
+  }
+
   ngOnInit() {
-    this.authService.currentUser$.subscribe({
+    this.activeTitle = this.menuItems.find(item => this.router.url.startsWith(item.link))?.label || 'Dashboard';
+    this.authService.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (user) => {
-          this.user = user || {};
+          this.user = user;
           this.isLoggedIn = !!user;
           this.updateTopNavVisibility();
       }
@@ -62,7 +58,7 @@ export class SuperAdmin {
 
         // Update activeTitle based on current route
     this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(filter(event => event instanceof NavigationEnd), takeUntilDestroyed(this.destroyRef))
       .subscribe((event: NavigationEnd) => {
         const currentRoute = this.menuItems.find(item => event.urlAfterRedirects.startsWith(item.link));
         this.activeTitle = currentRoute ? currentRoute.label : 'Dashboard';

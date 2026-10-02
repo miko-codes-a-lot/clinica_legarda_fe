@@ -39,7 +39,7 @@ export class DatePicker implements ControlValueAccessor, Validator, OnChanges {
   @Input() label = '';
   @Input() placeholder = '';
   @Input() hint = '';
-  @Input() appearance: 'fill' | 'outline' = 'fill';
+  @Input() appearance: 'fill' | 'outline' = 'outline';
   @Input() floatLabel: FloatLabelType = 'auto';
   @Input() minDate: Date | null = null;
   @Input() maxDate: Date | null = null;

@@ -61,35 +61,15 @@ interface TimeSlot {
     </mat-form-field>
   `,
   styles: [`
-    mat-form-field {
-      --mat-form-field-filled-focus-active-indicator-color: #1976d2;
-      --mat-form-field-filled-focus-label-text-color: #1976d2;
-      --mat-form-field-outlined-focus-outline-color: #1976d2;
-      --mat-form-field-outlined-focus-label-text-color: #1976d2;
-      --mat-form-field-focus-select-arrow-color: #1976d2;
-    }
-
-    .unavailable-slot {
-      color: rgba(0, 0, 0, 0.38) !important;
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-    
-    .unavailable-text {
-      font-size: 0.8em;
-      color: rgba(0, 0, 0, 0.54);
-      font-style: italic;
-    }
-
-    ::ng-deep .mat-mdc-option.mdc-list-item--disabled {
-      opacity: 0.5;
-    }
+    :host { display: block; width: 100%; }
+    .unavailable-text { font-size: 12px; color: var(--color-muted); }
   `]
 })
 export class TimePicker implements ControlValueAccessor, Validator, OnChanges {
   @Input() label = 'Select Time';
   @Input() placeholder = 'Choose a time slot';
   @Input() hint = '';
-  @Input() appearance: 'fill' | 'outline' = 'fill';
+  @Input() appearance: 'fill' | 'outline' = 'outline';
   @Input() required = false;
   @Input() errorMessage = 'Please select an available time';
   @Input() dentist?: DentistBookingSchedule;

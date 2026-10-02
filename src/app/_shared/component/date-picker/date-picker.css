@@ -1,7 +1,1 @@
-mat-form-field {
-  display: block;
-  --mat-form-field-filled-focus-active-indicator-color: #1976d2;
-  --mat-form-field-filled-focus-label-text-color: #1976d2;
-  --mat-form-field-outlined-focus-outline-color: #1976d2;
-  --mat-form-field-outlined-focus-label-text-color: #1976d2;
-}
+:host, mat-form-field { display: block; width: 100%; }

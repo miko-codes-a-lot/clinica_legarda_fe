@@ -1,12 +1,14 @@
-<div class="nav-container">
-  <a
-    *ngFor="let item of menuItems"
-    [routerLink]="!item.link || disabled ? null : item.link"
-    routerLinkActive="active"
-    (click)="item.onClick ? item.onClick() : null"
-    class="nav-link"
-  >
-    <span class="material-icons nav-icon">{{ item.icon }}</span>
-    <span>{{ item.label }}</span>
-  </a>
-</div>
+<nav aria-label="Workspace navigation" class="space-y-1">
+  @for (item of menuItems; track item.label) {
+    @if (item.link) {
+      <a [routerLink]="disabled ? null : item.link" routerLinkActive="active" [attr.aria-disabled]="disabled"
+        [attr.tabindex]="disabled ? -1 : null" class="nav-link">
+        <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon><span>{{ item.label }}</span>
+      </a>
+    } @else {
+      <button type="button" class="nav-link w-full" [disabled]="disabled" (click)="item.onClick?.()">
+        <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon><span>{{ item.label }}</span>
+      </button>
+    }
+  }
+</nav>

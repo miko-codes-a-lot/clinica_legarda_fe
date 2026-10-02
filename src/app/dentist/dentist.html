@@ -1,24 +1,8 @@
-
-<mat-drawer-container class="example-container">
-  @if (isLoggedIn) {
-    <mat-drawer id="dentist-navigation" [mode]="isMobile ? 'over' : 'side'" [opened]="!isMobile || menuOpen" (closedStart)="menuOpen = false">
-      <mat-toolbar color="primary">
-        <span class="system-title">Clinica Legarda </span>
-      </mat-toolbar>
-      <mat-list role="list">
-        <app-nav [disabled]="isLoading" [menuItems]="menuItems" (click)="closeMobileMenu()"></app-nav>
-      </mat-list>
-    </mat-drawer>
-  }
-
-  <mat-drawer-content>
-    @if (isLoggedIn && isMobile) {
-      <mat-toolbar class="mobile-toolbar">
-        <button mat-icon-button aria-label="Open navigation menu" aria-controls="dentist-navigation"
-          [attr.aria-expanded]="menuOpen" (click)="menuOpen = !menuOpen"><mat-icon>menu</mat-icon></button>
-        <span>Clinica Legarda</span>
-      </mat-toolbar>
-    }
+@if (isLoggedIn) {
+  <app-staff-shell [menuItems]="menuItems" roleLabel="Dentist" [title]="activeTitle" [userName]="userName"
+    [busy]="isLoading" (logout)="onClickLogout()" (account)="goToProfile()">
     <router-outlet></router-outlet>
-  </mat-drawer-content>
-</mat-drawer-container>
+  </app-staff-shell>
+} @else {
+  <router-outlet></router-outlet>
+}

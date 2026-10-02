@@ -1,0 +1,38 @@
+<mat-drawer-container class="workspace-container">
+  <mat-drawer id="staff-navigation" class="workspace-sidebar" [mode]="isMobile ? 'over' : 'side'"
+    [opened]="!isMobile || menuOpen" (closedStart)="menuOpen = false">
+    <div class="flex h-full flex-col px-4 py-7">
+      <div class="px-3 pb-9"><app-clinic-brand [subtitle]="roleLabel + ' workspace'"></app-clinic-brand></div>
+      <p class="px-4 pb-3 text-[10px] font-semibold uppercase tracking-[.18em] text-brand-200/70">Your workspace</p>
+      <app-nav [disabled]="busy" [menuItems]="menuItems" (click)="closeMobileMenu()"></app-nav>
+      <div class="mt-auto px-3 pt-12">
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+          <p class="text-sm font-medium text-white">Care, connected.</p>
+          <p class="mt-1 text-xs leading-relaxed text-brand-100/65">A clear view of your clinic, appointments, and patients.</p>
+        </div>
+      </div>
+    </div>
+  </mat-drawer>
+  <mat-drawer-content>
+    <header class="workspace-topbar flex h-20 items-center justify-between gap-3 border-b border-stroke bg-white/95 px-4 sm:px-7 lg:px-9">
+      <div class="flex min-w-0 items-center gap-3">
+        @if (isMobile) {
+          <button type="button" class="ui-icon-button" aria-label="Toggle navigation menu" aria-controls="staff-navigation"
+            [attr.aria-expanded]="menuOpen" (click)="menuOpen = !menuOpen"><mat-icon>menu</mat-icon></button>
+        }
+        <div class="min-w-0"><p class="text-[10px] font-semibold uppercase tracking-[.16em] text-muted">{{ roleLabel }}</p><p class="truncate text-sm font-semibold text-ink">{{ title }}</p></div>
+      </div>
+      <button type="button" class="flex shrink-0 items-center gap-2 rounded-xl p-2 text-ink hover:bg-canvas disabled:opacity-50"
+        [matMenuTriggerFor]="userMenu" [disabled]="busy" aria-label="Open account menu">
+        <span class="flex size-9 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-800">{{ userName.slice(0, 1) || 'C' }}</span>
+        <span class="hidden text-left sm:block"><span class="block text-xs font-semibold">{{ userName || roleLabel }}</span><span class="block text-[11px] text-muted">{{ roleLabel }}</span></span>
+        <mat-icon>expand_more</mat-icon>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        @if (accountEnabled) { <button mat-menu-item (click)="account.emit()"><mat-icon>person_outline</mat-icon><span>My account</span></button> }
+        <button mat-menu-item (click)="logout.emit()"><mat-icon>logout</mat-icon><span>Sign out</span></button>
+      </mat-menu>
+    </header>
+    <main id="main-content" class="min-w-0"><ng-content></ng-content></main>
+  </mat-drawer-content>
+</mat-drawer-container>

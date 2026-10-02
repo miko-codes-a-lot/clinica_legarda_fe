@@ -6,6 +6,13 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 
+export interface NavigationItem {
+  label: string;
+  icon: string;
+  link?: string;
+  onClick?: () => void;
+}
+
 @Component({
     selector: 'app-nav',
     templateUrl: './nav.component.html',
@@ -16,10 +23,5 @@ import { CommonModule } from '@angular/common';
 
 export class NavComponent {
   @Input() disabled = false
-  @Input() menuItems: {
-    label: string
-    icon: string
-    link?: string
-    onClick?: () => void
-  }[] = [];
+  @Input() menuItems: NavigationItem[] = [];
 }

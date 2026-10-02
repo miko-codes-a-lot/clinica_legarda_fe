@@ -1,85 +1,59 @@
-<div class="page-container">
-
-  @if (createButtonLabel && create) {
-    <div class="actions">
-      <!-- [routerLink]="createButtonLink" -->
-      <button mat-raised-button color="primary" (click)="onCreateClick()">
-        {{ createButtonLabel }}
-      </button>
+<section class="ui-page">
+  <app-page-header [title]="title || 'Records'" [description]="description">
+    @if (createButtonLabel) {
+      <button type="button" class="ui-button" [disabled]="isLoading" (click)="onCreateClick()"><mat-icon>add</mat-icon>{{ createButtonLabel }}</button>
+    }
+  </app-page-header>
+  <ng-content select="[table-filters]"></ng-content>
+  <div class="overflow-hidden rounded-2xl border border-stroke bg-white shadow-card">
+    <div class="ui-toolbar border-b border-stroke px-5 pt-5">
+      <mat-form-field appearance="outline" class="max-w-md">
+        <mat-label>Search records</mat-label>
+        <input matInput [value]="dataSource.filter" (keyup)="applyFilter($event)" placeholder="Name, status, or another detail">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <span class="pb-5 text-xs text-muted">{{ dataSource.filteredData.length }} records</span>
     </div>
-  }
-  <mat-form-field appearance="fill">
-    <mat-label>Search</mat-label>
-    <input matInput [value]="dataSource.filter" (keyup)="applyFilter($event)" placeholder="Type to search">
-    <mat-icon matSuffix>search</mat-icon>
-  </mat-form-field>
-  <div class="user-table-container">
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 custom-table" matSort (matSortChange)="announceSortChange($event)">
-
-      <!-- Dynamic columns -->
-      @for (col of columnDefs; track col.key) {
-        <ng-container [matColumnDef]="col.key">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header [attr.sortActionDescription]="'Sort by '+ col.key">{{ col.label }}</th>
-          <td mat-cell *matCellDef="let element">
-            @let cellValue = getCellValue(col, element);
-            @if (col.key === 'message' && (cellValue?.dataLink || element?.link)) {
-              <!-- enable data link -->
-              <a
-                [routerLink]="cellValue?.dataLink || element?.link"
-                class="message-link"
-              >
-                {{ cellValue?.display || cellValue || element?.message }}
-              </a>
-              <!-- <a [routerLink]="getCellValue(col, element).dataLink">{{ getCellValue(col, element).display }}</a> -->
-            } @else {
-         
-                {{ getCellValue(col, element) }}
+    <div class="overflow-x-auto">
+      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="announceSortChange($event)" class="w-full" [attr.aria-label]="title || 'Records'" [attr.aria-busy]="isLoading">
+        @for (col of columnDefs; track col.key) {
+          <ng-container [matColumnDef]="col.key">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header [attr.sortActionDescription]="'Sort by ' + col.label">{{ col.label }}</th>
+            <td mat-cell *matCellDef="let element">
+              @let cellValue = getCellValue(col, element);
+              @if (col.key === 'message' && (cellValue?.dataLink || element?.link)) {
+                <a [routerLink]="cellValue?.dataLink || element?.link" class="font-medium text-brand-700 hover:underline">{{ cellValue?.display || cellValue || element?.message }}</a>
+              } @else if (col.key === 'status') {
+                <app-status-badge [status]="cellValue || ''"></app-status-badge>
+              } @else {
+                {{ cellValue }}
+              }
+            </td>
+          </ng-container>
+        }
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let element" class="whitespace-nowrap">
+            <button mat-icon-button aria-label="View details" (click)="onDetailsClick(element)"><mat-icon>visibility</mat-icon></button>
+            @if (update.observers.length > 0) {
+              <button mat-icon-button aria-label="Edit record" (click)="onUpdateClick(element)" [disabled]="getEditDisabled(element)"><mat-icon>edit</mat-icon></button>
+            }
+            @if (enableDelete && delete.observers.length > 0) {
+              <button mat-icon-button aria-label="Delete record" class="text-red-700" (click)="onDeleteClick(element)"><mat-icon>delete</mat-icon></button>
+            }
+            @if (markAsRead.observers.length > 0) {
+              <button mat-icon-button aria-label="Mark as read" (click)="onMarkAsReadClick(element)"><mat-icon>done_all</mat-icon></button>
             }
           </td>
         </ng-container>
-      }
-
-      <!-- Actions Column -->
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef> Actions </th>
-        <td mat-cell *matCellDef="let element">
-          <button mat-icon-button  color="primary" (click)="onDetailsClick(element)">
-            <mat-icon>visibility</mat-icon>
-          </button>
-          @if (update.observers.length > 0) {
-            <button mat-icon-button color="accent" (click)="onUpdateClick(element)" [disabled]="getEditDisabled(element)">
-              <mat-icon>edit</mat-icon>
-            </button>
-          }
-
-          @if (enableDelete && delete.observers.length > 0) {
-            <button
-              mat-icon-button
-              color="warn"
-              (click)="onDeleteClick(element)"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
-          }
-
-          @if (markAsRead.observers.length > 0) {
-            <button mat-icon-button color="accent" (click)="onMarkAsReadClick(element)">
-              <mat-icon>done_all</mat-icon>
-            </button>
-          }
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="rowClassFn ? rowClassFn(row) : ''"></tr>
-    </table>
-
-    @if (isLoading) {
-      <div class="spinner-container">
-        <mat-spinner [diameter]="50"></mat-spinner>
-      </div>
-    }
-
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="rowClassFn ? rowClassFn(row) : ''"></tr>
+        <tr class="mat-row" *matNoDataRow><td [attr.colspan]="displayedColumns.length" class="p-5">
+          @if (!isLoading) { <app-empty-state [title]="dataSource.filter ? 'No matching records' : 'No records yet'" [description]="dataSource.filter ? 'Try a different search or clear the search field.' : 'Records will appear here when they are available.'"></app-empty-state> }
+        </td></tr>
+      </table>
+    </div>
+    @if (isLoading) { <div class="flex items-center justify-center gap-3 p-8" role="status"><mat-spinner [diameter]="28"></mat-spinner><span class="text-sm text-muted">Loading records…</span></div> }
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Records pagination"></mat-paginator>
   </div>
-</div>
+</section>
