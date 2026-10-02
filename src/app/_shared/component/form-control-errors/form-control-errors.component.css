@@ -1,5 +1,5 @@
 .error {
   display: inline; /* important: avoid block layout */
   font-size: 12px;
-  color: #f44336; /* Angular Material default error red */
+  color: var(--color-danger);
 }

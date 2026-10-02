@@ -9,11 +9,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { NavComponent, NavigationItem } from '../../component/nav/nav.component';
 import { ClinicBrand } from '../clinic-brand/clinic-brand';
+import { ThemeToggle } from '../theme-toggle/theme-toggle';
 
 @Component({
   selector: 'app-staff-shell',
   standalone: true,
-  imports: [MatSidenavModule, MatMenuModule, MatIconModule, MatButtonModule, NavComponent, ClinicBrand],
+  imports: [MatSidenavModule, MatMenuModule, MatIconModule, MatButtonModule, NavComponent, ClinicBrand, ThemeToggle],
   templateUrl: './staff-shell.html',
   styleUrl: './staff-shell.css',
 })

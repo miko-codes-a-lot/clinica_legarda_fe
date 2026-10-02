@@ -7,24 +7,24 @@
 } @else {
   <app-form [form]="rxform" [fields]="appointmentFields" [isLoading]="bookingUnavailable" (onSubmitEvent)="onSubmit()">
     @if (availabilityLoading) { <p class="mb-4 text-sm text-muted" role="status">Checking dentist availability...</p> }
-    @if (availabilityError) { <p class="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-800" role="alert">{{ availabilityError }}</p> }
-    <div [formGroup]="rxform" class="mt-5 border-t border-brand-100 pt-5">
+    @if (availabilityError) { <p class="mb-4 rounded-xl bg-danger-soft p-4 text-sm text-danger" role="alert">{{ availabilityError }}</p> }
+    <div [formGroup]="rxform" class="mt-5 border-t border-stroke pt-5">
       @if (bookingSchedule) {
         <h2 class="ui-section-title mb-4">Appointment schedule</h2>
         <div class="ui-form-grid">
           <app-date-picker class="block min-w-0" formControlName="date" label="Appointment day" placeholder="Choose a date" [dentist]="bookingSchedule" [minDate]="minDate" [maxDate]="maxDate" [serviceDuration]="serviceDuration()" />
           <app-time-picker class="block min-w-0" label="Appointment time" [dentist]="bookingSchedule" [selectedDate]="date.value" [serviceDuration]="serviceDuration()" [timeSlotInterval]="30" [required]="true" formControlName="time" />
         </div>
-        <dl class="mt-4 grid gap-4 rounded-xl border border-brand-100 bg-brand-50/50 p-4 sm:grid-cols-2">
+        <dl class="mt-4 grid gap-4 rounded-xl border border-stroke bg-tint/50 p-4 sm:grid-cols-2">
           <div><dt class="ui-label mb-1">Total duration</dt><dd class="text-sm font-semibold text-ink">{{ getFormattedDuration() }}</dd></div>
           <div><dt class="ui-label mb-1">Time</dt><dd class="text-sm font-semibold text-ink">{{ getAppointmentTimeRange() }}</dd></div>
         </dl>
       }
     </div>
     @if (isChangeBranch) {
-      <section class="mt-5 rounded-xl border border-brand-200 bg-brand-50/40 p-5" aria-labelledby="clinic-transfer-title">
+      <section class="mt-5 rounded-xl border border-tint-border bg-tint/40 p-5" aria-labelledby="clinic-transfer-title">
         <div class="mb-4 flex items-start gap-3">
-          <mat-icon class="shrink-0 text-brand-700">swap_horiz</mat-icon>
+          <mat-icon class="shrink-0 text-accent">swap_horiz</mat-icon>
           <div class="min-w-0">
             <h2 id="clinic-transfer-title" class="ui-section-title">Clinic transfer required</h2>
             <p class="ui-muted mt-1 break-words">You are switching from <strong>{{ latestPatientAppointment?.clinic?.name }}</strong>. A referral is required to proceed.</p>
@@ -50,7 +50,7 @@
         <p class="mt-3 flex items-start gap-2 text-sm text-muted"><mat-icon class="shrink-0">info</mat-icon> The receiving clinic will review and confirm this referral.</p>
       </section>
     }
-    <section class="mt-5 rounded-xl border border-brand-100 bg-canvas p-5" *ngIf="latestPatientAppointment as appt" aria-labelledby="previous-visit-title">
+    <section class="mt-5 rounded-xl border border-stroke bg-canvas p-5" *ngIf="latestPatientAppointment as appt" aria-labelledby="previous-visit-title">
       <h2 id="previous-visit-title" class="ui-section-title mb-4">Previous visit</h2>
       <dl class="grid gap-4 sm:grid-cols-2">
         <div class="min-w-0"><dt class="ui-label mb-1">Clinic</dt><dd class="break-words text-sm">{{ appt.clinic.name }}</dd></div>
@@ -59,6 +59,6 @@
         <div class="min-w-0"><dt class="ui-label mb-1">Services</dt><dd class="break-words text-sm">{{ getServiceNames(appt.services) }}</dd></div>
       </dl>
     </section>
-    @if (services.errors?.['maxlength']) { <p class="mt-4 text-sm text-red-700" role="alert">Maximum of 3 services per visit/consultation only.</p> }
+    @if (services.errors?.['maxlength']) { <p class="mt-4 text-sm text-danger" role="alert">Maximum of 3 services per visit/consultation only.</p> }
   </app-form>
 }

@@ -2,7 +2,7 @@
   <app-page-header title="Edit your account" eyebrow="Patient portal" description="Keep your name and contact information up to date." />
   <section class="ui-card p-5 sm:p-7">
     <form [formGroup]="profileForm" (ngSubmit)="onSave()" [attr.aria-busy]="isLoading">
-      <section class="mb-6 border-b border-brand-100 pb-5">
+      <section class="mb-6 border-b border-stroke pb-5">
         <h2 class="ui-section-title mb-4">Full name</h2>
         <div class="ui-form-grid lg:grid-cols-3">
           <mat-form-field appearance="outline" class="w-full"><mat-label>First name</mat-label><input matInput formControlName="firstName" autocomplete="given-name"><mat-error><app-form-control-errors [control]="profileForm.get('firstName')" /></mat-error></mat-form-field>
@@ -18,17 +18,17 @@
           <mat-form-field appearance="outline" class="w-full sm:col-span-2"><mat-label>Address</mat-label><textarea matInput formControlName="address" rows="3" autocomplete="street-address"></textarea><mat-error><app-form-control-errors [control]="profileForm.get('address')" /></mat-error></mat-form-field>
         </div>
       </section>
-      <section *ngIf="isDentist" class="mb-6 border-t border-brand-100 pt-5">
+      <section *ngIf="isDentist" class="mb-6 border-t border-stroke pt-5">
         <div class="ui-toolbar mb-4"><h2 class="ui-section-title">Operating hours</h2><button class="ui-button-secondary" type="button" (click)="onAddSchedule()" [disabled]="isLoading || operatingHours.length >= (clinicOperatingHours.value?.length || 0)">Add schedule</button></div>
         <div formArrayName="operatingHours" class="space-y-4">
-          <div class="rounded-xl border border-brand-100 bg-canvas p-4" *ngFor="let hour of operatingHours.controls; let i = index" [formGroupName]="i">
+          <div class="rounded-xl border border-stroke bg-canvas p-4" *ngFor="let hour of operatingHours.controls; let i = index" [formGroupName]="i">
             <div class="ui-form-grid lg:grid-cols-3"><mat-form-field appearance="outline" class="w-full"><mat-label>Day</mat-label><mat-select formControlName="day"><mat-option *ngFor="let day of days" [value]="day.code" [disabled]="getSelectedDays(i).includes(day.code)">{{ day.label }}</mat-option></mat-select></mat-form-field><mat-form-field appearance="outline" class="w-full"><mat-label>From</mat-label><input matInput type="time" formControlName="startTime"></mat-form-field><mat-form-field appearance="outline" class="w-full"><mat-label>To</mat-label><input matInput type="time" formControlName="endTime"></mat-form-field></div>
-            <div class="mb-3 text-sm text-red-800"><mat-error *ngIf="hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)">End time must be after start time.</mat-error><mat-error *ngIf="hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)">Time must be within the clinic's operating hours.</mat-error></div>
+            <div class="mb-3 text-sm text-danger"><mat-error *ngIf="hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)">End time must be after start time.</mat-error><mat-error *ngIf="hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)">Time must be within the clinic's operating hours.</mat-error></div>
             <button class="ui-button-danger" type="button" (click)="removeOperatingHour(i)" [disabled]="isLoading">Remove schedule</button>
           </div>
         </div>
       </section>
-      <div class="flex flex-wrap gap-2 border-t border-brand-100 pt-5"><button [disabled]="!profileForm.valid || isLoading" class="ui-button" type="submit">{{ isLoading ? 'Saving…' : 'Save changes' }}</button><button class="ui-button-secondary" type="button" (click)="cancelEdit()" [disabled]="isLoading">Cancel</button></div>
+      <div class="flex flex-wrap gap-2 border-t border-stroke pt-5"><button [disabled]="!profileForm.valid || isLoading" class="ui-button" type="submit">{{ isLoading ? 'Saving…' : 'Save changes' }}</button><button class="ui-button-secondary" type="button" (click)="cancelEdit()" [disabled]="isLoading">Cancel</button></div>
     </form>
   </section>
 </div>

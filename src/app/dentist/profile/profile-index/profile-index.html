@@ -4,11 +4,11 @@
     <section class="ui-card p-5 sm:p-6" aria-labelledby="profile-summary-title">
       <div class="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
         <div class="relative h-24 w-24 shrink-0">
-          <button type="button" class="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-brand-100 bg-brand-50 text-3xl font-semibold text-brand-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600" aria-label="Change profile picture" (click)="openAvatarModal()">
+          <button type="button" class="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-stroke bg-tint text-3xl font-semibold text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600" aria-label="Change profile picture" (click)="openAvatarModal()">
             @if (avatarUrl) { <img [src]="avatarUrl" alt="Your profile picture" class="h-full w-full object-cover"> }
             @else { {{ (user?.firstName?.charAt(0) || '') + (user?.lastName?.charAt(0) || '') }} }
           </button>
-          <button type="button" class="ui-icon-button absolute -right-2 -bottom-2 border border-brand-100 bg-white shadow-sm" aria-label="Select a profile image" (click)="fileInput.click()"><mat-icon>edit</mat-icon></button>
+          <button type="button" class="ui-icon-button absolute -right-2 -bottom-2 border border-stroke bg-surface shadow-sm" aria-label="Select a profile image" (click)="fileInput.click()"><mat-icon>edit</mat-icon></button>
           <input type="file" #fileInput hidden (change)="onAvatarChange($event)">
         </div>
         <div class="min-w-0">
@@ -57,7 +57,7 @@
       </div>
       <div formArrayName="operatingHours" class="space-y-4">
         @for (hour of operatingHours.controls; track hour.value.day; let i = $index) {
-          <div class="rounded-xl border border-brand-100 bg-canvas p-4" [formGroupName]="i">
+          <div class="rounded-xl border border-stroke bg-canvas p-4" [formGroupName]="i">
             <div class="ui-form-grid">
               <mat-form-field appearance="outline" class="w-full sm:col-span-2">
                 <mat-label>Day</mat-label>
@@ -80,9 +80,9 @@
   <ng-template #avatarModal>
     <h2 mat-dialog-title>Upload profile picture</h2>
     <mat-dialog-content>
-      <div class="rounded-xl border border-dashed border-brand-200 bg-brand-50/40 p-5">
+      <div class="rounded-xl border border-dashed border-tint-border bg-tint/40 p-5">
         <label for="avatarInput" class="ui-label mb-3 flex items-center gap-2"><mat-icon>cloud_upload</mat-icon> Choose an image</label>
-        <input id="avatarInput" type="file" accept="image/*" (change)="onAvatarChange($event)" class="block w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-brand-100 file:px-3 file:py-2 file:font-medium file:text-brand-800">
+        <input id="avatarInput" type="file" accept="image/*" (change)="onAvatarChange($event)" class="block w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-tint-strong file:px-3 file:py-2 file:font-medium file:text-accent">
       </div>
     </mat-dialog-content>
     <mat-dialog-actions align="end">

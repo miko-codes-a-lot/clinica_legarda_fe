@@ -1,15 +1,15 @@
 <div class="ui-page max-w-6xl">
   <app-page-header title="Your account" eyebrow="Patient portal" description="Manage your personal details and review your appointment history." />
   <section class="ui-card overflow-hidden">
-    <nav class="flex flex-wrap gap-2 border-b border-brand-100 p-3" aria-label="Account sections">
-      <button type="button" class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold" (click)="activeTab = 'profile'" [attr.aria-pressed]="activeTab === 'profile'" aria-controls="account-profile" [ngClass]="activeTab === 'profile' ? 'bg-brand-800 text-white' : 'text-muted hover:bg-brand-50'"><mat-icon aria-hidden="true">person</mat-icon> Profile</button>
-      <button type="button" class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold" (click)="activeTab = 'history'" [attr.aria-pressed]="activeTab === 'history'" aria-controls="account-history" [ngClass]="activeTab === 'history' ? 'bg-brand-800 text-white' : 'text-muted hover:bg-brand-50'"><mat-icon aria-hidden="true">history</mat-icon> Appointment history</button>
+    <nav class="flex flex-wrap gap-2 border-b border-stroke p-3" aria-label="Account sections">
+      <button type="button" class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold" (click)="activeTab = 'profile'" [attr.aria-pressed]="activeTab === 'profile'" aria-controls="account-profile" [ngClass]="activeTab === 'profile' ? 'bg-brand-800 text-white' : 'text-muted hover:bg-tint'"><mat-icon aria-hidden="true">person</mat-icon> Profile</button>
+      <button type="button" class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold" (click)="activeTab = 'history'" [attr.aria-pressed]="activeTab === 'history'" aria-controls="account-history" [ngClass]="activeTab === 'history' ? 'bg-brand-800 text-white' : 'text-muted hover:bg-tint'"><mat-icon aria-hidden="true">history</mat-icon> Appointment history</button>
     </nav>
     <div *ngIf="activeTab === 'profile'" id="account-profile" class="p-5 sm:p-7">
-      <div class="mb-7 flex flex-wrap items-center gap-4 border-b border-brand-100 pb-6">
-        <button type="button" class="group relative size-20 shrink-0 overflow-hidden rounded-full bg-brand-50" (click)="openAvatarModal()" aria-label="Change your profile picture">
+      <div class="mb-7 flex flex-wrap items-center gap-4 border-b border-stroke pb-6">
+        <button type="button" class="group relative size-20 shrink-0 overflow-hidden rounded-full bg-tint" (click)="openAvatarModal()" aria-label="Change your profile picture">
           <img *ngIf="avatarUrl; else defaultAvatar" class="size-full object-cover" [src]="avatarUrl" alt="Your profile picture">
-          <ng-template #defaultAvatar><span class="grid size-full place-items-center text-2xl font-semibold text-brand-700">{{ (user.firstName.charAt(0) || '') + (user.lastName.charAt(0) || '') }}</span></ng-template>
+          <ng-template #defaultAvatar><span class="grid size-full place-items-center text-2xl font-semibold text-accent">{{ (user.firstName.charAt(0) || '') + (user.lastName.charAt(0) || '') }}</span></ng-template>
           <span class="absolute inset-x-0 bottom-0 bg-brand-900/90 py-1 text-[10px] font-semibold text-white">Change photo</span>
         </button>
         <div class="min-w-0 flex-1"><h2 class="ui-section-title break-words">{{ user.firstName }} {{ user.middleName || '' }} {{ user.lastName }}</h2><p class="ui-muted mt-2 break-words text-sm">{{ user.emailAddress }}</p></div>
@@ -23,7 +23,7 @@
         <div><dt class="ui-label">Joined</dt><dd class="mt-2 text-ink">{{ user.createdAt ? (user.createdAt | date:'mediumDate') : 'Not available' }}</dd></div>
         <div><dt class="ui-label">Last updated</dt><dd class="mt-2 text-ink">{{ user.updatedAt ? (user.updatedAt | date:'mediumDate') : 'Not available' }}</dd></div>
       </dl>
-      <div class="mt-7 flex flex-wrap gap-2 border-t border-brand-100 pt-5"><button type="button" class="ui-button" (click)="editUser()" [disabled]="isLoading">Edit details</button><button type="button" class="ui-button-secondary" (click)="logout()" [disabled]="isLoading">{{ isLoading ? 'Please wait…' : 'Sign out' }}</button></div>
+      <div class="mt-7 flex flex-wrap gap-2 border-t border-stroke pt-5"><button type="button" class="ui-button" (click)="editUser()" [disabled]="isLoading">Edit details</button><button type="button" class="ui-button-secondary" (click)="logout()" [disabled]="isLoading">{{ isLoading ? 'Please wait…' : 'Sign out' }}</button></div>
     </div>
     <div *ngIf="activeTab === 'history'" id="account-history" class="min-w-0 p-5 sm:p-7">
       <div class="ui-toolbar mb-5"><div><h2 class="ui-section-title">Appointment history</h2><p class="ui-muted mt-2 text-sm">Review your past visits and recorded appointment outcomes.</p></div></div>

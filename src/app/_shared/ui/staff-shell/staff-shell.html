@@ -14,7 +14,7 @@
     </div>
   </mat-drawer>
   <mat-drawer-content>
-    <header class="workspace-topbar flex h-20 items-center justify-between gap-3 border-b border-stroke bg-white/95 px-4 sm:px-7 lg:px-9">
+    <header class="workspace-topbar flex h-20 items-center justify-between gap-3 border-b border-stroke bg-surface/95 px-4 sm:px-7 lg:px-9">
       <div class="flex min-w-0 items-center gap-3">
         @if (isMobile) {
           <button type="button" class="ui-icon-button" aria-label="Toggle navigation menu" aria-controls="staff-navigation"
@@ -22,12 +22,15 @@
         }
         <div class="min-w-0"><p class="text-[10px] font-semibold uppercase tracking-[.16em] text-muted">{{ roleLabel }}</p><p class="truncate text-sm font-semibold text-ink">{{ title }}</p></div>
       </div>
+      <div class="flex shrink-0 items-center gap-2">
+      <app-theme-toggle />
       <button type="button" class="flex shrink-0 items-center gap-2 rounded-xl p-2 text-ink hover:bg-canvas disabled:opacity-50"
         [matMenuTriggerFor]="userMenu" [disabled]="busy" aria-label="Open account menu">
-        <span class="flex size-9 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-800">{{ userName.slice(0, 1) || 'C' }}</span>
+        <span class="flex size-9 items-center justify-center rounded-full bg-tint-strong text-sm font-semibold text-accent">{{ userName.slice(0, 1) || 'C' }}</span>
         <span class="hidden text-left sm:block"><span class="block text-xs font-semibold">{{ userName || roleLabel }}</span><span class="block text-[11px] text-muted">{{ roleLabel }}</span></span>
         <mat-icon>expand_more</mat-icon>
       </button>
+      </div>
       <mat-menu #userMenu="matMenu">
         @if (accountEnabled) { <button mat-menu-item (click)="account.emit()"><mat-icon>person_outline</mat-icon><span>My account</span></button> }
         <button mat-menu-item (click)="logout.emit()"><mat-icon>logout</mat-icon><span>Sign out</span></button>

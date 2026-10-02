@@ -41,7 +41,7 @@ import { CommonModule } from '@angular/common';
       white-space: pre-line;
       line-height: 1.5;
       font-size: 14px;
-      color: #333;
+      color: var(--color-ink);
       margin: 0;
     }
     .consent-checkbox {

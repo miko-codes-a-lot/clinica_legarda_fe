@@ -1,3 +1,3 @@
 :host { display: block; }
 table { min-width: 640px; }
-tr.mat-mdc-row:hover { background: var(--color-brand-50); }
+tr.mat-mdc-row:hover { background: var(--color-tint); }

@@ -3,8 +3,8 @@
     <a class="ui-button" routerLink="/app/user-settings/update">Edit profile</a>
   </app-page-header>
   <section class="ui-card p-6">
-    <div class="mb-6 flex flex-wrap items-center gap-4 border-b border-brand-100 pb-6">
-      @if (user.profileImage) { <img class="size-16 rounded-full object-cover" [src]="user.profileImage" [alt]="user.firstName + ' ' + user.lastName"> } @else { <div class="grid size-16 shrink-0 place-items-center rounded-full bg-brand-50 text-xl font-semibold text-brand-700" aria-hidden="true">{{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}</div> }
+    <div class="mb-6 flex flex-wrap items-center gap-4 border-b border-stroke pb-6">
+      @if (user.profileImage) { <img class="size-16 rounded-full object-cover" [src]="user.profileImage" [alt]="user.firstName + ' ' + user.lastName"> } @else { <div class="grid size-16 shrink-0 place-items-center rounded-full bg-tint text-xl font-semibold text-accent" aria-hidden="true">{{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}</div> }
       <div class="min-w-0"><h2 class="ui-section-title break-words">{{ user.firstName }} {{ user.lastName }}</h2><p class="ui-muted mt-1 break-words text-sm">{{ user.email }}</p></div>
     </div>
     <h2 class="ui-section-title mb-5">Personal details</h2>

@@ -4,29 +4,29 @@
     <div class="ui-card"><app-empty-state title="Sign in to book an appointment" description="Please sign in to continue." icon="login"><a routerLink="/app/login" class="ui-button">Proceed to login</a></app-empty-state></div>
   } @else {
     <section class="ui-card p-5 sm:p-7" aria-label="Appointment booking form">
-      <div class="mb-5 border-b border-brand-100 pb-5"><h2 class="ui-section-title">Visit details</h2><p class="ui-muted mt-2 text-sm">Select up to three services per visit. Available dates and times depend on the selected dentist and total service duration.</p></div>
+      <div class="mb-5 border-b border-stroke pb-5"><h2 class="ui-section-title">Visit details</h2><p class="ui-muted mt-2 text-sm">Select up to three services per visit. Available dates and times depend on the selected dentist and total service duration.</p></div>
       <app-form [framed]="false" submitLabel="Book appointment" busyLabel="Book appointment" [form]="rxform" [fields]="appointmentFields" [isLoading]="bookingUnavailable" (onSubmitEvent)="onSubmit()">
         @if (availabilityLoading) { <p class="ui-muted my-3 text-sm" role="status">Checking dentist availability…</p> }
-        @if (availabilityError) { <p class="my-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">{{ availabilityError }}</p> }
+        @if (availabilityError) { <p class="my-3 rounded-xl border border-danger-border bg-danger-soft p-4 text-sm text-danger" role="alert">{{ availabilityError }}</p> }
         <div [formGroup]="rxform">
           @if (bookingSchedule) {
-            <div class="mt-4 border-t border-brand-100 pt-5"><h2 class="ui-section-title mb-4">Choose your schedule</h2>
+            <div class="mt-4 border-t border-stroke pt-5"><h2 class="ui-section-title mb-4">Choose your schedule</h2>
               <div class="ui-form-grid"><app-date-picker class="min-w-0" formControlName="date" label="Appointment day" placeholder="Choose a date" [dentist]="bookingSchedule" [minDate]="minDate" [maxDate]="maxDate" [serviceDuration]="serviceDuration()" /><app-time-picker class="min-w-0" label="Appointment time" [dentist]="bookingSchedule" [selectedDate]="date.value" [serviceDuration]="serviceDuration()" [timeSlotInterval]="30" [required]="true" formControlName="time" /></div>
-              <dl class="mb-5 grid gap-3 rounded-xl border border-brand-100 bg-brand-50 p-4 text-sm sm:grid-cols-2"><div><dt class="ui-label">Total duration</dt><dd class="mt-1 font-semibold text-brand-900">{{ getFormattedDuration() }}</dd></div><div><dt class="ui-label">Appointment time</dt><dd class="mt-1 font-semibold text-brand-900">{{ getAppointmentTimeRange() }}</dd></div></dl>
+              <dl class="mb-5 grid gap-3 rounded-xl border border-stroke bg-tint p-4 text-sm sm:grid-cols-2"><div><dt class="ui-label">Total duration</dt><dd class="mt-1 font-semibold text-accent-strong">{{ getFormattedDuration() }}</dd></div><div><dt class="ui-label">Appointment time</dt><dd class="mt-1 font-semibold text-accent-strong">{{ getAppointmentTimeRange() }}</dd></div></dl>
             </div>
           }
         </div>
         @if (isChangeBranch) {
-          <section class="my-5 rounded-xl border border-amber-200 bg-amber-50 p-5" aria-labelledby="referral-title">
-            <div class="mb-5 flex items-start gap-3"><mat-icon class="shrink-0 text-amber-800" aria-hidden="true">swap_horiz</mat-icon><div><h2 id="referral-title" class="ui-section-title">Clinic transfer required</h2><p class="mt-2 text-sm text-amber-900">You are switching from <strong>{{ latestPatientAppointment?.clinic?.name }}</strong>. A referral is required to proceed.</p></div></div>
+          <section class="my-5 rounded-xl border border-warning-border bg-warning-soft p-5" aria-labelledby="referral-title">
+            <div class="mb-5 flex items-start gap-3"><mat-icon class="shrink-0 text-warning" aria-hidden="true">swap_horiz</mat-icon><div><h2 id="referral-title" class="ui-section-title">Clinic transfer required</h2><p class="mt-2 text-sm text-warning">You are switching from <strong>{{ latestPatientAppointment?.clinic?.name }}</strong>. A referral is required to proceed.</p></div></div>
             <div [formGroup]="rxReferralForm" class="ui-form-grid">
               <mat-form-field appearance="outline" class="w-full"><mat-label>Referring dentist</mat-label><mat-select formControlName="fromDoctorId" required><mat-option value="" disabled>Select a referring dentist</mat-option>@for (opt of selectReferringDentist; track opt.value) { <mat-option [value]="opt.value">{{ opt.label }}</mat-option> }</mat-select><mat-hint>From your previous clinic</mat-hint></mat-form-field>
               <mat-form-field appearance="outline" class="w-full"><mat-label>Reason for referral</mat-label><mat-select formControlName="reason" required><mat-option value="" disabled>Select a reason</mat-option><mat-option *ngFor="let reason of reasons" [value]="reason.value">{{ reason.label }}</mat-option></mat-select></mat-form-field>
             </div>
-            <p class="mt-2 flex items-start gap-2 text-sm text-amber-900"><mat-icon class="shrink-0" aria-hidden="true">info</mat-icon><span>The receiving clinic will review and confirm this referral.</span></p>
+            <p class="mt-2 flex items-start gap-2 text-sm text-warning"><mat-icon class="shrink-0" aria-hidden="true">info</mat-icon><span>The receiving clinic will review and confirm this referral.</span></p>
           </section>
         }
-        @if (services.errors?.['maxlength']) { <p class="my-4 text-sm font-medium text-red-800" role="alert">Maximum of 3 services per visit/consultation only.</p> }
+        @if (services.errors?.['maxlength']) { <p class="my-4 text-sm font-medium text-danger" role="alert">Maximum of 3 services per visit/consultation only.</p> }
       </app-form>
     </section>
   }

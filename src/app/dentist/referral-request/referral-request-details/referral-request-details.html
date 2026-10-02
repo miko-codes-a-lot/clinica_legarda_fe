@@ -3,10 +3,10 @@
     @if (referral) { <app-status-badge [status]="referral.status" /> }
   </app-page-header>
   @if (loadError) {
-    <p class="ui-card border-red-200 bg-red-50 p-5 text-sm text-red-800" role="alert">{{ loadError }}</p>
+    <p class="ui-card border-danger-border bg-danger-soft p-5 text-sm text-danger" role="alert">{{ loadError }}</p>
   } @else if (referral) {
     <app-list [data]="displayReferral" />
-    @if (!referral.appointment) { <p class="mt-5 rounded-xl bg-brand-50 p-4 text-sm text-brand-800" role="status">This referral is waiting for its receiving appointment to be linked.</p> }
+    @if (!referral.appointment) { <p class="mt-5 rounded-xl bg-tint p-4 text-sm text-accent" role="status">This referral is waiting for its receiving appointment to be linked.</p> }
     <section class="ui-card mt-5 flex flex-wrap gap-3 p-5 sm:p-6" aria-label="Referral decision">
       <button type="button" class="ui-button" (click)="approveReferral()" [disabled]="isActionDisabled()"><mat-icon>check</mat-icon> Approve</button>
       <button type="button" class="ui-button-danger" (click)="declineReferral()" [disabled]="isActionDisabled()"><mat-icon>close</mat-icon> Reject</button>

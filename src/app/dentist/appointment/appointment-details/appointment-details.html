@@ -3,14 +3,14 @@
     @if (appointment) { <app-status-badge [status]="appointment.status" /> }
   </app-page-header>
   @if (loadError) {
-    <div class="ui-card mb-5 flex flex-wrap items-center justify-between gap-3 border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+    <div class="ui-card mb-5 flex flex-wrap items-center justify-between gap-3 border-danger-border bg-danger-soft p-4 text-sm text-danger" role="alert">
       <p>{{ loadError }}</p>
       <button type="button" class="ui-button-secondary" (click)="loadAppointment()" [disabled]="isBusy">Try again</button>
     </div>
   }
   @if (appointment) {
     @if (requiresOutcome(appointment, reminderNow)) {
-      <div class="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900" role="status">
+      <div class="mb-5 rounded-xl border border-warning-border bg-warning-soft p-5 text-sm text-warning" role="status">
         <strong class="font-semibold">Outcome required</strong>
         <p class="mt-1 leading-6">This confirmed appointment has passed its scheduled end in Manila time. Record Completed or No show, or update the appointment as needed.</p>
       </div>
@@ -20,7 +20,7 @@
       <h2 id="services-title" class="ui-section-title mb-4">Services</h2>
       <ul class="flex flex-wrap gap-2">
         @for (service of appointment.services; track service._id) {
-          <li class="max-w-full rounded-lg bg-brand-50 px-3 py-2 text-sm font-medium text-brand-800 break-words">{{ service.name }}</li>
+          <li class="max-w-full rounded-lg bg-tint px-3 py-2 text-sm font-medium text-accent break-words">{{ service.name }}</li>
         } @empty { <li class="ui-muted">No services recorded.</li> }
       </ul>
     </section>
@@ -57,7 +57,7 @@
       <h2 id="activity-title" class="ui-section-title mb-5">Appointment activity</h2>
       <ol class="space-y-3">
         @for (entry of appointment.history; track $index) {
-          <li class="rounded-xl border border-brand-100 bg-canvas p-4">
+          <li class="rounded-xl border border-stroke bg-canvas p-4">
             <div class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <strong class="break-words text-sm font-semibold text-ink">{{ entry.action }}</strong>
               <time class="shrink-0 text-xs text-muted">{{ entry.timestamp | date:'medium':'+0800' }}</time>
@@ -70,7 +70,7 @@
     </section>
     <section class="mt-6" aria-label="Previous appointments">
       @if (historyError) {
-        <div class="ui-card mb-4 flex flex-wrap items-center justify-between gap-3 border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+        <div class="ui-card mb-4 flex flex-wrap items-center justify-between gap-3 border-danger-border bg-danger-soft p-4 text-sm text-danger" role="alert">
           <p>{{ historyError }}</p>
           <button type="button" class="ui-button-secondary" (click)="loadAppointment()" [disabled]="isBusy">Try again</button>
         </div>
@@ -82,7 +82,7 @@
       }
     </section>
     @if (actionError) {
-      <div class="ui-card mt-5 flex flex-wrap items-center justify-between gap-3 border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+      <div class="ui-card mt-5 flex flex-wrap items-center justify-between gap-3 border-danger-border bg-danger-soft p-4 text-sm text-danger" role="alert">
         <p>{{ actionError }}</p>
         <button type="button" class="ui-button-secondary" (click)="loadAppointment()" [disabled]="isBusy">Reload appointment</button>
       </div>

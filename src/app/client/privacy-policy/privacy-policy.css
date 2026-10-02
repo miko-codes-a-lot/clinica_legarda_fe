@@ -2,4 +2,4 @@
 .privacy-policy section + section { margin-top: 2rem; }
 .privacy-policy h2 { margin-bottom: .75rem; color: var(--color-ink); font-size: 1rem; font-weight: 600; }
 .privacy-policy section p { color: var(--color-muted); font-size: .875rem; line-height: 1.8; }
-.privacy-policy a { color: var(--color-brand-700); text-decoration: underline; text-underline-offset: .2em; overflow-wrap: anywhere; }
+.privacy-policy a { color: var(--color-accent); text-decoration: underline; text-underline-offset: .2em; overflow-wrap: anywhere; }

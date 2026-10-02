@@ -11,7 +11,7 @@
     <article class="ui-card p-5 sm:p-6">
       <p class="ui-eyebrow mb-3">{{ getTypeLabel(notification.type) || notification.type.replaceAll('_', ' ') }}</p>
       <p class="whitespace-pre-wrap break-words text-base leading-7 text-ink">{{ notification.message }}</p>
-      <p class="mt-5 border-t border-brand-100 pt-4 text-xs text-muted">Received {{ notification.createdAt | date:'medium':'+0800' }}</p>
+      <p class="mt-5 border-t border-stroke pt-4 text-xs text-muted">Received {{ notification.createdAt | date:'medium':'+0800' }}</p>
     </article>
   } @else {
     @if (!isLoading) { <p class="ui-card p-5 text-sm text-muted" role="status">Fetching data...</p> }

@@ -5,21 +5,21 @@
   @if (isLoading) { <p class="ui-muted mb-5 text-sm" role="status">Updating appointments…</p> }
   <div class="space-y-6" [attr.aria-busy]="isLoading">
     <section aria-labelledby="confirmed-title">
-      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-brand-600" aria-hidden="true">check_circle</mat-icon><h2 id="confirmed-title" class="ui-section-title">Confirmed appointments</h2></div>
+      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-accent" aria-hidden="true">check_circle</mat-icon><h2 id="confirmed-title" class="ui-section-title">Confirmed appointments</h2></div>
       <div class="space-y-4" *ngIf="hasConfirmedAppointments; else noConfirmed">
         <ng-container *ngFor="let appointment of confirmedAppointments"><ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'confirmed' }"></ng-container></ng-container>
       </div>
       <ng-template #noConfirmed><div class="ui-card"><app-empty-state title="No confirmed appointments yet" description="Confirmed visits will appear here." icon="event_available" /></div></ng-template>
     </section>
     <section aria-labelledby="pending-title">
-      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-brand-600" aria-hidden="true">hourglass_empty</mat-icon><h2 id="pending-title" class="ui-section-title">Pending appointments</h2></div>
+      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-accent" aria-hidden="true">hourglass_empty</mat-icon><h2 id="pending-title" class="ui-section-title">Pending appointments</h2></div>
       <div class="space-y-4" *ngIf="hasPendingAppointments; else noPending">
         <ng-container *ngFor="let appointment of pendingAppointments"><ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'pending' }"></ng-container></ng-container>
       </div>
       <ng-template #noPending><div class="ui-card"><app-empty-state title="No pending appointments yet" icon="pending_actions" /></div></ng-template>
     </section>
     <section aria-labelledby="finished-title">
-      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-brand-600" aria-hidden="true">history</mat-icon><h2 id="finished-title" class="ui-section-title">Completed and no-show appointments</h2></div>
+      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-accent" aria-hidden="true">history</mat-icon><h2 id="finished-title" class="ui-section-title">Completed and no-show appointments</h2></div>
       <div class="space-y-4">@for (appointment of finishedAppointments; track appointment._id) { <ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'finished' }"></ng-container> } @empty { <div class="ui-card"><app-empty-state title="No completed or no-show appointments" icon="history" /></div> }</div>
     </section>
     <section aria-labelledby="rejected-title">
@@ -41,29 +41,29 @@
 
 <ng-template #visit let-appointment let-mode="mode">
   <article class="ui-card overflow-hidden">
-    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-brand-100 bg-brand-50 px-5 py-4">
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-stroke bg-tint px-5 py-4">
       <div><p class="font-semibold text-ink">{{ appointment.date | date:'mediumDate':'+0000' }}</p><p class="ui-muted mt-1 text-sm">{{ appointment.startTime }} – {{ appointment.endTime }} · Clinic time</p></div>
       <app-status-badge [status]="appointment.status" />
     </div>
     <div class="p-5">
       <div class="grid gap-5 md:grid-cols-2">
-        <div><h3 class="ui-label mb-2">Services</h3><ul class="flex flex-wrap gap-2"><li *ngFor="let service of appointment.services" class="rounded-lg border border-brand-100 px-3 py-1.5 text-sm text-brand-800">{{ service.name }}</li></ul></div>
+        <div><h3 class="ui-label mb-2">Services</h3><ul class="flex flex-wrap gap-2"><li *ngFor="let service of appointment.services" class="rounded-lg border border-stroke px-3 py-1.5 text-sm text-accent">{{ service.name }}</li></ul></div>
         <dl class="space-y-3 text-sm"><div><dt class="ui-label">Dentist</dt><dd class="mt-1 break-words text-ink">{{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</dd></div><div><dt class="ui-label">Clinic</dt><dd class="mt-1 break-words text-ink">{{ appointment.clinic.name }}</dd><dd class="ui-muted mt-1 break-words">{{ appointment.clinic.address }}</dd></div></dl>
       </div>
       @if ((mode === 'confirmed' || mode === 'pending' || mode === 'finished') && appointment.notes.patientNotes) { <div class="mt-5 rounded-xl bg-canvas p-4 text-sm"><h3 class="ui-label mb-2">Patient notes</h3><p class="whitespace-pre-wrap break-words text-ink">{{ appointment.notes.patientNotes }}</p></div> }
       @if ((mode === 'confirmed' || mode === 'finished') && appointment.notes.clinicNotes) { <div class="mt-4 rounded-xl bg-canvas p-4 text-sm"><h3 class="ui-label mb-2">Dentist notes</h3><p class="whitespace-pre-wrap break-words text-ink">{{ appointment.notes.clinicNotes }}</p></div> }
       @if (mode === 'confirmed' && appointment.referral?.status === 'pending') { <div class="mt-4 flex flex-wrap items-center gap-2 text-sm"><span class="ui-label">Referral status</span><app-status-badge [status]="appointment.referral?.status || ''" /></div> }
-      @if (mode === 'rejected' && appointment.referral?.status === 'rejected') { <div class="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"><p class="font-semibold">Rejected by the referring dentist</p><p class="mt-2 break-words">Reason for rejection: {{ getReasonLabel(appointment.referral?.reasonOfDecline) }}</p></div> }
-      <details class="mt-5 border-t border-brand-100 pt-4">
-        <summary class="cursor-pointer text-sm font-semibold text-brand-800">Appointment activity</summary>
-        <div class="mt-4 space-y-4 border-l-2 border-brand-100 pl-4">
+      @if (mode === 'rejected' && appointment.referral?.status === 'rejected') { <div class="mt-4 rounded-xl border border-danger-border bg-danger-soft p-4 text-sm text-danger"><p class="font-semibold">Rejected by the referring dentist</p><p class="mt-2 break-words">Reason for rejection: {{ getReasonLabel(appointment.referral?.reasonOfDecline) }}</p></div> }
+      <details class="mt-5 border-t border-stroke pt-4">
+        <summary class="cursor-pointer text-sm font-semibold text-accent">Appointment activity</summary>
+        <div class="mt-4 space-y-4 border-l-2 border-stroke pl-4">
           @for (entry of appointment.history; track $index) { <div class="text-sm"><p class="font-semibold capitalize text-ink">{{ entry.action }}</p><p class="ui-muted mt-1 text-xs">{{ entry.timestamp | date:'MMM d, yyyy, h:mm a':'+0800' }}</p>@if (actorLabel(entry)) { <p class="ui-muted mt-1">By {{ actorLabel(entry) }}</p> }@if (entry.reason) { <p class="mt-2 whitespace-pre-wrap break-words text-ink"><strong>Reason:</strong> {{ entry.reason }}</p> }</div> } @empty { <p class="ui-muted text-sm">No appointment activity yet.</p> }
         </div>
       </details>
       @if (mode === 'confirmed' && !isAppointmentPast(appointment)) {
-        <div class="mt-5 flex flex-wrap gap-2 border-t border-brand-100 pt-4"><button type="button" class="ui-button-secondary" (click)="onReschedule(appointment)" [disabled]="isLoading"><mat-icon aria-hidden="true">event_repeat</mat-icon> Reschedule</button>@if (canCancel(appointment)) { <button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><mat-icon aria-hidden="true">cancel</mat-icon> Cancel appointment</button> }</div>
+        <div class="mt-5 flex flex-wrap gap-2 border-t border-stroke pt-4"><button type="button" class="ui-button-secondary" (click)="onReschedule(appointment)" [disabled]="isLoading"><mat-icon aria-hidden="true">event_repeat</mat-icon> Reschedule</button>@if (canCancel(appointment)) { <button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><mat-icon aria-hidden="true">cancel</mat-icon> Cancel appointment</button> }</div>
       }
-      @if (mode === 'pending' && canCancel(appointment)) { <div class="mt-5 border-t border-brand-100 pt-4"><button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><mat-icon aria-hidden="true">cancel</mat-icon> Cancel appointment</button></div> }
+      @if (mode === 'pending' && canCancel(appointment)) { <div class="mt-5 border-t border-stroke pt-4"><button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><mat-icon aria-hidden="true">cancel</mat-icon> Cancel appointment</button></div> }
     </div>
   </article>
 </ng-template>

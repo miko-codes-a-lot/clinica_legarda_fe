@@ -7,11 +7,11 @@
     </section>
   } @else {
   @if (isLoading) { <p class="ui-card text-sm text-muted" role="status">Loading services…</p> }
-  @if (loadError) { <div class="ui-card" role="alert"><p class="text-sm text-red-700">{{ loadError }}</p><button type="button" class="ui-button-secondary mt-4" (click)="loadServices()">Try again</button></div> }
+  @if (loadError) { <div class="ui-card" role="alert"><p class="text-sm text-danger">{{ loadError }}</p><button type="button" class="ui-button-secondary mt-4" (click)="loadServices()">Try again</button></div> }
   <section aria-label="Available services" class="grid gap-5 md:grid-cols-3">
     @for (service of services; track service._id) {
     <article class="ui-card flex flex-col p-6 sm:p-8">
-      <span class="mb-6 flex size-14 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+      <span class="mb-6 flex size-14 items-center justify-center rounded-xl bg-tint text-accent">
         <span class="material-icons !text-3xl" aria-hidden="true">
           health_and_safety
         </span>
@@ -34,9 +34,9 @@
     }
   </section>
   }
-  <aside class="mt-8 flex flex-col gap-4 rounded-xl border border-brand-100 bg-brand-50 p-6 sm:flex-row sm:items-center sm:justify-between">
+  <aside class="mt-8 flex flex-col gap-4 rounded-xl border border-stroke bg-tint p-6 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <h2 class="text-base font-semibold text-brand-900">
+      <h2 class="text-base font-semibold text-accent-strong">
         Need help planning your visit?
       </h2>
       <p class="ui-muted mt-2 text-sm">

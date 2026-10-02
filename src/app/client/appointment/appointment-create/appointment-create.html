@@ -3,7 +3,7 @@
 } @else if (!user) {
   <div class="ui-page max-w-5xl"><app-page-header title="Book an appointment" eyebrow="Patient portal" /><div class="ui-card"><app-empty-state title="Sign in to book an appointment" description="Please sign in to continue." icon="login"><a routerLink="/app/login" class="ui-button">Proceed to login</a></app-empty-state></div></div>
 } @else if (loadError) {
-  <div class="ui-page max-w-5xl"><app-page-header title="Book an appointment" eyebrow="Patient portal" /><p class="ui-card border-red-200 bg-red-50 p-5 text-sm text-red-800" role="alert">Unable to load appointment booking. Please refresh to try again.</p></div>
+  <div class="ui-page max-w-5xl"><app-page-header title="Book an appointment" eyebrow="Patient portal" /><p class="ui-card border-danger-border bg-danger-soft p-5 text-sm text-danger" role="alert">Unable to load appointment booking. Please refresh to try again.</p></div>
 } @else if (clinics.length !== 0) {
   <app-appointment [isLoading]="isLoading" [dentalServices]="dentalServices" [clinics]="clinics" [appointment]="initDoc" (onSubmitEvent)="onSubmit($event)" />
 } @else {

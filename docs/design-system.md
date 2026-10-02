@@ -44,3 +44,11 @@ Import a standalone component from `src/app/_shared/ui/<name>/<name>` into the s
 ## Verification commands
 
 Use Node 20.19.2. Run `npm run test:business` for the focused authentication, permissions, membership, booking, appointment, reporting and patient-save checks, then `npm run build`. Set `CHROME_BIN` to an installed Chrome/Chromium executable if the test launcher cannot discover it. This focused command does not replace or rewrite the existing full-suite entry point.
+
+## Light and dark mode
+
+`ThemeService` sets `html[data-theme]` and native `color-scheme`. Fresh visits follow the device preference; `app-theme-toggle` saves a light/dark choice in browser storage across public/patient and staff pages. The head `public/theme-init.js` applies that choice before rendering; keep its key (`clinica-theme`) and validation rule in sync with the service. Denied storage falls back to session state. Device and other-tab listeners belong to the service and are removed on teardown.
+
+Use `bg-surface`, `text-ink`, `text-muted`, `text-accent`, `text-accent-strong`, `bg-tint`, `bg-tint-strong`, `border-stroke` and semantic danger/warning tokens for content. Light defaults live in `styles.css`; screen dark values live in `styles/themes.css`. Keep `white` for text on fixed solid green chrome/artwork, rather than for cards/inputs. Material overlays inherit root tokens and color-scheme. Chart.js reads CSS tokens through `chart-theme.ts` and refreshes existing charts when the preference changes; report export colors remain independent. Print uses the light token palette.
+
+The toggle is included once in public/mobile navigation and shared staff topbar. Standalone staff auth uses `AuthLayout.showThemeToggle`; patient auth already has the public header. Tests cover preference state and failure boundaries; verify visual contrast, calendar/dialog/menu/table/chart surfaces in both themes in the browser.

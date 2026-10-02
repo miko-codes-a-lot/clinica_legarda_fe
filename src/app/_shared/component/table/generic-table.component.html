@@ -5,7 +5,7 @@
     }
   </app-page-header>
   <ng-content select="[table-filters]"></ng-content>
-  <div class="overflow-hidden rounded-2xl border border-stroke bg-white shadow-card">
+  <div class="overflow-hidden rounded-2xl border border-stroke bg-surface shadow-card">
     <div class="ui-toolbar border-b border-stroke px-5 pt-5">
       <mat-form-field appearance="outline" class="max-w-md">
         <mat-label>Search records</mat-label>
@@ -22,7 +22,7 @@
             <td mat-cell *matCellDef="let element">
               @let cellValue = getCellValue(col, element);
               @if (col.key === 'message' && (cellValue?.dataLink || element?.link)) {
-                <a [routerLink]="cellValue?.dataLink || element?.link" class="font-medium text-brand-700 hover:underline">{{ cellValue?.display || cellValue || element?.message }}</a>
+                <a [routerLink]="cellValue?.dataLink || element?.link" class="font-medium text-accent hover:underline">{{ cellValue?.display || cellValue || element?.message }}</a>
               } @else if (col.key === 'status') {
                 <app-status-badge [status]="cellValue || ''"></app-status-badge>
               } @else {
@@ -39,7 +39,7 @@
               <button mat-icon-button aria-label="Edit record" (click)="onUpdateClick(element)" [disabled]="getEditDisabled(element)"><mat-icon>edit</mat-icon></button>
             }
             @if (enableDelete && delete.observers.length > 0) {
-              <button mat-icon-button aria-label="Delete record" class="text-red-700" (click)="onDeleteClick(element)"><mat-icon>delete</mat-icon></button>
+              <button mat-icon-button aria-label="Delete record" class="text-danger" (click)="onDeleteClick(element)"><mat-icon>delete</mat-icon></button>
             }
             @if (markAsRead.observers.length > 0) {
               <button mat-icon-button aria-label="Mark as read" (click)="onMarkAsReadClick(element)"><mat-icon>done_all</mat-icon></button>

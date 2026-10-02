@@ -6,7 +6,7 @@
       </label>
       <input id="patient-username" type="text" class="ui-input" placeholder="Enter your username" formControlName="username" autocomplete="username" [attr.aria-invalid]="username.touched && username.invalid">
       @if (username.touched && username.hasError('required')) {
-      <p class="mt-2 text-xs text-red-700" role="alert">
+      <p class="mt-2 text-xs text-danger" role="alert">
         Enter your username.
       </p>
       }
@@ -16,13 +16,13 @@
         <label for="patient-password" class="ui-label mb-0">
           Password
         </label>
-        <a routerLink="/app/forgot-password" class="text-xs font-semibold text-brand-700 underline underline-offset-4">
+        <a routerLink="/app/forgot-password" class="text-xs font-semibold text-accent underline underline-offset-4">
           Forgot password?
         </a>
       </div>
       <input id="patient-password" type="password" class="ui-input" placeholder="Enter your password" formControlName="password" autocomplete="current-password" [attr.aria-invalid]="password.touched && password.invalid">
       @if (password.touched && password.hasError('required')) {
-      <p class="mt-2 text-xs text-red-700" role="alert">
+      <p class="mt-2 text-xs text-danger" role="alert">
         Enter your password.
       </p>
       }
@@ -34,7 +34,7 @@
       </span>
     </button>
   </form>
-  <div class="mt-7 border-t border-brand-100 pt-6 text-center">
+  <div class="mt-7 border-t border-stroke pt-6 text-center">
     <p class="text-sm text-muted">
       New to Clinica Legarda?
     </p>

@@ -1,7 +1,7 @@
 <section class="ui-page max-w-4xl">
   <app-page-header title="Edit user" eyebrow="Management" description="Manage users in your currently assigned clinics. Shared staff retain their other clinic assignments." />
   @if (loadError) {
-    <p class="ui-card p-5 text-sm text-red-800" role="alert">{{ loadError }}</p>
+    <p class="ui-card p-5 text-sm text-danger" role="alert">{{ loadError }}</p>
   } @else if (!isLoading && clinics.length === 0) {
     <div class="ui-card"><app-empty-state title="No assigned clinics" description="Ask a super admin to assign a clinic before editing users." icon="domain" /></div>
   } @else if (user && days.length > 0) {

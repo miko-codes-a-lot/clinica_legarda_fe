@@ -1,10 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ClinicBrand } from '../clinic-brand/clinic-brand';
+import { ThemeToggle } from '../theme-toggle/theme-toggle';
 
 @Component({
   selector: 'app-auth-layout',
-  imports: [RouterLink, ClinicBrand],
+  imports: [RouterLink, ClinicBrand, ThemeToggle],
   template: `
     <section class="ui-auth-layout max-w-5xl items-stretch gap-0 lg:gap-0">
       <aside class="flex flex-col justify-between rounded-t-3xl bg-brand-900 p-7 text-white sm:p-10 lg:rounded-l-3xl lg:rounded-tr-none">
@@ -19,6 +20,7 @@ import { ClinicBrand } from '../clinic-brand/clinic-brand';
         <a routerLink="/app/privacy-policy" class="mt-6 hidden w-fit text-xs text-brand-100 underline underline-offset-4 lg:block">Privacy policy</a>
       </aside>
       <div class="ui-auth-card rounded-t-none lg:rounded-l-none lg:rounded-tr-3xl">
+        @if (showThemeToggle) { <div class="mb-5 flex justify-end"><app-theme-toggle /></div> }
         <p class="ui-eyebrow mb-3">{{ eyebrow }}</p>
         <h1 class="ui-title">{{ title }}</h1>
         @if (description) { <p class="ui-muted mb-7 mt-3">{{ description }}</p> }
@@ -31,4 +33,5 @@ export class AuthLayout {
   @Input({ required: true }) title = '';
   @Input() eyebrow = 'Patient portal';
   @Input() description = '';
+  @Input() showThemeToggle = false;
 }

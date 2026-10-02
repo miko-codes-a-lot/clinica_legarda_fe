@@ -1,7 +1,7 @@
 .chart-container { position: relative; height: 19rem; min-width: 0; }
 .dashboard-table-scroll { max-height: 28rem; overflow: auto; }
 .dashboard-table { width: 100%; min-width: 42rem; }
-.dashboard-table mat-header-cell { background: var(--color-brand-50); color: var(--color-muted); font-size: .75rem; font-weight: 600; }
+.dashboard-table mat-header-cell { background: var(--color-tint); color: var(--color-muted); font-size: .75rem; font-weight: 600; }
 .dashboard-table mat-cell { padding: 1rem .75rem; color: var(--color-ink); font-size: .8125rem; overflow-wrap: anywhere; }
 .dashboard-table mat-header-cell { padding: .75rem; }
 .dashboard-table .mat-column-message, .dashboard-table .mat-column-service { flex: 2; }

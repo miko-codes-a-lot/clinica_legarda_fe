@@ -1,11 +1,11 @@
 <div class="ui-page">
   <app-page-header eyebrow="Find your clinic" title="Contact us" description="Branch contact details and opening hours to help you plan your visit." />
   @if (isLoading) { <p role="status" class="ui-card text-sm text-muted">Loading clinic branches…</p> }
-  @if (loadError) { <div class="ui-card mb-5" role="alert"><p class="text-sm text-red-700">{{ loadError }}</p><button type="button" class="ui-button-secondary mt-4" (click)="loadClinics()">Try again</button></div> }
+  @if (loadError) { <div class="ui-card mb-5" role="alert"><p class="text-sm text-danger">{{ loadError }}</p><button type="button" class="ui-button-secondary mt-4" (click)="loadClinics()">Try again</button></div> }
   <section aria-label="Clinic branches" class="grid items-start gap-6 lg:grid-cols-2">
     @for (clinic of clinics; track clinic._id) {
     <article class="ui-card min-w-0 overflow-hidden p-0 sm:p-0">
-      <header class="border-b border-brand-100 bg-brand-50 px-6 py-5">
+      <header class="border-b border-stroke bg-tint px-6 py-5">
         <p class="ui-eyebrow mb-2">
           Clinic branch
         </p>
@@ -16,7 +16,7 @@
       <div class="p-6">
         <dl class="space-y-4 text-sm">
           <div class="flex gap-3">
-            <span class="material-icons !text-xl text-brand-600" aria-hidden="true">
+            <span class="material-icons !text-xl text-accent" aria-hidden="true">
               location_on
             </span>
             <div class="min-w-0">
@@ -29,7 +29,7 @@
             </div>
           </div>
           <div class="flex gap-3">
-            <span class="material-icons !text-xl text-brand-600" aria-hidden="true">
+            <span class="material-icons !text-xl text-accent" aria-hidden="true">
               phone
             </span>
             <div class="min-w-0">
@@ -37,14 +37,14 @@
                 Phone
               </dt>
               <dd>
-                <a [href]="'tel:' + clinic.mobileNumber" class="break-all text-brand-700 underline underline-offset-4">
+                <a [href]="'tel:' + clinic.mobileNumber" class="break-all text-accent underline underline-offset-4">
                   {{ clinic.mobileNumber }}
                 </a>
               </dd>
             </div>
           </div>
           <div class="flex gap-3">
-            <span class="material-icons !text-xl text-brand-600" aria-hidden="true">
+            <span class="material-icons !text-xl text-accent" aria-hidden="true">
               mail_outline
             </span>
             <div class="min-w-0">
@@ -52,14 +52,14 @@
                 Email
               </dt>
               <dd>
-                <a [href]="'mailto:' + clinic.emailAddress" class="break-all text-brand-700 underline underline-offset-4">
+                <a [href]="'mailto:' + clinic.emailAddress" class="break-all text-accent underline underline-offset-4">
                   {{ clinic.emailAddress }}
                 </a>
               </dd>
             </div>
           </div>
         </dl>
-        <div class="mt-6 border-t border-brand-100 pt-5">
+        <div class="mt-6 border-t border-stroke pt-5">
           <h3 class="mb-3 text-sm font-semibold text-ink">
             Opening hours
           </h3>

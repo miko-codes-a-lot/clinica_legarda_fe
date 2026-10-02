@@ -3,11 +3,14 @@
     <a routerLink="/app/home" class="nav-brand" (click)="mobileOpen = false" aria-label="Clinica Legarda home">
       <app-clinic-brand subtitle="Patient care" />
     </a>
+    <div class="nav-controls">
+      <app-theme-toggle />
     <button type="button" class="ui-icon-button menu-toggle" (click)="mobileOpen = !mobileOpen" [attr.aria-expanded]="mobileOpen" aria-controls="public-navigation" [attr.aria-label]="mobileOpen ? 'Close navigation menu' : 'Open navigation menu'">
       <span class="material-icons" aria-hidden="true">
         {{ mobileOpen ? 'close' : 'menu' }}
       </span>
     </button>
+    </div>
     <div id="public-navigation" class="menu-panel" [class.is-open]="mobileOpen">
       <nav aria-label="Main navigation" class="nav-menu">
         @for (item of menuItems; track item.label) {

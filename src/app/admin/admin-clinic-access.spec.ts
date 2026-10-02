@@ -1,3 +1,5 @@
+import { ElementRef } from '@angular/core';
+import { ThemeService } from '../_shared/service/theme-service';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -161,6 +163,32 @@ describe('Admin clinic access contract', () => {
     respondWithClinics([clinic, { ...clinic, _id: 'clinic-2' }]);
     expect(view.clinics.map(choice => choice._id)).toEqual(['all', 'clinic-1', 'clinic-2']);
     expect(view.canExport).toBeTrue();
+  });
+
+  it('preserves a hidden chart service when the display theme changes', () => {
+    const view = dashboard('super-admin');
+    respondWithClinics();
+    view.state = { status: 'ready', clinicId: 'all', report: {
+      ...report, trend: { ...report.trend, labels: ['Monday'], serviceTrend: { Cleaning: [1] } },
+    } };
+    const canvas = () => new ElementRef(document.createElement('canvas'));
+    view.servicesChartRef = canvas();
+    view.appointmentTrendRef = canvas();
+    view.serviceTrendChartRef = canvas();
+    view.declinedReferralChartRef = canvas();
+    view.ngAfterViewInit();
+    try {
+      expect(view.serviceTrendChart.isDatasetVisible(0)).toBeTrue();
+      view.serviceTrendChart.hide(0);
+      expect(view.serviceTrendChart.isDatasetVisible(0)).toBeFalse();
+      TestBed.inject(ThemeService).toggle();
+      expect(view.serviceTrendChart.isDatasetVisible(0)).toBeFalse();
+      TestBed.inject(ThemeService).toggle();
+      expect(view.serviceTrendChart.isDatasetVisible(0)).toBeFalse();
+    } finally {
+      view.ngOnDestroy();
+      localStorage.removeItem('clinica-theme');
+    }
   });
 
   it('refreshes appointment clinic choices and removes a revoked selection', () => {

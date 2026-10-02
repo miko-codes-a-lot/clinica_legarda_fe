@@ -29,10 +29,10 @@
 <main #mainContent id="main-content" tabindex="-1" class="min-h-[60vh] outline-none">
   <router-outlet />
 </main>
-<footer class="border-t border-brand-100 bg-white">
+<footer class="border-t border-stroke bg-surface">
   <div class="mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:px-8 md:grid-cols-[1.4fr_1fr_1fr]">
     <div>
-      <a routerLink="/app/home" class="inline-block text-brand-900" aria-label="Clinica Legarda home">
+      <a routerLink="/app/home" class="inline-block text-accent-strong" aria-label="Clinica Legarda home">
         <app-clinic-brand subtitle="Patient care" />
       </a>
       <p class="ui-muted mt-4 max-w-sm text-sm">
@@ -44,13 +44,13 @@
         Plan your visit
       </h2>
       <div class="flex flex-col items-start gap-3 text-sm text-muted">
-        <a routerLink="/app/service" class="hover:text-brand-700">
+        <a routerLink="/app/service" class="hover:text-accent">
           Services
         </a>
-        <a routerLink="/app/appointment" class="hover:text-brand-700">
+        <a routerLink="/app/appointment" class="hover:text-accent">
           Book an appointment
         </a>
-        <a routerLink="/app/contact-us" class="hover:text-brand-700">
+        <a routerLink="/app/contact-us" class="hover:text-accent">
           Branches & opening hours
         </a>
       </div>
@@ -60,19 +60,19 @@
         Helpful links
       </h2>
       <div class="flex flex-col items-start gap-3 text-sm text-muted">
-        <a routerLink="/app/faq" class="hover:text-brand-700">
+        <a routerLink="/app/faq" class="hover:text-accent">
           Frequently asked questions
         </a>
-        <a routerLink="/app/privacy-policy" class="hover:text-brand-700">
+        <a routerLink="/app/privacy-policy" class="hover:text-accent">
           Privacy policy
         </a>
-        <a routerLink="/admin/login" class="hover:text-brand-700">
+        <a routerLink="/admin/login" class="hover:text-accent">
           Staff login
         </a>
       </div>
     </div>
   </div>
-  <div class="mx-auto max-w-7xl border-t border-brand-100 px-5 py-5 text-xs text-muted sm:px-8">
+  <div class="mx-auto max-w-7xl border-t border-stroke px-5 py-5 text-xs text-muted sm:px-8">
     Clinica Legarda · Appointment & patient portal
   </div>
 </footer>

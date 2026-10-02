@@ -1,4 +1,4 @@
 .dialog-body { display: flex; flex-direction: column; gap: 16px; }
-.current-appointment-info { border: 1px solid var(--color-brand-100); background: var(--color-brand-50); border-radius: 12px; padding: 16px; font-size: 13px; }
+.current-appointment-info { border: 1px solid var(--color-stroke); background: var(--color-tint); border-radius: 12px; padding: 16px; font-size: 13px; }
 app-date-picker, app-time-picker { width: 100%; display: block; }
 [mat-dialog-actions] { border-top: 1px solid var(--color-stroke); padding: 16px 24px; gap: 8px; }

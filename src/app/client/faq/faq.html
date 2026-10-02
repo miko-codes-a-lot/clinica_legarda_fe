@@ -2,13 +2,13 @@
   <app-page-header eyebrow="Patient information" title="Frequently asked questions" description="A few helpful answers before your next visit." />
   <div class="ui-card overflow-hidden p-0 sm:p-0">
     @for (faq of faqs; track faq.question; let i = $index) {
-    <section class="border-b border-brand-100 last:border-b-0">
+    <section class="border-b border-stroke last:border-b-0">
       <h2>
-        <button type="button" class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm font-semibold text-ink hover:bg-brand-50 sm:text-base" (click)="toggleFaq(i)" [attr.aria-expanded]="faq.open" [attr.aria-controls]="'faq-answer-' + i" [id]="'faq-question-' + i">
+        <button type="button" class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm font-semibold text-ink hover:bg-tint sm:text-base" (click)="toggleFaq(i)" [attr.aria-expanded]="faq.open" [attr.aria-controls]="'faq-answer-' + i" [id]="'faq-question-' + i">
           <span>
             {{ faq.question }}
           </span>
-          <span class="material-icons shrink-0 !text-xl text-brand-600" aria-hidden="true">
+          <span class="material-icons shrink-0 !text-xl text-accent" aria-hidden="true">
             {{ faq.open ? 'remove' : 'add' }}
           </span>
         </button>
@@ -21,9 +21,9 @@
     </section>
     }
   </div>
-  <aside class="mt-7 flex flex-col items-start gap-4 rounded-xl bg-brand-50 p-6 sm:flex-row sm:items-center sm:justify-between">
+  <aside class="mt-7 flex flex-col items-start gap-4 rounded-xl bg-tint p-6 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <h2 class="text-base font-semibold text-brand-900">
+      <h2 class="text-base font-semibold text-accent-strong">
         Still have a question?
       </h2>
       <p class="ui-muted mt-2 text-sm">

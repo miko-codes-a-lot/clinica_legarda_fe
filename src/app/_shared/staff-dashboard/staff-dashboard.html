@@ -14,13 +14,13 @@
       </button>
       <section *ngIf="showNotifications" id="dashboard-notifications" [attr.aria-label]="notificationScope"
         class="ui-card absolute right-0 top-full z-40 mt-3 w-[min(24rem,calc(100vw-3rem))] overflow-hidden">
-        <div class="flex items-center justify-between gap-3 border-b border-brand-100 px-5 py-4">
+        <div class="flex items-center justify-between gap-3 border-b border-stroke px-5 py-4">
           <h2 class="ui-section-title">{{ notificationScope }}</h2>
           <button mat-icon-button type="button" (click)="toggleNotifications()" aria-label="Close notifications"><mat-icon>close</mat-icon></button>
         </div>
         <div class="max-h-96 overflow-y-auto" *ngIf="notifications$ | async as notifications">
-          <article *ngFor="let notification of notifications" class="flex flex-wrap items-start gap-3 border-b border-brand-100 p-4"
-            [class.bg-brand-50]="!notification.read">
+          <article *ngFor="let notification of notifications" class="flex flex-wrap items-start gap-3 border-b border-stroke p-4"
+            [class.bg-tint]="!notification.read">
             <div class="min-w-0 flex-1">
               <button type="button" class="ui-button-ghost mb-2 px-0 text-xs" (click)="redirectToDetails(notification.link)">
                 {{ formatNotificationType(notification.type) }}
@@ -38,15 +38,15 @@
   </app-page-header>
 
   <div class="mb-5 space-y-3">
-    <div *ngIf="reportError" class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+    <div *ngIf="reportError" class="rounded-xl border border-danger-border bg-danger-soft p-4 text-sm text-danger" role="alert">
       <p>{{ reportError }}</p>
       <button *ngIf="state.status === 'error'" type="button" class="ui-button-secondary mt-3" (click)="retryReport()">Retry report</button>
     </div>
     <p *ngIf="state.status === 'loading'" class="ui-muted" role="status">Loading report…</p>
-    <div *ngIf="clinicError" class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+    <div *ngIf="clinicError" class="rounded-xl border border-danger-border bg-danger-soft p-4 text-sm text-danger" role="alert">
       {{ clinicError }} <button type="button" class="ui-button-secondary ml-2" (click)="loadClinics()">Retry clinic choices</button>
     </div>
-    <p *ngIf="notificationError" class="text-sm text-red-800" role="alert">{{ notificationError }}</p>
+    <p *ngIf="notificationError" class="text-sm text-danger" role="alert">{{ notificationError }}</p>
   </div>
 
   <section class="ui-card mb-6 p-5" aria-label="Report clinic scope">
@@ -66,17 +66,17 @@
 
   <div class="mb-6 grid gap-4 sm:grid-cols-3">
     <section class="ui-card p-5">
-      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Total appointments</h2><mat-icon class="text-brand-600" aria-hidden="true">event</mat-icon></div>
+      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Total appointments</h2><mat-icon class="text-accent" aria-hidden="true">event</mat-icon></div>
       <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ weeklyReport?.totalAppointments ?? '—' }}</p>
       <p class="ui-muted mt-2 text-xs">This report week</p>
     </section>
     <section class="ui-card p-5">
-      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Appointments updated</h2><mat-icon class="text-brand-600" aria-hidden="true">assignment</mat-icon></div>
+      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Appointments updated</h2><mat-icon class="text-accent" aria-hidden="true">assignment</mat-icon></div>
       <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ weeklyReport?.appointmentsUpdated ?? '—' }}</p>
       <p class="ui-muted mt-2 text-xs">This report week</p>
     </section>
     <section class="ui-card p-5">
-      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Today's queue</h2><mat-icon class="text-brand-600" aria-hidden="true">schedule</mat-icon></div>
+      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Today's queue</h2><mat-icon class="text-accent" aria-hidden="true">schedule</mat-icon></div>
       <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ report ? appointmentQueue.length : '—' }}</p>
       <p class="ui-muted mt-2 text-xs">Confirmed appointments</p>
     </section>
@@ -101,7 +101,7 @@
 
   <div class="grid gap-5 2xl:grid-cols-2">
     <section class="ui-card min-w-0 overflow-hidden">
-      <div class="border-b border-brand-100 p-5"><p class="ui-eyebrow mb-2">Clinic schedule</p><h2 class="ui-section-title">Today's appointment queue</h2><p class="ui-muted mt-1 text-sm">{{ todayLabel }}</p></div>
+      <div class="border-b border-stroke p-5"><p class="ui-eyebrow mb-2">Clinic schedule</p><h2 class="ui-section-title">Today's appointment queue</h2><p class="ui-muted mt-1 text-sm">{{ todayLabel }}</p></div>
       <div class="dashboard-table-scroll">
         <mat-table [dataSource]="appointmentQueue" class="dashboard-table">
           <ng-container matColumnDef="time"><mat-header-cell *matHeaderCellDef>Time</mat-header-cell><mat-cell *matCellDef="let appointment">{{ appointment.time }}</mat-cell></ng-container>
@@ -116,7 +116,7 @@
     </section>
     <ng-container *ngIf="notifications$ | async as notifications">
       <section class="ui-card min-w-0 overflow-hidden" *ngIf="!showNotifications">
-        <div class="border-b border-brand-100 p-5"><p class="ui-eyebrow mb-2">{{ area === 'admin' ? 'Assigned clinics' : 'Account-wide' }}</p><h2 class="ui-section-title">Recent notifications</h2></div>
+        <div class="border-b border-stroke p-5"><p class="ui-eyebrow mb-2">{{ area === 'admin' ? 'Assigned clinics' : 'Account-wide' }}</p><h2 class="ui-section-title">Recent notifications</h2></div>
         <div class="dashboard-table-scroll" *ngIf="notifications.length > 0">
           <mat-table [dataSource]="notifications" class="dashboard-table">
             <ng-container matColumnDef="type"><mat-header-cell *matHeaderCellDef>Type</mat-header-cell><mat-cell *matCellDef="let notification"><button type="button" class="ui-button-ghost px-0 text-left text-xs" (click)="redirectToDetails(notification.link)">{{ formatNotificationType(notification.type) }}</button></mat-cell></ng-container>
@@ -124,7 +124,7 @@
             <ng-container matColumnDef="timestamp"><mat-header-cell *matHeaderCellDef>Date</mat-header-cell><mat-cell *matCellDef="let notification">{{ formatTimestamp(notification.createdAt) }}</mat-cell></ng-container>
             <ng-container matColumnDef="status"><mat-header-cell *matHeaderCellDef>Status</mat-header-cell><mat-cell *matCellDef="let notification"><button *ngIf="!notification.read" type="button" class="ui-button-ghost text-xs" (click)="markAsRead(notification._id)">Mark as read</button><app-status-badge *ngIf="notification.read" status="Read" /></mat-cell></ng-container>
             <mat-header-row *matHeaderRowDef="notificationColumns"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: notificationColumns;" [class.bg-brand-50]="!row.read"></mat-row>
+            <mat-row *matRowDef="let row; columns: notificationColumns;" [class.bg-tint]="!row.read"></mat-row>
           </mat-table>
         </div>
         <app-empty-state *ngIf="notifications.length === 0" title="No notifications" description="Appointment updates will appear here." icon="notifications_none" />

@@ -7,4 +7,5 @@ html {
     density: -1,
   ));
   color-scheme: light;
+  &[data-theme="dark"] { color-scheme: dark; }
 }

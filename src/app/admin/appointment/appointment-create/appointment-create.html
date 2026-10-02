@@ -1,7 +1,7 @@
 <section class="ui-page max-w-4xl">
   <app-page-header title="Create appointment" eyebrow="Appointments" description="Schedule a patient in one of your currently assigned clinics." />
   @if (loadError) {
-    <p class="ui-card mb-5 border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">{{ loadError }}</p>
+    <p class="ui-card mb-5 border-danger-border bg-danger-soft p-4 text-sm text-danger" role="alert">{{ loadError }}</p>
   } @else if (clinics.length !== 0) {
     <app-appointment-form
       [isLoading]="isLoading"

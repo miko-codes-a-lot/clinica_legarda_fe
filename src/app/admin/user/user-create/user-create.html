@@ -1,7 +1,7 @@
 <section class="ui-page max-w-4xl">
   <app-page-header title="Create user" eyebrow="Management" description="Manage users in your currently assigned clinics." />
   @if (loadError) {
-    <p class="ui-card p-5 text-sm text-red-800" role="alert">{{ loadError }}</p>
+    <p class="ui-card p-5 text-sm text-danger" role="alert">{{ loadError }}</p>
   } @else if (isLoading && clinics.length === 0) {
     <p class="ui-card p-5 text-sm text-muted" role="status">Loading user options…</p>
   } @else if (clinics.length === 0) {

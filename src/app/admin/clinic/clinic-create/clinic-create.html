@@ -1,5 +1,5 @@
 <section class="ui-page max-w-4xl">
   <app-page-header title="Create clinic" eyebrow="Management" description="Manage clinic information and operating hours." />
-  @if (loadError) { <p class="ui-card mb-5 border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">{{ loadError }}</p> }
+  @if (loadError) { <p class="ui-card mb-5 border-danger-border bg-danger-soft p-4 text-sm text-danger" role="alert">{{ loadError }}</p> }
   <app-clinic-form [isLoading]="isLoading" [days]="days" (onSubmitEvent)="onSubmit($event)"></app-clinic-form>
 </section>

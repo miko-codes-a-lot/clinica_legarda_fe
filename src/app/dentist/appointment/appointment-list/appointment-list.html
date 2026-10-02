@@ -8,27 +8,27 @@
   </div>
   <section class="ui-card mb-6 p-5 sm:p-6" aria-labelledby="confirmed-schedule-title">
     <div class="mb-4 flex items-center gap-3">
-      <mat-icon class="text-brand-700">calendar_today</mat-icon>
+      <mat-icon class="text-accent">calendar_today</mat-icon>
       <h2 id="confirmed-schedule-title" class="ui-section-title">Confirmed schedule</h2>
     </div>
     <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      <article class="min-w-0 rounded-xl border border-brand-100 bg-canvas p-4" *ngFor="let date of dailyDates" [class.border-brand-500]="date === todayStr" [class.bg-brand-50]="date === todayStr">
+      <article class="min-w-0 rounded-xl border border-stroke bg-canvas p-4" *ngFor="let date of dailyDates" [class.border-brand-500]="date === todayStr" [class.bg-tint]="date === todayStr">
         <h3 class="text-sm font-semibold text-ink">{{ (date + 'T00:00:00Z') | date:'EEE, MMM d':'UTC' }}</h3>
-        <p class="mt-2 text-2xl font-semibold text-brand-800">{{ dailyAppointments[date].length }} <span class="text-sm font-normal text-muted">patient{{ dailyAppointments[date].length > 1 ? 's' : '' }}</span></p>
+        <p class="mt-2 text-2xl font-semibold text-accent">{{ dailyAppointments[date].length }} <span class="text-sm font-normal text-muted">patient{{ dailyAppointments[date].length > 1 ? 's' : '' }}</span></p>
         <p class="mt-2 break-words text-xs leading-5 text-muted">{{ dailyClinicNames[date] }}</p>
       </article>
       <p *ngIf="dailyDates.length === 0" class="ui-muted sm:col-span-2">No upcoming appointments</p>
     </div>
   </section>
   @if (errorMessage) {
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-danger-border bg-danger-soft p-4 text-sm text-danger" role="alert">
       <p>{{ errorMessage }}</p><button type="button" class="ui-button-secondary" (click)="refresh()">Try again</button>
     </div>
   }
   <div class="mb-5 flex flex-wrap gap-2" role="group" aria-label="Filter appointments by status">
     @for (filter of statusFilters; track filter.value) {
       <button type="button" class="ui-button-secondary aria-pressed:bg-brand-700 aria-pressed:text-white" [attr.data-status]="filter.value" [attr.aria-pressed]="selectedStatus === filter.value" [class.active]="selectedStatus === filter.value" (click)="selectStatus(filter.value)">
-        {{ filter.label }} <span class="rounded-md bg-brand-50 px-1.5 text-xs text-brand-800">{{ statusCounts[filter.value] }}</span>
+        {{ filter.label }} <span class="rounded-md bg-tint px-1.5 text-xs text-accent">{{ statusCounts[filter.value] }}</span>
       </button>
     }
   </div>

@@ -1,3 +1,6 @@
+import { DOCUMENT } from '@angular/common';
+import { ThemeService } from '../service/theme-service';
+import { applyChartTheme, readChartTheme } from './chart-theme';
 import { PageHeader } from '../ui/page-header/page-header';
 import { StatusBadge } from '../ui/status-badge/status-badge';
 import { EmptyState } from '../ui/empty-state/empty-state';
@@ -63,6 +66,9 @@ export class StaffDashboard {
 
   @Input() area: 'admin' | 'super-admin' = 'admin';
   private readonly destroyRef = inject(DestroyRef);
+  private readonly document = inject(DOCUMENT);
+  private readonly themeService = inject(ThemeService);
+  private chartTheme = readChartTheme(this.document);
   private readonly clinicSelection = new BehaviorSubject('all');
   private viewReady = false;
   state: AnalyticsReportState = { status: 'loading', clinicId: 'all' };
@@ -108,6 +114,10 @@ export class StaffDashboard {
   get todayLabel(): string { return this.weeklyReport ? formatReportDate(this.weeklyReport.today) : ''; }
 
   ngOnInit(): void {
+    this.themeService.themeChanges$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.chartTheme = readChartTheme(this.document);
+      this.refreshChartTheme();
+    });
     this.reasonService.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: reasons => { this.reasons = reasons; this.updateCharts(); },
       error: () => { /* Raw reason codes remain usable if the label directory fails. */ },
@@ -167,6 +177,32 @@ export class StaffDashboard {
     this.createAppointmentTrendChart();
     this.createServiceTrendChart();
     this.createOrUpdateDeclinedReferralChart();
+    this.refreshChartTheme();
+  }
+
+  private refreshChartTheme(): void {
+    if (!this.viewReady) return;
+    // Recolor existing dataset objects so legend visibility survives a theme change.
+    if (this.servicesChart) {
+      this.servicesChart.data.datasets[0].backgroundColor = this.chartTheme.colors.slice(0, 4);
+      this.servicesChart.data.datasets[0].borderColor = this.chartTheme.surface;
+    }
+    this.appointmentTrendChart?.data.datasets.forEach((dataset, index) => {
+      dataset.borderColor = this.chartTheme.colors[index];
+      dataset.backgroundColor = this.chartTheme.fills[index];
+    });
+    this.serviceTrendChart?.data.datasets.forEach((dataset, index) => {
+      dataset.backgroundColor = this.chartTheme.colors[index % this.chartTheme.colors.length];
+    });
+    if (this.declinedReferralChart) {
+      this.declinedReferralChart.data.datasets[0].backgroundColor = this.declinedChartColors;
+      this.declinedReferralChart.data.datasets[0].borderColor = this.chartTheme.surface;
+    }
+    for (const chart of [this.servicesChart, this.appointmentTrendChart, this.serviceTrendChart, this.declinedReferralChart]) {
+      if (!chart) continue;
+      applyChartTheme(chart, this.chartTheme);
+      chart.update('none');
+    }
   }
 
   // ----------------- SERVICES CHART -----------------
@@ -177,7 +213,6 @@ export class StaffDashboard {
     if (this.servicesChart) {
       this.servicesChart.data.labels = services;
       this.servicesChart.data.datasets[0].data = counts;
-      this.servicesChart.update();
       return;
     }
 
@@ -187,9 +222,9 @@ export class StaffDashboard {
         labels: services,
         datasets: [{
           data: counts,
-          backgroundColor: ['#087563', '#44ab92', '#0a4a41', '#b45309'],
+          backgroundColor: this.chartTheme.colors.slice(0, 4),
           borderWidth: 2,
-          borderColor: '#ffffff'
+          borderColor: this.chartTheme.surface
         }]
       },
       options: {
@@ -231,7 +266,6 @@ export class StaffDashboard {
       this.appointmentTrendChart.data.labels = trendData.labels;
       this.appointmentTrendChart.data.datasets[0].data = trendData.scheduled;
       this.appointmentTrendChart.data.datasets[1].data = trendData.completed;
-      this.appointmentTrendChart.update();
       return;
     }
 
@@ -243,16 +277,16 @@ export class StaffDashboard {
           {
             label: 'Total Appointments',
             data: trendData.scheduled,
-            borderColor: '#087563',
-            backgroundColor: 'rgba(8, 117, 99, 0.1)',
+            borderColor: this.chartTheme.colors[0],
+            backgroundColor: this.chartTheme.fills[0],
             tension: 0.4,
             fill: true
           },
           {
             label: 'Completed Appointments',
             data: trendData.completed,
-            borderColor: '#44ab92',
-            backgroundColor: 'rgba(68, 171, 146, 0.1)',
+            borderColor: this.chartTheme.colors[1],
+            backgroundColor: this.chartTheme.fills[1],
             tension: 0.4,
             fill: true
           }
@@ -314,7 +348,6 @@ export class StaffDashboard {
     if (this.serviceTrendChart) {
       this.serviceTrendChart.data.labels = trendData.labels;
       this.serviceTrendChart.data.datasets = trendData.datasets;
-      this.serviceTrendChart.update();
       return;
     }
 
@@ -350,13 +383,18 @@ export class StaffDashboard {
   }
 
   private getServiceTrendData(): { labels: string[], datasets: { label: string, data: number[], backgroundColor: string }[] } {
-    const colors = ['#087563', '#44ab92', '#0a4a41', '#b45309', '#647472', '#79cdb6', '#b42318'];
+    const colors = this.chartTheme.colors;
     return {
       labels: this.report?.trend.labels ?? [],
       datasets: Object.entries(this.report?.trend.serviceTrend ?? {}).map(([label, data], index) => ({
         label, data, backgroundColor: colors[index % colors.length],
       })),
     };
+  }
+
+  private get declinedChartColors(): string[] {
+    const colors = this.chartTheme.colors;
+    return [colors[6], colors[3], colors[4], colors[0], colors[1]];
   }
 
   private getDeclinedReferralData(): { labels: string[], counts: number[] } {
@@ -372,7 +410,6 @@ export class StaffDashboard {
     if (this.declinedReferralChart) {
       this.declinedReferralChart.data.labels = labels;
       this.declinedReferralChart.data.datasets[0].data = counts;
-      this.declinedReferralChart.update();
       return;
     }
 
@@ -382,9 +419,9 @@ export class StaffDashboard {
         labels,
         datasets: [{
           data: counts,
-          backgroundColor: ['#b42318', '#b45309', '#647472', '#087563', '#44ab92'],
+          backgroundColor: this.declinedChartColors,
           borderWidth: 2,
-          borderColor: '#fff'
+          borderColor: this.chartTheme.surface
         }]
       },
       options: {

@@ -1,0 +1,36 @@
+/* Semantic colors change; the fixed brand palette stays usable on solid green chrome. */
+@media screen {
+html[data-theme="dark"] {
+  --color-canvas: #101b19;
+  --color-surface: #192925;
+  --color-ink: #e4eeea;
+  --color-muted: #a5b9b0;
+  --color-stroke: #35483f;
+  --color-outline: #718a7d;
+  --color-accent: #7bd7bc;
+  --color-accent-strong: #cfefe3;
+  --color-on-accent: #092923;
+  --color-tint: #203a30;
+  --color-tint-strong: #2a4d3e;
+  --color-tint-border: #456b59;
+  --color-danger: #ffb4ab;
+  --color-danger-soft: #3c2425;
+  --color-danger-hover: #512c2d;
+  --color-danger-border: #754044;
+  --color-warning: #f3cc80;
+  --color-warning-soft: #352f20;
+  --color-warning-border: #6a5835;
+  --color-neutral: #c0cad4;
+  --color-neutral-soft: #2b3640;
+  --color-chart-1: #7bd7bc;
+  --color-chart-2: #47b99c;
+  --color-chart-3: #b1ead8;
+  --color-chart-4: #efbe70;
+  --color-chart-5: #a5b9b0;
+  --color-chart-6: #73aee0;
+  --color-chart-7: #ffb4ab;
+  --color-chart-fill-1: rgb(123 215 188 / .12);
+  --color-chart-fill-2: rgb(71 185 156 / .12);
+  --shadow-card: 0 2px 8px -4px rgb(0 0 0 / .25), 0 0 0 1px rgb(0 0 0 / .08);
+}
+}

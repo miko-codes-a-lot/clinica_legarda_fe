@@ -1,7 +1,7 @@
 <app-form [form]="rxform" [fields]="userFields" [isLoading]="isLoading" (onSubmitEvent)="onSubmit()">
   <div [formGroup]="rxform">
     @if (rxform.get('role')?.value === 'dentist') {
-      <section class="mt-6 border-t border-brand-100 pt-6" aria-labelledby="dentist-schedule-title">
+      <section class="mt-6 border-t border-stroke pt-6" aria-labelledby="dentist-schedule-title">
         <div class="ui-toolbar mb-4">
           <div>
             <h2 id="dentist-schedule-title" class="ui-section-title">Working hours</h2>
@@ -12,11 +12,11 @@
           }
         </div>
         @if (assignedClinics.value.length === 0) {
-          <p class="rounded-xl bg-brand-50 p-4 text-sm text-brand-800" role="status">Please select at least one clinic.</p>
+          <p class="rounded-xl bg-tint p-4 text-sm text-accent" role="status">Please select at least one clinic.</p>
         } @else {
           <div formArrayName="operatingHours" class="space-y-4">
             @for (hour of this.operatingHours.controls; track $index) {
-              <div [formGroupName]="$index" class="rounded-xl border border-brand-100 bg-canvas p-4">
+              <div [formGroupName]="$index" class="rounded-xl border border-stroke bg-canvas p-4">
                 <div class="ui-form-grid">
                   <mat-form-field appearance="outline" class="w-full sm:col-span-2">
                     <mat-label>Day</mat-label>
@@ -34,10 +34,10 @@
                   </mat-form-field>
                 </div>
                 @if (hour.errors?.['timeRangeInvalid'] && (hour.touched || hour.dirty)) {
-                  <p class="mt-2 text-sm text-red-700" role="alert">Time must be between the start and end time.</p>
+                  <p class="mt-2 text-sm text-danger" role="alert">Time must be between the start and end time.</p>
                 }
                 @if (hour.errors?.['outsideClinicHours'] && (hour.touched || hour.dirty)) {
-                  <p class="mt-2 text-sm text-red-700" role="alert">Time must be within the clinic's operating hours.</p>
+                  <p class="mt-2 text-sm text-danger" role="alert">Time must be within the clinic's operating hours.</p>
                 }
               </div>
             }

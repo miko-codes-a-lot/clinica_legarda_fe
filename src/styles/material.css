@@ -1,18 +1,23 @@
 /* Material owns interaction and focus; shared tokens own the visual language. */
 html {
-  --mat-sys-primary: var(--color-brand-600);
-  --mat-sys-on-primary: #fff;
-  --mat-sys-primary-container: var(--color-brand-100);
-  --mat-sys-on-primary-container: var(--color-brand-900);
-  --mat-sys-secondary: var(--color-brand-700);
-  --mat-sys-tertiary: var(--color-brand-600);
-  --mat-sys-surface: #fff;
+  --mat-sys-primary: var(--color-accent);
+  --mat-sys-on-primary: var(--color-on-accent);
+  --mat-sys-primary-container: var(--color-tint-strong);
+  --mat-sys-on-primary-container: var(--color-accent-strong);
+  --mat-sys-secondary: var(--color-accent);
+  --mat-sys-tertiary: var(--color-accent);
+  --mat-sys-error: var(--color-danger);
+  --mat-sys-error-container: var(--color-danger-soft);
+  --mat-sys-on-error-container: var(--color-danger);
+  --mat-sys-surface-container-lowest: var(--color-surface);
+  --mat-sys-surface-container-highest: var(--color-tint);
+  --mat-sys-surface: var(--color-surface);
   --mat-sys-surface-container: var(--color-canvas);
-  --mat-sys-surface-container-low: #fff;
+  --mat-sys-surface-container-low: var(--color-surface);
   --mat-sys-surface-container-high: var(--color-canvas);
   --mat-sys-on-surface: var(--color-ink);
   --mat-sys-on-surface-variant: var(--color-muted);
-  --mat-sys-outline: #c3d1ca;
+  --mat-sys-outline: var(--color-outline);
   --mat-sys-outline-variant: var(--color-stroke);
   --mat-sys-body-large-font: var(--font-sans);
   --mat-sys-body-medium-font: var(--font-sans);
@@ -21,7 +26,7 @@ html {
 }
 .mat-mdc-form-field { width: 100%; font-size: 14px; --mat-form-field-outlined-container-shape: 12px; }
 .mat-mdc-form-field .mdc-notched-outline__notch { border-right-width: 0 !important; }
-.mat-mdc-text-field-wrapper { background: #fff; }
+.mat-mdc-text-field-wrapper { background: var(--color-surface); }
 .mat-mdc-form-field .mdc-text-field--outlined { border-radius: 12px; }
 .mat-mdc-form-field .mdc-notched-outline { --mdc-outlined-text-field-container-shape: 12px; }
 .mat-mdc-form-field-infix { min-width: 0; }
@@ -34,10 +39,10 @@ html {
 .mat-mdc-cell { color: var(--color-ink); font-size: 13px; }
 .mat-mdc-header-cell, .mat-mdc-cell { border-bottom-color: var(--color-stroke); padding: 12px 18px; }
 .mat-mdc-paginator { background: transparent; color: var(--color-muted); }
-.mat-mdc-dialog-surface { border-radius: 20px; background: white; }
+.mat-mdc-dialog-surface { border-radius: 20px; background: var(--color-surface); }
 .mat-mdc-dialog-title { font-weight: 600; letter-spacing: -.025em; }
-.mat-mdc-menu-panel { border: 1px solid var(--color-stroke); border-radius: 14px; background: white; }
-.mat-mdc-tab-header { --mat-tab-header-active-label-text-color: var(--color-brand-700); --mdc-tab-indicator-active-indicator-color: var(--color-brand-600); }
+.mat-mdc-menu-panel { border: 1px solid var(--color-stroke); border-radius: 14px; background: var(--color-surface); }
+.mat-mdc-tab-header { --mat-tab-header-active-label-text-color: var(--color-accent); --mdc-tab-indicator-active-indicator-color: var(--color-brand-600); }
 .mat-mdc-list-item { --mdc-list-list-item-label-text-color: var(--color-ink); }
 @media (max-width: 640px) {
   .mat-mdc-header-cell, .mat-mdc-cell { padding: 10px 12px; }
