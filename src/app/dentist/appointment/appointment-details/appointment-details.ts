@@ -1,3 +1,4 @@
+import { AppointmentCareLinks } from '../../../care/appointment-care-links/appointment-care-links';
 import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
 import { StatusBadge } from '../../../_shared/ui/status-badge/status-badge';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
@@ -27,7 +28,7 @@ import { compareAppointmentSchedule, formatAppointmentDate, requiresAppointmentO
 
 @Component({
   selector: 'app-appointment-details',
-  imports: [EmptyState, StatusBadge, PageHeader, ListComponent, MatListModule, MatButtonModule, MatIconModule, CommonModule, GenericTableComponent],
+  imports: [AppointmentCareLinks, EmptyState, StatusBadge, PageHeader, ListComponent, MatListModule, MatButtonModule, MatIconModule, CommonModule, GenericTableComponent],
   templateUrl: './appointment-details.html',
   styleUrl: './appointment-details.css',
 })

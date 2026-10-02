@@ -37,6 +37,7 @@ export interface Appointment {
   endTime: string
   status: AppointmentStatus
   isWalkIn?: boolean
+  careCase?: string
   notes: AppointmentNote
   history: AppointmentHistory[],
   createdBy?: string

@@ -123,6 +123,11 @@ export class AppointmentForm {
         this.patient.disable({ emitEvent: false });
       }
     }
+    if (this.appointment?.careCase) {
+      this.clinic.disable({ emitEvent: false });
+      this.dentist.disable({ emitEvent: false });
+      this.patient.disable({ emitEvent: false });
+    }
     this.rxReferralForm = this.fb.nonNullable.group({
       fromDoctorId: ['', Validators.required],
       fromClinicId: ['', Validators.required],
@@ -427,6 +432,7 @@ Do you want to proceed?` },
       endTime,
       status: AppointmentStatus.PENDING,
       isWalkIn: this.rxform.controls.isWalkIn.value,
+      ...(this.appointment?.careCase ? { careCase: this.appointment.careCase } : {}),
       notes: {
         clinicNotes: this.appointment?.notes?.clinicNotes || '',
         patientNotes: this.rxform.controls.patientNotes.value || ''

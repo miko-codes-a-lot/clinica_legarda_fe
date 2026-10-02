@@ -9,7 +9,7 @@ import { ClinicService } from '../../_shared/service/clinic-service';
 import { AuthService } from '../../_shared/service/auth-service';
 import { assignedClinicIds, isStaffBookablePatient } from '../../_shared/model/user';
 import { CareApiService, careError } from '../care-api.service';
-import { CareAppointment, CareClinic, CarePerson, clinicToday } from '../care.models';
+import { CareAppointment, CareClinic, CarePerson, TreatmentCase, clinicToday } from '../care.models';
 
 @Component({ selector: 'app-patient-check-in', imports: [CommonModule, ReactiveFormsModule, RouterLink, PageHeader], templateUrl: './check-in.html' })
 export class PatientCheckIn implements OnInit {
@@ -26,7 +26,8 @@ export class PatientCheckIn implements OnInit {
     clinic: new FormControl('', { nonNullable: true, validators: Validators.required }),
     dentist: new FormControl('', { nonNullable: true, validators: Validators.required }),
     appointment: new FormControl('', { nonNullable: true }),
-    purpose: new FormControl<'consultation' | 'treatment'>('consultation', { nonNullable: true, validators: Validators.required }),
+    careCase: new FormControl('', { nonNullable: true }),
+    purpose: new FormControl<'consultation' | 'treatment'>(this.route.snapshot.queryParamMap.get('purpose') === 'treatment' ? 'treatment' : 'consultation', { nonNullable: true, validators: Validators.required }),
     isWalkIn: new FormControl(true, { nonNullable: true }),
   });
   readonly keyword = new FormControl(this.route.snapshot.queryParamMap.get('patient') ?? '', { nonNullable: true, validators: Validators.maxLength(100) });
@@ -34,6 +35,7 @@ export class PatientCheckIn implements OnInit {
   patients: CarePerson[] = [];
   dentists: CarePerson[] = [];
   appointments: CareAppointment[] = [];
+  cases: TreatmentCase[] = [];
   loading = false;
   saving = false;
   error = '';
@@ -41,6 +43,7 @@ export class PatientCheckIn implements OnInit {
   readonly canRegister = ['admin', 'super-admin'].includes(this.auth.currentUserValue?.role ?? '');
   private initialPatient = this.route.snapshot.queryParamMap.get('patient');
   private initialAppointment = this.route.snapshot.queryParamMap.get('appointment');
+  private initialCase = this.route.snapshot.queryParamMap.get('careCase');
 
   ngOnInit(): void {
     this.searches.pipe(switchMap(() => {
@@ -66,11 +69,15 @@ export class PatientCheckIn implements OnInit {
       this.form.controls.patient.setValue(''); this.form.controls.dentist.setValue(''); this.search();
     });
     this.form.controls.patient.valueChanges.pipe(startWith(''), switchMap(patient => {
-      this.appointments = []; this.form.controls.appointment.setValue('');
+      this.appointments = []; this.cases = []; this.form.controls.appointment.setValue(''); this.form.controls.careCase.setValue('');
       if (!patient) return of(null);
-      return this.api.patientRecord(patient, this.form.controls.clinic.value).pipe(catchError(error => { this.searchError = careError(error); return of(null); }));
-    }), takeUntilDestroyed(this.destroyRef)).subscribe(record => {
-      this.appointments = record?.appointments.filter(appointment => appointment.status === 'confirmed' && appointment.date.slice(0, 10) === clinicToday()) ?? [];
+      return forkJoin({ record: this.api.patientRecord(patient, this.form.controls.clinic.value), cases: this.api.cases(patient, this.form.controls.clinic.value) }).pipe(catchError(error => { this.searchError = careError(error); return of(null); }));
+    }), takeUntilDestroyed(this.destroyRef)).subscribe(result => {
+      this.appointments = result?.record.appointments.filter(appointment => appointment.status === 'confirmed' && appointment.date.slice(0, 10) === clinicToday()) ?? [];
+      this.cases = result?.cases.filter(careCase => careCase.status === 'active') ?? [];
+      if (this.initialCase && this.cases.some(careCase => careCase._id === this.initialCase)) {
+        this.form.controls.careCase.setValue(this.initialCase); this.initialCase = null;
+      }
       if (this.initialAppointment && this.appointments.some(appointment => appointment._id === this.initialAppointment)) {
         this.form.controls.appointment.setValue(this.initialAppointment); this.initialAppointment = null;
       }
@@ -78,7 +85,18 @@ export class PatientCheckIn implements OnInit {
     this.form.controls.appointment.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(id => {
       const appointment = this.appointments.find(item => item._id === id);
       this.form.controls.isWalkIn.setValue(appointment ? !!appointment.isWalkIn : true);
-      if (appointment) this.form.controls.dentist.setValue(appointment.dentist._id);
+      if (appointment) { this.form.controls.dentist.setValue(appointment.dentist._id); this.form.controls.dentist.disable({ emitEvent: false }); }
+      else this.form.controls.dentist.enable({ emitEvent: false });
+      if (appointment?.careCase) { this.form.controls.careCase.setValue(appointment.careCase); this.form.controls.careCase.disable(); }
+      else this.form.controls.careCase.enable();
+    });
+    this.form.controls.careCase.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(id => {
+      const careCase = this.cases.find(item => item._id === id);
+      if (careCase) { this.form.controls.dentist.setValue(careCase.dentist._id); this.form.controls.purpose.setValue('treatment'); }
+    });
+    this.form.controls.dentist.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(id => {
+      const careCase = this.cases.find(item => item._id === this.form.controls.careCase.value);
+      if (careCase && careCase.dentist._id !== id) this.form.controls.careCase.setValue('');
     });
     this.clinicsApi.getAccessible().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ next: clinics => {
       const user = this.auth.currentUserValue;
@@ -94,7 +112,7 @@ export class PatientCheckIn implements OnInit {
     const value = this.form.getRawValue();
     this.saving = true; this.error = '';
     this.api.checkIn({ patient: value.patient, clinic: value.clinic, dentist: value.dentist, purpose: value.purpose,
-      isWalkIn: value.appointment ? value.isWalkIn : true, ...(value.appointment ? { appointment: value.appointment } : {}) })
+      isWalkIn: value.appointment ? value.isWalkIn : true, ...(value.appointment ? { appointment: value.appointment } : {}), ...(value.careCase ? { careCase: value.careCase } : {}) })
       .pipe(finalize(() => this.saving = false), takeUntilDestroyed(this.destroyRef)).subscribe({
         next: () => this.router.navigate([this.base, 'queue']), error: error => this.error = careError(error),
       });

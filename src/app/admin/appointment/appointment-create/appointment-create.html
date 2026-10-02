@@ -1,5 +1,6 @@
 <section class="ui-page max-w-4xl">
-  <app-page-header title="Create appointment" eyebrow="Appointments" description="Schedule a patient in one of your currently assigned clinics." />
+  <app-page-header title="Create appointment" eyebrow="Appointments" description="Schedule an identified patient with an assigned dentist and available time." />
+  @if (caseTitle) { <p class="mb-5 rounded-xl bg-tint p-4 text-sm text-accent">Linked treatment case: {{ caseTitle }}. The patient, clinic and responsible dentist are fixed for this session.</p> }
   @if (loadError) {
     <p class="ui-card mb-5 border-danger-border bg-danger-soft p-4 text-sm text-danger" role="alert">{{ loadError }}</p>
   } @else if (clinics.length !== 0) {

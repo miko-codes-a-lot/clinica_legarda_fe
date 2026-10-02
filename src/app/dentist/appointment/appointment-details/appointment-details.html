@@ -1,3 +1,4 @@
+<app-appointment-care-links [appointment]="appointment" />
 <section class="ui-page max-w-6xl">
   <app-page-header title="Appointment details" eyebrow="Clinical workspace" description="Review the visit, record clinical notes, and manage its outcome.">
     @if (appointment) { <app-status-badge [status]="appointment.status" />

@@ -24,6 +24,7 @@ export interface CareAppointment {
   endTime: string;
   status: string;
   isWalkIn?: boolean;
+  careCase?: string;
   services: { _id: string; name: string }[];
 }
 export interface PatientSearchResult { items: CarePerson[]; total: number; page: number; pageSize: number; }
@@ -47,9 +48,32 @@ export interface CareVisit {
   isWalkIn: boolean;
   revision: number;
   events: { state: string; actor: string; at: string; reason?: string }[];
+  assessment: string;
+  treatments: VisitTreatment[];
+  summary: string;
+  aftercare: string;
+  nextSteps: string;
+  clinicalAuthor?: string;
+  clinicalUpdatedAt?: string;
+}
+export interface VisitTreatment { description: string; tooth?: string; notes?: string; }
+export interface VisitRecordPayload {
+  revision: number; complete: boolean; assessment: string; treatments: VisitTreatment[];
+  summary: string; aftercare: string; nextSteps: string;
+}
+export interface TreatmentCase {
+  _id: string; patient: CarePerson; clinic: CareClinic; dentist: CarePerson; consultationVisit: string;
+  title: string; plan: string; internalNotes: string; status: 'active' | 'completed' | 'discontinued'; revision: number;
+  createdAt: string; closedAt?: string;
+}
+export interface TreatmentCaseDetail {
+  careCase: TreatmentCase;
+  visits: Pick<CareVisit, '_id' | 'date' | 'purpose' | 'state' | 'summary' | 'checkedInAt' | 'endedAt'>[];
+  appointments: Pick<CareAppointment, '_id' | 'date' | 'startTime' | 'endTime' | 'status' | 'services'>[];
 }
 export interface CheckInPayload {
   patient: string; clinic: string; dentist: string; appointment?: string;
+  careCase?: string;
   purpose: 'consultation' | 'treatment'; isWalkIn: boolean;
 }
 export function clinicToday(): string {
