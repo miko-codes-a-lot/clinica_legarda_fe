@@ -3,7 +3,7 @@
     <div class="mx-auto grid max-w-7xl items-center gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:py-20">
       <div>
         <p class="ui-eyebrow mb-4">
-          Welcome to Clinica Legarda
+          {{ clinic.fullName }}
         </p>
         <h1 class="max-w-2xl text-4xl font-semibold leading-[1.12] tracking-tight text-accent-strong sm:text-5xl lg:text-6xl">
           Care for you.
@@ -11,7 +11,7 @@
           Space for your smile.
         </h1>
         <p class="ui-muted mt-6 max-w-xl text-base sm:text-lg">
-          Find clinic information, plan your visit and manage your appointments with Clinica Legarda.
+          General dentistry and orthodontics in Pinagbuhatan, Pasig City. Explore our services, plan your visit and keep track of your care with {{ clinic.shortName }}.
         </p>
         <div class="mt-8 flex flex-wrap gap-3">
           <a routerLink="/app/appointment" class="ui-button">

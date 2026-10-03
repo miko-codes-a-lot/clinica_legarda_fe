@@ -1,4 +1,5 @@
 import { Icon } from '../../_shared/ui/icon/icon';
+import { CLINIC_PROFILE } from '../../_shared/clinic-profile';
 import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
 import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { Component, DestroyRef, inject } from '@angular/core';
@@ -16,6 +17,7 @@ import { AlertService } from '../../_shared/service/alert.service';
   styleUrl: './contact-us.css'
 })
 export class ContactUs {
+ readonly clinic = CLINIC_PROFILE;
  isLoading = false;
  loadError = '';
  private readonly destroyRef = inject(DestroyRef);
@@ -43,7 +45,7 @@ export class ContactUs {
     this.loadError = '';
     this.clinicService.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (clinics) => {
-        this.clinics = clinics;
+        this.clinics = [...clinics].sort((a, b) => Number(b._id === this.clinic.mainClinicId) - Number(a._id === this.clinic.mainClinicId));
       },
       error: () => { this.loadError = 'We could not load the branch details. Please try again.'; }
     }).add(() => this.isLoading = false);

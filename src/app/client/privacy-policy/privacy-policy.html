@@ -1,7 +1,7 @@
 <div class="ui-page max-w-4xl">
   <article class="ui-card privacy-policy">
     <header class="mb-8 border-b border-stroke pb-6">
-      <p class="ui-eyebrow mb-3">Clinica Legarda</p>
+      <p class="ui-eyebrow mb-3">{{ clinic.shortName }}</p>
       <h1 class="ui-title">Privacy Policy</h1>
       <p class="ui-muted mt-3">Effective September 1, 2026</p>
     </header>
@@ -10,7 +10,7 @@
       <h2>Information we collect</h2>
       <p>
         We collect the account, profile, contact, and appointment information
-        you provide when using Clinica Legarda. This may include your name,
+        you provide when using {{ clinic.shortName }}. This may include your name,
         email address, phone number, appointment details, and notes needed to
         provide clinic services.
       </p>
@@ -28,7 +28,7 @@
     <section>
       <h2>Google and Gmail data</h2>
       <p>
-        Clinica Legarda uses the Gmail API only to send one-time passwords and
+        {{ clinic.shortName }} uses the Gmail API only to send one-time passwords and
         account-related email from the clinic account. The application does not
         read, download, or manage a user's Gmail inbox.
       </p>
@@ -56,8 +56,8 @@
       <h2>Contact</h2>
       <p>
         For privacy questions or requests, email
-        <a href="mailto:clinicalegarda9@gmail.com"
-          >clinicalegarda9&#64;gmail.com</a
+        <a [href]="'mailto:' + clinic.email"
+          >{{ clinic.email }}</a
         >.
       </p>
     </section>

@@ -1,0 +1,46 @@
+{
+  "shortName": "R. Nañez Dental",
+  "fullName": "R. Nañez Dental Clinic",
+  "tagline": "General Dentistry & Orthodontics",
+  "logo": "/assets/images/rnanez-logo.png",
+  "mainClinicId": "70c100000000000000000002",
+  "address": "Block 4 Lot 1 Megaville, Eusebio Avenue, Nagpayong II, Pinagbuhatan, Pasig City",
+  "phones": ["09092535715", "09063315890"],
+  "email": "rnanezdentalclinic@gmail.com",
+  "serviceGroups": [
+    {
+      "title": "General & preventive dentistry",
+      "icon": "shield-check",
+      "services": [
+        { "name": "Oral Prophylaxis", "duration": 30, "aliases": ["Routine Cleaning"] },
+        { "name": "Fluoride Application", "duration": 30, "aliases": [] },
+        { "name": "Tooth Restoration", "duration": 30, "aliases": ["Tooth Filling", "Composite Filling"] },
+        { "name": "Pit and Fissure Sealant", "duration": 30, "aliases": [] },
+        { "name": "Tooth Extraction", "duration": 30, "aliases": ["Simple Tooth Extraction"] },
+        { "name": "Teeth Whitening", "duration": 60, "aliases": ["Tooth Whitening"] },
+        { "name": "Periodontal Treatment", "duration": 60, "aliases": [] }
+      ]
+    },
+    {
+      "title": "Orthodontics & prosthodontics",
+      "icon": "tooth",
+      "services": [
+        { "name": "Braces", "duration": 120, "aliases": [], "assessment": true, "multipleSessions": true },
+        { "name": "Retainers", "duration": 60, "aliases": [] },
+        { "name": "Dentures", "duration": 60, "aliases": ["Denture"], "multipleSessions": true },
+        { "name": "Fixed Bridge", "duration": 60, "aliases": [] },
+        { "name": "Jacket Crowns", "duration": 60, "aliases": ["Jacket Crown"] },
+        { "name": "Night Guard", "duration": 30, "aliases": [] },
+        { "name": "Post and Core", "duration": 60, "aliases": [] }
+      ]
+    },
+    {
+      "title": "Endodontics & surgery",
+      "icon": "heart",
+      "services": [
+        { "name": "Root Canal Treatment", "duration": 120, "aliases": [], "assessment": true, "multipleSessions": true },
+        { "name": "Special Surgery – Odontectomy", "duration": 120, "aliases": ["Wisdom Tooth Extraction", "Special Surgery - Odontectomy"], "assessment": true }
+      ]
+    }
+  ]
+}

@@ -46,15 +46,15 @@ export class MockService {
     return {
       _id: '1',
       name: 'Branch A',
-      address: '2275 Legarda st. Sampaloc Manila',
+      address: 'Block 4 Lot 1 Megaville, Eusebio Avenue, Pinagbuhatan, Pasig City',
       mobileNumber: '+639391112236',
-      emailAddress: 'contact@clinicalegarda.com',
+      emailAddress: 'rnanezdentalclinic@gmail.com',
       clinic: {
         _id: '1',
-        name: 'Clinica Legarda Dental Clinic',
-        address: '2275 Legarda st. Sampaloc Manila',
+        name: 'R. Nañez Dental Clinic',
+        address: 'Block 4 Lot 1 Megaville, Eusebio Avenue, Pinagbuhatan, Pasig City',
         mobileNumber: '+639391112236',
-        emailAddress: 'contact@clinicalegarda.com',
+        emailAddress: 'rnanezdentalclinic@gmail.com',
         operatingHours: [
           { day: 'monday', startTime: '09:00', endTime: '18:00' },
           { day: 'tuesday', startTime: '09:00', endTime: '18:00' },
@@ -75,10 +75,10 @@ export class MockService {
   mockClinicBase(): Clinic {
     return {
       _id: '1',
-      name: 'Clinica Legarda Dental Clinic',
-      address: '2275 Legarda st. Sampaloc Manila',
+      name: 'R. Nañez Dental Clinic',
+      address: 'Block 4 Lot 1 Megaville, Eusebio Avenue, Pinagbuhatan, Pasig City',
       mobileNumber: '+639391112236',
-      emailAddress: 'contact@clinicalegarda.com',
+      emailAddress: 'rnanezdentalclinic@gmail.com',
       operatingHours: [
         { day: 'monday', startTime: '09:00', endTime: '18:00' },
         { day: 'tuesday', startTime: '09:00', endTime: '18:00' },

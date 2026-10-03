@@ -1,24 +1,42 @@
 <div class="ui-page">
-  <app-page-header eyebrow="Clinica Legarda" title="Our services" description="Plan your dental visit and choose an available service when you book." />
+  <app-page-header [eyebrow]="clinic.shortName" title="Our services" description="Plan your dental visit and choose an available service when you book." />
+  <section aria-label="Dental services offered" class="mb-6 grid gap-5 lg:grid-cols-3">
+    @for (group of clinic.serviceGroups; track group.title) {
+      <article class="ui-card p-6 sm:p-6">
+        <app-icon [name]="group.icon" class="mb-4 !size-7 text-accent" />
+        <h2 class="ui-section-title">{{ group.title }}</h2>
+        <ul class="mt-4 space-y-3">
+          @for (service of group.services; track service.name) {
+            <li class="flex items-start gap-2 text-sm text-ink">
+              <app-icon name="check" class="mt-0.5 !size-4 shrink-0 text-accent" />
+              <div>{{ service.name }}@if (service.assessment) { <p class="mt-1 text-xs text-muted">Consultation first</p> }</div>
+            </li>
+          }
+        </ul>
+      </article>
+    }
+  </section>
+  <aside class="mb-8 rounded-xl border border-stroke bg-tint p-5">
+    <h2 class="text-sm font-semibold text-accent-strong">Start with the right visit</h2>
+    <p class="ui-muted mt-2 text-sm">Braces, root canal treatment and surgery begin with a consultation or assessment. Braces, root canal treatment and denture fitting can involve linked visits. Your dentist will plan the sessions with you.</p>
+  </aside>
   @if (!isSignedIn) {
     <section class="ui-card grid items-center gap-6 sm:grid-cols-[1fr_auto]">
-      <div><p class="ui-eyebrow mb-3">Dental care</p><h2 class="ui-section-title">Find the services for your visit</h2><p class="ui-muted mt-3 max-w-xl">Sign in to view the clinic’s available services and appointment durations, then choose your clinic and dentist when you book.</p></div>
-      <div class="flex flex-wrap gap-3 sm:flex-col"><a routerLink="/app/login" class="ui-button">Sign in to view services</a><a routerLink="/app/appointment" class="ui-button-secondary">Book an appointment</a></div>
+      <div><p class="ui-eyebrow mb-3">Plan your appointment</p><h2 class="ui-section-title">Ready to visit the clinic?</h2><p class="ui-muted mt-3 max-w-xl">Sign in to choose an available appointment, clinic and dentist. If you need help deciding, contact the clinic to plan your first consultation.</p></div>
+      <div class="flex flex-wrap gap-3 sm:flex-col"><a routerLink="/app/login" class="ui-button">Patient sign in</a><a routerLink="/app/appointment" class="ui-button-secondary">Book an appointment</a></div>
     </section>
   } @else {
   @if (isLoading) { <p class="ui-card text-sm text-muted" role="status">Loading services…</p> }
   @if (loadError) { <div class="ui-card" role="alert"><p class="text-sm text-danger">{{ loadError }}</p><button type="button" class="ui-button-secondary mt-4" (click)="loadServices()">Try again</button></div> }
-  <section aria-label="Available services" class="grid gap-5 md:grid-cols-3">
+  <h2 class="ui-section-title mb-4">Available appointment services</h2>
+  <section aria-label="Available services" class="grid gap-4 md:grid-cols-3">
     @for (service of services; track service._id) {
-    <article class="ui-card flex flex-col p-6 sm:p-8">
-      <span class="mb-6 flex size-14 items-center justify-center rounded-xl bg-tint text-accent">
-        <app-icon class="!size-8" aria-hidden="true" name="health_and_safety" />
-      </span>
+    <article class="ui-card flex flex-col p-5 sm:p-5">
       <h2 class="ui-section-title">
         {{ service.name }}
       </h2>
-      <p class="ui-muted mb-8 mt-3 text-sm">
-        Appointment duration: {{ service.duration }} minutes.
+      <p class="ui-muted mb-4 mt-2 text-sm">
+        Scheduled time: {{ service.duration }} minutes.
       </p>
       <a routerLink="/app/appointment" class="ui-button-secondary mt-auto" [attr.aria-label]="'Book an appointment for ' + service.name">
         Book an appointment

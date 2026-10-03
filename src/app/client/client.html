@@ -29,7 +29,7 @@
 <footer class="border-t border-stroke bg-surface">
   <div class="mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:px-8 md:grid-cols-[1.4fr_1fr_1fr]">
     <div>
-      <a routerLink="/app/home" class="inline-block text-accent-strong" aria-label="Clinica Legarda home">
+      <a routerLink="/app/home" class="inline-block text-accent-strong" [attr.aria-label]="clinic.shortName + ' home'">
         <app-clinic-brand subtitle="Patient care" />
       </a>
       <p class="ui-muted mt-4 max-w-sm text-sm">
@@ -70,7 +70,7 @@
     </div>
   </div>
   <div class="mx-auto max-w-7xl border-t border-stroke px-5 py-5 text-xs text-muted sm:px-8">
-    Clinica Legarda · Appointment & patient portal
+    {{ clinic.shortName }} · Appointment & patient portal
   </div>
 </footer>
 <div class="chatbot-container">

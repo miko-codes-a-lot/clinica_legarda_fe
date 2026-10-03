@@ -1,3 +1,4 @@
+import { CLINIC_PROFILE } from '../../_shared/clinic-profile';
 import { Icon } from '../../_shared/ui/icon/icon';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { catchError, distinctUntilChanged, EMPTY, map, of, startWith, Subject, switchMap } from 'rxjs';
@@ -17,6 +18,7 @@ import { DentalServicesService } from '../../_shared/service/dental-services-ser
   styleUrl: './dental-service.css',
 })
 export class DentalService implements OnInit {
+  readonly clinic = CLINIC_PROFILE;
   services: DentalServiceRecord[] = [];
   isLoading = false;
   isSignedIn = false;

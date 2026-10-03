@@ -1,5 +1,5 @@
 <div class="ui-page max-w-6xl">
-  <app-page-header title="Your patient portal" eyebrow="Clinica Legarda" description="Plan your next visit and keep your appointment and account details together.">
+  <app-page-header title="Your patient portal" [eyebrow]="clinic.shortName" description="Plan your next visit and keep your appointment and account details together.">
     <a class="ui-button" routerLink="/app/appointment">Book an appointment <app-icon class="!size-5" aria-hidden="true" name="arrow_forward" /></a>
   </app-page-header>
   <div class="grid gap-5 md:grid-cols-2">

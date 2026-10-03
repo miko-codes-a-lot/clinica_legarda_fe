@@ -1,8 +1,10 @@
 <div class="ui-page">
-  <app-page-header eyebrow="About the clinic" title="Welcome to Clinica Legarda" description="A place to connect with your clinic and plan your care." />
+  <app-page-header eyebrow="About the clinic" [title]="clinic.fullName" description="A place to connect with your clinic and plan your care." />
   <section class="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
-    <div class="ui-card overflow-hidden bg-tint p-6 sm:p-8">
-      <img src="/assets/images/clinic.svg" alt="Illustration of a dental clinic" width="720" height="480" class="h-auto w-full">
+    <div class="ui-card flex flex-col items-center overflow-hidden bg-tint p-6 sm:p-8">
+      <img [src]="clinic.logo" [alt]="clinic.fullName + ' logo'" width="1046" height="1045" class="aspect-square w-full max-w-72 rounded-full bg-white object-contain">
+      <p class="mt-6 text-center text-lg font-semibold text-accent-strong">{{ clinic.fullName }}</p>
+      <p class="ui-muted mt-2 text-center">{{ clinic.tagline }}</p>
     </div>
     <div>
       <p class="ui-eyebrow mb-3">
@@ -12,11 +14,16 @@
         Care begins with a conversation.
       </h2>
       <p class="ui-muted mt-5">
-        At Clinica Legarda, we aim to make each visit welcoming and help patients feel informed about their care.
+        {{ clinic.fullName }} offers general dentistry and orthodontics in Pinagbuhatan, Pasig City. Explore preventive care, tooth restoration, braces, dentures, root canal treatment and other services before planning your visit.
       </p>
       <p class="ui-muted mt-4">
         Our patient portal brings clinic information and appointment management together, so you can prepare for your visit and follow your appointment updates.
       </p>
+      <address class="mt-5 border-l-2 border-tint-border pl-4 text-sm not-italic leading-7 text-muted">
+        <p>{{ clinic.address }}</p>
+        <p class="mt-2"><a [href]="'tel:' + clinic.phones[0]" class="text-accent underline underline-offset-4">{{ clinic.phones[0] }}</a> · <a [href]="'tel:' + clinic.phones[1]" class="text-accent underline underline-offset-4">{{ clinic.phones[1] }}</a></p>
+        <a [href]="'mailto:' + clinic.email" class="break-all text-accent underline underline-offset-4">{{ clinic.email }}</a>
+      </address>
       <a routerLink="/app/contact-us" class="ui-button-secondary mt-6">
         Get in touch
         <app-icon class="!size-5" aria-hidden="true" name="arrow_forward" />

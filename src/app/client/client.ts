@@ -1,3 +1,4 @@
+import { CLINIC_PROFILE } from '../_shared/clinic-profile';
 import { Icon } from '../_shared/ui/icon/icon';
 import { ClinicBrand } from '../_shared/ui/clinic-brand/clinic-brand';
 import { Component } from '@angular/core';
@@ -16,6 +17,7 @@ import { AlertService } from '../_shared/service/alert.service';
   styleUrl: './client.css'
 })
 export class Client {
+  readonly clinic = CLINIC_PROFILE;
   user: UserSimple | null = null
   isLoading = false
   isChatOpen = false;

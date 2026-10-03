@@ -1,3 +1,4 @@
+import { CLINIC_PROFILE } from '../../clinic-profile';
 import { Icon } from '../../ui/icon/icon';
 import { Component, Input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
@@ -12,6 +13,7 @@ import { ThemeToggle } from '../../ui/theme-toggle/theme-toggle';
   standalone: true
 })
 export class ClientNavComponent {
+  readonly clinic = CLINIC_PROFILE;
   @Input() disabled = false;
   @Input() menuItems: {
     label: string;

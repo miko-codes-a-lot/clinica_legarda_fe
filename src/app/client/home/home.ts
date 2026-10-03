@@ -1,3 +1,4 @@
+import { CLINIC_PROFILE } from '../../_shared/clinic-profile';
 import { Icon } from '../../_shared/ui/icon/icon';
 import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
@@ -11,5 +12,6 @@ import { RouterModule } from '@angular/router';
   styleUrl: './home.css'
 })
 export class Home {
+  readonly clinic = CLINIC_PROFILE;
   isChatOpen: boolean = false
 }

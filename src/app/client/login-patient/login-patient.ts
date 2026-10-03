@@ -1,3 +1,4 @@
+import { CLINIC_PROFILE } from '../../_shared/clinic-profile';
 import { Icon } from '../../_shared/ui/icon/icon';
 import { AuthLayout } from '../../_shared/ui/auth-layout/auth-layout';
 import { isOnlineBookablePatient } from '../../_shared/model/user';
@@ -17,6 +18,7 @@ import { AlertService } from '../../_shared/service/alert.service';
   styleUrl: './login-patient.css'
 })
 export class LoginPatient implements OnDestroy {
+  readonly clinic = CLINIC_PROFILE;
   private readonly subscriptions = new Subscription();
   rxform!: FormGroup<RxLogin>
   isLoading = false

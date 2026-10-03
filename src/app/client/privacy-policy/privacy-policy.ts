@@ -1,3 +1,4 @@
+import { CLINIC_PROFILE } from '../../_shared/clinic-profile';
 import { Component } from '@angular/core';
 
 @Component({
@@ -6,4 +7,5 @@ import { Component } from '@angular/core';
   templateUrl: './privacy-policy.html',
   styleUrl: './privacy-policy.css',
 })
-export class PrivacyPolicy {}
+export class PrivacyPolicy {
+  readonly clinic = CLINIC_PROFILE;}

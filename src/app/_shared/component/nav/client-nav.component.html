@@ -1,6 +1,6 @@
 <header class="public-header">
   <div class="nav-inner">
-    <a routerLink="/app/home" class="nav-brand" (click)="mobileOpen = false" aria-label="Clinica Legarda home">
+    <a routerLink="/app/home" class="nav-brand" (click)="mobileOpen = false" [attr.aria-label]="clinic.shortName + ' home'">
       <app-clinic-brand subtitle="Patient care" />
     </a>
     <div class="nav-controls">

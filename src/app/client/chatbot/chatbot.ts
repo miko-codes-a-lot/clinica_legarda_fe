@@ -1,3 +1,4 @@
+import { CLINIC_PROFILE } from '../../_shared/clinic-profile';
 import { Icon } from '../../_shared/ui/icon/icon';
 import { CommonModule } from '@angular/common';
 import {
@@ -24,7 +25,7 @@ export interface ChatMessage {
 }
 
 const GREETING =
-  "Hi! I'm the Clinica Legarda Dental Assistant. Ask me anything about dental care, or I can help you book an appointment.";
+  `Hi! I'm the ${CLINIC_PROFILE.shortName} assistant. Ask me about our services, or I can help you plan an appointment.`;
 
 const HISTORY_LIMIT = 20;
 const MESSAGE_LIMIT = 200;

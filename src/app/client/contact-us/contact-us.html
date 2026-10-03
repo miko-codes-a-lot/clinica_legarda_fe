@@ -1,5 +1,11 @@
 <div class="ui-page">
   <app-page-header eyebrow="Find your clinic" title="Contact us" description="Branch contact details and opening hours to help you plan your visit." />
+  <aside class="mb-6 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-stroke bg-tint px-5 py-4 text-sm">
+    <p class="font-semibold text-accent-strong">{{ clinic.fullName }}</p>
+    <a [href]="'tel:' + clinic.phones[0]" class="text-accent underline underline-offset-4">{{ clinic.phones[0] }}</a>
+    <a [href]="'tel:' + clinic.phones[1]" class="text-accent underline underline-offset-4">{{ clinic.phones[1] }}</a>
+    <a [href]="'mailto:' + clinic.email" class="break-all text-accent underline underline-offset-4">{{ clinic.email }}</a>
+  </aside>
   @if (isLoading) { <p role="status" class="ui-card text-sm text-muted">Loading clinic branches…</p> }
   @if (loadError) { <div class="ui-card mb-5" role="alert"><p class="text-sm text-danger">{{ loadError }}</p><button type="button" class="ui-button-secondary mt-4" (click)="loadClinics()">Try again</button></div> }
   <section aria-label="Clinic branches" class="grid items-start gap-6 lg:grid-cols-2">

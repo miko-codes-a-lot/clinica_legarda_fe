@@ -1,3 +1,4 @@
+import { CLINIC_PROFILE } from '../../_shared/clinic-profile';
 import { Component, EventEmitter, Input, OnInit, Output, signal, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RxUserForm } from '../../admin/user/user-form/rx-user-form.interface';
@@ -25,6 +26,7 @@ import { PASSWORD_REQUIREMENTS_MESSAGE, strongPasswordValidators } from '../../u
   styleUrls: ['./registration.css']
 })
 export class RegistrationPage implements OnInit, OnChanges {
+  readonly clinic = CLINIC_PROFILE;
   @Output() onSubmitEvent = new EventEmitter<UserPayload>()
   @Input() isLoading = false
   @Input() clinics: Clinic[] = []
