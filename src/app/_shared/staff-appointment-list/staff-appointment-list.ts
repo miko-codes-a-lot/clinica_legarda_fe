@@ -15,11 +15,12 @@ import { AppointmentService } from '../service/appointment-service';
 import { AuthService } from '../service/auth-service';
 import { ClinicService } from '../service/clinic-service';
 import { GenericTableComponent } from '../component/table/generic-table.component';
+import { Icon } from '../ui/icon/icon';
 import { appointmentDateKey, formatAppointmentDate } from '../../dentist/appointment/appointment-schedule';
 
 @Component({
   selector: 'app-staff-appointment-list',
-  imports: [GenericTableComponent, MatFormFieldModule, MatSelectModule, MatButtonModule],
+  imports: [GenericTableComponent, MatFormFieldModule, MatSelectModule, MatButtonModule, Icon],
   templateUrl: './staff-appointment-list.html',
   styleUrl: './staff-appointment-list.css',
 })

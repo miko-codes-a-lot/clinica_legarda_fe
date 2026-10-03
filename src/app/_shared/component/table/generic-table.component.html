@@ -6,28 +6,28 @@
   }
   <div class="table-card">
     <div class="table-toolbar">
-      <div class="table-search-row">
         @if (searchEnabled) {
           <label class="table-search"><span class="sr-only">Search {{ title || 'records' }}</span>
             <app-icon name="magnifying-glass" class="table-search-icon" />
-            <input class="ui-input" type="search" [attr.aria-label]="'Search ' + (title || 'records')" [value]="searchTerm" (input)="setSearch(search.value)" #search [placeholder]="searchPlaceholder" autocomplete="off" />
+            <input class="ui-input ui-table-control" type="search" [attr.aria-label]="'Search ' + (title || 'records')" [value]="searchTerm" (input)="setSearch(search.value)" #search [placeholder]="searchPlaceholder" autocomplete="off" />
             @if (searchTerm) { <button type="button" class="table-search-clear" aria-label="Clear search" (click)="setSearch('')"><app-icon name="x-mark" /></button> }
           </label>
         }
+        <ng-content select="[table-filters]" />
+        @for (filter of filters; track filter.key) {
+          <label class="ui-table-field"><span>{{ filter.label }}</span><select class="ui-input ui-table-control" [value]="selectedFilters[filter.key] || ''" #choice (change)="setFilter(filter.key, choice.value)"><option value="">All</option>@for (option of filter.options; track option.value) { <option [value]="option.value">{{ option.label }}</option> }</select></label>
+        }
+        @if (dateValue) {
+          <div class="ui-table-date-range">
+            <label class="ui-table-field"><span>{{ dateLabel }} from</span><input class="ui-input ui-table-control" type="date" [value]="from" #fromDate (change)="setDate('from', fromDate.value)" /></label>
+            <label class="ui-table-field"><span>{{ dateLabel }} to</span><input class="ui-input ui-table-control" type="date" [value]="to" #toDate (change)="setDate('to', toDate.value)" /></label>
+          </div>
+        }
+      <div class="table-meta">
         <span class="table-count" aria-live="polite">{{ count }} {{ count === 1 ? 'record' : 'records' }}@if (!serverMode && hasQuery) { <span> of {{ dataSource.data.length }}</span> }</span>
         @if (hasQuery) { <button class="table-reset" type="button" (click)="resetQuery()">Reset filters</button> }
       </div>
-      <div class="table-filter-row">
-        <ng-content select="[table-filters]" />
-        @for (filter of filters; track filter.key) {
-          <label class="table-filter"><span>{{ filter.label }}</span><select class="ui-input" [value]="selectedFilters[filter.key] || ''" #choice (change)="setFilter(filter.key, choice.value)"><option value="">All</option>@for (option of filter.options; track option.value) { <option [value]="option.value">{{ option.label }}</option> }</select></label>
-        }
-        @if (dateValue) {
-          <label class="table-filter"><span>{{ dateLabel }} from</span><input class="ui-input" type="date" [value]="from" #fromDate (change)="setDate('from', fromDate.value)" /></label>
-          <label class="table-filter"><span>{{ dateLabel }} to</span><input class="ui-input" type="date" [value]="to" #toDate (change)="setDate('to', toDate.value)" /></label>
-        }
-      </div>
-      @if (invalidDateRange) { <p class="text-xs text-danger" role="alert">The end date must be on or after the start date.</p> }
+      @if (invalidDateRange) { <p class="w-full text-xs text-danger" role="alert">The end date must be on or after the start date.</p> }
     </div>
     <div class="table-scroll">
       <table mat-table [dataSource]="dataSource" matSort [matSortActive]="sortBy" [matSortDirection]="sortDirection" (matSortChange)="announceSortChange($event)" [attr.aria-label]="title || 'Records'" [attr.aria-busy]="isLoading">
