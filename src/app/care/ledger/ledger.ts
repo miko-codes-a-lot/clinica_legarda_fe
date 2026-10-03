@@ -1,6 +1,6 @@
 import { ClinicDate } from '../clinic-date';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, Input, OnChanges } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, ElementRef, inject, Injector, Input, OnChanges, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, finalize } from 'rxjs';
@@ -23,6 +23,8 @@ export class PatientLedgerView implements OnChanges {
   @Input() visits: CareVisit[] = [];
   @Input() cases: TreatmentCase[] = [];
   private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
+  @ViewChild('entryEditor') private entryEditor?: ElementRef<HTMLElement>;
   private readonly api = inject(LedgerApiService);
   private readonly auth = inject(AuthService);
   private readonly clinicsApi = inject(ClinicService);
@@ -68,6 +70,12 @@ export class PatientLedgerView implements OnChanges {
       if (this.selectedPlan) this.selectedPlan.items.forEach(item => this.addItem(item.dueDate, item.amount));
       else this.generate();
     }
+    afterNextRender({ write: () => {
+      const editor = this.entryEditor?.nativeElement;
+      if (!editor) return;
+      editor.scrollIntoView({ block: 'start' });
+      editor.focus({ preventScroll: true });
+    } }, { injector: this.injector });
   }
   close() { if (!this.saving) this.mode = ''; }
   newEntry() {
