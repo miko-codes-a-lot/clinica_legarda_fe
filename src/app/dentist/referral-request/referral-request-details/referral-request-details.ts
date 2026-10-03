@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ListComponent } from '../../../_shared/component/list/list.component';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../../../_shared/ui/icon/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { catchError, finalize, forkJoin, Observable, of } from 'rxjs';
 import { Referral, ReferralStatus } from '../../../_shared/model/referral';
@@ -21,7 +21,7 @@ import { formatAppointmentDate } from '../../appointment/appointment-schedule';
 
 @Component({
   selector: 'app-referral-request-details',
-  imports: [StatusBadge, PageHeader, ListComponent, MatButtonModule, MatIconModule, CommonModule],
+  imports: [StatusBadge, PageHeader, ListComponent, MatButtonModule, Icon, CommonModule],
   templateUrl: './referral-request-details.html',
   styleUrl: './referral-request-details.css',
 })

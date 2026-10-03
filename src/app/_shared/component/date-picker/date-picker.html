@@ -16,7 +16,7 @@
     readonly
   />
   <mat-hint *ngIf="hint">{{ hint }}</mat-hint>
-  <mat-datepicker-toggle matIconSuffix [for]="picker" [disabled]="disabled"></mat-datepicker-toggle>
+  <mat-datepicker-toggle matIconSuffix [for]="picker" [disabled]="disabled"><app-icon matDatepickerToggleIcon name="calendar-days" /></mat-datepicker-toggle>
   <mat-datepicker #picker [touchUi]="touchUi" [startView]="startView"></mat-datepicker>
   <mat-error *ngIf="showError">
     {{ errorMessage }}

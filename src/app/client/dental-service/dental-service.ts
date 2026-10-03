@@ -1,3 +1,4 @@
+import { Icon } from '../../_shared/ui/icon/icon';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { catchError, distinctUntilChanged, EMPTY, map, of, startWith, Subject, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -11,7 +12,7 @@ import { DentalServicesService } from '../../_shared/service/dental-services-ser
 
 @Component({
   selector: 'app-dental-service',
-  imports: [PageHeader, EmptyState, CommonModule, RouterModule],
+  imports: [Icon, PageHeader, EmptyState, CommonModule, RouterModule],
   templateUrl: './dental-service.html',
   styleUrl: './dental-service.css',
 })

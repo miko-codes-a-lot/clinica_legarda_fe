@@ -5,16 +5,12 @@
   <div class="flex flex-wrap items-center gap-2">
     @if (user) {
     <a routerLink="/app/user-settings/index" class="ui-button-ghost !px-3 !text-xs">
-      <span class="material-icons !text-base" aria-hidden="true">
-        person
-      </span>
+      <app-icon class="!size-4" aria-hidden="true" name="person" />
       Profile
     </a>
     <a routerLink="/app/my-care" class="ui-button-ghost !px-3 !text-xs">My care</a>
     <a routerLink="/app/my-appointment" class="ui-button-ghost !px-3 !text-xs">
-      <span class="material-icons !text-base" aria-hidden="true">
-        schedule
-      </span>
+      <app-icon class="!size-4" aria-hidden="true" name="schedule" />
       My appointments
     </a>
     <button type="button" (click)="onClickLogout()" [disabled]="isLoading" class="ui-button-secondary !px-3 !text-xs">
@@ -82,9 +78,7 @@
   <app-chatbot (chatClosed)="isChatOpen = false" />
   } @else {
   <button type="button" class="ui-button shadow-md" (click)="isChatOpen = true" aria-label="Open clinic chat">
-    <span class="material-icons !text-xl" aria-hidden="true">
-      chat_bubble_outline
-    </span>
+    <app-icon class="!size-6" aria-hidden="true" name="chat_bubble_outline" />
     <span class="hidden sm:inline">
       Clinic chat
     </span>

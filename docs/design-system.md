@@ -62,3 +62,17 @@ Patient intake uses the shared staff `UserForm` for admin and super admin: `isWa
 The shared `care` routes serve scoped staff patient records, queue/check-in, visit records and treatment cases. `PatientLedgerView` serves staff manual entry forms and patient read-only balances from different projected API endpoints. Clinic closures reuse the same availability rules for booking and rescheduling. Use semantic `ui-card`, `ui-table`, input, alert and button styles for both themes; never render internal notes in the patient portal.
 
 Patient My care receives only published completed summaries and public case/session fields. Print summary isolates the selected visit and uses paper colors. Installment amounts use integer PHP centavos through the exact decimal parser and formatter; do not use floating-point peso calculations.
+
+## Interface icons
+
+Use shared `Icon` / `app-icon` from `src/app/_shared/ui/icon/icon`. It renders a vendored subset of 24px Heroicons outline icons as native SVG, with currentColor and a consistent 1.5px stroke. 20px is the default; use `class="!size-6"` for 24px and `class="!size-8"` for 32px feature/empty-state icons. Apply existing semantic text colors to the host. Icons are decorative and hidden from accessibility; put readable text or an accessible name on the parent action.
+
+```html
+<button type="button" class="ui-button-secondary" aria-label="Edit clinic notes">
+  <app-icon name="pencil-square" /> Edit notes
+</button>
+```
+
+`icon-paths.ts` records pinned Heroicons 2.2.0 provenance and the centrally mapped compatibility names used by existing navigation/empty-state screens. New code should use canonical Heroicons names. The clinic tooth and closure calendar are local supplements with the same stroke language. Copy only needed SVG path data and retain upstream license; do not add icon fonts, arbitrary SVG markup, `innerHTML` or a runtime icon-package dependency. An unknown name shows a question-circle fallback. The MIT notice is shipped at `/licenses/heroicons-LICENSE.txt`.
+
+Material still owns menu/calendar/button focus, keyboard behavior and native internal controls. Project an account-menu icon with `matMenuItemIcon`, or a calendar-toggle icon with `matDatepickerToggleIcon`. Staff account menus use `xPosition="before"`, `overlapTrigger=false`, and shared `account-menu` styling so their right edge aligns to the trigger with an 8px vertical gap.

@@ -20,12 +20,12 @@
         </div>
         @if (isChangeBranch) {
           <section class="my-5 rounded-xl border border-warning-border bg-warning-soft p-5" aria-labelledby="referral-title">
-            <div class="mb-5 flex items-start gap-3"><mat-icon class="shrink-0 text-warning" aria-hidden="true">swap_horiz</mat-icon><div><h2 id="referral-title" class="ui-section-title">Clinic transfer required</h2><p class="mt-2 text-sm text-warning">You are switching from <strong>{{ latestPatientAppointment?.clinic?.name }}</strong>. A referral is required to proceed.</p></div></div>
+            <div class="mb-5 flex items-start gap-3"><app-icon class="shrink-0 text-warning" aria-hidden="true" name="swap_horiz" /><div><h2 id="referral-title" class="ui-section-title">Clinic transfer required</h2><p class="mt-2 text-sm text-warning">You are switching from <strong>{{ latestPatientAppointment?.clinic?.name }}</strong>. A referral is required to proceed.</p></div></div>
             <div [formGroup]="rxReferralForm" class="ui-form-grid">
               <mat-form-field appearance="outline" class="w-full"><mat-label>Referring dentist</mat-label><mat-select formControlName="fromDoctorId" required><mat-option value="" disabled>Select a referring dentist</mat-option>@for (opt of selectReferringDentist; track opt.value) { <mat-option [value]="opt.value">{{ opt.label }}</mat-option> }</mat-select><mat-hint>From your previous clinic</mat-hint></mat-form-field>
               <mat-form-field appearance="outline" class="w-full"><mat-label>Reason for referral</mat-label><mat-select formControlName="reason" required><mat-option value="" disabled>Select a reason</mat-option><mat-option *ngFor="let reason of reasons" [value]="reason.value">{{ reason.label }}</mat-option></mat-select></mat-form-field>
             </div>
-            <p class="mt-2 flex items-start gap-2 text-sm text-warning"><mat-icon class="shrink-0" aria-hidden="true">info</mat-icon><span>The receiving clinic will review and confirm this referral.</span></p>
+            <p class="mt-2 flex items-start gap-2 text-sm text-warning"><app-icon class="shrink-0" aria-hidden="true" name="info" /><span>The receiving clinic will review and confirm this referral.</span></p>
           </section>
         }
         @if (services.errors?.['maxlength']) { <p class="my-4 text-sm font-medium text-danger" role="alert">Maximum of 3 services per visit/consultation only.</p> }

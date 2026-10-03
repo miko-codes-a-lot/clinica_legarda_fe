@@ -2,8 +2,8 @@
   <app-page-header title="Your account" eyebrow="Patient portal" description="Manage your personal details and review your appointment history." />
   <section class="ui-card overflow-hidden">
     <nav class="flex flex-wrap gap-2 border-b border-stroke p-3" aria-label="Account sections">
-      <button type="button" class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold" (click)="activeTab = 'profile'" [attr.aria-pressed]="activeTab === 'profile'" aria-controls="account-profile" [ngClass]="activeTab === 'profile' ? 'bg-brand-800 text-white' : 'text-muted hover:bg-tint'"><mat-icon aria-hidden="true">person</mat-icon> Profile</button>
-      <button type="button" class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold" (click)="activeTab = 'history'" [attr.aria-pressed]="activeTab === 'history'" aria-controls="account-history" [ngClass]="activeTab === 'history' ? 'bg-brand-800 text-white' : 'text-muted hover:bg-tint'"><mat-icon aria-hidden="true">history</mat-icon> Appointment history</button>
+      <button type="button" class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold" (click)="activeTab = 'profile'" [attr.aria-pressed]="activeTab === 'profile'" aria-controls="account-profile" [ngClass]="activeTab === 'profile' ? 'bg-brand-800 text-white' : 'text-muted hover:bg-tint'"><app-icon aria-hidden="true" name="person" /> Profile</button>
+      <button type="button" class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold" (click)="activeTab = 'history'" [attr.aria-pressed]="activeTab === 'history'" aria-controls="account-history" [ngClass]="activeTab === 'history' ? 'bg-brand-800 text-white' : 'text-muted hover:bg-tint'"><app-icon aria-hidden="true" name="history" /> Appointment history</button>
     </nav>
     <div *ngIf="activeTab === 'profile'" id="account-profile" class="p-5 sm:p-7">
       <div class="mb-7 flex flex-wrap items-center gap-4 border-b border-stroke pb-6">

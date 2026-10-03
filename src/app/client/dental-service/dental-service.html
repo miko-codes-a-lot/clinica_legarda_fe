@@ -12,9 +12,7 @@
     @for (service of services; track service._id) {
     <article class="ui-card flex flex-col p-6 sm:p-8">
       <span class="mb-6 flex size-14 items-center justify-center rounded-xl bg-tint text-accent">
-        <span class="material-icons !text-3xl" aria-hidden="true">
-          health_and_safety
-        </span>
+        <app-icon class="!size-8" aria-hidden="true" name="health_and_safety" />
       </span>
       <h2 class="ui-section-title">
         {{ service.name }}
@@ -24,9 +22,7 @@
       </p>
       <a routerLink="/app/appointment" class="ui-button-secondary mt-auto" [attr.aria-label]="'Book an appointment for ' + service.name">
         Book an appointment
-        <span class="material-icons !text-lg" aria-hidden="true">
-          arrow_forward
-        </span>
+        <app-icon class="!size-5" aria-hidden="true" name="arrow_forward" />
       </a>
     </article>
     } @empty {

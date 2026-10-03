@@ -1,22 +1,22 @@
 <div class="ui-page">
   <app-page-header [title]="title" eyebrow="Clinic operations" [description]="weekLabel">
     <button type="button" class="ui-button-secondary" (click)="printTables()" [disabled]="!canExport || isExporting">
-      <mat-icon aria-hidden="true">print</mat-icon> Print tables
+      <app-icon aria-hidden="true" name="print" /> Print tables
     </button>
     <button type="button" class="ui-button" (click)="exportToPDF()" [disabled]="!canExport || isExporting">
-      <mat-icon aria-hidden="true">download</mat-icon> {{ isExporting ? 'Exporting…' : 'Export PDF' }}
+      <app-icon aria-hidden="true" name="download" /> {{ isExporting ? 'Exporting…' : 'Export PDF' }}
     </button>
     <div class="relative">
       <button mat-icon-button type="button" (click)="toggleNotifications()" class="ui-icon-button"
         [attr.aria-label]="'Toggle ' + notificationScope.toLowerCase()" [attr.aria-expanded]="showNotifications" aria-controls="dashboard-notifications">
-        <mat-icon [matBadge]="unreadNotificationsCount$ | async" matBadgeColor="warn"
-          [matBadgeHidden]="(unreadNotificationsCount$ | async) === 0">notifications</mat-icon>
+        <app-icon [matBadge]="unreadNotificationsCount$ | async" matBadgeColor="warn"
+          [matBadgeHidden]="(unreadNotificationsCount$ | async) === 0" name="notifications" />
       </button>
       <section *ngIf="showNotifications" id="dashboard-notifications" [attr.aria-label]="notificationScope"
         class="ui-card absolute right-0 top-full z-40 mt-3 w-[min(24rem,calc(100vw-3rem))] overflow-hidden">
         <div class="flex items-center justify-between gap-3 border-b border-stroke px-5 py-4">
           <h2 class="ui-section-title">{{ notificationScope }}</h2>
-          <button mat-icon-button type="button" (click)="toggleNotifications()" aria-label="Close notifications"><mat-icon>close</mat-icon></button>
+          <button mat-icon-button type="button" (click)="toggleNotifications()" aria-label="Close notifications"><app-icon name="close" /></button>
         </div>
         <div class="max-h-96 overflow-y-auto" *ngIf="notifications$ | async as notifications">
           <article *ngFor="let notification of notifications" class="flex flex-wrap items-start gap-3 border-b border-stroke p-4"
@@ -66,17 +66,17 @@
 
   <div class="mb-6 grid gap-4 sm:grid-cols-3">
     <section class="ui-card p-5">
-      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Total appointments</h2><mat-icon class="text-accent" aria-hidden="true">event</mat-icon></div>
+      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Total appointments</h2><app-icon class="text-accent" aria-hidden="true" name="event" /></div>
       <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ weeklyReport?.totalAppointments ?? '—' }}</p>
       <p class="ui-muted mt-2 text-xs">This report week</p>
     </section>
     <section class="ui-card p-5">
-      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Appointments updated</h2><mat-icon class="text-accent" aria-hidden="true">assignment</mat-icon></div>
+      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Appointments updated</h2><app-icon class="text-accent" aria-hidden="true" name="assignment" /></div>
       <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ weeklyReport?.appointmentsUpdated ?? '—' }}</p>
       <p class="ui-muted mt-2 text-xs">This report week</p>
     </section>
     <section class="ui-card p-5">
-      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Today's queue</h2><mat-icon class="text-accent" aria-hidden="true">schedule</mat-icon></div>
+      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Today's queue</h2><app-icon class="text-accent" aria-hidden="true" name="schedule" /></div>
       <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ report ? appointmentQueue.length : '—' }}</p>
       <p class="ui-muted mt-2 text-xs">Confirmed appointments</p>
     </section>

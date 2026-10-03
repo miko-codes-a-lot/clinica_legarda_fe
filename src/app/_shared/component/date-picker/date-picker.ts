@@ -8,10 +8,12 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { CommonModule } from '@angular/common';
 import { bookingSlots, DentistBookingSchedule } from '../../model/booking-availability';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { Icon } from '../../ui/icon/icon';
 
 @Component({
   selector: 'app-date-picker',
   imports: [
+    Icon,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatDatepickerModule,

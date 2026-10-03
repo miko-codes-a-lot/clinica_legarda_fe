@@ -8,8 +8,8 @@
     <app-list [data]="displayReferral" />
     @if (!referral.appointment) { <p class="mt-5 rounded-xl bg-tint p-4 text-sm text-accent" role="status">This referral is waiting for its receiving appointment to be linked.</p> }
     <section class="ui-card mt-5 flex flex-wrap gap-3 p-5 sm:p-6" aria-label="Referral decision">
-      <button type="button" class="ui-button" (click)="approveReferral()" [disabled]="isActionDisabled()"><mat-icon>check</mat-icon> Approve</button>
-      <button type="button" class="ui-button-danger" (click)="declineReferral()" [disabled]="isActionDisabled()"><mat-icon>close</mat-icon> Reject</button>
+      <button type="button" class="ui-button" (click)="approveReferral()" [disabled]="isActionDisabled()"><app-icon name="check" /> Approve</button>
+      <button type="button" class="ui-button-danger" (click)="declineReferral()" [disabled]="isActionDisabled()"><app-icon name="close" /> Reject</button>
     </section>
   } @else {
     <p class="ui-card p-5 text-sm text-muted" role="status">Fetching details...</p>

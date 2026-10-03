@@ -15,7 +15,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ListComponent } from '../../../_shared/component/list/list.component';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../../../_shared/ui/icon/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { NotesDialogComponent } from '../../../_shared/component/dialog/notes-dialog/notes-dialog.component';
 import { AppointmentReasonDialogComponent, AppointmentReasonDialogData } from '../../../_shared/component/dialog/appointment-reason-dialog/appointment-reason-dialog.component';
@@ -28,7 +28,7 @@ import { compareAppointmentSchedule, formatAppointmentDate, requiresAppointmentO
 
 @Component({
   selector: 'app-appointment-details',
-  imports: [AppointmentCareLinks, EmptyState, StatusBadge, PageHeader, ListComponent, MatListModule, MatButtonModule, MatIconModule, CommonModule, GenericTableComponent],
+  imports: [AppointmentCareLinks, EmptyState, StatusBadge, PageHeader, ListComponent, MatListModule, MatButtonModule, Icon, CommonModule, GenericTableComponent],
   templateUrl: './appointment-details.html',
   styleUrl: './appointment-details.css',
 })

@@ -29,7 +29,7 @@
     @if (isChangeBranch) {
       <section class="mt-5 rounded-xl border border-tint-border bg-tint/40 p-5" aria-labelledby="clinic-transfer-title">
         <div class="mb-4 flex items-start gap-3">
-          <mat-icon class="shrink-0 text-accent">swap_horiz</mat-icon>
+          <app-icon class="shrink-0 text-accent" name="swap_horiz" />
           <div class="min-w-0">
             <h2 id="clinic-transfer-title" class="ui-section-title">Clinic transfer required</h2>
             <p class="ui-muted mt-1 break-words">You are switching from <strong>{{ latestPatientAppointment?.clinic?.name }}</strong>. A referral is required to proceed.</p>
@@ -52,7 +52,7 @@
             </mat-select>
           </mat-form-field>
         </div>
-        <p class="mt-3 flex items-start gap-2 text-sm text-muted"><mat-icon class="shrink-0">info</mat-icon> The receiving clinic will review and confirm this referral.</p>
+        <p class="mt-3 flex items-start gap-2 text-sm text-muted"><app-icon class="shrink-0" name="info" /> The receiving clinic will review and confirm this referral.</p>
       </section>
     }
     <section class="mt-5 rounded-xl border border-stroke bg-canvas p-5" *ngIf="latestPatientAppointment as appt" aria-labelledby="previous-visit-title">

@@ -31,7 +31,7 @@ import { AppointmentService } from '../../_shared/service/appointment-service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../_shared/component/dialog/confirm-dialog/confirm-dialog.component';
 import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../../_shared/ui/icon/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Referral, ReferralStatus } from '../../_shared/model/referral';
@@ -53,7 +53,7 @@ import { AlertService } from '../../_shared/service/alert.service';
     FormComponent,
     RouterLink,
     MatSelectModule,
-    MatIconModule,
+    Icon,
     MatFormFieldModule,
     MatInputModule,
     CommonModule

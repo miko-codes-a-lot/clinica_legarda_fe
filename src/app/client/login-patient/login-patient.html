@@ -29,9 +29,7 @@
     </div>
     <button type="submit" class="ui-button w-full" [disabled]="!rxform.valid || isLoading">
       {{ isLoading ? 'Signing in…' : 'Sign in' }}
-      <span class="material-icons !text-lg" aria-hidden="true">
-        arrow_forward
-      </span>
+      <app-icon class="!size-5" aria-hidden="true" name="arrow_forward" />
     </button>
   </form>
   <div class="mt-7 border-t border-stroke pt-6 text-center">

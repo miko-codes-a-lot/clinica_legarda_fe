@@ -22,7 +22,7 @@ import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../_shared/component/dialog/confirm-dialog/confirm-dialog.component';
 import { RxReferralForm } from '../../../client/appointment/rx-referral-form';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../../../_shared/ui/icon/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -46,7 +46,7 @@ import { FormField } from '../../../_shared/component/form/form-field.interface'
     DatePicker,
     FormComponent,
     CommonModule,
-    MatIconModule,
+    Icon,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule

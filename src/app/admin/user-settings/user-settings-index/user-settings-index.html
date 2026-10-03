@@ -23,12 +23,12 @@
       </div>
     </div>
   </article>
-  <a class="ui-button-ghost mt-5" routerLink="/admin/dashboard/index"><mat-icon>arrow_back</mat-icon> Return to dashboard</a>
+  <a class="ui-button-ghost mt-5" routerLink="/admin/dashboard/index"><app-icon name="arrow_back" /> Return to dashboard</a>
   <ng-template #avatarModal>
     <h2 mat-dialog-title>Upload profile picture</h2>
     <mat-dialog-content>
       <div class="rounded-xl border border-dashed border-tint-border bg-tint/40 p-5">
-        <label for="avatarInput" class="ui-label mb-3 flex items-center gap-2"><mat-icon>cloud_upload</mat-icon> Choose an image</label>
+        <label for="avatarInput" class="ui-label mb-3 flex items-center gap-2"><app-icon name="cloud_upload" /> Choose an image</label>
         <input id="avatarInput" type="file" accept="image/*" (change)="onAvatarChange($event)" class="block w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-tint-strong file:px-3 file:py-2 file:font-medium file:text-accent">
       </div>
     </mat-dialog-content>

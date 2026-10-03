@@ -8,13 +8,12 @@ import { Clinic } from '../../../_shared/model/clinic';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { ListComponent } from '../../../_shared/component/list/list.component';
-import { MatIconModule } from '@angular/material/icon';
 import { AlertService } from '../../../_shared/service/alert.service';
 import { DentistApproval } from '../../../_shared/component/dentist-approval/dentist-approval';
 
 @Component({
   selector: 'app-user-details',
-  imports: [PatientAccountAccess, PageHeader, MatButtonModule, MatListModule, ListComponent, MatIconModule, DentistApproval],
+  imports: [PatientAccountAccess, PageHeader, MatButtonModule, MatListModule, ListComponent, DentistApproval],
   templateUrl: './user-details.html',
   styleUrl: './user-details.css'
 })

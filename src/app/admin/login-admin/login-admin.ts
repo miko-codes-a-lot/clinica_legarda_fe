@@ -1,3 +1,4 @@
+import { Icon } from '../../_shared/ui/icon/icon';
 import { AuthLayout } from '../../_shared/ui/auth-layout/auth-layout';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,7 +9,7 @@ import { AlertService } from '../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-login-admin',
-  imports: [AuthLayout, ReactiveFormsModule, RouterLink],
+  imports: [Icon, AuthLayout, ReactiveFormsModule, RouterLink],
   templateUrl: './login-admin.html',
   styleUrl: './login-admin.css'
 })

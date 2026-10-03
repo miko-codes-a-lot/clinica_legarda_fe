@@ -12,7 +12,7 @@ import { ReasonService } from '../../_shared/service/reason-service';
 import { canCancelAppointment } from '../../_shared/model/appointment-permissions';
 import { Appointment, AppointmentStatus } from '../../_shared/model/appointment';
 import { appointmentActorLabel, appointmentHasEnded, appointmentStatusLabel } from '../../_shared/model/appointment-history';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../../_shared/ui/icon/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -30,7 +30,7 @@ import { AlertService } from '../../_shared/service/alert.service';
   imports: [RouterLink, PageHeader, StatusBadge, EmptyState,
     CommonModule,
     ReactiveFormsModule,
-    MatIconModule,
+    Icon,
     MatButtonModule,
     MatDialogModule,
     MatDatepickerModule,

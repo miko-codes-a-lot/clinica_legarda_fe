@@ -8,9 +8,7 @@
           <span>
             {{ faq.question }}
           </span>
-          <span class="material-icons shrink-0 !text-xl text-accent" aria-hidden="true">
-            {{ faq.open ? 'remove' : 'add' }}
-          </span>
+          <app-icon class="shrink-0 !size-6 text-accent" aria-hidden="true" [name]="faq.open ? 'remove' : 'add'" />
         </button>
       </h2>
       <div [hidden]="!faq.open" [id]="'faq-answer-' + i" role="region" [attr.aria-labelledby]="'faq-question-' + i" class="px-6 pb-6">

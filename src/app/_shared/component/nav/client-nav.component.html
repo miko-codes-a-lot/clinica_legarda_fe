@@ -6,9 +6,7 @@
     <div class="nav-controls">
       <app-theme-toggle />
     <button type="button" class="ui-icon-button menu-toggle" (click)="mobileOpen = !mobileOpen" [attr.aria-expanded]="mobileOpen" aria-controls="public-navigation" [attr.aria-label]="mobileOpen ? 'Close navigation menu' : 'Open navigation menu'">
-      <span class="material-icons" aria-hidden="true">
-        {{ mobileOpen ? 'close' : 'menu' }}
-      </span>
+      <app-icon aria-hidden="true" [name]="mobileOpen ? 'close' : 'menu'" />
     </button>
     </div>
     <div id="public-navigation" class="menu-panel" [class.is-open]="mobileOpen">
@@ -16,18 +14,14 @@
         @for (item of menuItems; track item.label) {
           @if (item.link) {
         <a [routerLink]="disabled ? null : item.link" routerLinkActive="active" ariaCurrentWhenActive="page" [attr.aria-disabled]="disabled" [attr.tabindex]="disabled ? -1 : null" (click)="mobileOpen = false" class="nav-link">
-          <span class="material-icons nav-icon" aria-hidden="true">
-            {{ item.icon }}
-          </span>
+          <app-icon class="nav-icon" aria-hidden="true" [name]="item.icon" />
           <span>
             {{ item.label }}
           </span>
         </a>
         } @else {
         <button type="button" [disabled]="disabled" (click)="item.onClick ? item.onClick() : null; mobileOpen = false" class="nav-link">
-          <span class="material-icons nav-icon" aria-hidden="true">
-            {{ item.icon }}
-          </span>
+          <app-icon class="nav-icon" aria-hidden="true" [name]="item.icon" />
           <span>
             {{ item.label }}
           </span>

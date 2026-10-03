@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../../../_shared/ui/icon/icon';
 import { MatSelectModule } from '@angular/material/select';
 
 import { AuthService } from '../../../_shared/service/auth-service';
@@ -53,7 +53,7 @@ interface User {
     ReactiveFormsModule,
     MatInputModule,
     MatFormFieldModule,
-    MatIconModule,
+    Icon,
     MatSelectModule,
     FormControlErrorsComponent,
     CommonModule,

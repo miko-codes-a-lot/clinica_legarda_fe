@@ -8,7 +8,7 @@
 .nav-link { display: flex; align-items: center; gap: .6rem; border-radius: .6rem; padding: .65rem .75rem; color: var(--color-muted); font-size: .85rem; font-weight: 600; text-decoration: none; }
 .nav-link:hover, .nav-link.active { background: var(--color-tint); color: var(--color-accent); }
 .nav-link[aria-disabled='true'] { opacity: .5; pointer-events: none; }
-.nav-icon { font-size: 1.15rem; }
+.nav-icon { width: 1.15rem; height: 1.15rem; }
 .nav-account { border-top: 1px solid var(--color-stroke); padding-top: 1rem; }
 @media (min-width: 75rem) {
   .nav-inner { flex-wrap: nowrap; padding-inline: 2rem; }

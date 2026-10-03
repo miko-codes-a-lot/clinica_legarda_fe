@@ -1,7 +1,7 @@
 <section class="ui-page">
   <app-page-header [title]="title || 'Records'" [description]="description">
     @if (createButtonLabel) {
-      <button type="button" class="ui-button" [disabled]="isLoading" (click)="onCreateClick()"><mat-icon>add</mat-icon>{{ createButtonLabel }}</button>
+      <button type="button" class="ui-button" [disabled]="isLoading" (click)="onCreateClick()"><app-icon name="add" />{{ createButtonLabel }}</button>
     }
   </app-page-header>
   <ng-content select="[table-filters]"></ng-content>
@@ -10,7 +10,7 @@
       <mat-form-field appearance="outline" class="max-w-md">
         <mat-label>Search records</mat-label>
         <input matInput [value]="dataSource.filter" (keyup)="applyFilter($event)" placeholder="Name, status, or another detail">
-        <mat-icon matSuffix>search</mat-icon>
+        <app-icon matSuffix name="search" />
       </mat-form-field>
       <span class="pb-5 text-xs text-muted">{{ dataSource.filteredData.length }} records</span>
     </div>
@@ -34,15 +34,15 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let element" class="whitespace-nowrap">
-            <button mat-icon-button aria-label="View details" (click)="onDetailsClick(element)"><mat-icon>visibility</mat-icon></button>
+            <button mat-icon-button aria-label="View details" (click)="onDetailsClick(element)"><app-icon name="visibility" /></button>
             @if (update.observers.length > 0) {
-              <button mat-icon-button aria-label="Edit record" (click)="onUpdateClick(element)" [disabled]="getEditDisabled(element)"><mat-icon>edit</mat-icon></button>
+              <button mat-icon-button aria-label="Edit record" (click)="onUpdateClick(element)" [disabled]="getEditDisabled(element)"><app-icon name="edit" /></button>
             }
             @if (enableDelete && delete.observers.length > 0) {
-              <button mat-icon-button aria-label="Delete record" class="text-danger" (click)="onDeleteClick(element)"><mat-icon>delete</mat-icon></button>
+              <button mat-icon-button aria-label="Delete record" class="text-danger" (click)="onDeleteClick(element)"><app-icon name="delete" /></button>
             }
             @if (markAsRead.observers.length > 0) {
-              <button mat-icon-button aria-label="Mark as read" (click)="onMarkAsReadClick(element)"><mat-icon>done_all</mat-icon></button>
+              <button mat-icon-button aria-label="Mark as read" (click)="onMarkAsReadClick(element)"><app-icon name="done_all" /></button>
             }
           </td>
         </ng-container>

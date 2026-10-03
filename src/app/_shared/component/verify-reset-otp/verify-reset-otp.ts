@@ -1,3 +1,4 @@
+import { Icon } from '../../ui/icon/icon';
 import { AuthLayout } from '../../ui/auth-layout/auth-layout';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,7 +9,7 @@ import { AlertService } from '../../service/alert.service';
 
 @Component({
   selector: 'app-verify-reset-otp',
-  imports: [AuthLayout, ReactiveFormsModule, RouterModule],
+  imports: [Icon, AuthLayout, ReactiveFormsModule, RouterModule],
   templateUrl: './verify-reset-otp.html',
   styleUrl: './verify-reset-otp.css'
 })

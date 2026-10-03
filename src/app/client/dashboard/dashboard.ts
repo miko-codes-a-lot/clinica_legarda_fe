@@ -1,3 +1,4 @@
+import { Icon } from '../../_shared/ui/icon/icon';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
@@ -6,7 +7,7 @@ import { AlertService } from '../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, PageHeader],
+  imports: [Icon, RouterLink, PageHeader],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })

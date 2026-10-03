@@ -5,7 +5,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon'; // ✅ for mat-icon
 import { AuthService } from '../../../_shared/service/auth-service';
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
@@ -30,7 +29,7 @@ Chart.register(...registerables);
   selector: 'app-user-settings-update',
   templateUrl: './user-settings-update.html',
   styleUrl: './user-settings-update.css',
-  imports: [PageHeader, MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatIconModule, MatSelectModule, FormControlErrorsComponent, CommonModule],
+  imports: [PageHeader, MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatSelectModule, FormControlErrorsComponent, CommonModule],
 })
 export class UserSettingsUpdate implements OnInit {
   profileForm!: FormGroup;

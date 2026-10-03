@@ -42,6 +42,8 @@ html {
 .mat-mdc-dialog-surface { border-radius: 20px; background: var(--color-surface); }
 .mat-mdc-dialog-title { font-weight: 600; letter-spacing: -.025em; }
 .mat-mdc-menu-panel { border: 1px solid var(--color-stroke); border-radius: 14px; background: var(--color-surface); }
+.account-menu.mat-mdc-menu-panel { min-width: 14rem; max-width: calc(100vw - 2rem); margin-top: .5rem; }
+.account-menu [matMenuItemIcon] { margin-right: .75rem; color: var(--color-muted); }
 .mat-mdc-tab-header { --mat-tab-header-active-label-text-color: var(--color-accent); --mdc-tab-indicator-active-indicator-color: var(--color-brand-600); }
 .mat-mdc-list-item { --mdc-list-list-item-label-text-color: var(--color-ink); }
 @media (max-width: 640px) {

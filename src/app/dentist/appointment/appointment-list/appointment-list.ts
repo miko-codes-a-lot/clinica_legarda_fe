@@ -8,7 +8,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../../../_shared/ui/icon/icon';
 import { appointmentDateKey, clinicClock, formatAppointmentDate, requiresAppointmentOutcome } from '../appointment-schedule';
 import { DentistAppointmentFeed } from '../dentist-appointment-feed';
 
@@ -16,7 +16,7 @@ type StatusFilter = 'all' | AppointmentStatus;
 
 @Component({
   selector: 'app-appointment-list',
-  imports: [GenericTableComponent, MatCardModule, CommonModule, MatIconModule],
+  imports: [GenericTableComponent, MatCardModule, CommonModule, Icon],
   templateUrl: './appointment-list.html',
   styleUrl: './appointment-list.css',
   providers: [DentistAppointmentFeed],

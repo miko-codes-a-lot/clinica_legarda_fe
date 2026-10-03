@@ -1,3 +1,4 @@
+import { Icon } from '../../_shared/ui/icon/icon';
 import { CommonModule } from '@angular/common';
 import {
   AfterViewChecked,
@@ -36,7 +37,7 @@ const ALLOWED_INTERNAL_ROUTES = new Set<string>([
 
 @Component({
   selector: 'app-chatbot',
-  imports: [CommonModule, FormsModule],
+  imports: [Icon, CommonModule, FormsModule],
   templateUrl: './chatbot.html',
   styleUrl: './chatbot.css',
 })

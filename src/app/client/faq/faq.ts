@@ -1,3 +1,4 @@
+import { Icon } from '../../_shared/ui/icon/icon';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
@@ -5,7 +6,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-faq',
-  imports: [PageHeader, CommonModule, RouterLink],
+  imports: [Icon, PageHeader, CommonModule, RouterLink],
   templateUrl: './faq.html',
   styleUrl: './faq.css'
 })

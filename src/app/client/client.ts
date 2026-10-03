@@ -1,3 +1,4 @@
+import { Icon } from '../_shared/ui/icon/icon';
 import { ClinicBrand } from '../_shared/ui/clinic-brand/clinic-brand';
 import { Component } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
@@ -10,7 +11,7 @@ import { AlertService } from '../_shared/service/alert.service';
 
 @Component({
   selector: 'app-client',
-  imports: [ClinicBrand, RouterLink, RouterOutlet, ClientNavComponent, Chatbot],
+  imports: [Icon, ClinicBrand, RouterLink, RouterOutlet, ClientNavComponent, Chatbot],
   templateUrl: './client.html',
   styleUrl: './client.css'
 })

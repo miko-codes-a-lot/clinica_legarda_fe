@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../../../_shared/ui/icon/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
@@ -24,7 +24,7 @@ Chart.register(...registerables);
   selector: 'app-user-settings-index',
   templateUrl: './user-settings-index.html',
   styleUrl: './user-settings-index.css',
-  imports: [PageHeader, MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatIconModule, MatSelectModule, CommonModule, RouterLink, MatDialogModule]
+  imports: [PageHeader, MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, Icon, MatSelectModule, CommonModule, RouterLink, MatDialogModule]
 })
 export class UserSettingsIndex implements OnInit {
   @ViewChild('avatarModal') avatarModal!: TemplateRef<any>;

@@ -3,7 +3,7 @@ import { RouterLink, RouterModule } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../../ui/icon/icon';
 import { CommonModule } from '@angular/common';
 
 export interface NavigationItem {
@@ -17,7 +17,7 @@ export interface NavigationItem {
     selector: 'app-nav',
     templateUrl: './nav.component.html',
     styleUrl: './nav.component.css',
-    imports: [RouterLink, MatSidenavModule, MatListModule, MatToolbarModule, MatIconModule, RouterModule, CommonModule],
+    imports: [RouterLink, MatSidenavModule, MatListModule, MatToolbarModule, Icon, RouterModule, CommonModule],
     standalone: true
 })
 

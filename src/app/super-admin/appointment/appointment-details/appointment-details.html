@@ -22,7 +22,7 @@
         <div class="mb-4 flex items-center justify-between gap-3">
           <h2 id="clinic-notes-title" class="ui-section-title">Clinic notes</h2>
           <button type="button" class="ui-icon-button" aria-label="Edit clinic notes" (click)="openNotesDialog()" [disabled]="isClinicNotesDisabled()">
-            <mat-icon>edit</mat-icon>
+            <app-icon name="edit" />
           </button>
         </div>
         <p class="whitespace-pre-wrap break-words text-sm leading-7 text-muted">{{ appointment.notes.clinicNotes || 'No notes yet' }}</p>
@@ -63,13 +63,13 @@
     </section>
     @if (canCancel) {
       <section class="ui-card mt-5 p-5 sm:p-6" aria-label="Appointment actions">
-        <button type="button" class="ui-button-danger" (click)="cancelAppointment()" [disabled]="isBusy"><mat-icon>cancel</mat-icon> Cancel appointment</button>
+        <button type="button" class="ui-button-danger" (click)="cancelAppointment()" [disabled]="isBusy"><app-icon name="cancel" /> Cancel appointment</button>
       </section>
     }
     @if (appointment.status === 'pending') {
       <section class="ui-card mt-5 flex flex-wrap gap-3 p-5 sm:p-6" aria-label="Appointment decision">
-        <button type="button" class="ui-button" (click)="approveAppointment()" [disabled]="isActionDisabled()"><mat-icon>check</mat-icon> Approve</button>
-        <button type="button" class="ui-button-danger" (click)="declineAppointment()" [disabled]="isActionDisabled()"><mat-icon>close</mat-icon> Reject</button>
+        <button type="button" class="ui-button" (click)="approveAppointment()" [disabled]="isActionDisabled()"><app-icon name="check" /> Approve</button>
+        <button type="button" class="ui-button-danger" (click)="declineAppointment()" [disabled]="isActionDisabled()"><app-icon name="close" /> Reject</button>
       </section>
     }
   } @else {

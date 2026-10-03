@@ -1,37 +1,37 @@
 <div class="ui-page max-w-6xl">
   <a class="ui-button-secondary mb-4" routerLink="/app/my-care">Visit summaries and payment balances</a>
   <app-page-header title="My appointments" eyebrow="Patient portal" description="View your visits, appointment activity, and scheduling options.">
-    <a class="ui-button" routerLink="/app/appointment"><mat-icon aria-hidden="true">add</mat-icon> Book a visit</a>
+    <a class="ui-button" routerLink="/app/appointment"><app-icon aria-hidden="true" name="add" /> Book a visit</a>
   </app-page-header>
   @if (isLoading) { <p class="ui-muted mb-5 text-sm" role="status">Updating appointments…</p> }
   <div class="space-y-6" [attr.aria-busy]="isLoading">
     <section aria-labelledby="confirmed-title">
-      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-accent" aria-hidden="true">check_circle</mat-icon><h2 id="confirmed-title" class="ui-section-title">Confirmed appointments</h2></div>
+      <div class="mb-3 flex items-center gap-2"><app-icon class="text-accent" aria-hidden="true" name="check_circle" /><h2 id="confirmed-title" class="ui-section-title">Confirmed appointments</h2></div>
       <div class="space-y-4" *ngIf="hasConfirmedAppointments; else noConfirmed">
         <ng-container *ngFor="let appointment of confirmedAppointments"><ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'confirmed' }"></ng-container></ng-container>
       </div>
       <ng-template #noConfirmed><div class="ui-card"><app-empty-state title="No confirmed appointments yet" description="Confirmed visits will appear here." icon="event_available" /></div></ng-template>
     </section>
     <section aria-labelledby="pending-title">
-      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-accent" aria-hidden="true">hourglass_empty</mat-icon><h2 id="pending-title" class="ui-section-title">Pending appointments</h2></div>
+      <div class="mb-3 flex items-center gap-2"><app-icon class="text-accent" aria-hidden="true" name="hourglass_empty" /><h2 id="pending-title" class="ui-section-title">Pending appointments</h2></div>
       <div class="space-y-4" *ngIf="hasPendingAppointments; else noPending">
         <ng-container *ngFor="let appointment of pendingAppointments"><ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'pending' }"></ng-container></ng-container>
       </div>
       <ng-template #noPending><div class="ui-card"><app-empty-state title="No pending appointments yet" icon="pending_actions" /></div></ng-template>
     </section>
     <section aria-labelledby="finished-title">
-      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-accent" aria-hidden="true">history</mat-icon><h2 id="finished-title" class="ui-section-title">Completed and no-show appointments</h2></div>
+      <div class="mb-3 flex items-center gap-2"><app-icon class="text-accent" aria-hidden="true" name="history" /><h2 id="finished-title" class="ui-section-title">Completed and no-show appointments</h2></div>
       <div class="space-y-4">@for (appointment of finishedAppointments; track appointment._id) { <ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'finished' }"></ng-container> } @empty { <div class="ui-card"><app-empty-state title="No completed or no-show appointments" icon="history" /></div> }</div>
     </section>
     <section aria-labelledby="rejected-title">
-      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-muted" aria-hidden="true">cancel</mat-icon><h2 id="rejected-title" class="ui-section-title">Rejected appointments</h2></div>
+      <div class="mb-3 flex items-center gap-2"><app-icon class="text-muted" aria-hidden="true" name="cancel" /><h2 id="rejected-title" class="ui-section-title">Rejected appointments</h2></div>
       <div class="space-y-4" *ngIf="hasRejectedAppointments; else noRejected">
         <ng-container *ngFor="let appointment of rejectedAppointments"><ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'rejected' }"></ng-container></ng-container>
       </div>
       <ng-template #noRejected><div class="ui-card"><app-empty-state title="No rejected appointments" icon="event_busy" /></div></ng-template>
     </section>
     <section aria-labelledby="cancelled-title">
-      <div class="mb-3 flex items-center gap-2"><mat-icon class="text-muted" aria-hidden="true">block</mat-icon><h2 id="cancelled-title" class="ui-section-title">Cancelled appointments</h2></div>
+      <div class="mb-3 flex items-center gap-2"><app-icon class="text-muted" aria-hidden="true" name="block" /><h2 id="cancelled-title" class="ui-section-title">Cancelled appointments</h2></div>
       <div class="space-y-4" *ngIf="hasCancelledAppointments; else noCancelled">
         <ng-container *ngFor="let appointment of cancelledAppointments"><ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'cancelled' }"></ng-container></ng-container>
       </div>
@@ -63,9 +63,9 @@
         </div>
       </details>
       @if (mode === 'confirmed' && !isAppointmentPast(appointment)) {
-        <div class="mt-5 flex flex-wrap gap-2 border-t border-stroke pt-4"><button type="button" class="ui-button-secondary" (click)="onReschedule(appointment)" [disabled]="isLoading"><mat-icon aria-hidden="true">event_repeat</mat-icon> Reschedule</button>@if (canCancel(appointment)) { <button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><mat-icon aria-hidden="true">cancel</mat-icon> Cancel appointment</button> }</div>
+        <div class="mt-5 flex flex-wrap gap-2 border-t border-stroke pt-4"><button type="button" class="ui-button-secondary" (click)="onReschedule(appointment)" [disabled]="isLoading"><app-icon aria-hidden="true" name="event_repeat" /> Reschedule</button>@if (canCancel(appointment)) { <button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><app-icon aria-hidden="true" name="cancel" /> Cancel appointment</button> }</div>
       }
-      @if (mode === 'pending' && canCancel(appointment)) { <div class="mt-5 border-t border-stroke pt-4"><button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><mat-icon aria-hidden="true">cancel</mat-icon> Cancel appointment</button></div> }
+      @if (mode === 'pending' && canCancel(appointment)) { <div class="mt-5 border-t border-stroke pt-4"><button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><app-icon aria-hidden="true" name="cancel" /> Cancel appointment</button></div> }
     </div>
   </article>
 </ng-template>

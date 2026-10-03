@@ -1,11 +1,11 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../../ui/icon/icon';
 
 @Component({
   selector: 'app-alert',
   standalone: true,
-  imports: [MatIconModule],
+  imports: [Icon],
   templateUrl: './alert.component.html',
   styleUrls: ['./alert.component.css']
 })

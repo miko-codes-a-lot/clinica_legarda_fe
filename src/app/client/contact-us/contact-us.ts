@@ -1,3 +1,4 @@
+import { Icon } from '../../_shared/ui/icon/icon';
 import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
 import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { Component, DestroyRef, inject } from '@angular/core';
@@ -10,7 +11,7 @@ import { AlertService } from '../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-contact-us',
-  imports: [PageHeader, EmptyState, CommonModule, FormsModule],
+  imports: [Icon, PageHeader, EmptyState, CommonModule, FormsModule],
   templateUrl: './contact-us.html',
   styleUrl: './contact-us.css'
 })

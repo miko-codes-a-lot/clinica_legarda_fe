@@ -5,7 +5,7 @@ import { MatDrawerContent, MatSidenavModule } from '@angular/material/sidenav';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../icon/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { NavComponent, NavigationItem } from '../../component/nav/nav.component';
 import { ClinicBrand } from '../clinic-brand/clinic-brand';
@@ -14,7 +14,7 @@ import { ThemeToggle } from '../theme-toggle/theme-toggle';
 @Component({
   selector: 'app-staff-shell',
   standalone: true,
-  imports: [MatSidenavModule, MatMenuModule, MatIconModule, MatButtonModule, NavComponent, ClinicBrand, ThemeToggle],
+  imports: [MatSidenavModule, MatMenuModule, Icon, MatButtonModule, NavComponent, ClinicBrand, ThemeToggle],
   templateUrl: './staff-shell.html',
   styleUrl: './staff-shell.css',
 })

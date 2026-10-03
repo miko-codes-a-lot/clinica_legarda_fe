@@ -1,3 +1,4 @@
+import { Icon } from '../../_shared/ui/icon/icon';
 import { AuthLayout } from '../../_shared/ui/auth-layout/auth-layout';
 import { isOnlineBookablePatient } from '../../_shared/model/user';
 import { Component, OnDestroy } from '@angular/core';
@@ -11,7 +12,7 @@ import { AlertService } from '../../_shared/service/alert.service';
 
 @Component({
   selector: 'app-login-patient',
-  imports: [AuthLayout, ReactiveFormsModule, RouterModule],
+  imports: [Icon, AuthLayout, ReactiveFormsModule, RouterModule],
   templateUrl: './login-patient.html',
   styleUrl: './login-patient.css'
 })
