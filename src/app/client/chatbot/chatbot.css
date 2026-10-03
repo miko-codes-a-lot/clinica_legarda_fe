@@ -2,7 +2,7 @@
 .chatbot-container { width: 380px; max-width: calc(100vw - 32px); height: min(600px, calc(100dvh - 120px)); display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--color-stroke); border-radius: 20px; background: var(--color-surface); box-shadow: 0 12px 48px rgb(9 41 35 / .16); }
 .chat-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; color: white; background: var(--color-brand-900); }
 .chat-header h3 { font-size: 14px; font-weight: 600; }
-.close-button { height: 32px; width: 32px; border-radius: 8px; font-size: 24px; }
+.close-button { display: inline-flex; align-items: center; justify-content: center; height: 32px; width: 32px; border-radius: 8px; }
 .close-button:hover { background: rgb(255 255 255 / .12); }
 .chat-messages { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 20px; }
 .message-row { display: flex; align-items: flex-end; gap: 8px; }

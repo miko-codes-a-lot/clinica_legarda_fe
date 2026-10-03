@@ -3,7 +3,7 @@
     <h3>Dental Assistant</h3>
 
     <button class="close-button" (click)="closeChat()" aria-label="Close Chat">
-      &times;
+      <app-icon name="x-mark" />
     </button>
   </header>
   <div class="chat-messages" role="log" aria-label="Chat messages" aria-live="polite" #chatMessages (click)="onMessagesClick($event)" (scroll)="onMessagesScroll()">
