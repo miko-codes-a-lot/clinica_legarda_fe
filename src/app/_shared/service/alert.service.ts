@@ -29,7 +29,7 @@ export class AlertService {
       duration: 3500,
       horizontalPosition: 'right',
       verticalPosition: 'top',
-      panelClass: [panelClass],
+      panelClass: ['app-snackbar', panelClass],
       data: {
         message
       }

@@ -4,6 +4,7 @@ import { RxDentalServiceForm } from './rx-dental-service-form';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 // for table component
 import { FormComponent } from '../../../_shared/component/form/form.component';
+import { FormField } from '../../../_shared/component/form/form-field.interface';
 
 @Component({
   selector: 'app-dental-service-form',
@@ -17,14 +18,14 @@ export class DentalServiceForm {
   @Input() dentalService!: DentalService
 
   rxform!: FormGroup<RxDentalServiceForm>
-  dentalServiceFields: any[] = [];
+  dentalServiceFields: FormField[] = [];
 
   constructor(private readonly fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.rxform = this.fb.nonNullable.group({
-      name: [this.dentalService.name, Validators.required],
-      duration: [this.dentalService.duration, Validators.required]
+      name: [this.dentalService.name, [Validators.required, Validators.minLength(3)]],
+      duration: [this.dentalService.duration, [Validators.required, Validators.min(0)]]
     })
 
     this.buildDentalServiceFields();
@@ -32,13 +33,17 @@ export class DentalServiceForm {
 
   private buildDentalServiceFields() {
     this.dentalServiceFields = [
-      { name: 'name', label: 'Name', type: 'text'},
-      { name: 'duration', label: 'duration', type: 'number'},
+      { name: 'name', label: 'Name', type: 'text', customError: 'Enter at least 3 characters.' },
+      { name: 'duration', label: 'Duration (minutes)', type: 'number', customError: 'Duration must be 0 or more minutes.' },
     ];
-      // remove password validation and input on Update
   }
 
   onSubmit() {
+    if (this.isLoading || this.rxform.invalid) {
+      this.rxform.markAllAsTouched();
+      return;
+    }
+
     const service: DentalService = {
       name: this.name.value,
       duration: this.duration.value,

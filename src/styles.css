@@ -67,10 +67,21 @@
   }
 }
 
-.success-snackbar { --mdc-snackbar-container-color: #095e51; color: white; }
-.error-snackbar { --mdc-snackbar-container-color: #b42318; color: white; }
-.warning-snackbar { --mdc-snackbar-container-color: #854d0e; color: white; }
-.info-snackbar { --mdc-snackbar-container-color: #164e63; color: white; }
+.app-snackbar {
+  --mat-snack-bar-container-color: #24332f;
+  --mat-snack-bar-supporting-text-color: #ffffff;
+  --mat-snack-bar-container-shape: 14px;
+}
+.app-snackbar.mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
+  min-width: 0;
+  max-width: min(450px, calc(100vw - 32px));
+  padding: 0;
+}
+.app-snackbar .mat-mdc-snack-bar-label { padding: 0; }
+.success-snackbar app-icon { color: #79cdb6; }
+.error-snackbar app-icon { color: #fca5a5; }
+.warning-snackbar app-icon { color: #fde68a; }
+.info-snackbar app-icon { color: #7dd3fc; }
 
 @media print {
   .no-print, .workspace-sidebar, .workspace-topbar { display: none !important; }

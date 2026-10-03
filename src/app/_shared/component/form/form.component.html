@@ -7,6 +7,14 @@
 
         @if (field.type === 'textarea') {
           <textarea matInput [formControlName]="field.name" [placeholder]="field.placeholder || ''" [readonly]="!!field.readonly" [attr.maxlength]="field.maxlength || null" rows="3"></textarea>
+        } @else if (field.type === 'number') {
+          <input
+            type="number"
+            step="any"
+            matInput
+            [readonly]="field.readonly || null"
+            [formControlName]="field.name"
+          />
         } @else if (field.type !== 'select') {
           <input
             [readonly]="field.readonly || null"
