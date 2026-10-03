@@ -1,3 +1,4 @@
+import { TableColumn } from '../../../_shared/component/table/table-model';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Reason } from '../../../_shared/model/reason';
@@ -19,12 +20,11 @@ export class ReasonList implements OnInit {
   title = 'Reason'
   createLabel = 'Create Reason'
   dataSource = new MatTableDataSource<Reason>();
-  displayedColumns: string[] = ['_id', 'code', 'label', 'description', 'actions'];
-  columnDefs = [
-    { key: '_id', label: 'ID', cell: (reason: Reason) => reason._id ?? '' },
-    { key: 'code', label: 'Code', cell: (reason: Reason) => reason.code},
-    { key: 'label', label: 'Label', cell: (reason: Reason) =>  reason.label},
-    { key: 'description', label: 'Description', cell: (reason: Reason) =>  reason.description},
+  displayedColumns = ['label', 'code', 'description', 'actions'];
+  columnDefs: TableColumn<Reason>[] = [
+    { key: 'label', label: 'Reason', cell: reason => reason.label },
+    { key: 'code', label: 'Code', cell: reason => reason.code },
+    { key: 'description', label: 'Description', cell: reason => reason.description },
   ];
 
   constructor(

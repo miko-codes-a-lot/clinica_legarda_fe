@@ -1,3 +1,4 @@
+import { TableColumn, TableFilter } from '../../../_shared/component/table/table-model';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DentalService } from '../../../_shared/model/dental-service';
@@ -19,12 +20,12 @@ export class DentalServiceList implements OnInit {
   title = 'Service'
   createLabel = 'Create Service'
   dataSource = new MatTableDataSource<DentalService>();
-  displayedColumns: string[] = ['_id', 'name', 'duration', 'actions'];
-  columnDefs = [
-    { key: '_id', label: 'ID', cell: (dentalService: DentalService) => dentalService._id ?? '' },
-    { key: 'name', label: 'Name', cell: (dentalService: DentalService) => dentalService.name},
-    { key: 'duration', label: 'Duration', cell: (dentalService: DentalService) =>  dentalService.duration},
+  displayedColumns = ['name', 'duration', 'actions'];
+  columnDefs: TableColumn<DentalService>[] = [
+    { key: 'name', label: 'Service', cell: service => service.name },
+    { key: 'duration', label: 'Duration', cell: service => `${service.duration} min`, sortValue: service => service.duration, kind: 'number' },
   ];
+  filters: TableFilter<DentalService>[] = [{ key: 'duration', label: 'Duration', options: [{ value: 'short', label: '30 min or less' }, { value: 'medium', label: '31–60 min' }, { value: 'long', label: 'Over 60 min' }], value: service => service.duration <= 30 ? 'short' : service.duration <= 60 ? 'medium' : 'long' }];
 
   constructor(
     private readonly dentalServicesService: DentalServicesService,

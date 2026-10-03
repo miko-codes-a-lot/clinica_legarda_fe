@@ -8,7 +8,7 @@
   [description]="canManage ? 'Manage all clinics.' : 'Clinics currently assigned to your account.'"
   [createButtonLabel]="createLabel"
   [displayedColumns]="displayedColumns"
-  [columnDefs]="columnDefs"
+  [columnDefs]="columnDefs" [filters]="filters" sortBy="name" searchPlaceholder="Search clinic, address or contact"
   [dataSource]="dataSource"
   [isLoading]="isLoading"
   [disableEditFn]="disableEdit"
@@ -17,6 +17,6 @@
   (create)="onCreate()"
 >
   @if (!canManage && !isLoading && !loadError && dataSource.data.length === 0) {
-    <p table-filters class="ui-card mb-5 p-5 text-sm text-muted" role="status">No assigned clinics. Ask a super admin to assign a clinic to your account.</p>
+    <p table-filters class="text-xs text-muted" role="status">No assigned clinics. Ask a super admin to assign a clinic to your account.</p>
   }
 </app-generic-table>

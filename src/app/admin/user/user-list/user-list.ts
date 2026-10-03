@@ -1,3 +1,5 @@
+import { USER_TABLE_COLUMNS, userTableFilters } from '../../../_shared/component/table/management-table-config';
+import { TableFilter } from '../../../_shared/component/table/table-model';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from '../../../_shared/model/user';
@@ -19,14 +21,9 @@ export class UserList implements OnInit {
   title = 'User Management'
   createLabel = 'Create User'
   dataSource = new MatTableDataSource<User>();
-  displayedColumns: string[] = ['_id', 'name', 'role', 'mobileNumber', 'emailAddress', 'actions'];
-  columnDefs = [
-    { key: '_id', label: 'ID', cell: (user: User) => user._id ?? '' },
-    { key: 'name', label: 'Name', cell: (user: User) => `${user.firstName} ${user.lastName}` },
-    { key: 'role', label: 'ROLE', cell: (user: User) => user.role ?? '' },
-    { key: 'mobileNumber', label: 'Mobile #', cell: (user: User) => user.mobileNumber ?? '' },
-    { key: 'emailAddress', label: 'Email Address', cell: (user: User) => user.emailAddress ?? '' },
-  ];
+  displayedColumns = ['name', 'role', 'status', 'contact', 'clinics', 'actions'];
+  columnDefs = USER_TABLE_COLUMNS;
+  filters: TableFilter<User>[] = [];
 
   constructor(
     private readonly userService: UserService,
@@ -41,6 +38,7 @@ export class UserList implements OnInit {
     this.userService.getAll().subscribe({
       next: (users) => {
         this.dataSource.data = users;
+        this.filters = userTableFilters(users);
       },
       error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false);

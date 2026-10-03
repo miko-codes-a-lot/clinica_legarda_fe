@@ -1,3 +1,4 @@
+import { TableColumn, TableFilter } from '../../../_shared/component/table/table-model';
 import { AuthService } from '../../../_shared/service/auth-service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
@@ -25,12 +26,13 @@ export class ClinicList implements OnInit {
   get createLabel(): string { return this.canManage ? 'Create Clinic' : ''; }
   disableEdit = () => !this.canManage;
   dataSource = new MatTableDataSource<Clinic>();
-  displayedColumns: string[] = ['_id', 'name', 'address', 'actions'];
-  columnDefs = [
-    { key: '_id', label: 'ID', cell: (clinic: Clinic) => clinic._id ?? '' },
-    { key: 'name', label: 'Name', cell: (clinic: Clinic) => clinic.name},
-    { key: 'address', label: 'Address', cell: (clinic: Clinic) =>  clinic.address},
+  displayedColumns = ['name', 'contact', 'hours', 'actions'];
+  columnDefs: TableColumn<Clinic>[] = [
+    { key: 'name', label: 'Clinic', cell: clinic => clinic.name, secondary: clinic => clinic.address || '' },
+    { key: 'contact', label: 'Contact', cell: clinic => clinic.mobileNumber || clinic.emailAddress, secondary: clinic => clinic.mobileNumber ? clinic.emailAddress || '' : '' },
+    { key: 'hours', label: 'Open days', cell: clinic => (clinic.operatingHours || []).filter(hour => hour.startTime && hour.endTime).map(hour => hour.day.slice(0, 3)).join(' · ') },
   ];
+  filters: TableFilter<Clinic>[] = [{ key: 'day', label: 'Open on', options: ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].map(day => ({ value: day, label: day.charAt(0).toUpperCase() + day.slice(1) })), value: clinic => (clinic.operatingHours || []).filter(hour => hour.startTime && hour.endTime).map(hour => hour.day) }];
 
   get canManage(): boolean { return this.authService.currentUserValue?.role === 'super-admin'; }
 
