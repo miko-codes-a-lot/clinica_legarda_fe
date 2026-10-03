@@ -6,6 +6,8 @@ The application uses Tailwind v4 through `.postcssrc.json`. `src/styles.css` own
 
 Use `ui-page` for the content width and responsive spacing, `app-page-header` for the title and actions, and `ui-card` for a section. Use `ui-section-title`, `ui-muted` and `ui-label` for hierarchy. Use `ui-button`, `ui-button-secondary`, `ui-button-danger` or `ui-button-ghost` according to the action's importance. Native buttons need an explicit type and an accessible name for icon-only actions. Forms retain their reactive controls and validation.
 
+Single native dropdowns use `ui-input`, which reserves space for a theme-aware chevron inset 1rem from the right edge. Keep the native `select` for keyboard behavior; multi-selects and listboxes retain their browser appearance. Forced-colors mode uses the native arrow.
+
 ```html
 <section class="ui-page">
   <app-page-header title="Clinic details" eyebrow="Management" description="Review clinic information.">

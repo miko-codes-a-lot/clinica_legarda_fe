@@ -23,10 +23,9 @@ export class Dentist {
   user: UserSimple | null = null
 
   menuItems = [
+    { label: 'Home', icon: 'home', link: '/dentist/homepage' },
     { label: 'Patient records', icon: 'folder_shared', link: '/dentist/care/patients' },
     { label: 'Treatment queue', icon: 'groups', link: '/dentist/care/queue' },
-    { label: 'Home', icon: 'home', link: '/dentist/homepage' },
-    { label: 'Profile', icon: 'person', link: '/dentist/profile' },
     { label: 'Appointments', icon: 'event', link: '/dentist/appointment' },
     { label: 'Referral Request', icon: 'event', link: '/dentist/referral-request' },
     { label: 'Notifications', icon: 'notifications', link: '/dentist/notification' },
@@ -58,6 +57,7 @@ export class Dentist {
   }
 
   get activeTitle(): string {
+    if (this.router.url.startsWith('/dentist/profile')) return 'My account';
     return this.menuItems.find(item => this.router.url.startsWith(item.link))?.label || 'Home';
   }
 
