@@ -7,6 +7,15 @@ export const SUPER_ADMIN_ROUTES: Routes = [
     path: '',
     component: SuperAdmin,
     children: [
+      {
+        path: 'notification',
+        canActivate: [AuthGuard],
+        data: { role: 'super-admin' },
+        children: [
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+          { path: 'list', loadComponent: () => import('../admin/notification/notification-list/notification-list').then(m => m.NotificationList) },
+        ],
+      },
       { path: 'care', canActivate: [AuthGuard], data: { role: 'super-admin' }, loadChildren: () => import('../care/care.routes').then(m => m.CARE_ROUTES) },
       {
         path: '',

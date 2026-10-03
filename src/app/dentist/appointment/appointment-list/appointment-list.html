@@ -36,4 +36,4 @@
     <p class="ui-muted mb-4" role="status">No {{ selectedStatus === 'all' ? '' : statusLabel(selectedStatus).toLowerCase() }} appointments found.</p>
   }
 </section>
-<app-generic-table title="Appointments" [displayedColumns]="displayedColumns" [columnDefs]="columnDefs" [filters]="filters" [dateValue]="dateValue" sortBy="date" sortDirection="desc" [dataSource]="dataSource" [isLoading]="isLoading" [rowClassFn]="outcomeRowClass" (details)="onDetails($event)" />
+<app-generic-table [resetKey]="loadedDentistId" title="Appointments" [displayedColumns]="displayedColumns" [columnDefs]="columnDefs" [filters]="filters" [dateValue]="dateValue" sortBy="date" sortDirection="desc" [dataSource]="dataSource" [isLoading]="isLoading" [rowClassFn]="outcomeRowClass" (details)="onDetails($event)" />

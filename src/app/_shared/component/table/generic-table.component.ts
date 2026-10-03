@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ContentChildren, EventEmitter, Input, OnChanges, Output, QueryList, TemplateRef, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, Component, ContentChildren, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -44,6 +44,7 @@ export class GenericTableComponent<T> implements AfterViewInit, OnChanges {
   @Input() pageSize = 10;
   @Input() emptyTitle = 'No records yet';
   @Input() emptyDescription = 'Records will appear here when they are available.';
+  @Input() resetKey = '';
   @Output() details = new EventEmitter<string>();
   @Output() update = new EventEmitter<string>();
   @Output() create = new EventEmitter<void>();
@@ -67,7 +68,11 @@ export class GenericTableComponent<T> implements AfterViewInit, OnChanges {
   get invalidDateRange(): boolean { return !!this.from && !!this.to && this.from > this.to; }
   get count(): number { return this.serverMode ? this.totalRows ?? this.dataSource.data.length : this.dataSource.filteredData.length; }
 
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['resetKey']) {
+      this.searchTerm = ''; this.selectedFilters = {}; this.from = ''; this.to = '';
+      this.paginator?.firstPage();
+    }
     if (this.rows) this.dataSource.data = [...this.rows];
     this.configureSource();
   }

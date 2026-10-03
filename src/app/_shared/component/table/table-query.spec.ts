@@ -1,3 +1,5 @@
+import { SCHEDULE_TABLE_COLUMNS } from './appointment-table-config';
+import { dentistAppointment } from '../../../dentist/appointment/appointment-test-fixtures';
 import { matchesTableQuery, sortTableRows, TableColumn, TableFilter, TableQuery } from './table-model';
 
 interface Row { _id: string; name: string; clinic: string; status: string; date: string; amount: number | null; }
@@ -38,5 +40,15 @@ describe('Record table data selection', () => {
     sortTableRows(rows, columns, { active: 'name', direction: 'desc' });
     expect(rows).toEqual(before);
     expect(sortTableRows(rows, columns, { active: 'name', direction: '' })).toEqual(rows);
+  });
+});
+
+describe('Dentist schedule visible fields', () => {
+  it('finds services and clinics displayed inside the patient cell', () => {
+    const appointment = dentistAppointment();
+    const visible = SCHEDULE_TABLE_COLUMNS.filter(column => ['time', 'patient', 'status'].includes(column.key));
+    expect(matchesTableQuery(appointment, visible, [], query({ search: appointment.services[0].name }))).toBeTrue();
+    expect(matchesTableQuery(appointment, visible, [], query({ search: appointment.clinic.name }))).toBeTrue();
+    expect(matchesTableQuery(appointment, visible, [], query({ search: appointment._id }))).toBeFalse();
   });
 });

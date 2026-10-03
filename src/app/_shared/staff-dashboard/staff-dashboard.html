@@ -7,32 +7,29 @@
       <app-icon aria-hidden="true" name="download" /> {{ isExporting ? 'Exporting…' : 'Export PDF' }}
     </button>
     <div class="relative">
-      <button mat-icon-button type="button" (click)="toggleNotifications()" class="ui-icon-button"
+      <button #notificationTrigger mat-icon-button type="button" (click)="toggleNotifications()" class="ui-icon-button"
         [attr.aria-label]="'Toggle ' + notificationScope.toLowerCase()" [attr.aria-expanded]="showNotifications" aria-controls="dashboard-notifications">
         <app-icon [matBadge]="unreadNotificationsCount$ | async" matBadgeColor="warn"
           [matBadgeHidden]="(unreadNotificationsCount$ | async) === 0" name="notifications" />
       </button>
       <section *ngIf="showNotifications" id="dashboard-notifications" [attr.aria-label]="notificationScope"
-        class="ui-card absolute right-0 top-full z-40 mt-3 w-[min(24rem,calc(100vw-3rem))] overflow-hidden">
-        <div class="flex items-center justify-between gap-3 border-b border-stroke px-5 py-4">
-          <h2 class="ui-section-title">{{ notificationScope }}</h2>
-          <button mat-icon-button type="button" (click)="toggleNotifications()" aria-label="Close notifications"><app-icon name="close" /></button>
+        class="notification-popover" (keydown.escape)="closeNotifications(); $event.stopPropagation()">
+        <div class="notification-header">
+          <h2>Notifications <span class="ui-muted text-xs font-normal">{{ unreadNotificationsCount$ | async }} unread</span></h2>
+          <button type="button" class="notification-action" (click)="closeNotifications()" aria-label="Close notifications"><app-icon name="x-mark" /></button>
         </div>
-        <div class="max-h-96 overflow-y-auto" *ngIf="notifications$ | async as notifications">
-          <article *ngFor="let notification of notifications" class="flex flex-wrap items-start gap-3 border-b border-stroke p-4"
-            [class.bg-tint]="!notification.read">
-            <div class="min-w-0 flex-1">
-              <button type="button" class="ui-button-ghost mb-2 px-0 text-xs" (click)="redirectToDetails(notification.link)">
-                {{ formatNotificationType(notification.type) }}
-              </button>
-              <p class="break-words text-sm text-ink">{{ notification.message }}</p>
-              <p class="ui-muted mt-2 text-xs">{{ formatTimestamp(notification.createdAt) }}</p>
+        <div class="notification-list" *ngIf="notifications$ | async as notifications">
+          <article *ngFor="let notification of notifications" class="notification-item" [class.bg-tint]="!notification.read">
+            <div class="notification-meta"><span>{{ formatNotificationType(notification.type) }}</span><span *ngIf="!notification.read" class="notification-dot" aria-label="Unread"></span></div>
+            <button type="button" class="notification-message" (click)="redirectToDetails(notification.link)" [disabled]="!notification.link">{{ notification.message }}</button>
+            <div class="notification-footer"><time>{{ formatTimestamp(notification.createdAt) }}</time>
+              <button *ngIf="!notification.read" type="button" class="notification-action" aria-label="Mark as read" title="Mark as read" [disabled]="pendingReads.has(notification._id)" (click)="markAsRead(notification._id)"><app-icon name="check" /></button>
+              <span *ngIf="notification.read" class="text-xs text-muted">Read</span>
             </div>
-            <button *ngIf="!notification.read" type="button" class="ui-button-ghost text-xs" (click)="markAsRead(notification._id)">Mark as read</button>
-            <app-status-badge *ngIf="notification.read" status="Read" />
           </article>
-          <app-empty-state *ngIf="notifications.length === 0" title="No notifications" icon="notifications_none" />
+          <p *ngIf="notifications.length === 0" class="px-4 py-6 text-sm text-muted">No notifications yet.</p>
         </div>
+        <a class="notification-view-all" [routerLink]="'/' + area + '/notification/list'">View all notifications <app-icon name="arrow-right" /></a>
       </section>
     </div>
   </app-page-header>
@@ -102,32 +99,19 @@
   <div class="grid gap-5 2xl:grid-cols-2">
     <section class="ui-card min-w-0 overflow-hidden">
       <div class="border-b border-stroke p-5"><p class="ui-eyebrow mb-2">Clinic schedule</p><h2 class="ui-section-title">Today's appointment queue</h2><p class="ui-muted mt-1 text-sm">{{ todayLabel }}</p></div>
-      <div class="dashboard-table-scroll">
-        <mat-table [dataSource]="appointmentQueue" class="dashboard-table">
-          <ng-container matColumnDef="time"><mat-header-cell *matHeaderCellDef>Time</mat-header-cell><mat-cell *matCellDef="let appointment">{{ appointment.time }}</mat-cell></ng-container>
-          <ng-container matColumnDef="patientName"><mat-header-cell *matHeaderCellDef>Patient</mat-header-cell><mat-cell *matCellDef="let appointment">{{ appointment.patientName }}</mat-cell></ng-container>
-          <ng-container matColumnDef="service"><mat-header-cell *matHeaderCellDef>Service</mat-header-cell><mat-cell *matCellDef="let appointment">{{ appointment.service }}</mat-cell></ng-container>
-          <ng-container matColumnDef="clinicName"><mat-header-cell *matHeaderCellDef>Clinic</mat-header-cell><mat-cell *matCellDef="let appointment">{{ appointment.clinicName }}</mat-cell></ng-container>
-          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-        </mat-table>
-      </div>
-      <app-empty-state *ngIf="report && appointmentQueue.length === 0" title="No confirmed appointments today" description="There are no appointments in today's queue for this clinic scope." icon="event_available" />
+      <app-generic-table [embedded]="true" title="Today's appointment queue" [rows]="appointmentQueue" [columnDefs]="queueColumns" [displayedColumns]="displayedColumns"
+        sortBy="time" sortDirection="asc" searchPlaceholder="Search patient, service or clinic"
+        emptyTitle="No confirmed appointments today" emptyDescription="There are no appointments for this clinic scope today." />
     </section>
     <ng-container *ngIf="notifications$ | async as notifications">
       <section class="ui-card min-w-0 overflow-hidden" *ngIf="!showNotifications">
-        <div class="border-b border-stroke p-5"><p class="ui-eyebrow mb-2">{{ area === 'admin' ? 'Assigned clinics' : 'Account-wide' }}</p><h2 class="ui-section-title">Recent notifications</h2></div>
-        <div class="dashboard-table-scroll" *ngIf="notifications.length > 0">
-          <mat-table [dataSource]="notifications" class="dashboard-table">
-            <ng-container matColumnDef="type"><mat-header-cell *matHeaderCellDef>Type</mat-header-cell><mat-cell *matCellDef="let notification"><button type="button" class="ui-button-ghost px-0 text-left text-xs" (click)="redirectToDetails(notification.link)">{{ formatNotificationType(notification.type) }}</button></mat-cell></ng-container>
-            <ng-container matColumnDef="message"><mat-header-cell *matHeaderCellDef>Message</mat-header-cell><mat-cell *matCellDef="let notification">{{ notification.message }}</mat-cell></ng-container>
-            <ng-container matColumnDef="timestamp"><mat-header-cell *matHeaderCellDef>Date</mat-header-cell><mat-cell *matCellDef="let notification">{{ formatTimestamp(notification.createdAt) }}</mat-cell></ng-container>
-            <ng-container matColumnDef="status"><mat-header-cell *matHeaderCellDef>Status</mat-header-cell><mat-cell *matCellDef="let notification"><button *ngIf="!notification.read" type="button" class="ui-button-ghost text-xs" (click)="markAsRead(notification._id)">Mark as read</button><app-status-badge *ngIf="notification.read" status="Read" /></mat-cell></ng-container>
-            <mat-header-row *matHeaderRowDef="notificationColumns"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: notificationColumns;" [class.bg-tint]="!row.read"></mat-row>
-          </mat-table>
-        </div>
-        <app-empty-state *ngIf="notifications.length === 0" title="No notifications" description="Appointment updates will appear here." icon="notifications_none" />
+        <div class="border-b border-stroke p-5"><h2 class="ui-section-title">Recent notifications</h2></div>
+        <app-generic-table [embedded]="true" title="Recent notifications" [rows]="notifications" [columnDefs]="notificationDefs" [displayedColumns]="notificationColumns"
+          [filters]="notificationFilters" [dateValue]="notificationDay" dateLabel="Received" sortBy="createdAt" sortDirection="desc" [paginate]="false"
+          emptyTitle="No notifications" emptyDescription="Appointment updates will appear here.">
+          <ng-template tableCell="message" let-item><button type="button" class="text-left text-sm text-accent hover:underline" (click)="redirectToDetails(item.link)" [disabled]="!item.link">{{ item.message }}</button></ng-template>
+          <ng-template tableCell="actions" let-item><button *ngIf="!item.read" type="button" class="notification-action" aria-label="Mark as read" title="Mark as read" [disabled]="pendingReads.has(item._id)" (click)="markAsRead(item._id)"><app-icon name="check" /></button></ng-template>
+        </app-generic-table>
       </section>
     </ng-container>
   </div>

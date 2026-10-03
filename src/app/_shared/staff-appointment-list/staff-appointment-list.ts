@@ -57,6 +57,7 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
   readonly columnDefs = APPOINTMENT_TABLE_COLUMNS;
   readonly dateValue = appointmentTableDate;
   filters: TableFilter<Appointment>[] = [];
+  scopeKey = '';
   resetFilters(): void { this.selectedClinic = 'all'; this.selectedStatus = 'all'; this.applyFilters(); }
   readonly disableEdit = (appointment: Appointment) => appointment.status !== AppointmentStatus.PENDING;
 
@@ -65,6 +66,7 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
       map(user => ({ id: user?._id ?? '', role: user?.role ?? '' })),
       distinctUntilChanged((previous, current) => previous.id === current.id && previous.role === current.role),
       switchMap(actor => {
+        this.scopeKey = `${actor.id}:${actor.role}`;
         this.appointments = [];
         this.clinics = [];
         this.selectedClinic = 'all';

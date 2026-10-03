@@ -1,4 +1,4 @@
-import { APPOINTMENT_TABLE_COLUMNS } from '../../../_shared/component/table/appointment-table-config';
+import { SCHEDULE_TABLE_COLUMNS } from '../../../_shared/component/table/appointment-table-config';
 import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
 import { TableCellDirective } from '../../../_shared/component/table/table-cell.directive';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
@@ -38,7 +38,7 @@ interface CalendarDay {
   providers: [DentistAppointmentFeed],
 })
 export class HomepageIndex implements OnInit {
-  readonly scheduleColumns = APPOINTMENT_TABLE_COLUMNS;
+  readonly scheduleColumns = SCHEDULE_TABLE_COLUMNS;
   readonly scheduleRowClass = (appointment: Appointment): string => requiresAppointmentOutcome(appointment, this.reminderNow) ? 'outcome-required' : '';
   readonly statusLabel = appointmentStatusLabel;
   readonly requiresOutcome = requiresAppointmentOutcome;

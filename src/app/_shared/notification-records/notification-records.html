@@ -1,0 +1,11 @@
+<app-generic-table title="Notifications" description="Appointment updates for your account."
+  [rows]="rows" [columnDefs]="columns" [displayedColumns]="['type', 'message', 'createdAt', 'status', 'actions']"
+  [filters]="filters" [dateValue]="dateValue" dateLabel="Received" [isLoading]="isLoading" [resetKey]="scopeKey"
+  sortBy="createdAt" sortDirection="desc" searchPlaceholder="Search notification messages"
+  emptyTitle="No notifications" emptyDescription="Appointment updates will appear here.">
+  <ng-template tableCell="actions" let-item>
+    <button *ngIf="!item.read" class="ui-icon-button !h-8 !w-8" type="button" aria-label="Mark as read" title="Mark as read"
+      [disabled]="isLoading || pendingReads.has(item._id)" (click)="markAsRead(item)"><app-icon name="check" /></button>
+  </ng-template>
+  <div table-footer *ngIf="error" class="px-4 pb-4 text-sm text-danger" role="alert">{{ error }} <button type="button" class="underline" (click)="retry()" [disabled]="isLoading">Retry</button></div>
+</app-generic-table>

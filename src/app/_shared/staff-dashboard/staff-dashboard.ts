@@ -2,7 +2,6 @@ import { DOCUMENT } from '@angular/common';
 import { ThemeService } from '../service/theme-service';
 import { applyChartTheme, readChartTheme } from './chart-theme';
 import { PageHeader } from '../ui/page-header/page-header';
-import { StatusBadge } from '../ui/status-badge/status-badge';
 import { EmptyState } from '../ui/empty-state/empty-state';
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild, ElementRef, Input, DestroyRef, inject } from '@angular/core';
@@ -11,7 +10,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { Icon } from '../ui/icon/icon';
-import { MatTableModule } from '@angular/material/table';
+import { GenericTableComponent } from '../component/table/generic-table.component';
+import { TableCellDirective } from '../component/table/table-cell.directive';
+import { TableColumn } from '../component/table/table-model';
+import { NOTIFICATION_COLUMNS, NOTIFICATION_FILTERS, notificationDay, notificationLink, notificationTimestamp, notificationTypeLabel } from '../component/table/notification-table-config';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
@@ -21,11 +23,11 @@ import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { BehaviorSubject, map, Observable, shareReplay, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AnalyticsService } from '../service/analytics-service';
-import { AnalyticsReportState, formatReportDate } from '../model/analytics-report';
+import { AnalyticsReportState, AnalyticsQueueEntry, formatReportDate } from '../model/analytics-report';
 import { NotificationService } from '../service/notification-service';
 import { ClinicService } from '../service/clinic-service';
 import { Notification, NotificationType } from '../model/notification';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Reason } from '../model/reason';
 import { ReasonService } from '../service/reason-service';
 
@@ -37,12 +39,12 @@ Chart.register(...registerables);
 
 @Component({
   selector: 'app-staff-dashboard',
-  imports: [PageHeader, StatusBadge, EmptyState,
+  imports: [PageHeader, EmptyState,
     CommonModule,
     MatCardModule,
     Icon,
     MatBadgeModule,
-    MatTableModule,
+    GenericTableComponent, TableCellDirective, RouterLink,
     MatChipsModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -87,7 +89,18 @@ export class StaffDashboard {
   appointmentTrendChart!: Chart<'line', number[], string>;
   showNotifications = false;
   displayedColumns = ['time', 'patientName', 'service', 'clinicName'];
-  notificationColumns = ['type', 'message', 'timestamp', 'status'];
+  readonly notificationColumns = ['type', 'message', 'createdAt', 'status', 'actions'];
+  readonly notificationDefs = NOTIFICATION_COLUMNS;
+  readonly notificationFilters = NOTIFICATION_FILTERS;
+  readonly notificationDay = notificationDay;
+  readonly queueColumns: readonly TableColumn<AnalyticsQueueEntry>[] = [
+    { key: 'time', label: 'Time', cell: row => row.time },
+    { key: 'patientName', label: 'Patient', cell: row => row.patientName },
+    { key: 'service', label: 'Services', cell: row => row.service },
+    { key: 'clinicName', label: 'Clinic', cell: row => row.clinicName },
+  ];
+  readonly pendingReads = new Set<string>();
+  @ViewChild('notificationTrigger', { read: ElementRef }) notificationTrigger?: ElementRef<HTMLButtonElement>;
 
   constructor(
     private readonly notificationService: NotificationService,
@@ -106,7 +119,8 @@ export class StaffDashboard {
       ? this.state.report : undefined;
   }
   get weeklyReport() { return this.report?.summary; }
-  get appointmentQueue() { return this.report?.queue ?? []; }
+  private readonly emptyQueue: AnalyticsQueueEntry[] = [];
+  get appointmentQueue() { return this.report?.queue ?? this.emptyQueue; }
   get weekLabel(): string {
     const summary = this.weeklyReport;
     return summary ? `${formatReportDate(summary.weekOf)} – ${formatReportDate(summary.weekEnd)} (Manila)` : '';
@@ -304,31 +318,21 @@ export class StaffDashboard {
   }
 
   // ----------------- HELPERS -----------------
-  formatTimestamp(timestamp: string): string {
-    return new Date(timestamp).toLocaleString();
-  }
-
-  formatNotificationType(type: NotificationType): string {
-    switch (type) {
-      case NotificationType.APPOINTMENT_CREATED: return 'New Booking';
-      case NotificationType.APPOINTMENT_STATUS_UPDATED: return 'Status Update';
-      case NotificationType.APPOINTMENT_REMINDER: return 'Reminder';
-      default: return 'Notification';
-    }
-  }
-
-  getNotificationTypeClass(type: NotificationType): string {
-    return type === NotificationType.APPOINTMENT_CREATED ? 'booking' : 'cancellation';
-  }
+  formatTimestamp = notificationTimestamp;
+  formatNotificationType = notificationTypeLabel;
 
   markAsRead(notificationId: string): void {
+    if (this.pendingReads.has(notificationId) || this.reportNotifications.find(item => item._id === notificationId)?.read) return;
+    this.pendingReads.add(notificationId);
     this.notificationService.markAsRead(notificationId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      error: (err) => console.error(`Failed to mark notification ${notificationId} as read`, err)
-    });
+      error: () => this.notificationError = 'This notification could not be marked as read. Please try again.',
+    }).add(() => this.pendingReads.delete(notificationId));
   }
 
-  toggleNotifications(): void {
-    this.showNotifications = !this.showNotifications;
+  toggleNotifications(): void { this.showNotifications = !this.showNotifications; }
+  closeNotifications(): void {
+    this.showNotifications = false;
+    this.notificationTrigger?.nativeElement.focus();
   }
 
   ngOnDestroy(): void {
@@ -339,7 +343,8 @@ export class StaffDashboard {
   }
 
   redirectToDetails(link: string | undefined) {
-    if (link) this.router.navigate([link.replace(/^\/(?:admin|super-admin)(?=\/)/, `/${this.area}`)]);
+    const route = notificationLink(link, this.area);
+    if (route) void this.router.navigateByUrl(route);
   }
 
   private createServiceTrendChart(): void {

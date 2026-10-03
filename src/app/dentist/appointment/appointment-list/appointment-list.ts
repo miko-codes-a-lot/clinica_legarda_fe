@@ -29,7 +29,7 @@ export class AppointmentList implements OnInit, AfterViewInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
   private appointments: Appointment[] = [];
-  private loadedDentistId = '';
+  loadedDentistId = '';
   private reminderNow = new Date();
   readonly outcomeRowClass = (appointment: Appointment): string =>
     requiresAppointmentOutcome(appointment, this.reminderNow) ? 'attention-row' : '';

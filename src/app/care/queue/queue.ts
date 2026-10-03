@@ -38,7 +38,7 @@ export class TreatmentQueue implements OnInit {
   saved = '';
   get waiting(): CareVisit[] { return this.visits.filter(visit => visit.state === 'waiting'); }
   get inProgress(): CareVisit[] { return this.visits.filter(visit => visit.state === 'in_progress'); }
-  get ended(): CareVisit[] { return this.visits.filter(visit => visit.state === 'completed' || visit.state === 'cancelled'); }
+  ended: CareVisit[] = [];
   canStart(visit: CareVisit): boolean { return this.auth.currentUserValue?.role === 'super-admin' || (this.auth.currentUserValue?.role === 'dentist' && this.auth.currentUserValue._id === visit.dentist._id); }
 
   ngOnInit(): void {
@@ -50,7 +50,10 @@ export class TreatmentQueue implements OnInit {
     this.refreshes.pipe(switchMap(() => {
       this.loading = true; this.error = '';
       return this.api.visits(this.filters.getRawValue(), true).pipe(catchError(error => { this.error = careError(error); return of([]); }), finalize(() => this.loading = false));
-    }), takeUntilDestroyed(this.destroyRef)).subscribe(visits => this.visits = visits);
+    }), takeUntilDestroyed(this.destroyRef)).subscribe(visits => {
+      this.visits = visits;
+      this.ended = visits.filter(visit => visit.state === 'completed' || visit.state === 'cancelled');
+    });
     this.refresh();
   }
   refresh(): void { if (this.filters.valid) this.refreshes.next(); }

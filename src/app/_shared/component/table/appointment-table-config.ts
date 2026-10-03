@@ -18,3 +18,8 @@ export function appointmentTableFilters(rows: readonly Appointment[], includeSta
   if (includeClinic) filters.unshift({ key: 'clinic', label: 'Clinic', options: tableOptions(rows, row => row.clinic?._id || '', row => row.clinic?.name || ''), value: row => row.clinic?._id || '' });
   return filters;
 }
+
+export const SCHEDULE_TABLE_COLUMNS: readonly TableColumn<Appointment>[] = APPOINTMENT_TABLE_COLUMNS.map(column => column.key === 'patient' ? {
+  ...column,
+  searchValue: row => `${row.patient?.firstName || ''} ${row.patient?.lastName || ''} ${row.services.map(service => service.name).join(' ')} ${row.clinic?.name || ''}`,
+} : column);
