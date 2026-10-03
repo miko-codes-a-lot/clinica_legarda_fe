@@ -1,3 +1,6 @@
+import { AFFECTED_APPOINTMENT_COLUMNS, AFFECTED_APPOINTMENT_FILTERS, careAppointmentDate } from '../care-table-config';
+import { GenericTableComponent } from '../../_shared/component/table/generic-table.component';
+import { TableCellDirective } from '../../_shared/component/table/table-cell.directive';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -13,8 +16,12 @@ import { careError } from '../care-api.service';
 import { ClosuresApiService } from './closures-api.service';
 import { AffectedAppointment, ClinicClosure, ClosureDetail } from './closure.models';
 const required = (value = '') => new FormControl(value, { nonNullable: true, validators: [Validators.required] });
-@Component({ selector: 'app-clinic-closures', imports: [CommonModule, ReactiveFormsModule, RouterLink, PageHeader, EmptyState, StatusBadge], templateUrl: './closures.html' })
+@Component({ selector: 'app-clinic-closures', imports: [GenericTableComponent, TableCellDirective, CommonModule, ReactiveFormsModule, RouterLink, PageHeader, EmptyState, StatusBadge], templateUrl: './closures.html' })
 export class ClinicClosures implements OnInit {
+  readonly affectedColumns = AFFECTED_APPOINTMENT_COLUMNS;
+  readonly affectedFilters = AFFECTED_APPOINTMENT_FILTERS;
+  readonly dateValue = careAppointmentDate;
+
   private readonly destroyRef = inject(DestroyRef); private readonly api = inject(ClosuresApiService); private readonly clinicsApi = inject(ClinicService);
   readonly base = `/${inject(Router).url.split('/')[1]}`;
   clinics: CareClinic[] = []; closures: ClinicClosure[] = []; detail: ClosureDetail | null = null;

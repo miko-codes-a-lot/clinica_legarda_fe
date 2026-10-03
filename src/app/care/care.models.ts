@@ -29,7 +29,7 @@ export interface CareAppointment {
 }
 export interface PatientSearchResult { items: CarePerson[]; total: number; page: number; pageSize: number; }
 export interface PatientRecord { patient: CarePerson; appointments: CareAppointment[]; }
-export interface PatientSearchQuery { search?: string; clinic?: string; page?: number; }
+export interface PatientSearchQuery { search?: string; clinic?: string; page?: number; status?: UserStatus; registration?: 'walk_in' | 'standard'; sortBy?: 'name' | 'username' | 'emailAddress' | 'mobileNumber' | 'status'; direction?: 'asc' | 'desc'; }
 
 export type VisitState = 'waiting' | 'in_progress' | 'completed' | 'cancelled';
 export interface CareVisit {

@@ -1,3 +1,5 @@
+import { FINISHED_VISIT_COLUMNS, FINISHED_VISIT_FILTERS } from '../care-table-config';
+import { GenericTableComponent } from '../../_shared/component/table/generic-table.component';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -13,8 +15,11 @@ import { assignedClinicIds } from '../../_shared/model/user';
 import { CareApiService, careError } from '../care-api.service';
 import { CareClinic, CareVisit, clinicToday } from '../care.models';
 
-@Component({ selector: 'app-treatment-queue', imports: [CommonModule, ReactiveFormsModule, RouterLink, PageHeader, EmptyState, StatusBadge], templateUrl: './queue.html' })
+@Component({ selector: 'app-treatment-queue', imports: [GenericTableComponent, CommonModule, ReactiveFormsModule, RouterLink, PageHeader, EmptyState, StatusBadge], templateUrl: './queue.html' })
 export class TreatmentQueue implements OnInit {
+  readonly finishedColumns = FINISHED_VISIT_COLUMNS;
+  readonly finishedFilters = FINISHED_VISIT_FILTERS;
+
   private readonly destroyRef = inject(DestroyRef);
   private readonly api = inject(CareApiService);
   private readonly clinicsApi = inject(ClinicService);

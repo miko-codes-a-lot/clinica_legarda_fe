@@ -1,3 +1,6 @@
+import { LINKED_APPOINTMENT_COLUMNS, LINKED_APPOINTMENT_FILTERS, careAppointmentDate } from '../care-table-config';
+import { GenericTableComponent } from '../../_shared/component/table/generic-table.component';
+import { TableCellDirective } from '../../_shared/component/table/table-cell.directive';
 import { ClinicDate } from '../clinic-date';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
@@ -11,8 +14,12 @@ import { assignedClinicIds } from '../../_shared/model/user';
 import { CareApiService, careError } from '../care-api.service';
 import { TreatmentCaseDetail } from '../care.models';
 
-@Component({ selector: 'app-case-detail', imports: [ClinicDate, CommonModule, RouterLink, PageHeader, StatusBadge], templateUrl: './case-detail.html' })
+@Component({ selector: 'app-case-detail', imports: [GenericTableComponent, TableCellDirective, ClinicDate, CommonModule, RouterLink, PageHeader, StatusBadge], templateUrl: './case-detail.html' })
 export class CaseDetail implements OnInit {
+  readonly appointmentColumns = LINKED_APPOINTMENT_COLUMNS;
+  readonly appointmentFilters = LINKED_APPOINTMENT_FILTERS;
+  readonly dateValue = careAppointmentDate;
+
   private readonly destroyRef = inject(DestroyRef);
   private readonly api = inject(CareApiService);
   private readonly auth = inject(AuthService);

@@ -1,3 +1,6 @@
+import { INSTALLMENT_COLUMNS, LEDGER_ENTRY_COLUMNS, LEDGER_ENTRY_FILTERS } from '../care-table-config';
+import { GenericTableComponent } from '../../_shared/component/table/generic-table.component';
+import { TableCellDirective } from '../../_shared/component/table/table-cell.directive';
 import { ClinicDate } from '../clinic-date';
 import { CommonModule } from '@angular/common';
 import { afterNextRender, Component, DestroyRef, ElementRef, inject, Injector, Input, OnChanges, ViewChild } from '@angular/core';
@@ -15,8 +18,13 @@ import { LedgerApiService } from './ledger-api.service';
 import { InstallmentPlan, LedgerEntry, PatientLedger } from './ledger.models';
 import { formatPesos, monthlyInstallments, parsePesos } from './ledger-rules';
 const text = (value = '', required = false, max = 500) => new FormControl(value, { nonNullable: true, validators: [Validators.maxLength(max), ...(required ? [Validators.required] : [])] });
-@Component({ selector: 'app-patient-ledger', imports: [ClinicDate, CommonModule, ReactiveFormsModule, EmptyState, StatusBadge], templateUrl: './ledger.html' })
+@Component({ selector: 'app-patient-ledger', imports: [GenericTableComponent, TableCellDirective, ClinicDate, CommonModule, ReactiveFormsModule, EmptyState, StatusBadge], templateUrl: './ledger.html' })
 export class PatientLedgerView implements OnChanges {
+  readonly installmentColumns = INSTALLMENT_COLUMNS;
+  readonly entryColumns = LEDGER_ENTRY_COLUMNS;
+  readonly entryFilters = LEDGER_ENTRY_FILTERS;
+  readonly entryDate = (row: LedgerEntry): string => row.date;
+
   @Input({ required: true }) patient = '';
   @Input() clinic = '';
   @Input() self = false;

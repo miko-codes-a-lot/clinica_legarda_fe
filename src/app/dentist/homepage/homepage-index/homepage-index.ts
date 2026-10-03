@@ -1,3 +1,6 @@
+import { APPOINTMENT_TABLE_COLUMNS } from '../../../_shared/component/table/appointment-table-config';
+import { GenericTableComponent } from '../../../_shared/component/table/generic-table.component';
+import { TableCellDirective } from '../../../_shared/component/table/table-cell.directive';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { StatusBadge } from '../../../_shared/ui/status-badge/status-badge';
 import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
@@ -31,10 +34,12 @@ interface CalendarDay {
   selector: 'app-dentist-home',
   templateUrl: './homepage-index.html',
   styleUrl: './homepage-index.css',
-  imports: [PageHeader, StatusBadge, EmptyState, CommonModule, RouterLink],
+  imports: [GenericTableComponent, TableCellDirective, PageHeader, StatusBadge, EmptyState, CommonModule, RouterLink],
   providers: [DentistAppointmentFeed],
 })
 export class HomepageIndex implements OnInit {
+  readonly scheduleColumns = APPOINTMENT_TABLE_COLUMNS;
+  readonly scheduleRowClass = (appointment: Appointment): string => requiresAppointmentOutcome(appointment, this.reminderNow) ? 'outcome-required' : '';
   readonly statusLabel = appointmentStatusLabel;
   readonly requiresOutcome = requiresAppointmentOutcome;
   reminderNow = new Date();

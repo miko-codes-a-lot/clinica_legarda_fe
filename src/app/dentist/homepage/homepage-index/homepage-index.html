@@ -63,15 +63,7 @@
     <section class="ui-card min-w-0 overflow-hidden" data-testid="selected-schedule" aria-labelledby="schedule-title">
       <div class="border-b border-stroke p-5"><p class="ui-eyebrow mb-2">Selected day</p><h2 id="schedule-title" class="ui-section-title">{{ (selectedDate + 'T00:00:00Z') | date:'EEE, MMM d, yyyy':'UTC' }}</h2><p class="ui-muted mt-1 text-sm">{{ selectedAppointments.length }} appointment{{ selectedAppointments.length === 1 ? '' : 's' }} · Clinic time</p></div>
       @if (selectedAppointments.length > 0) {
-        <div class="overflow-x-auto"><table class="schedule-table"><thead><tr><th scope="col">Time</th><th scope="col">Patient / service</th><th scope="col">Status</th></tr></thead><tbody>
-          @for (appointment of selectedAppointments; track appointment._id) {
-            <tr [class.outcome-required]="requiresOutcome(appointment, reminderNow)">
-              <td class="whitespace-nowrap font-medium">{{ appointment.startTime }}<small class="ui-muted mt-1 block">– {{ appointment.endTime }}</small></td>
-              <td><a class="font-semibold text-accent hover:underline" [routerLink]="['/dentist/appointment/details', appointment._id]">{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</a><div class="mt-2 flex flex-wrap gap-1 text-xs text-muted">@for (service of appointment.services; track service._id) { <span class="rounded bg-tint px-2 py-1">{{ service.name }}</span> }</div><small class="ui-muted mt-2 block break-words">{{ appointment.clinic.name }}</small></td>
-              <td><app-status-badge [status]="appointment.status" />@if (requiresOutcome(appointment, reminderNow)) { <span class="ui-status mt-2 border border-warning-border bg-warning-soft text-warning">Outcome required</span> }</td>
-            </tr>
-          }
-        </tbody></table></div>
+        <app-generic-table title="Selected day appointments" [embedded]="true" [rows]="selectedAppointments" [columnDefs]="scheduleColumns" [displayedColumns]="['time','patient','status']" [rowClassFn]="scheduleRowClass" sortBy="time"><ng-template tableCell="patient" let-appointment><a class="font-semibold text-accent hover:underline" [routerLink]="['/dentist/appointment/details', appointment._id]">{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</a><p class="mt-1 text-xs text-muted">@for (service of appointment.services; track service._id) { <span>{{ service.name }} </span> }</p><p class="text-xs text-muted">{{ appointment.clinic.name }}</p></ng-template><ng-template tableCell="status" let-appointment><app-status-badge [status]="appointment.status" />@if (requiresOutcome(appointment, reminderNow)) { <span class="ui-status mt-2 border border-warning-border bg-warning-soft text-warning">Outcome required</span> }</ng-template></app-generic-table>
       } @else { <app-empty-state title="No appointments on this date" description="Select a highlighted date to view your schedule." icon="event_available" /> }
     </section>
   </div>

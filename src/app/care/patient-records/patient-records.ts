@@ -1,3 +1,9 @@
+import { GenericTableComponent } from '../../_shared/component/table/generic-table.component';
+import { TableCellDirective } from '../../_shared/component/table/table-cell.directive';
+import { Icon } from '../../_shared/ui/icon/icon';
+import { Sort } from '@angular/material/sort';
+import { UserStatus } from '../../_shared/model/user';
+import { CARE_PERSON_COLUMNS } from '../care-table-config';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -14,10 +20,13 @@ import { CareClinic, PatientSearchQuery, PatientSearchResult } from '../care.mod
 
 @Component({
   selector: 'app-patient-records',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, PageHeader, EmptyState],
+  imports: [GenericTableComponent, TableCellDirective, Icon, CommonModule, ReactiveFormsModule, RouterLink, PageHeader, EmptyState],
   templateUrl: './patient-records.html',
 })
 export class PatientRecords implements OnInit {
+  readonly columns = CARE_PERSON_COLUMNS;
+  sortBy: NonNullable<PatientSearchQuery['sortBy']> = 'name';
+  direction: 'asc' | 'desc' = 'asc';
   private readonly destroyRef = inject(DestroyRef);
   private readonly api = inject(CareApiService);
   private readonly clinicService = inject(ClinicService);
@@ -28,6 +37,8 @@ export class PatientRecords implements OnInit {
   readonly form = new FormGroup({
     search: new FormControl('', { nonNullable: true }),
     clinic: new FormControl('', { nonNullable: true }),
+    status: new FormControl<UserStatus | ''>('', { nonNullable: true }),
+    registration: new FormControl<'walk_in' | 'standard' | ''>('', { nonNullable: true }),
   });
   clinics: CareClinic[] = [];
   result: PatientSearchResult = { items: [], total: 0, page: 1, pageSize: 20 };
@@ -56,6 +67,16 @@ export class PatientRecords implements OnInit {
     this.search();
   }
 
-  search(page = 1): void { this.requests.next({ ...this.form.getRawValue(), page }); }
+  search(page = 1): void {
+    const value = this.form.getRawValue();
+    this.requests.next({ search: value.search, clinic: value.clinic, status: value.status || undefined, registration: value.registration || undefined, sortBy: this.sortBy, direction: this.direction, page });
+  }
+  sortPatients(sort: Sort): void {
+    const supported = ['name', 'username', 'emailAddress', 'mobileNumber', 'status'];
+    this.sortBy = supported.includes(sort.active) && sort.direction ? sort.active as NonNullable<PatientSearchQuery['sortBy']> : 'name';
+    this.direction = sort.direction || 'asc';
+    this.search();
+  }
+  resetFilters(): void { this.form.reset({ search: '', clinic: '', status: '', registration: '' }); this.search(); }
   get lastPage(): number { return Math.max(1, Math.ceil(this.result.total / this.result.pageSize)); }
 }

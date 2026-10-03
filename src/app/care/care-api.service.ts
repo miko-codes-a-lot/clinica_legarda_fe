@@ -20,6 +20,10 @@ export class CareApiService {
     let params = new HttpParams().set('page', query.page ?? 1);
     if (query.search?.trim()) params = params.set('search', query.search.trim());
     if (query.clinic) params = params.set('clinic', query.clinic);
+    if (query.status) params = params.set('status', query.status);
+    if (query.registration) params = params.set('registration', query.registration);
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.direction) params = params.set('direction', query.direction);
     return this.http.get<PatientSearchResult>('/care/patients', { params });
   }
   patientRecord(id: string, clinic?: string) {
