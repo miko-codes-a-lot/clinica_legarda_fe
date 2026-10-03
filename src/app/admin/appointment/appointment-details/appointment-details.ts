@@ -84,6 +84,7 @@ export class AppointmentDetails {
     if (!this.appointment || this.isBusy) return;
 
     const dialogRef = this.dialog.open(NotesDialogComponent, {
+      width: '560px', maxWidth: '95vw',
       data: { clinicNotes: this.appointment.notes.clinicNotes }
     });
 

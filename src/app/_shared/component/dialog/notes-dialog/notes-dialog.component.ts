@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 @Component({
   selector: 'app-notes-dialog',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatInputModule],
+  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule, MatInputModule],
   templateUrl: './notes-dialog.component.html',
   styleUrls: ['./notes-dialog.component.css']
 })

@@ -1,5 +1,5 @@
 .full-width { width: 100%; }
-.dialog-body { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 700px; box-sizing: border-box; }
+.dialog-body { width: 100%; }
 .dialog-title { font-size: 20px; font-weight: 600; }
 .dialog-actions { gap: 8px; border-top: 1px solid var(--color-stroke); padding: 16px 24px; }
 textarea[matInput] { min-height: 120px; line-height: 1.6; resize: vertical; }

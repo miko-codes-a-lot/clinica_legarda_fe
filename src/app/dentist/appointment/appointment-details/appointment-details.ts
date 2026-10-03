@@ -112,6 +112,7 @@ export class AppointmentDetails {
     const appointmentId = this.appointment._id;
     this.isDialogOpen = true;
     this.dialog.open<NotesDialogComponent, { clinicNotes: string }, string>(NotesDialogComponent, {
+      width: '560px', maxWidth: '95vw',
       data: { clinicNotes: this.appointment.notes.clinicNotes },
     }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(notes => {
       this.isDialogOpen = false;
