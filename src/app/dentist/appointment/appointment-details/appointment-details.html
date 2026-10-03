@@ -78,7 +78,7 @@
         </div>
       }
       @if (appointmentHistory && appointmentHistory.length) {
-        <app-generic-table title="Previous appointments" [displayedColumns]="displayedColumns" [columnDefs]="columnDefs" [dataSource]="dataSource" [isLoading]="isLoading" />
+        <app-generic-table title="Previous appointments" [displayedColumns]="displayedColumns" [columnDefs]="columnDefs" [embedded]="true" [filters]="historyFilters" [dateValue]="dateValue" sortBy="date" sortDirection="desc" [dataSource]="dataSource" [isLoading]="isLoading" />
       } @else {
         <div class="ui-card"><app-empty-state title="No previous appointments" description="Earlier visits will appear here when available." icon="history" /></div>
       }

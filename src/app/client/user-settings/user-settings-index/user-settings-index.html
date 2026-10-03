@@ -27,7 +27,7 @@
     </div>
     <div *ngIf="activeTab === 'history'" id="account-history" class="min-w-0 p-5 sm:p-7">
       <div class="ui-toolbar mb-5"><div><h2 class="ui-section-title">Appointment history</h2><p class="ui-muted mt-2 text-sm">Review your past visits and recorded appointment outcomes.</p></div></div>
-      <div *ngIf="latestAppointments.length; else noHistory" class="min-w-0"><app-generic-table [displayedColumns]="displayedColumns" [columnDefs]="columnDefs" [dataSource]="dataSource" [isLoading]="isLoading" [ngClass]="{'expanded-table': activeTab === 'history'}" /></div>
+      <div *ngIf="latestAppointments.length; else noHistory" class="min-w-0"><app-generic-table [displayedColumns]="displayedColumns" [columnDefs]="columnDefs" [embedded]="true" [filters]="historyFilters" [dateValue]="dateValue" sortBy="date" sortDirection="desc" [dataSource]="dataSource" [isLoading]="isLoading" [ngClass]="{'expanded-table': activeTab === 'history'}" /></div>
       <ng-template #noHistory><app-empty-state title="No appointment history found" description="Past visits will appear here when available." icon="history" /></ng-template>
     </div>
   </section>

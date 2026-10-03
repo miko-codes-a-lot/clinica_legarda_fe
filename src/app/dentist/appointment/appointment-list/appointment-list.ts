@@ -1,3 +1,5 @@
+import { APPOINTMENT_TABLE_COLUMNS, appointmentTableDate, appointmentTableFilters } from '../../../_shared/component/table/appointment-table-config';
+import { TableColumn, TableFilter } from '../../../_shared/component/table/table-model';
 import { AfterViewInit, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
@@ -50,17 +52,11 @@ export class AppointmentList implements OnInit, AfterViewInit {
   ];
   statusCounts: Record<StatusFilter, number> = { all: 0, pending: 0, confirmed: 0, cancelled: 0, rejected: 0, completed: 0, no_show: 0 };
 
-  displayedColumns = ['_id', 'clinic', 'patient', 'dentist', 'date', 'time', 'status', 'actions'];
-  columnDefs = [
-    { key: '_id', label: 'ID', cell: (appointment: Appointment) => appointment._id ?? '' },
-    { key: 'clinic', label: 'Clinic', cell: (appointment: Appointment) => appointment.clinic.name },
-    { key: 'patient', label: 'Patient', cell: (appointment: Appointment) => `${appointment.patient.firstName} ${appointment.patient.lastName}` },
-    { key: 'dentist', label: 'Dentist', cell: (appointment: Appointment) => `${appointment.dentist.firstName} ${appointment.dentist.lastName}` },
-    { key: 'date', label: 'Date', cell: (appointment: Appointment) => formatAppointmentDate(appointment.date) },
-    { key: 'time', label: 'Time', cell: (appointment: Appointment) => `${appointment.startTime} - ${appointment.endTime}` },
-    { key: 'status', label: 'Status', cell: (appointment: Appointment) => appointmentStatusLabel(appointment.status) +
-      (requiresAppointmentOutcome(appointment, this.reminderNow) ? ' · Outcome required' : '') },
-  ];
+  displayedColumns = ['patient', 'clinic', 'date', 'time', 'visitType', 'status', 'actions'];
+  columnDefs: readonly TableColumn<Appointment>[] = APPOINTMENT_TABLE_COLUMNS.map(column => column.key === 'status'
+    ? { ...column, cell: (appointment: Appointment) => appointmentStatusLabel(appointment.status) + (requiresAppointmentOutcome(appointment, this.reminderNow) ? ' · Outcome required' : '') } : column);
+  readonly dateValue = appointmentTableDate;
+  filters: TableFilter<Appointment>[] = [];
 
   ngOnInit(): void {
     this.feed.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(state => {
@@ -118,6 +114,7 @@ export class AppointmentList implements OnInit, AfterViewInit {
   }
 
   private updateAppointments(appointments: Appointment[]): void {
+    this.filters = appointmentTableFilters(appointments);
     this.appointments = [...appointments].sort((a, b) => {
       const aDate = a.updatedAt ?? a.createdAt ?? '';
       const bDate = b.updatedAt ?? b.createdAt ?? '';

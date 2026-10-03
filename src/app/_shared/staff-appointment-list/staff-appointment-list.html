@@ -2,7 +2,7 @@
   title="Appointments"
   [description]="scopeDescription"
   [displayedColumns]="displayedColumns"
-  [columnDefs]="columnDefs"
+  [columnDefs]="columnDefs" [filters]="filters" [dateValue]="dateValue" sortBy="date" sortDirection="desc" (queryReset)="resetFilters()"
   [dataSource]="dataSource"
   [isLoading]="isLoading"
   [disableEditFn]="disableEdit"
@@ -10,31 +10,11 @@
   (details)="onDetails($event)"
   (update)="onUpdate($event)"
   (create)="onCreate()">
-  <section table-filters class="ui-card mb-5" aria-label="Appointment filters">
-<div class="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-start">
-  <mat-form-field appearance="outline">
-    <mat-label>Clinic</mat-label>
-    <mat-select [value]="selectedClinic" (selectionChange)="selectClinic($event.value)">
-      <mat-option value="all">{{ allClinicsLabel }}</mat-option>
-      @for (clinic of clinics; track clinic._id) {
-        <mat-option [value]="clinic._id">{{ clinic.name }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline">
-    <mat-label>Status</mat-label>
-    <mat-select [value]="selectedStatus" (selectionChange)="selectStatus($event.value)">
-      <mat-option value="all">All statuses</mat-option>
-      @for (status of statuses; track status.value) {
-        <mat-option [value]="status.value">{{ status.label }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-  <button class="ui-button-secondary" type="button" (click)="refresh()" [disabled]="isLoading">Refresh</button>
-</div>
-@if (loadError) { <p role="alert">{{ loadError }}</p> }
-@if (area === 'admin' && !isLoading && !loadError && clinics.length === 0) {
-  <p class="ui-muted mt-3 text-sm" role="status">No assigned clinics. Ask a super admin to assign a clinic before accessing appointments.</p>
-}
-  </section>
+  <div table-filters class="flex flex-wrap items-end gap-3" aria-label="Appointment filters">
+    <label class="grid w-48 gap-1"><span class="text-xs font-semibold text-muted">Clinic</span><select class="ui-input h-9 text-xs" [value]="selectedClinic" #clinicChoice (change)="selectClinic(clinicChoice.value)"><option value="all">{{ allClinicsLabel }}</option>@for (clinic of clinics; track clinic._id) { <option [value]="clinic._id">{{ clinic.name }}</option> }</select></label>
+    <label class="grid w-36 gap-1"><span class="text-xs font-semibold text-muted">Status</span><select class="ui-input h-9 text-xs" [value]="selectedStatus" #statusChoice (change)="selectStatus(statusChoice.value)"><option value="all">All statuses</option>@for (status of statuses; track status.value) { <option [value]="status.value">{{ status.label }}</option> }</select></label>
+    <button class="ui-button-ghost h-9 text-xs" type="button" (click)="refresh()" [disabled]="isLoading">Refresh</button>
+    @if (loadError) { <p class="w-full text-xs text-danger" role="alert">{{ loadError }}</p> }
+    @if (area === 'admin' && !isLoading && !loadError && clinics.length === 0) { <p class="w-full text-xs text-muted" role="status">No assigned clinics. Ask a super admin to assign a clinic before accessing appointments.</p> }
+  </div>
 </app-generic-table>

@@ -6,7 +6,7 @@
 <app-generic-table
   [title]="title"
   [displayedColumns]="displayedColumns"
-  [columnDefs]="columnDefs"
+  [columnDefs]="columnDefs" [filters]="filters" [dateValue]="dateValue" sortBy="updatedAt" sortDirection="desc"
   [dataSource]="dataSource"
   [isLoading]="isLoading"
   (details)="onDetails($event)"

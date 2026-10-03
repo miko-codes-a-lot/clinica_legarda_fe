@@ -1,3 +1,4 @@
+import { appointmentTableDate, appointmentTableFilters } from '../../../_shared/component/table/appointment-table-config';
 import { AppointmentCareLinks } from '../../../care/appointment-care-links/appointment-care-links';
 import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
 import { StatusBadge } from '../../../_shared/ui/status-badge/status-badge';
@@ -51,12 +52,14 @@ export class AppointmentDetails {
   historyError = '';
 
   displayedColumns = ['clinic', 'services', 'patient', 'dentist', 'date', 'time', 'status', 'notes.clinicNotes', 'notes.patientNotes'];
+  readonly dateValue = appointmentTableDate;
+  readonly historyFilters = appointmentTableFilters([], true);
   columnDefs = [
     { key: 'clinic', label: 'Clinic', cell: (appointment: Appointment) => appointment.clinic.name },
     { key: 'services', label: 'Services', cell: (appointment: Appointment) => appointment.services.map(service => service.name).join(', ') },
     { key: 'patient', label: 'Patient', cell: (appointment: Appointment) => `${appointment.patient.firstName} ${appointment.patient.lastName}` },
     { key: 'dentist', label: 'Dentist', cell: (appointment: Appointment) => `${appointment.dentist.firstName} ${appointment.dentist.lastName}` },
-    { key: 'date', label: 'Date', cell: (appointment: Appointment) => formatAppointmentDate(appointment.date) },
+    { key: 'date', sortValue: appointmentTableDate, label: 'Date', cell: (appointment: Appointment) => formatAppointmentDate(appointment.date) },
     { key: 'time', label: 'Time', cell: (appointment: Appointment) => `${appointment.startTime} - ${appointment.endTime}` },
     { key: 'status', label: 'Status', cell: (appointment: Appointment) => appointmentStatusLabel(appointment.status) },
     { key: 'notes.clinicNotes', label: 'Clinic Notes', cell: (appointment: Appointment) => appointment.notes.clinicNotes },

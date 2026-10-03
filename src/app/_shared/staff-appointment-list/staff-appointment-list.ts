@@ -1,3 +1,5 @@
+import { APPOINTMENT_TABLE_COLUMNS, appointmentTableDate, appointmentTableFilters } from '../component/table/appointment-table-config';
+import { TableFilter } from '../component/table/table-model';
 import { AfterViewInit, Component, DestroyRef, inject, Input, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
@@ -51,18 +53,11 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
     { value: AppointmentStatus.CANCELLED, label: 'Cancelled' },
     { value: AppointmentStatus.REJECTED, label: 'Rejected' },
   ];
-  readonly displayedColumns = ['_id', 'clinic', 'patient', 'dentist', 'date', 'time', 'visitType', 'status', 'actions'];
-  readonly columnDefs = [
-    { key: '_id', label: 'ID', cell: (appointment: Appointment) => appointment._id },
-    { key: 'clinic', label: 'Clinic', cell: (appointment: Appointment) => appointment.clinic?.name || 'Unknown clinic' },
-    { key: 'patient', label: 'Patient', cell: (appointment: Appointment) => this.personName(appointment.patient) },
-    { key: 'dentist', label: 'Dentist', cell: (appointment: Appointment) => this.personName(appointment.dentist) },
-    { key: 'date', label: 'Date', cell: (appointment: Appointment) => formatAppointmentDate(appointment.date) },
-    { key: 'time', label: 'Time', cell: (appointment: Appointment) => `${appointment.startTime} - ${appointment.endTime}` },
-    { key: 'visitType', label: 'Visit type', cell: (appointment: Appointment) => appointment.isWalkIn ? 'Walk-in' : 'Scheduled' },
-    { key: 'status', label: 'Status', cell: (appointment: Appointment) =>
-      this.statuses.find(status => status.value === appointment.status)?.label || appointment.status },
-  ];
+  readonly displayedColumns = ['patient', 'clinic', 'date', 'time', 'visitType', 'status', 'actions'];
+  readonly columnDefs = APPOINTMENT_TABLE_COLUMNS;
+  readonly dateValue = appointmentTableDate;
+  filters: TableFilter<Appointment>[] = [];
+  resetFilters(): void { this.selectedClinic = 'all'; this.selectedStatus = 'all'; this.applyFilters(); }
   readonly disableEdit = (appointment: Appointment) => appointment.status !== AppointmentStatus.PENDING;
 
   ngOnInit(): void {
@@ -105,6 +100,7 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(({ appointments, clinics }) => {
       this.appointments = clinics.length === 0 ? [] : appointments;
+      this.filters = appointmentTableFilters(this.appointments);
       this.clinics = clinics;
       if (this.selectedClinic !== 'all' && !clinics.some(clinic => clinic._id === this.selectedClinic)) {
         this.selectedClinic = 'all';
@@ -124,8 +120,9 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
     this.applyFilters();
   }
 
-  selectStatus(status: 'all' | AppointmentStatus): void {
-    this.selectedStatus = status;
+  selectStatus(status: string): void {
+    if (status !== 'all' && !Object.values(AppointmentStatus).includes(status as AppointmentStatus)) return;
+    this.selectedStatus = status as 'all' | AppointmentStatus;
     this.applyFilters();
   }
 

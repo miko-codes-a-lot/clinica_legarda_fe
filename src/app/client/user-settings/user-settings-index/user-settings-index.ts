@@ -1,3 +1,4 @@
+import { appointmentTableDate, appointmentTableFilters } from '../../../_shared/component/table/appointment-table-config';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
 import { Component, OnInit, ViewChild, TemplateRef  } from '@angular/core';
@@ -73,15 +74,18 @@ export class UserSettingsIndex implements OnInit {
   showAllHistory = false;
 
   displayedColumns: string[] = ['clinic', 'services', 'patient', 'dentist', 'date', 'status'];
+  readonly dateValue = appointmentTableDate;
+  readonly historyFilters = appointmentTableFilters([], true);
   columnDefs = [
     { key: 'clinic', label: 'Clinic', cell: (latestAppointments: Appointment) => latestAppointments.clinic.name},
     { key: 'services', label: 'Services',   cell: (latestAppointments: Appointment) => latestAppointments.services.map(service => service.name).join(', ')
     },
     { key: 'patient', label: 'Patient', cell: (latestAppointments: Appointment) =>  `${latestAppointments.patient.firstName} ${latestAppointments.patient.lastName}` },
     { key: 'dentist', label: 'Dentist', cell: (latestAppointments: Appointment) =>  `${latestAppointments.dentist.firstName} ${latestAppointments.dentist.lastName}` },
-    // { key: 'date', label: 'Date', cell: (latestAppointments: Appointment) => latestAppointments.date },
+    // { key: 'date', sortValue: appointmentTableDate, label: 'Date', cell: (latestAppointments: Appointment) => latestAppointments.date },
     {
       key: 'date',
+      sortValue: appointmentTableDate,
       label: 'Date & Time',
       cell: (a: Appointment) => {
         const date = formatAppointmentDate(a.date);

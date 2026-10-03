@@ -1,3 +1,4 @@
+import { TableColumn, TableFilter, tableOptions } from '../../../_shared/component/table/table-model';
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Referral } from '../../../_shared/model/referral';
@@ -7,7 +8,7 @@ import { GenericTableComponent } from '../../../_shared/component/table/generic-
 import { AuthService } from '../../../_shared/service/auth-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
-import { formatAppointmentDate } from '../../appointment/appointment-schedule';
+import { appointmentDateKey, formatAppointmentDate } from '../../appointment/appointment-schedule';
 
 @Component({
   selector: 'app-referral-request-list',
@@ -24,73 +25,17 @@ export class ReferralRequestList implements OnInit {
   loadError = '';
   private readonly destroyRef = inject(DestroyRef);
   dataSource = new MatTableDataSource<Referral>();
-  displayedColumns: string[] = [ 'referTo', 'toBranch', 'appointment.patient', 'reason', 'appointment.notes', 'date', 'startTime', 'status', 'updatedAt', 'actions'];
-  columnDefs = [
-
-    {
-      key: 'referTo',
-      label: 'Refer to',
-      cell: (row: Referral) => `${row.appointment?.dentist?.firstName ?? ''} ${row.appointment?.dentist?.lastName ?? ''}`
-    },
-    {
-      key: 'toBranch',
-      label: 'Transfer Branch',
-      cell: (row: Referral) => row.appointment?.clinic?.name ?? ''
-    },
-    {
-      key: 'appointment.patient',
-      label: 'Patient',
-      cell: (row: Referral) => `${row.appointment?.patient?.firstName ?? ''} ${row.appointment?.patient?.lastName ?? ''}`
-    },
-    {
-      key: 'reason',
-      label: 'Reason',
-      cell: (row: Referral) => row.reason ?? ''
-    },
-    {
-      key: 'appointment.notes',
-      label: 'Note for Dentist',
-      cell: (row: Referral) => row.appointment?.notes?.patientNotes ?? ''
-    },
-    // {
-    //   key: 'appointmentStatus',
-    //   label: 'Appointment Status',
-    //   cell: (row: Referral) => row.appointment?.status ?? 'No Appointment'
-    // },
-    {
-      key: 'date',
-      label: 'Appointment Date',
-      cell: (row: Referral) => row.appointment?.date ? formatAppointmentDate(row.appointment.date) : ''
-    },
-    {
-      key: 'startTime',
-      label: 'Appointment Time',
-      cell: (row: Referral) => row.appointment ? `${row.appointment.startTime} - ${row.appointment.endTime}` : ''
-    },
-    // {
-    //   key: 'appointmentClinic',
-    //   label: 'Appointment Clinic',
-    //   cell: (row: Referral) => row.appointment?.clinic?.name ?? ''
-    // },
-    {
-      key: 'dentist',
-      label: 'Dentist',
-      cell: (row: Referral) =>
-        row.appointment?.dentist
-          ? `${row.appointment.dentist.firstName} ${row.appointment.dentist.lastName}`
-          : ''
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      cell: (row: Referral) => row.status ?? ''
-    },
-    {
-      key: 'updatedAt',
-      label: 'Status Updated',
-      cell: (row: Referral) => row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : ''
-    },
+  displayedColumns = ['patient', 'clinic', 'date', 'reason', 'status', 'updatedAt', 'actions'];
+  readonly dateValue = (row: Referral): string => row.appointment?.date ? appointmentDateKey(row.appointment.date) : '';
+  columnDefs: TableColumn<Referral>[] = [
+    { key: 'patient', label: 'Patient', cell: row => `${row.appointment?.patient?.firstName || ''} ${row.appointment?.patient?.lastName || ''}` },
+    { key: 'clinic', label: 'Transfer clinic / dentist', cell: row => row.appointment?.clinic?.name, secondary: row => `${row.appointment?.dentist?.firstName || ''} ${row.appointment?.dentist?.lastName || ''}` },
+    { key: 'date', label: 'Appointment', cell: row => row.appointment?.date ? formatAppointmentDate(row.appointment.date) : '', secondary: row => row.appointment ? `${row.appointment.startTime}–${row.appointment.endTime}` : '', sortValue: this.dateValue },
+    { key: 'reason', label: 'Reason / patient note', cell: row => row.reason, secondary: row => row.appointment?.notes?.patientNotes || '' },
+    { key: 'status', label: 'Status', cell: row => row.status, kind: 'status' },
+    { key: 'updatedAt', label: 'Updated', cell: row => row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : '', sortValue: row => row.updatedAt },
   ];
+  filters: TableFilter<Referral>[] = [];
 
   constructor(
     private readonly referralService: ReferralService,
@@ -113,6 +58,10 @@ export class ReferralRequestList implements OnInit {
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(referrals => {
       this.dataSource.data = referrals;
+      this.filters = [
+        { key: 'status', label: 'Status', options: ['pending', 'confirmed', 'rejected'].map(value => ({ value, label: value.charAt(0).toUpperCase() + value.slice(1) })), value: row => row.status },
+        { key: 'clinic', label: 'Transfer clinic', options: tableOptions(referrals, row => row.appointment?.clinic?._id || '', row => row.appointment?.clinic?.name || ''), value: row => row.appointment?.clinic?._id || '' },
+      ];
       this.isLoading = false;
     });
   }
