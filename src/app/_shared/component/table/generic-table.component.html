@@ -1,59 +1,71 @@
-<section class="ui-page">
-  <app-page-header [title]="title || 'Records'" [description]="description">
-    @if (createButtonLabel) {
-      <button type="button" class="ui-button" [disabled]="isLoading" (click)="onCreateClick()"><app-icon name="add" />{{ createButtonLabel }}</button>
-    }
-  </app-page-header>
-  <ng-content select="[table-filters]"></ng-content>
-  <div class="overflow-hidden rounded-2xl border border-stroke bg-surface shadow-card">
-    <div class="ui-toolbar border-b border-stroke px-5 pt-5">
-      <mat-form-field appearance="outline" class="max-w-md">
-        <mat-label>Search records</mat-label>
-        <input matInput [value]="dataSource.filter" (keyup)="applyFilter($event)" placeholder="Name, status, or another detail">
-        <app-icon matSuffix name="search" />
-      </mat-form-field>
-      <span class="pb-5 text-xs text-muted">{{ dataSource.filteredData.length }} records</span>
+<section [class.ui-page]="!embedded" class="record-table">
+  @if (!embedded && (title || createButtonLabel)) {
+    <app-page-header [title]="title || 'Records'" [description]="description">
+      @if (createButtonLabel) { <button type="button" class="ui-button" [disabled]="isLoading" (click)="create.emit()"><app-icon name="plus" />{{ createButtonLabel }}</button> }
+    </app-page-header>
+  }
+  <div class="table-card">
+    <div class="table-toolbar">
+      <div class="table-search-row">
+        @if (searchEnabled) {
+          <label class="table-search"><span class="sr-only">Search {{ title || 'records' }}</span>
+            <app-icon name="magnifying-glass" class="table-search-icon" />
+            <input class="ui-input" type="search" [attr.aria-label]="'Search ' + (title || 'records')" [value]="searchTerm" (input)="setSearch(search.value)" #search [placeholder]="searchPlaceholder" autocomplete="off" />
+            @if (searchTerm) { <button type="button" class="table-search-clear" aria-label="Clear search" (click)="setSearch('')"><app-icon name="x-mark" /></button> }
+          </label>
+        }
+        <span class="table-count" aria-live="polite">{{ count }} {{ count === 1 ? 'record' : 'records' }}@if (!serverMode && hasQuery) { <span> of {{ dataSource.data.length }}</span> }</span>
+        @if (hasQuery) { <button class="table-reset" type="button" (click)="resetQuery()">Reset filters</button> }
+      </div>
+      <div class="table-filter-row">
+        <ng-content select="[table-filters]" />
+        @for (filter of filters; track filter.key) {
+          <label class="table-filter"><span>{{ filter.label }}</span><select class="ui-input" [value]="selectedFilters[filter.key] || ''" #choice (change)="setFilter(filter.key, choice.value)"><option value="">All</option>@for (option of filter.options; track option.value) { <option [value]="option.value">{{ option.label }}</option> }</select></label>
+        }
+        @if (dateValue) {
+          <label class="table-filter"><span>{{ dateLabel }} from</span><input class="ui-input" type="date" [value]="from" #fromDate (change)="setDate('from', fromDate.value)" /></label>
+          <label class="table-filter"><span>{{ dateLabel }} to</span><input class="ui-input" type="date" [value]="to" #toDate (change)="setDate('to', toDate.value)" /></label>
+        }
+      </div>
+      @if (invalidDateRange) { <p class="text-xs text-danger" role="alert">The end date must be on or after the start date.</p> }
     </div>
-    <div class="overflow-x-auto">
-      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="announceSortChange($event)" class="w-full" [attr.aria-label]="title || 'Records'" [attr.aria-busy]="isLoading">
-        @for (col of columnDefs; track col.key) {
+    <div class="table-scroll">
+      <table mat-table [dataSource]="dataSource" matSort [matSortActive]="sortBy" [matSortDirection]="sortDirection" (matSortChange)="announceSortChange($event)" [attr.aria-label]="title || 'Records'" [attr.aria-busy]="isLoading">
+        @for (col of visibleDefs; track col.key; let primary = $first) {
           <ng-container [matColumnDef]="col.key">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header [attr.sortActionDescription]="'Sort by ' + col.label">{{ col.label }}</th>
-            <td mat-cell *matCellDef="let element">
-              @let cellValue = getCellValue(col, element);
-              @if (col.key === 'message' && (cellValue?.dataLink || element?.link)) {
-                <a [routerLink]="cellValue?.dataLink || element?.link" class="font-medium text-accent hover:underline">{{ cellValue?.display || cellValue || element?.message }}</a>
-              } @else if (col.key === 'status') {
-                <app-status-badge [status]="cellValue || ''"></app-status-badge>
-              } @else {
-                {{ cellValue }}
+            <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="col.sortable === false" [sortActionDescription]="'Sort by ' + col.label">{{ col.label }}</th>
+            <td mat-cell *matCellDef="let row" [class.table-primary]="primary" [class.table-number]="col.kind === 'number'">
+              @if (templateFor(col.key); as template) { <ng-container [ngTemplateOutlet]="template" [ngTemplateOutletContext]="{ $implicit: row }" /> }
+              @else {
+                @if (cellLink(col, row); as link) { <a [routerLink]="link" class="font-medium text-accent hover:underline">{{ cellText(col, row) }}</a> }
+                @else if (col.kind === 'status' || col.key === 'status') { <app-status-badge [status]="cellText(col, row)" /> }
+                @else { <span>{{ cellText(col, row) }}</span> }
+                @if (col.secondary?.(row); as secondary) { <p class="table-secondary">{{ secondary }}</p> }
               }
             </td>
           </ng-container>
         }
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
-          <td mat-cell *matCellDef="let element" class="whitespace-nowrap">
-            <button mat-icon-button aria-label="View details" (click)="onDetailsClick(element)"><app-icon name="visibility" /></button>
-            @if (update.observers.length > 0) {
-              <button mat-icon-button aria-label="Edit record" (click)="onUpdateClick(element)" [disabled]="getEditDisabled(element)"><app-icon name="edit" /></button>
-            }
-            @if (enableDelete && delete.observers.length > 0) {
-              <button mat-icon-button aria-label="Delete record" class="text-danger" (click)="onDeleteClick(element)"><app-icon name="delete" /></button>
-            }
-            @if (markAsRead.observers.length > 0) {
-              <button mat-icon-button aria-label="Mark as read" (click)="onMarkAsReadClick(element)"><app-icon name="done_all" /></button>
+          <th mat-header-cell *matHeaderCellDef><span class="sr-only">Actions</span></th>
+          <td mat-cell *matCellDef="let row" class="table-actions-cell">
+            @if (templateFor('actions'); as template) { <ng-container [ngTemplateOutlet]="template" [ngTemplateOutletContext]="{ $implicit: row }" /> }
+            @else {
+              <div class="table-actions">
+                @if (details.observers.length) { <button type="button" class="table-action" aria-label="View details" title="View details" [disabled]="isLoading" (click)="details.emit(rowId(row))"><app-icon name="eye" /></button> }
+                @if (update.observers.length) { <button type="button" class="table-action" aria-label="Edit record" title="Edit record" [disabled]="getEditDisabled(row)" (click)="update.emit(rowId(row))"><app-icon name="pencil-square" /></button> }
+                @if (enableDelete && delete.observers.length) { <button type="button" class="table-action text-danger" aria-label="Delete record" title="Delete record" [disabled]="isLoading" (click)="delete.emit(rowId(row))"><app-icon name="trash" /></button> }
+                @if (markAsRead.observers.length) { <button type="button" class="table-action" aria-label="Mark as read" title="Mark as read" [disabled]="isLoading" (click)="markAsRead.emit(rowId(row))"><app-icon name="check" /></button> }
+              </div>
             }
           </td>
         </ng-container>
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="rowClassFn ? rowClassFn(row) : ''"></tr>
-        <tr class="mat-row" *matNoDataRow><td [attr.colspan]="displayedColumns.length" class="p-5">
-          @if (!isLoading) { <app-empty-state [title]="dataSource.filter ? 'No matching records' : 'No records yet'" [description]="dataSource.filter ? 'Try a different search or clear the search field.' : 'Records will appear here when they are available.'"></app-empty-state> }
-        </td></tr>
+        <tr mat-header-row *matHeaderRowDef="visibleColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: visibleColumns" [ngClass]="rowClassFn ? rowClassFn(row) : ''"></tr>
+        <tr *matNoDataRow><td [attr.colspan]="visibleColumns.length" class="p-5">@if (!isLoading) { <app-empty-state [title]="hasQuery ? 'No matching records' : emptyTitle" [description]="hasQuery ? 'Try a different search or reset the filters.' : emptyDescription" /> }</td></tr>
       </table>
     </div>
-    @if (isLoading) { <div class="flex items-center justify-center gap-3 p-8" role="status"><mat-spinner [diameter]="28"></mat-spinner><span class="text-sm text-muted">Loading records…</span></div> }
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Records pagination"></mat-paginator>
+    @if (isLoading) { <div class="flex items-center justify-center gap-3 p-6" role="status"><mat-spinner [diameter]="24" /><span class="text-sm text-muted">Loading records…</span></div> }
+    @if (paginate && !serverMode) { <mat-paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20, 50]" showFirstLastButtons aria-label="Records pagination" /> }
+    <ng-content select="[table-footer]" />
   </div>
 </section>
