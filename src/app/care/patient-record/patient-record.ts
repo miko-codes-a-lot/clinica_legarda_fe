@@ -2,7 +2,6 @@ import { CARE_APPOINTMENT_COLUMNS, CARE_APPOINTMENT_FILTERS, careAppointmentDate
 import { GenericTableComponent } from '../../_shared/component/table/generic-table.component';
 import { TableCellDirective } from '../../_shared/component/table/table-cell.directive';
 import { ClinicDate } from '../clinic-date';
-import { PatientLedgerView } from '../ledger/ledger';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -14,7 +13,7 @@ import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
 import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
 
-@Component({ selector: 'app-patient-record', imports: [GenericTableComponent, TableCellDirective, ClinicDate, CommonModule, RouterLink, PageHeader, EmptyState, StatusBadge, PatientLedgerView], templateUrl: './patient-record.html' })
+@Component({ selector: 'app-patient-record', imports: [GenericTableComponent, TableCellDirective, ClinicDate, CommonModule, RouterLink, PageHeader, EmptyState, StatusBadge], templateUrl: './patient-record.html' })
 export class PatientRecordPage implements OnInit {
   readonly appointmentColumns = CARE_APPOINTMENT_COLUMNS;
   readonly appointmentFilters = CARE_APPOINTMENT_FILTERS;

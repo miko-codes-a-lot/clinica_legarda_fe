@@ -223,7 +223,6 @@ export const ICON_ALIASES: Readonly<Record<string, string>> = {
   "person_search": "user-circle",
   "print": "printer",
   "quickreply": "chat-bubble-bottom-center-text",
-  "receipt_long": "document-text",
   "remove": "minus",
   "save": "check",
   "schedule": "clock",

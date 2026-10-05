@@ -59,9 +59,9 @@ Patient intake uses the shared staff `UserForm` for admin and super admin: `isWa
 
 ## Care workspace
 
-The shared `care` routes serve scoped staff patient records, queue/check-in, visit records and treatment cases. `PatientLedgerView` serves staff manual entry forms and patient read-only balances from different projected API endpoints. Clinic closures reuse the same availability rules for booking and rescheduling. Use semantic `ui-card`, `ui-table`, input, alert and button styles for both themes; never render internal notes in the patient portal.
+The shared `care` routes serve scoped staff patient records, queue/check-in, visit records and treatment cases. Clinic closures reuse the same availability rules for booking and rescheduling. Use semantic `ui-card`, `ui-table`, input, alert and button styles for both themes; never render internal notes in the patient portal.
 
-Patient My care receives only published completed summaries and public case/session fields. Print summary isolates the selected visit and uses paper colors. Installment amounts use integer PHP centavos through the exact decimal parser and formatter; do not use floating-point peso calculations.
+Patient My care receives only published completed summaries and public case/session fields. Print summary isolates the selected visit and uses paper colors.
 
 ## Interface icons
 

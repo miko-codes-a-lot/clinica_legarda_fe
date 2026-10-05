@@ -9,10 +9,9 @@ import { finalize } from 'rxjs';
 import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
 import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
-import { PatientLedgerView } from '../../care/ledger/ledger';
 import { careError } from '../../care/care-api.service';
 import { ClinicCareGroup, MyCareRecord } from './my-care.models';
-@Component({ selector: 'app-my-care', imports: [ClinicDate, CommonModule, RouterLink, PageHeader, EmptyState, StatusBadge, PatientLedgerView],
+@Component({ selector: 'app-my-care', imports: [ClinicDate, CommonModule, RouterLink, PageHeader, EmptyState, StatusBadge],
   templateUrl: './my-care.html', styleUrl: './my-care.css', host: { '[attr.data-printing]': 'printing ? "true" : null' } })
 export class MyCare implements OnInit {
   private readonly destroyRef = inject(DestroyRef); private readonly http = inject(HttpClient);

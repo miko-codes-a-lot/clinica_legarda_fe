@@ -1,8 +1,6 @@
 import { TableColumn, TableFilter } from '../_shared/component/table/table-model';
 import { CareAppointment, CarePerson, CareVisit, TreatmentCaseDetail } from './care.models';
 import { AffectedAppointment } from './closures/closure.models';
-import { InstallmentPlan, LedgerEntry } from './ledger/ledger.models';
-import { formatPesos } from './ledger/ledger-rules';
 import { formatReportDate } from '../_shared/model/analytics-report';
 
 export const careDay = (key: string): string => key ? formatReportDate(key.slice(0, 10)) : '';
@@ -46,21 +44,3 @@ export const AFFECTED_APPOINTMENT_COLUMNS: TableColumn<AffectedAppointment>[] = 
   { key: 'flag', label: 'Closure review', cell: row => row.disruption ? 'Needs review' : 'Resolved' },
 ];
 export const AFFECTED_APPOINTMENT_FILTERS: TableFilter<AffectedAppointment>[] = [{ key: 'flag', label: 'Closure review', options: [{ value: 'open', label: 'Needs review' }, { value: 'resolved', label: 'Resolved' }], value: row => row.disruption ? 'open' : 'resolved' }];
-type InstallmentRow = InstallmentPlan['items'][number];
-export const INSTALLMENT_COLUMNS: TableColumn<InstallmentRow>[] = [
-  { key: 'dueDate', label: 'Due date', cell: row => careDay(row.dueDate), sortValue: row => row.dueDate },
-  { key: 'amount', label: 'Amount', cell: row => formatPesos(row.amount), sortValue: row => row.amount, kind: 'number' },
-  { key: 'paid', label: 'Paid', cell: row => formatPesos(row.paid), sortValue: row => row.paid, kind: 'number' },
-  { key: 'remaining', label: 'Remaining', cell: row => formatPesos(row.remaining), sortValue: row => row.remaining, kind: 'number' },
-];
-export const LEDGER_ENTRY_COLUMNS: TableColumn<LedgerEntry>[] = [
-  { key: 'date', label: 'Date / entry', cell: row => careDay(row.date), secondary: row => row.kind === 'charge' ? 'Charge' : 'Payment', sortValue: row => row.date + row.createdAt },
-  { key: 'description', label: 'Description / clinic', cell: row => row.description, secondary: row => row.clinic.name },
-  { key: 'amount', label: 'Amount', cell: row => formatPesos(row.amount), sortValue: row => row.amount, kind: 'number' },
-  { key: 'status', label: 'Status', cell: row => row.voidedAt ? 'Voided' : 'Active', secondary: row => row.voidReason || '', kind: 'status' },
-  { key: 'receipt', label: 'Method / receipt', cell: row => row.method || '', secondary: row => row.reference || '' },
-];
-export const LEDGER_ENTRY_FILTERS: TableFilter<LedgerEntry>[] = [
-  { key: 'kind', label: 'Entry', options: [{ value: 'charge', label: 'Charge' }, { value: 'payment', label: 'Payment' }], value: row => row.kind },
-  { key: 'status', label: 'Status', options: [{ value: 'active', label: 'Active' }, { value: 'voided', label: 'Voided' }], value: row => row.voidedAt ? 'voided' : 'active' },
-];
