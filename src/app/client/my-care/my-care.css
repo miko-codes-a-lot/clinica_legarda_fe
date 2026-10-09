@@ -1,7 +1,22 @@
+.care-print-only { display: none; }
+
+@page { margin: 14mm; }
+
 @media print {
+  :host { display: block; }
   .care-screen-only { display: none !important; }
-  :host([data-printing="true"]) .care-summary:not(.care-print-selected) { display: none !important; }
-  .care-summary { background: white !important; color: black !important; border: 0; box-shadow: none; padding: 0; }
-  .care-summary * { color: black !important; }
-  .care-summary h3 { margin-top: 1rem; }
+  .care-print-only { display: block; background: white; color: black; font: 10pt/1.4 Arial, sans-serif; }
+  .care-print-heading { break-inside: avoid; break-after: avoid; margin-bottom: 4mm; }
+  .care-print-heading h1 { margin: 0 0 2mm; font-size: 18pt; font-weight: 700; }
+  .care-print-heading h2 { margin: 5mm 0 1mm; font-size: 13pt; font-weight: 700; }
+  .care-print-heading p { margin: 0 0 1mm; }
+  .care-print-table { width: 100%; table-layout: fixed; border-collapse: collapse; margin: 0 0 5mm; break-inside: auto; }
+  .care-print-table caption { text-align: left; font-weight: 700; font-size: 11pt; padding: 0 0 2mm; break-after: avoid; }
+  .care-print-table thead { display: table-header-group; }
+  .care-print-table tr { break-inside: avoid; }
+  .care-print-table .care-print-prose-row { break-inside: auto; }
+  .care-print-table th, .care-print-table td { border: 1px solid #777; padding: 2mm 3mm; vertical-align: top; text-align: left; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .care-print-table th { font-weight: 700; }
+  .care-print-label-column { width: 25%; }
+  .care-print-sessions th:nth-child(1), .care-print-sessions th:nth-child(2), .care-print-sessions th:nth-child(4) { width: 22%; }
 }

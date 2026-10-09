@@ -12,7 +12,6 @@ const input: DashboardReportInput = {
   serviceTrend: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [
     { label: 'Cleaning <routine>', data: [2, 1, 0, 0, 0, 0, 0] },
   ] },
-  declinedReferrals: { labels: ['Service unavailable'], datasets: [{ data: [1] }] },
   metrics: { totalAppointments: 3, appointmentsUpdated: 4, queueCount: 1 },
   queue: [{ time: '09:00', patient: 'Test Patient', services: 'Cleaning, Checkup', clinic: 'Legarda Clinic' }],
   notifications: [{ type: 'Status Update', message: 'Notice', timestamp: 'Sep 8', status: 'Unread' }],
@@ -37,10 +36,9 @@ describe('Staff report values and scope', () => {
   it('names the selected scope and complete appointment-date week for every weekly series', () => {
     const report = createDashboardReport(input);
     expect(report.week).toBe('Sep 7, 2026 - Sep 13, 2026');
-    for (const title of ['Preferred Services Distribution', 'Weekly Appointment Trend', 'Service Trend per Day', 'Declined Referrals by Reason']) {
+    for (const title of ['Preferred Services Distribution', 'Weekly Appointment Trend', 'Service Trend per Day']) {
       expect(table(title).scope).toContain('Legarda Clinic; Sep 7, 2026 - Sep 13, 2026');
     }
-    expect(table('Declined Referrals by Reason').scope).toContain('receiving appointment');
     expect(table('Dashboard Metrics').rows[0][2]).toContain('all statuses');
     expect(table('Dashboard Metrics').rows[1][2]).toContain('updated in Manila time');
   });

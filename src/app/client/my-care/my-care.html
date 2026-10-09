@@ -1,4 +1,4 @@
-<div class="ui-page max-w-6xl">
+<div class="ui-page max-w-6xl care-screen-only">
   <div class="care-screen-only"><app-page-header title="My care" eyebrow="Patient records" description="Your completed visit summaries, treatment plans and linked sessions."><a class="ui-button-secondary" routerLink="/app/my-appointment">My appointments</a><button class="ui-button-secondary" type="button" [disabled]="loading" (click)="load()">Refresh summaries</button></app-page-header></div>
   @if (loading) { <p class="ui-muted care-screen-only" role="status">Loading your care history…</p> }@if (error) { <p class="ui-alert-error mb-6 care-screen-only" role="alert">{{ error }}</p> }
   @if (!loading && !error) {
@@ -8,3 +8,73 @@
     </section> } @empty { <div class="care-screen-only mb-8"><app-empty-state title="No published care records yet" description="Your visit summary appears here after your dentist completes the visit. Contact the clinic if you need help with an earlier record." icon="medical_information" /></div> }
   }
 </div>
+<section class="care-print-only" aria-label="Patient care summary">
+  <header class="care-print-heading">
+    <h1>Patient care summary</h1>
+    <p>Patient: {{ patientName }}</p>
+    <p>Published visit summaries, treatment plans and linked sessions</p>
+  </header>
+  @if (loading) { <p>Care records are still loading. Please wait before printing.</p> }
+  @else if (error) { <p>Care records could not be loaded. Please refresh before printing.</p> }
+  @else {
+    @for (group of printGroups; track group.clinic._id) {
+      <section class="care-print-clinic">
+        <header class="care-print-heading">
+          <h2>{{ group.clinic.name }}</h2>
+          <p>{{ group.clinic.address }}@if (group.clinic.mobileNumber) { · {{ group.clinic.mobileNumber }} }</p>
+        </header>
+        @for (visit of group.visits; track visit._id) {
+          <table class="care-print-table">
+            <caption>{{ visit.date | clinicDate }} · {{ visit.purpose | titlecase }} visit</caption>
+            <colgroup><col class="care-print-label-column"><col></colgroup>
+            <thead><tr><th scope="col">Visit information</th><th scope="col">Details</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Visit ID</th><td>{{ visit._id }}</td></tr>
+              <tr><th scope="row">Dentist</th><td>Dr. {{ visit.dentist.firstName }} {{ visit.dentist.lastName }}</td></tr>
+              <tr class="care-print-prose-row"><th scope="row">Visit summary</th><td>{{ visit.summary }}</td></tr>
+              @if (visit.aftercare) { <tr class="care-print-prose-row"><th scope="row">Aftercare</th><td>{{ visit.aftercare }}</td></tr> }
+              @if (visit.nextSteps) { <tr class="care-print-prose-row"><th scope="row">Next steps</th><td>{{ visit.nextSteps }}</td></tr> }
+            </tbody>
+          </table>
+          @if (visit.treatments.length) {
+            <table class="care-print-table">
+              <caption>Performed treatments · {{ visit.date | clinicDate }}</caption>
+              <colgroup><col class="care-print-label-column"><col></colgroup>
+              <thead><tr><th scope="col">Tooth / reference</th><th scope="col">Treatment</th></tr></thead>
+              <tbody>@for (item of visit.treatments; track $index) {
+                <tr><td>{{ item.tooth || '—' }}</td><td>{{ item.description }}</td></tr>
+              }</tbody>
+            </table>
+          }
+        }
+        @for (careCase of group.cases; track careCase._id) {
+          <table class="care-print-table">
+            <caption>Treatment plan · {{ careCase.title }}</caption>
+            <colgroup><col class="care-print-label-column"><col></colgroup>
+            <thead><tr><th scope="col">Plan information</th><th scope="col">Details</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Status</th><td>{{ careCase.status | titlecase }}</td></tr>
+              <tr><th scope="row">Dentist</th><td>Dr. {{ careCase.dentist.firstName }} {{ careCase.dentist.lastName }}</td></tr>
+              <tr class="care-print-prose-row"><th scope="row">Treatment plan</th><td>{{ careCase.plan }}</td></tr>
+            </tbody>
+          </table>
+          <table class="care-print-table care-print-sessions">
+            <caption>Linked sessions · {{ careCase.title }}</caption>
+            <thead><tr><th scope="col">Date</th><th scope="col">Time</th><th scope="col">Session</th><th scope="col">Status</th></tr></thead>
+            <tbody>
+              @for (visit of careCase.visits; track visit._id) {
+                <tr><td>{{ visit.date | clinicDate }}</td><td>—</td><td>{{ visit.purpose | titlecase }}<br>Visit ID: {{ visit._id }}</td><td>Completed</td></tr>
+              }
+              @for (session of careCase.sessions; track session._id) {
+                <tr><td>{{ session.date | clinicDate }}</td><td>{{ session.startTime }}–{{ session.endTime }}</td><td>Appointment</td><td>{{ session.status | titlecase }}</td></tr>
+              }
+              @if (!careCase.visits.length && !careCase.sessions.length) {
+                <tr><td colspan="4">No completed or scheduled sessions yet.</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+    } @empty { <p>No published care records yet.</p> }
+  }
+</section>

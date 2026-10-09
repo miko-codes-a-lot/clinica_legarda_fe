@@ -16,7 +16,6 @@ import { ClinicService } from '../_shared/service/clinic-service';
 import { DayService } from '../_shared/service/day-service';
 import { DentalServicesService } from '../_shared/service/dental-services-service';
 import { NotificationService } from '../_shared/service/notification-service';
-import { ReasonService } from '../_shared/service/reason-service';
 import { UserService } from '../_shared/service/user-service';
 import { StaffAppointmentList } from '../_shared/staff-appointment-list/staff-appointment-list';
 import { StaffDashboard } from '../_shared/staff-dashboard/staff-dashboard';
@@ -64,7 +63,6 @@ describe('Admin clinic access contract', () => {
       { provide: UserService, useValue: {
         getPatients: () => of([appointment.patient]), getOne: () => of(appointment.patient),
       } },
-      { provide: ReasonService, useValue: { getAll: () => of([]) } },
       { provide: NotificationService, useValue: {
         notifications$: of([]), getAllNotifications: () => of([]),
       } },
@@ -165,6 +163,32 @@ describe('Admin clinic access contract', () => {
     expect(view.canExport).toBeTrue();
   });
 
+  for (const area of ['admin', 'super-admin'] as const) {
+    it(`prints ${area} weekly appointment data without incomplete referral totals`, () => {
+      const view = dashboard(area);
+      respondWithClinics();
+      view.state = { status: 'ready', clinicId: 'all', report: {
+        ...report,
+        summary: { ...report.summary, totalAppointments: 3, preferredServices: { Cleaning: 3 },
+          declinedReferrals: { 'Service unavailable': 1 } },
+      } };
+      const printed = document.implementation.createHTMLDocument();
+      spyOn(window, 'open').and.returnValue({
+        document: printed, opener: null, focus: () => undefined, print: () => undefined,
+      } as unknown as Window);
+
+      view.printTables();
+
+      expect(printed.title).toBe(`${area === 'admin' ? 'Admin' : 'Super Admin'} Dashboard Report`);
+      expect(printed.querySelector('[aria-label="Preferred Services Distribution"] tbody')?.textContent)
+        .toContain('Cleaning3100.0%');
+      expect(printed.querySelector('[aria-label="Dashboard Metrics"] tbody')?.textContent)
+        .toContain('Total Appointments3');
+      expect(printed.body.textContent).not.toContain('Service unavailable');
+      expect(printed.body.textContent).not.toContain('Declined Referrals');
+    });
+  }
+
   it('preserves a hidden chart service when the display theme changes', () => {
     const view = dashboard('super-admin');
     respondWithClinics();
@@ -175,7 +199,6 @@ describe('Admin clinic access contract', () => {
     view.servicesChartRef = canvas();
     view.appointmentTrendRef = canvas();
     view.serviceTrendChartRef = canvas();
-    view.declinedReferralChartRef = canvas();
     view.ngAfterViewInit();
     try {
       expect(view.serviceTrendChart.isDatasetVisible(0)).toBeTrue();

@@ -90,8 +90,12 @@
 }
 
 @media print {
-  body:has(app-my-care[data-printing="true"]) app-client-nav,
-  body:has(app-my-care[data-printing="true"]) app-client > footer,
-  body:has(app-my-care[data-printing="true"]) app-chatbot,
-  body:has(app-my-care[data-printing="true"]) .skip-link { display: none !important; }
+  body:has(app-my-care) app-client-nav,
+  body:has(app-my-care) app-client > footer,
+  body:has(app-my-care) app-client > .chatbot-container,
+  body:has(app-my-care) .skip-link,
+  body:has(app-my-care) .cdk-overlay-container { display: none !important; }
+  body:has(app-my-care),
+  body:has(app-my-care) app-client,
+  body:has(app-my-care) #main-content { min-height: 0 !important; margin: 0 !important; padding: 0 !important; background: white !important; color: black !important; }
 }

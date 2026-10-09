@@ -28,8 +28,6 @@ import { NotificationService } from '../service/notification-service';
 import { ClinicService } from '../service/clinic-service';
 import { Notification, NotificationType } from '../model/notification';
 import { Router, RouterLink } from '@angular/router';
-import { Reason } from '../model/reason';
-import { ReasonService } from '../service/reason-service';
 
 
 import { Clinic } from '../model/clinic';
@@ -59,12 +57,10 @@ export class StaffDashboard {
   @ViewChild('servicesChart', { static: false }) servicesChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('appointmentTrendChart', { static: false }) appointmentTrendRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('serviceTrendChart', { static: false }) serviceTrendChartRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('declinedReferralChart', { static: false }) declinedReferralChartRef!: ElementRef<HTMLCanvasElement>;
 
   serviceTrendChart!: Chart<'bar', number[], string>;
   notifications$!: Observable<Notification[]>;
   unreadNotificationsCount$!: Observable<number>;
-  declinedReferralChart!: Chart<'doughnut', number[], string>;
 
   @Input() area: 'admin' | 'super-admin' = 'admin';
   private readonly destroyRef = inject(DestroyRef);
@@ -74,7 +70,6 @@ export class StaffDashboard {
   private readonly clinicSelection = new BehaviorSubject('all');
   private viewReady = false;
   state: AnalyticsReportState = { status: 'loading', clinicId: 'all' };
-  reasons: Reason[] = [];
   clinics: Pick<Clinic, '_id' | 'name'>[] = [];
   clinicsLoading = false;
   private clinicsLoaded = false;
@@ -107,7 +102,6 @@ export class StaffDashboard {
     private readonly analyticsService: AnalyticsService,
     private readonly clinicService: ClinicService,
     private readonly router: Router,
-    private readonly reasonService: ReasonService,
   ) {}
 
   get title(): string { return this.area === 'super-admin' ? 'Super Admin Dashboard' : 'Admin Dashboard'; }
@@ -131,10 +125,6 @@ export class StaffDashboard {
     this.themeService.themeChanges$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.chartTheme = readChartTheme(this.document);
       this.refreshChartTheme();
-    });
-    this.reasonService.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: reasons => { this.reasons = reasons; this.updateCharts(); },
-      error: () => { /* Raw reason codes remain usable if the label directory fails. */ },
     });
     this.loadClinics();
     this.analyticsService.watchReports(this.clinicSelection).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(state => {
@@ -190,7 +180,6 @@ export class StaffDashboard {
     this.createOrUpdateServicesChart();
     this.createAppointmentTrendChart();
     this.createServiceTrendChart();
-    this.createOrUpdateDeclinedReferralChart();
     this.refreshChartTheme();
   }
 
@@ -208,11 +197,7 @@ export class StaffDashboard {
     this.serviceTrendChart?.data.datasets.forEach((dataset, index) => {
       dataset.backgroundColor = this.chartTheme.colors[index % this.chartTheme.colors.length];
     });
-    if (this.declinedReferralChart) {
-      this.declinedReferralChart.data.datasets[0].backgroundColor = this.declinedChartColors;
-      this.declinedReferralChart.data.datasets[0].borderColor = this.chartTheme.surface;
-    }
-    for (const chart of [this.servicesChart, this.appointmentTrendChart, this.serviceTrendChart, this.declinedReferralChart]) {
+    for (const chart of [this.servicesChart, this.appointmentTrendChart, this.serviceTrendChart]) {
       if (!chart) continue;
       applyChartTheme(chart, this.chartTheme);
       chart.update('none');
@@ -339,7 +324,6 @@ export class StaffDashboard {
     if (this.servicesChart) this.servicesChart.destroy();
     if (this.appointmentTrendChart) this.appointmentTrendChart.destroy();
     if (this.serviceTrendChart) this.serviceTrendChart.destroy();
-    if (this.declinedReferralChart) this.declinedReferralChart.destroy();
   }
 
   redirectToDetails(link: string | undefined) {
@@ -397,60 +381,6 @@ export class StaffDashboard {
     };
   }
 
-  private get declinedChartColors(): string[] {
-    const colors = this.chartTheme.colors;
-    return [colors[6], colors[3], colors[4], colors[0], colors[1]];
-  }
-
-  private getDeclinedReferralData(): { labels: string[], counts: number[] } {
-    const counts = this.weeklyReport?.declinedReferrals ?? {};
-    return {
-      labels: Object.keys(counts).map(code => this.reasons.find(reason => reason.code === code)?.label ?? code),
-      counts: Object.values(counts),
-    };
-  }
-
-  private createOrUpdateDeclinedReferralChart(): void {
-    const { labels, counts } = this.getDeclinedReferralData();
-    if (this.declinedReferralChart) {
-      this.declinedReferralChart.data.labels = labels;
-      this.declinedReferralChart.data.datasets[0].data = counts;
-      return;
-    }
-
-    const config: ChartConfiguration<'doughnut', number[], string> = {
-      type: 'doughnut',
-      data: {
-        labels,
-        datasets: [{
-          data: counts,
-          backgroundColor: this.declinedChartColors,
-          borderWidth: 2,
-          borderColor: this.chartTheme.surface
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const label = context.label || '';
-                const value = context.parsed;
-                const total = (context.dataset.data as number[]).reduce((a, b) => a + b, 0);
-                const percentage = ((value / total) * 100).toFixed(1);
-                return `${label}: ${value} (${percentage}%)`;
-              }
-            }
-          }
-        }
-      }
-    };
-
-    this.declinedReferralChart = new Chart(this.declinedReferralChartRef.nativeElement, config);
-  }
   get canExport(): boolean {
     return this.clinicsLoaded && !this.clinicsLoading && !this.clinicError && !this.hasNoAssignedClinics
       && this.state.status === 'ready' && this.state.clinicId === this.selectedClinic;
@@ -459,7 +389,6 @@ export class StaffDashboard {
   private dashboardReport(): DashboardReport {
     const report = this.report;
     if (!report || report.clinicId !== this.selectedClinic) throw new Error('Report unavailable');
-    const declined = this.getDeclinedReferralData();
     return createDashboardReport({
       title: `${this.title} Report`,
       clinic: this.clinics.find(clinic => clinic._id === report.clinicId)?.name ?? report.clinicId,
@@ -469,7 +398,6 @@ export class StaffDashboard {
       services: { labels: Object.keys(report.summary.preferredServices), datasets: [{ data: Object.values(report.summary.preferredServices) }] },
       appointments: { labels: report.trend.labels, datasets: [{ data: report.trend.appointments }, { data: report.trend.completed }] },
       serviceTrend: { labels: report.trend.labels, datasets: Object.entries(report.trend.serviceTrend).map(([label, data]) => ({ label, data })) },
-      declinedReferrals: { labels: declined.labels, datasets: [{ data: declined.counts }] },
       metrics: {
         totalAppointments: report.summary.totalAppointments,
         appointmentsUpdated: report.summary.appointmentsUpdated,

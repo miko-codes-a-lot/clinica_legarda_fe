@@ -29,7 +29,6 @@ export interface DashboardReportInput {
   readonly services: GraphData;
   readonly appointments: GraphData;
   readonly serviceTrend: GraphData;
-  readonly declinedReferrals: GraphData;
   readonly today: string;
   readonly metrics: { readonly totalAppointments: number; readonly appointmentsUpdated: number; readonly queueCount: number };
   readonly queue: readonly { readonly time: string; readonly patient: string; readonly services: string; readonly clinic: string }[];
@@ -96,13 +95,6 @@ export function createDashboardReport(input: DashboardReportInput): DashboardRep
         columnWidths: [0.25, 0.1, 0.45, 0.2],
       },
       {
-        title: 'Declined Referrals by Reason',
-        scope: `${weeklyScope}; receiving appointment; rejected referrals`,
-        headers: ['Reason', 'Declined Referrals', 'Share'],
-        rows: distributionRows(input.declinedReferrals),
-        columnWidths: [0.6, 0.2, 0.2],
-      },
-      {
         title: "Today's Appointment Queue",
         scope: `${input.clinic}; ${formatReportDate(input.today)}; confirmed appointments`,
         headers: ['Time', 'Patient Name', 'Service', 'Clinic'],
@@ -120,7 +112,7 @@ export function createDashboardReport(input: DashboardReportInput): DashboardRep
   };
 }
 
-/** Uses textContent so clinic, service, and reason names remain literal text. */
+/** Uses textContent so clinic, service, and patient names remain literal text. */
 export function renderDashboardReport(document: Document, report: DashboardReport): void {
   document.title = report.title ?? 'Staff Dashboard Report';
   document.body.replaceChildren();

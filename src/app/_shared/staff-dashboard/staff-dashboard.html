@@ -87,12 +87,8 @@
     <section class="ui-card min-w-0 p-5"><h2 class="ui-section-title mb-5">Weekly appointment trend</h2>
       <div class="chart-container"><canvas #appointmentTrendChart aria-label="Weekly appointment trend chart" role="img"></canvas></div>
     </section>
-    <section class="ui-card min-w-0 p-5"><h2 class="ui-section-title mb-5">Service trend per day</h2>
+    <section class="ui-card min-w-0 p-5 xl:col-span-2"><h2 class="ui-section-title mb-5">Service trend per day</h2>
       <div class="chart-container"><canvas #serviceTrendChart aria-label="Service trend per day chart" role="img"></canvas></div>
-    </section>
-    <section class="ui-card min-w-0 p-5"><h2 class="ui-section-title mb-5">Declined referrals by reason</h2>
-      <div class="chart-container"><canvas #declinedReferralChart aria-label="Declined referrals by reason chart" role="img"></canvas></div>
-      <p *ngIf="(weeklyReport?.declinedReferrals | keyvalue)?.length === 0" class="ui-muted mt-3 text-sm">No declined referrals in this report week.</p>
     </section>
   </div>
 

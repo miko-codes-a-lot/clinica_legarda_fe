@@ -60,10 +60,10 @@ export class Chatbot implements AfterViewChecked {
 
   onMessagesClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
-    const anchor = target.closest('a[data-route]') as HTMLAnchorElement | null;
+    const anchor = target.closest('a') as HTMLAnchorElement | null;
     if (!anchor) return;
 
-    const route = anchor.getAttribute('data-route') ?? '';
+    const route = anchor.getAttribute('href') ?? '';
     if (!this.isSafeInternalRoute(route)) return;
 
     event.preventDefault();
@@ -152,13 +152,15 @@ export class Chatbot implements AfterViewChecked {
       /\[([^\]]+)\]\(([^)\s]+)\)/g,
       (_match, label: string, url: string) => {
         if (this.isSafeInternalRoute(url)) {
-          return `<a href="${url}" data-route="${url}" class="chat-link">${label}</a>`;
+          return `<a href="${url}" class="chat-link">${label}</a>`;
         }
         return label;
       },
     );
 
-    return withMarkdownLinks.replace(/\n/g, '<br>');
+    return withMarkdownLinks
+      .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
   }
 
   private scrollToBottom(): void {

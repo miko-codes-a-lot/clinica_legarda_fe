@@ -124,6 +124,11 @@ export class AppointmentForm {
       }
     }
     if (this.appointment?.careCase) {
+      // Ongoing treatment can be planned six months ahead. Clamp month-end
+      // dates so August 31 reaches February's last day, without rolling into March.
+      const lastDay = new Date(this.minDate.getFullYear(), this.minDate.getMonth() + 7, 0);
+      this.maxDate = new Date(lastDay.getFullYear(), lastDay.getMonth(),
+        Math.min(this.minDate.getDate(), lastDay.getDate()));
       this.clinic.disable({ emitEvent: false });
       this.dentist.disable({ emitEvent: false });
       this.patient.disable({ emitEvent: false });
