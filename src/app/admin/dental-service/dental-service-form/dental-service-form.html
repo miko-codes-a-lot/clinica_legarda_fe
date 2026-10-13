@@ -1,7 +1,12 @@
 <app-form
   [form]="rxform"
   [fields]="dentalServiceFields" 
-  [isLoading]="isLoading"
+  [isLoading]="isLoading || clinicsLoading || !!clinicsError"
   (onSubmitEvent)="onSubmit()"
 >
+  @if (clinicsLoading) { <p class="text-sm text-muted" role="status">Loading clinics…</p> }
+  @if (clinicsError) { <p class="ui-notice" role="alert">{{ clinicsError }}</p> }
+  @if (!clinicsLoading && !clinicsError && !clinics.length) { <p class="ui-notice" role="status">No clinics are assigned to your account. A super administrator must assign a clinic before you can create services.</p> }
+  @if (dentalService.canEditDetails === false) { <p class="text-sm text-muted">This service is shared with other clinics. You can change its availability at your clinics. A super administrator can edit its name and duration.</p> }
+  @if (dentalService._id) { <p class="text-sm text-muted">Clear clinic selections to stop offering this service there. Existing appointments retain their service history.</p> }
 </app-form>

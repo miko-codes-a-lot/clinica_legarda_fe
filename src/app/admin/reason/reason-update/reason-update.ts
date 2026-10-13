@@ -1,3 +1,4 @@
+import { staffManagementPath } from '../../../_shared/model/staff-management-path';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
 import { Reason } from '../../../_shared/model/reason';
@@ -51,7 +52,7 @@ export class ReasonUpdate {
   onSubmit(reason: Reason) {
     this.isLoading = true
     this.reasonService.update(this.id, reason).subscribe({
-      next: () => this.router.navigate(['admin/reason/details', this.id], { replaceUrl: true }),
+      next: () => this.router.navigate([`${staffManagementPath(this.router.url)}/reason/details`, this.id], { replaceUrl: true }),
       error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }

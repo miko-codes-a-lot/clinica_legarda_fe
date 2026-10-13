@@ -8,7 +8,7 @@ export const DENTAL_SERVICE: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '/admin/service/list',
+        redirectTo: 'list',
         pathMatch: 'full'
       },
       {

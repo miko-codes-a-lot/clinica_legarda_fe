@@ -55,12 +55,13 @@ export function pickerDateFromStored(value: Date | string): Date {
 
 export function createBookingSchedule(
   dentist: Omit<DentistBookingSchedule, 'appointments'>,
-  clinic: Pick<Clinic, 'operatingHours'>,
+  clinic: Pick<Clinic, 'operatingHours' | 'appointmentOnlyDays'>,
   appointments: readonly AppointmentAvailability[],
   excludeAppointmentId?: string,
   closures: readonly ClosureInterval[] = [],
 ): DentistBookingSchedule {
   const operatingHours = dentist.operatingHours.flatMap(hours => {
+    if (clinic.appointmentOnlyDays?.includes(hours.day)) return [{ ...hours }];
     const clinicHours = clinic.operatingHours?.find(candidate => candidate.day === hours.day);
     if (!clinicHours) return [];
     const start = Math.max(timeMinutes(hours.startTime), timeMinutes(clinicHours.startTime));

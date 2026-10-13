@@ -1,3 +1,4 @@
+import { staffManagementPath } from '../../../_shared/model/staff-management-path';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, OnInit } from '@angular/core';
 import { DentalService } from '../../../_shared/model/dental-service';
@@ -31,7 +32,7 @@ export class DentalServiceCreate implements OnInit {
   onSubmit(dentalService: DentalService) {
     this.isLoading = true
     this.dentalServicesService.create(dentalService).subscribe({
-      next: (c) => this.router.navigate(['admin/service/details', c._id], { replaceUrl: true }),
+      next: (c) => this.router.navigate([`${staffManagementPath(this.router.url)}/service/details`, c._id], { replaceUrl: true }),
       error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }

@@ -30,9 +30,15 @@ export class ClinicList implements OnInit {
   columnDefs: TableColumn<Clinic>[] = [
     { key: 'name', label: 'Clinic', cell: clinic => clinic.name, secondary: clinic => clinic.address || '' },
     { key: 'contact', label: 'Contact', cell: clinic => clinic.mobileNumber || clinic.emailAddress, secondary: clinic => clinic.mobileNumber ? clinic.emailAddress || '' : '' },
-    { key: 'hours', label: 'Open days', cell: clinic => (clinic.operatingHours || []).filter(hour => hour.startTime && hour.endTime).map(hour => hour.day.slice(0, 3)).join(' · ') },
+    { key: 'hours', label: 'Open days', cell: clinic => [
+      ...(clinic.operatingHours || []).filter(hour => hour.startTime && hour.endTime).map(hour => hour.day.slice(0, 3)),
+      ...(clinic.appointmentOnlyDays || []).map(day => `${day.slice(0, 3)} (by appointment)`),
+    ].join(' · ') },
   ];
-  filters: TableFilter<Clinic>[] = [{ key: 'day', label: 'Open on', options: ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].map(day => ({ value: day, label: day.charAt(0).toUpperCase() + day.slice(1) })), value: clinic => (clinic.operatingHours || []).filter(hour => hour.startTime && hour.endTime).map(hour => hour.day) }];
+  filters: TableFilter<Clinic>[] = [{ key: 'day', label: 'Open on', options: ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].map(day => ({ value: day, label: day.charAt(0).toUpperCase() + day.slice(1) })), value: clinic => [...new Set([
+    ...(clinic.operatingHours || []).filter(hour => hour.startTime && hour.endTime).map(hour => hour.day),
+    ...(clinic.appointmentOnlyDays || []),
+  ])] }];
 
   get canManage(): boolean { return this.authService.currentUserValue?.role === 'super-admin'; }
 

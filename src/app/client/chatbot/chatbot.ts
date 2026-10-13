@@ -158,9 +158,7 @@ export class Chatbot implements AfterViewChecked {
       },
     );
 
-    return withMarkdownLinks
-      .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
-      .replace(/\n/g, '<br>');
+    return withMarkdownLinks.replace(/\n/g, '<br>');
   }
 
   private scrollToBottom(): void {

@@ -1,3 +1,4 @@
+import { staffManagementPath } from '../../../_shared/model/staff-management-path';
 import { TableColumn } from '../../../_shared/component/table/table-model';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
@@ -16,7 +17,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 export class ReasonList implements OnInit {
   isLoading = false
-  moduleUrl = '/admin/reason/'
+  get moduleUrl() { return `${staffManagementPath(this.router.url)}/reason`; }
   title = 'Reason'
   createLabel = 'Create Reason'
   dataSource = new MatTableDataSource<Reason>();

@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { bookingSlots, DentistBookingSchedule, isBookableDentist, pickerDateFromStored } from '../../_shared/model/booking-availability';
 import { BookingAvailabilityService } from '../../_shared/service/booking-availability-service';
 import { Component, EventEmitter, Input, Output, DestroyRef, inject } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AppointmentPayload } from '../../admin/appointment/appointment-payload';
 import { ReferralPayload } from '../../admin/appointment/referral-payload';
 import { Appointment, AppointmentStatus } from '../../_shared/model/appointment';
@@ -14,7 +14,7 @@ import { isPreviousTreatment } from '../../_shared/model/appointment-history';
 import { DentistDirectoryEntry } from '../../_shared/model/user-directory';
 import { RxAppointmentForm } from './rx-appointment-form';
 import { RxReferralForm } from './rx-referral-form';
-import { DentalService } from '../../_shared/model/dental-service';
+import { DentalService, servicesForClinic } from '../../_shared/model/dental-service';
 import { Clinic } from '../../_shared/model/clinic';
 import { DatePicker } from '../../_shared/component/date-picker/date-picker';
 import { TimePicker } from '../../_shared/component/time-picker/time-picker';
@@ -120,7 +120,11 @@ export class AppointmentPage {
       clinic: [clinicId, Validators.required],
       dentist: [dentistId, Validators.required],
       patient: [this.user ? `${this.user.firstName} ${this.user.lastName}` : '', Validators.required],
-      services: [this.appointment?.services.map(service => service._id || '') || [] as string[], [Validators.required, Validators.maxLength(3)]],
+      services: this.fb.nonNullable.control(this.appointment?.services.map(service => service._id || '') || [] as string[], [Validators.required, Validators.maxLength(3), (control: AbstractControl<string[]>) => {
+        const selected = control.value as string[];
+        const available = servicesForClinic(this.dentalServices, this.rxform?.controls.clinic.value ?? clinicId);
+        return selected.some(id => !available.some(service => service._id === id)) ? { clinicServices: true } : null;
+      }]),
       date: new FormControl<Date | null>(this.appointment?.date ? pickerDateFromStored(this.appointment.date) : null, Validators.required),
       time: [this.appointment?.startTime || '', Validators.required],
       patientNotes: [this.appointment?.notes?.patientNotes || ''],
@@ -247,6 +251,7 @@ export class AppointmentPage {
     this.selectedDentist = undefined;
     this.dentists = [];
     this.dentist.setValue('', { emitEvent: false });
+    this.services.setValue([], { emitEvent: false });
     this.clearDateTime();
     this.builAppointmentFields();
     this.confirmingClinic = false;
@@ -297,7 +302,7 @@ Do you want to proceed?` },
   private builAppointmentFields() {
 
     const selectClinic = this.maptoOptions(this.clinics)
-    const selectDentalService = this.maptoOptions(this.dentalServices)
+    const selectDentalService = this.maptoOptions(servicesForClinic(this.dentalServices, this.clinic.value))
     this.appointmentFields = [
       { name: 'clinic', label: 'Clinic', type: 'select', options: selectClinic},
       { name: 'patient', label: 'Patient', type: 'text', readonly: true},
@@ -473,7 +478,7 @@ Do you want to proceed?` },
     this.rxform.patchValue({
       clinic: last?.clinic._id || '',
       dentist: '',
-      services: last?.services.map(service => service._id).filter((id): id is string => !!id) || [],
+      services: (last?.services ?? []).map(service => service._id).filter((id): id is string => !!id && servicesForClinic(this.dentalServices, last?.clinic._id ?? '').some(service => service._id === id)),
       date: null,
       time: '',
     }, { emitEvent: false });

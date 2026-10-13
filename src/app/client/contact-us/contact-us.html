@@ -95,6 +95,12 @@
                   </td>
                 </tr>
                 }
+                @for (day of clinic.appointmentOnlyDays; track day) {
+                <tr class="border-b border-brand-50">
+                  <th scope="row" class="px-3 py-3 font-medium text-ink">{{ day | titlecase }}</th>
+                  <td colspan="2" class="px-3 py-3 text-muted">By appointment</td>
+                </tr>
+                }
               </tbody>
             </table>
           </div>

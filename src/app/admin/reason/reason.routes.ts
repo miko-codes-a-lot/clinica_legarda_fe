@@ -8,7 +8,7 @@ export const REASON_ROUTES: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '/admin/reason/list',
+        redirectTo: 'list',
         pathMatch: 'full'
       },
       {

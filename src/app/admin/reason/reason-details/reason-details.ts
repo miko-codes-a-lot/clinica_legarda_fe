@@ -1,3 +1,4 @@
+import { staffManagementPath } from '../../../_shared/model/staff-management-path';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
 import { Reason } from '../../../_shared/model/reason';
@@ -51,6 +52,6 @@ export class ReasonDetails {
   }
 
   onUpdate() {
-    this.router.navigate(['/admin/reason/update', this.id])
+    this.router.navigate([`${staffManagementPath(this.router.url)}/reason/update`, this.id])
   }
 }

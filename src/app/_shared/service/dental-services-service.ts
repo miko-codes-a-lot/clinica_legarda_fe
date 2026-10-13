@@ -14,11 +14,12 @@ export class DentalServicesService {
       return {
         name: '',
         duration: 30,
+        clinics: [],
       }
     }
   
-    getAll(): Observable<DentalService[]> {
-      return this.http.get<DentalService[]>(this.baseUrl, { withCredentials: true });
+    getAll(clinic?: string): Observable<DentalService[]> {
+      return this.http.get<DentalService[]>(this.baseUrl, { withCredentials: true, ...(clinic ? { params: { clinic } } : {}) });
     }
   
     getOne(id: string): Observable<DentalService> {

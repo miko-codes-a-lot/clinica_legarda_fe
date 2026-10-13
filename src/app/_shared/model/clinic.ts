@@ -9,6 +9,7 @@ export interface Clinic {
   mobileNumber: string
   emailAddress: string
   operatingHours: OperatingHour[]
+  appointmentOnlyDays?: string[]
   dentists: DentistDirectoryEntry[]
   // branches: Branch[]
 }

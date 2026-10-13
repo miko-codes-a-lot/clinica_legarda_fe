@@ -21,6 +21,18 @@ const day = new Date(2026, 8, 21);
 const now = new Date('2026-09-14T00:00:00Z');
 
 describe('booking availability', () => {
+  it('offers appointment-only Sunday using the dentist hours and still blocks closures and unavailable dentists', () => {
+    const sunday = new Date(2026, 9, 18);
+    const place = { ...clinic, operatingHours: [], appointmentOnlyDays: ['sunday'] };
+    const doctor = { ...dentist, operatingHours: [{ day: 'sunday', startTime: '11:00', endTime: '14:00' }] };
+    const schedule = createBookingSchedule(doctor, place, [], undefined,
+      [{ startDate: '2026-10-18', endDate: '2026-10-18', startTime: '11:30', endTime: '12:00' }]);
+    const slots = bookingSlots(schedule, sunday, 30, 30, now);
+    expect(slots[0]?.value).toBe('11:00');
+    expect(slots.find(slot => slot.value === '11:30')?.available).toBeFalse();
+    expect(slots.find(slot => slot.value === '12:00')?.available).toBeTrue();
+    expect(bookingSlots(createBookingSchedule(dentist, place, []), sunday, 30, 30, now)).toEqual([]);
+  });
   it('intersects clinic and dentist hours and blocks occupied times from every clinic with a buffer', () => {
     const schedule = createBookingSchedule(dentist, clinic, occupied);
     const slots = bookingSlots(schedule, day, 30, 15, now);

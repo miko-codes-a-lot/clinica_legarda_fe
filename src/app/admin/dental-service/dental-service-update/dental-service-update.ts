@@ -1,3 +1,4 @@
+import { staffManagementPath } from '../../../_shared/model/staff-management-path';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component } from '@angular/core';
 import { DentalServiceForm } from '../dental-service-form/dental-service-form';
@@ -40,7 +41,7 @@ export class DentalServiceUpdate {
   onSubmit(dentalService: DentalService) {
     this.isLoading = true
     this.dentalServicesService.update(this.id, dentalService).subscribe({
-      next: () => this.router.navigate(['admin/service/details', this.id], { replaceUrl: true }),
+      next: saved => this.router.navigate(saved.clinics?.length ? [ `${staffManagementPath(this.router.url)}/service/details`, this.id ] : [ `${staffManagementPath(this.router.url)}/service/list` ], { replaceUrl: true }),
       error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }

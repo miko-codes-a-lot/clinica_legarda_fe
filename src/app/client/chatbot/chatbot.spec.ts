@@ -34,17 +34,18 @@ describe('Chatbot', () => {
     return messages[messages.length - 1];
   }
 
-  it('renders Markdown contact labels as emphasis without visible asterisks', () => {
+  it('keeps reply text plain while preserving line breaks', () => {
     const bubble = reply('**Phone:** 0917 123 4567\n**Email:** clinic@example.test');
-    expect(bubble.textContent).toBe('Phone: 0917 123 4567Email: clinic@example.test');
-    expect(Array.from(bubble.querySelectorAll('strong'), node => node.textContent)).toEqual(['Phone:', 'Email:']);
+    expect(bubble.textContent).toBe('**Phone:** 0917 123 4567**Email:** clinic@example.test');
+    expect(bubble.querySelector('strong')).toBeNull();
     expect(bubble.querySelectorAll('br').length).toBe(1);
   });
 
-  it('keeps untrusted HTML inert inside emphasized replies', () => {
+  it('keeps untrusted HTML inert inside plain replies', () => {
     const bubble = reply('**<img src=x onerror=alert(1)>** & <script>alert(1)</script>');
     expect(bubble.querySelector('img, script')).toBeNull();
-    expect(bubble.querySelector('strong')?.textContent).toBe('<img src=x onerror=alert(1)>');
+    expect(bubble.querySelector('strong')).toBeNull();
+    expect(bubble.textContent).toContain('**<img src=x onerror=alert(1)>**');
     expect(bubble.textContent).toContain('& <script>alert(1)</script>');
   });
 
@@ -57,15 +58,29 @@ describe('Chatbot', () => {
     links[0].addEventListener('click', event => event.preventDefault());
     links[0].click();
     expect(navigate).toHaveBeenCalledOnceWith('/app/appointment');
-    expect(bubble.textContent).toBe('Book unsafe outside injected');
+    expect(bubble.textContent).toBe('**Book** unsafe outside injected');
+  });
+
+  it('navigates both booking and contact links and closes the chat', () => {
+    const navigate = spyOn(TestBed.inject(Router), 'navigateByUrl').and.resolveTo(true);
+    const closed = spyOn(component.chatClosed, 'emit');
+    const bubble = reply('You can [book an appointment](/app/appointment), or [contact the clinic](/app/contact-us).');
+    const links = bubble.querySelectorAll('a');
+    expect(links.length).toBe(2);
+    links.forEach(link => {
+      link.addEventListener('click', event => event.preventDefault());
+      link.click();
+    });
+    expect(navigate.calls.allArgs()).toEqual([['/app/appointment'], ['/app/contact-us']]);
+    expect(closed).toHaveBeenCalledTimes(2);
   });
 
   it('sends original reply content in history without generated HTML', () => {
-    reply('**Phone:** 0917 123 4567');
+    reply('**Phone:** 0917 123 4567\n[Book](/app/appointment)');
     component.userInput = 'Thank you';
     component.sendMessage();
     const request = http.expectOne('/chatbot/message');
-    expect(request.request.body.history.at(-1)).toEqual({ role: 'assistant', content: '**Phone:** 0917 123 4567' });
+    expect(request.request.body.history.at(-1)).toEqual({ role: 'assistant', content: '**Phone:** 0917 123 4567\n[Book](/app/appointment)' });
     request.flush({ reply: 'You are welcome.' });
   });
 });

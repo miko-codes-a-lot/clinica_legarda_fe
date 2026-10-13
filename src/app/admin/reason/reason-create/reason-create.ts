@@ -1,3 +1,4 @@
+import { staffManagementPath } from '../../../_shared/model/staff-management-path';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, OnInit } from '@angular/core';
 import { ReasonForm } from '../reason-form/reason-form';
@@ -30,7 +31,7 @@ export class ReasonCreate implements OnInit {
   onSubmit(reason: Reason) {
     this.isLoading = true
     this.reasonService.create(reason).subscribe({
-      next: (c) => this.router.navigate(['admin/reason/details', c._id], { replaceUrl: true }),
+      next: (c) => this.router.navigate([`${staffManagementPath(this.router.url)}/reason/details`, c._id], { replaceUrl: true }),
       error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }

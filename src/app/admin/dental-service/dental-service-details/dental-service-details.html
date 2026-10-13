@@ -4,6 +4,8 @@
   </app-page-header>
   @if (dentalService) {
     <app-list [data]="displayDentalService" />
+  } @else if (loadError) {
+    <p class="ui-notice" role="alert">{{ loadError }}</p>
   } @else {
     <p class="ui-card p-5 text-sm text-muted" role="status">Fetching details...</p>
   }
