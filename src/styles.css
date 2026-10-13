@@ -3,6 +3,13 @@
 @import "./styles/material.css";
 @import "./styles/themes.css";
 
+/* Reply links are created through innerHTML and have no component style attribute. */
+app-chatbot a.chat-link {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* Chart.js reads these tokens at runtime, so preserve them even without utility use. */
