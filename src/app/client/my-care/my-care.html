@@ -1,5 +1,6 @@
 <div class="ui-page max-w-6xl care-screen-only">
   <div class="care-screen-only"><app-page-header title="My care" eyebrow="Patient records" description="Your completed visit summaries, treatment plans and linked sessions."><a class="ui-button-secondary" routerLink="/app/my-appointment">My appointments</a><button class="ui-button-secondary" type="button" [disabled]="loading" (click)="load()">Refresh summaries</button></app-page-header></div>
+  <app-patient-selector [self]="self" [disabled]="loading" (patientChange)="selectPatient($event)" />
   @if (loading) { <p class="ui-muted care-screen-only" role="status">Loading your care history…</p> }@if (error) { <p class="ui-alert-error mb-6 care-screen-only" role="alert">{{ error }}</p> }
   @if (!loading && !error) {
     @for (group of groups; track group.clinic._id) { <section class="mb-8"><div class="care-screen-only mb-4"><h2 class="ui-section-title">{{ group.clinic.name }}</h2><p class="ui-muted text-sm">{{ group.clinic.address }}@if (group.clinic.mobileNumber) { · {{ group.clinic.mobileNumber }} }</p></div>

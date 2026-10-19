@@ -8,7 +8,7 @@ const date = (value: string) => formatReportDate(value.slice(0,10));
 export function createPatientRecordReport(snapshot: PatientRecordSnapshot): PatientRecordReport {
   const patient = snapshot.record.patient, name = personName(patient), scope = `${name}; ${snapshot.scopeLabel}`;
   const tables: DashboardReportTable[] = [{ title: 'Patient details', scope, headers: ['Field','Details'], columnWidths: [.28,.72], rows: [
-    ['Name',name], ['Account status',patient.status ?? 'Not recorded'], ['Email',patient.emailAddress || 'Not recorded'],
+    ['Name',name], ...(patient.isDependent ? [['Patient account','Managed by parent; no independent sign-in']] : []), ['Account status',patient.status ?? 'Not recorded'], ['Email',patient.emailAddress || 'Not recorded'],
     ['Mobile number',patient.mobileNumber || 'Not recorded'], ['Address',patient.address || 'Not recorded'],
     ['Birth date',patient.birthDate ? date(patient.birthDate) : 'Not recorded'], ['Age',String(patientAge(patient.birthDate, manilaDay(new Date(snapshot.generatedAt))) ?? 'Not recorded')],
     ['Sex',patient.sex || 'Not recorded'], ['Occupation',patient.occupation || 'Not recorded'], ['Religion',patient.religion || 'Not recorded'], ['Marital status',patient.maritalStatus || 'Not recorded'],

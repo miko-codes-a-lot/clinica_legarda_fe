@@ -1,3 +1,4 @@
+import { RouterLink } from '@angular/router';
 import { appointmentTableDate, appointmentTableFilters } from '../../../_shared/component/table/appointment-table-config';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
@@ -36,7 +37,7 @@ Chart.register(...registerables);
   selector: 'app-user-settings-index',
   templateUrl: './user-settings-index.html',
   styleUrl: './user-settings-index.css',
-  imports: [PageHeader, EmptyState, MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, Icon, MatSelectModule, CommonModule, MatDialogModule, GenericTableComponent]
+  imports: [RouterLink, PageHeader, EmptyState, MatCardModule, MatDividerModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, Icon, MatSelectModule, CommonModule, MatDialogModule, GenericTableComponent]
 })
 export class UserSettingsIndex implements OnInit {
   @ViewChild('avatarModal') avatarModal!: TemplateRef<any>;

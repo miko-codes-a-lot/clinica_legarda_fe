@@ -1,3 +1,5 @@
+import { PatientSelector } from '../dependents/patient-selector';
+import { PatientIdentity } from '../dependents/dependents-api.service';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
@@ -27,7 +29,7 @@ import { AlertService } from '../../_shared/service/alert.service';
 @Component({
   selector: 'app-my-appointment',
   standalone: true,
-  imports: [RouterLink, PageHeader, StatusBadge, EmptyState,
+  imports: [PatientSelector, RouterLink, PageHeader, StatusBadge, EmptyState,
     CommonModule,
     ReactiveFormsModule,
     Icon,
@@ -54,6 +56,10 @@ export class MyAppointment {
 
   ) {}
 
+  get self() { return this.authService.currentUserValue; }
+  selectedPatient = '';
+  selectPatient(patient: PatientIdentity) { if (this.isLoading) return; this.selectedPatient = patient._id; this.loadAppointments(); }
+  private loadVersion = 0;
   isLoading = false;
   upcomingAppointmentsData: Appointment[] = [];
   reasons: Reason[] = [];
@@ -67,12 +73,15 @@ export class MyAppointment {
   }
 
   loadAppointments() {
+    const version = ++this.loadVersion;
     this.isLoading = true;
+    this.upcomingAppointmentsData = [];
     this.authService.currentUser$.pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (user) => {
         if (user) {
-          this.appointmentService.getAll(user._id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+          this.appointmentService.getAll(this.selectedPatient || user._id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
             next: (data: Appointment[]) => {
+              if (version !== this.loadVersion) return;
               this.upcomingAppointmentsData = data.sort((a, b) => {
                 // Prioritize confirmed over pending
                 if (a.status === AppointmentStatus.CONFIRMED && b.status !== AppointmentStatus.CONFIRMED) return -1;
@@ -83,6 +92,7 @@ export class MyAppointment {
               this.isLoading = false;
             },
             error: (err) => {
+              if (version !== this.loadVersion) return;
               this.alertService.error('Could not load appointments. Please try again.');
               this.isLoading = false;
             }

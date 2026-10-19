@@ -9,6 +9,7 @@ export interface CarePerson extends PatientDemographics {
   username?: string;
   role?: string;
   status?: UserStatus;
+  isDependent?: boolean; guardian?: string; loginEnabled?: boolean; verificationSource?: 'email' | 'guardian';
   isWalkIn?: boolean;
   emailAddress?: string;
   mobileNumber?: string;
@@ -24,6 +25,7 @@ export interface CareAppointment {
   startTime: string;
   endTime: string;
   status: string;
+  isDependent?: boolean; guardian?: string; loginEnabled?: boolean; verificationSource?: 'email' | 'guardian';
   isWalkIn?: boolean;
   careCase?: string;
   services: { _id: string; name: string }[];

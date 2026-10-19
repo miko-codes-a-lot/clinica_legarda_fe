@@ -1,3 +1,5 @@
+import { ParentRelationship } from './parent-relationship';
+import { CarePerson } from '../care.models';
 import { patientAge } from '../../_shared/model/patient-demographics';
 import { CARE_APPOINTMENT_COLUMNS, CARE_APPOINTMENT_FILTERS, careAppointmentDate } from '../care-table-config';
 import { GenericTableComponent } from '../../_shared/component/table/generic-table.component';
@@ -15,7 +17,7 @@ import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
 import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
 
-@Component({ selector: 'app-patient-record', imports: [GenericTableComponent, TableCellDirective, ClinicDate, CommonModule, RouterLink, PageHeader, EmptyState, StatusBadge], templateUrl: './patient-record.html' })
+@Component({ selector: 'app-patient-record', imports: [ParentRelationship, GenericTableComponent, TableCellDirective, ClinicDate, CommonModule, RouterLink, PageHeader, EmptyState, StatusBadge], templateUrl: './patient-record.html' })
 export class PatientRecordPage implements OnInit {
   readonly appointmentColumns = CARE_APPOINTMENT_COLUMNS;
   readonly appointmentFilters = CARE_APPOINTMENT_FILTERS;
@@ -37,6 +39,7 @@ export class PatientRecordPage implements OnInit {
   exporting = false;
   exportError = '';
   private version = 0;
+  updateRelationship(patient: Partial<CarePerson>) { if (this.record) this.record = { ...this.record, patient: { ...this.record.patient, ...patient } }; }
   get canExport() { return !!this.record && !this.loading && !this.error && !this.exporting; }
 
   ngOnInit(): void {

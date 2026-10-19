@@ -23,7 +23,7 @@
         <div><dt class="ui-label">Joined</dt><dd class="mt-2 text-ink">{{ user.createdAt ? (user.createdAt | date:'mediumDate') : 'Not available' }}</dd></div>
         <div><dt class="ui-label">Last updated</dt><dd class="mt-2 text-ink">{{ user.updatedAt ? (user.updatedAt | date:'mediumDate') : 'Not available' }}</dd></div>
       </dl>
-      <div class="mt-7 flex flex-wrap gap-2 border-t border-stroke pt-5"><button type="button" class="ui-button" (click)="editUser()" [disabled]="isLoading">Edit details</button><button type="button" class="ui-button-secondary" (click)="logout()" [disabled]="isLoading">{{ isLoading ? 'Please wait…' : 'Sign out' }}</button></div>
+      <div class="mt-7 flex flex-wrap gap-2 border-t border-stroke pt-5"><a class="ui-button-secondary" routerLink="/app/user-settings/children">Manage children</a><button type="button" class="ui-button" (click)="editUser()" [disabled]="isLoading">Edit details</button><button type="button" class="ui-button-secondary" (click)="logout()" [disabled]="isLoading">{{ isLoading ? 'Please wait…' : 'Sign out' }}</button></div>
     </div>
     <div *ngIf="activeTab === 'history'" id="account-history" class="min-w-0 p-5 sm:p-7">
       <div class="ui-toolbar mb-5"><div><h2 class="ui-section-title">Appointment history</h2><p class="ui-muted mt-2 text-sm">Review your past visits and recorded appointment outcomes.</p></div></div>

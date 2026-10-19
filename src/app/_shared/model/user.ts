@@ -28,6 +28,10 @@ export interface User extends PatientDemographics {
   appointments: Appointment[]
   role: string
   status?: UserStatus
+  isDependent?: boolean
+  guardian?: string
+  loginEnabled?: boolean
+  verificationSource?: 'email' | 'guardian'
   isWalkIn?: boolean
 }
 

@@ -1,3 +1,5 @@
+import { PatientSelector } from '../dependents/patient-selector';
+import { PatientIdentity } from '../dependents/dependents-api.service';
 import { ClinicDate } from '../../care/clinic-date';
 import { AuthService } from '../../_shared/service/auth-service';
 import { CommonModule } from '@angular/common';
@@ -11,12 +13,15 @@ import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
 import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
 import { careError } from '../../care/care-api.service';
 import { ClinicCareGroup, MyCareRecord } from './my-care.models';
-@Component({ selector: 'app-my-care', imports: [ClinicDate, CommonModule, RouterLink, PageHeader, EmptyState, StatusBadge],
+@Component({ selector: 'app-my-care', imports: [PatientSelector, ClinicDate, CommonModule, RouterLink, PageHeader, EmptyState, StatusBadge],
   templateUrl: './my-care.html', styleUrl: './my-care.css', host: { '(window:afterprint)': 'resetPrintSelection()' } })
 export class MyCare implements OnInit {
   private readonly destroyRef = inject(DestroyRef); private readonly http = inject(HttpClient);
   private readonly changeDetector = inject(ChangeDetectorRef);
-  readonly patientName = [inject(AuthService).currentUserValue?.firstName, inject(AuthService).currentUserValue?.lastName].filter(Boolean).join(' ');
+  readonly self = inject(AuthService).currentUserValue;
+  selectedPatient = '';
+  patientName = [this.self?.firstName, this.self?.lastName].filter(Boolean).join(' ');
+  selectPatient(patient: PatientIdentity) { if (this.loading) return; this.selectedPatient = patient._id; this.patientName = [patient.firstName, patient.lastName].filter(Boolean).join(' '); this.printedVisit = ''; this.load(); }
   groups: ClinicCareGroup[] = []; loading = false; error = ''; printedVisit = '';
   get printGroups(): ClinicCareGroup[] {
     if (!this.printedVisit) return this.groups;
@@ -29,8 +34,8 @@ export class MyCare implements OnInit {
   }
   ngOnInit() { this.load(); }
   load() {
-    if (this.loading) return; this.loading = true; this.error = '';
-    this.http.get<MyCareRecord>('/care/my-record').pipe(finalize(() => this.loading = false), takeUntilDestroyed(this.destroyRef)).subscribe({ next: record => {
+    if (this.loading) return; this.loading = true; this.error = ''; this.groups = [];
+    this.http.get<MyCareRecord>('/care/my-record', { params: this.selectedPatient && this.selectedPatient !== this.self?._id ? { patient: this.selectedPatient } : {} }).pipe(finalize(() => this.loading = false), takeUntilDestroyed(this.destroyRef)).subscribe({ next: record => {
       const clinics = new Map([...record.visits.map(v => v.clinic), ...record.cases.map(c => c.clinic)].map(c => [c._id, c]));
       this.groups = [...clinics.values()].map(clinic => ({ clinic, visits: record.visits.filter(v => v.clinic._id === clinic._id),
         cases: record.cases.filter(c => c.clinic._id === clinic._id).map(c => ({ ...c, visits: record.visits.filter(v => v.careCase === c._id), sessions: record.appointments.filter(a => a.careCase === c._id) })) }));

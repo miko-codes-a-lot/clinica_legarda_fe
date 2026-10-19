@@ -1,3 +1,4 @@
+import { DependentsApiService } from '../../../client/dependents/dependents-api.service';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { UserStatus } from '../../../_shared/model/user';
@@ -27,6 +28,7 @@ for (const kind of ['staff', 'patient'] as const) {
     ];
     beforeEach(async () => {
       await TestBed.configureTestingModule({ imports: [AppointmentForm, AppointmentPage], providers: [
+        { provide: DependentsApiService, useValue: { list: () => of([]) } },
         { provide: UserService, useValue: { getDentists: () => of([dentist]) } },
         { provide: AppointmentService, useValue: { getAll: () => of([]) } },
         { provide: AuthService, useValue: { currentUserValue: dentist, currentUser$: of({ ...base.patient, status: UserStatus.CONFIRMED }) } },

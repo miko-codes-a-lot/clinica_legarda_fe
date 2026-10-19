@@ -3,6 +3,7 @@
   <app-page-header title="My appointments" eyebrow="Patient portal" description="View your visits, appointment activity, and scheduling options.">
     <a class="ui-button" routerLink="/app/appointment"><app-icon aria-hidden="true" name="add" /> Book a visit</a>
   </app-page-header>
+  <app-patient-selector [self]="self" [disabled]="isLoading" (patientChange)="selectPatient($event)" />
   @if (isLoading) { <p class="ui-muted mb-5 text-sm" role="status">Updating appointments…</p> }
   <div class="space-y-6" [attr.aria-busy]="isLoading">
     <section aria-labelledby="confirmed-title">
@@ -49,7 +50,7 @@
     <div class="p-5">
       @if (appointment.disruption) { <p class="ui-alert-error mb-4" role="status">{{ appointment.disruption.message }}</p> }
       <div class="grid gap-5 md:grid-cols-2">
-        <div><h3 class="ui-label mb-2">Services</h3><ul class="flex flex-wrap gap-2"><li *ngFor="let service of appointment.services" class="rounded-lg border border-stroke px-3 py-1.5 text-sm text-accent">{{ service.name }}</li></ul></div>
+        <div><h3 class="ui-label mb-2">Patient</h3><p class="mb-3">{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}@if (appointment.patient.isDependent) { · Managed by parent }</p><h3 class="ui-label mb-2">Services</h3><ul class="flex flex-wrap gap-2"><li *ngFor="let service of appointment.services" class="rounded-lg border border-stroke px-3 py-1.5 text-sm text-accent">{{ service.name }}</li></ul></div>
         <dl class="space-y-3 text-sm"><div><dt class="ui-label">Dentist</dt><dd class="mt-1 break-words text-ink">{{ appointment.dentist.firstName }} {{ appointment.dentist.lastName }}</dd></div><div><dt class="ui-label">Clinic</dt><dd class="mt-1 break-words text-ink">{{ appointment.clinic.name }}</dd><dd class="ui-muted mt-1 break-words">{{ appointment.clinic.address }}</dd></div></dl>
       </div>
       @if ((mode === 'confirmed' || mode === 'pending' || mode === 'finished') && appointment.notes.patientNotes) { <div class="mt-5 rounded-xl bg-canvas p-4 text-sm"><h3 class="ui-label mb-2">Patient notes</h3><p class="whitespace-pre-wrap break-words text-ink">{{ appointment.notes.patientNotes }}</p></div> }

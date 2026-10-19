@@ -1,3 +1,5 @@
+import { PatientSelector } from '../dependents/patient-selector';
+import { PatientIdentity } from '../dependents/dependents-api.service';
 import { reasonTextValidator } from '../../utils/forms/reason-validator';
 import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { isOnlineBookablePatient } from '../../_shared/model/user';
@@ -46,7 +48,7 @@ import { clinicToday } from '../../care/care.models';
 @Component({
   selector: 'app-appointment',
   standalone: true,
-  imports: [PageHeader, EmptyState,
+  imports: [PatientSelector, PageHeader, EmptyState,
     ReactiveFormsModule,
     BookingCalendar,
     FormComponent,
@@ -108,15 +110,16 @@ export class AppointmentPage {
 
   ngOnInit(): void {
     this.authService.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(user => {
+      const accountChanged = this.user?._id !== user?._id;
       this.user = user;
-      if (this.rxform) this.patient.setValue(user ? `${user.firstName} ${user.lastName}` : '');
+      if (this.rxform && (accountChanged || !this.patient.value)) this.patient.setValue(user?._id ?? '');
     });
     const clinicId = this.appointment?.clinic?._id || '';
     const dentistId = this.appointment?.dentist?._id || '';
     this.rxform = this.fb.nonNullable.group({
       clinic: [clinicId, Validators.required],
       dentist: [dentistId, Validators.required],
-      patient: [this.user ? `${this.user.firstName} ${this.user.lastName}` : '', Validators.required],
+      patient: [this.user?._id ?? '', Validators.required],
       services: this.fb.nonNullable.control(this.appointment?.services.map(service => service._id || '') || [] as string[], [Validators.required, Validators.maxLength(3), (control: AbstractControl<string[]>) => {
         const selected = control.value as string[];
         const available = servicesForClinic(this.dentalServices, this.rxform?.controls.clinic.value ?? clinicId);
@@ -298,7 +301,7 @@ Do you want to proceed?` },
     const selectDentalService = this.maptoOptions(servicesForClinic(this.dentalServices, this.clinic.value))
     this.appointmentFields = [
       { name: 'clinic', label: 'Clinic', type: 'select', options: selectClinic},
-      { name: 'patient', label: 'Patient', type: 'text', readonly: true},
+
       { name: 'services', label: 'Services', type: 'select', options: selectDentalService, multiple: true},
       // { name: 'patient', label: 'Patient', type: 'select', options: selectPatient},
     ];
@@ -393,7 +396,7 @@ Do you want to proceed?` },
     const appointment: AppointmentPayload = {
       clinic: this.clinic.value ?? '',
       dentist: this.dentist.value,
-      patient: this.user?._id || '',
+      patient: this.patient.value,
       services: this.services.value,
       date: this.date.value,
       startTime: this.time.value,
@@ -414,6 +417,7 @@ Do you want to proceed?` },
     }
     // WITH referral → create referral first
     const referral: ReferralPayload = {
+      patient: this.patient.value,
       fromDoctorId: this.fromDoctorId.value,
       fromClinicId: previousClinicId ?? '',
       reason: this.reason.value.trim(),
@@ -455,8 +459,14 @@ Do you want to proceed?` },
     });
   }
 
+  selectPatient(person: PatientIdentity) {
+    if (this.patient.value === person._id) return;
+    this.patient.setValue(person._id); this.rxform.controls.patientNotes.setValue('');
+    this.refreshPatientAppointments(); this.applyPreviousAppointment();
+  }
+
   private refreshPatientAppointments() {
-    const patientId = this.user?._id;
+    const patientId = this.patient.value;
     const now = new Date();
     this.patientAppointments = this.appointments.filter(appointment =>
       appointment.patient?._id === patientId && isPreviousTreatment(appointment, now),

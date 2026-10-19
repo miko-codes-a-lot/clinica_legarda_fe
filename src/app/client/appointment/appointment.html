@@ -7,6 +7,7 @@
   } @else {
     <section class="ui-card p-5 sm:p-7" aria-label="Appointment booking form">
       <div class="mb-5 border-b border-stroke pb-5"><h2 class="ui-section-title">Visit details</h2><p class="ui-muted mt-2 text-sm">Select up to three services per visit. Available dates and times depend on the selected dentist and total service duration.</p></div>
+      <app-patient-selector [self]="user" [disabled]="isLoading" (patientChange)="selectPatient($event)" />
       <app-form [framed]="false" submitLabel="Book appointment" busyLabel="Book appointment" [form]="rxform" [fields]="appointmentFields" [isLoading]="bookingUnavailable" (onSubmitEvent)="onSubmit()">
         @if (availabilityLoading) { <p class="ui-muted my-3 text-sm" role="status">Checking dentist availability…</p> }
         @if (availabilityError) { <p class="my-3 rounded-xl border border-danger-border bg-danger-soft p-4 text-sm text-danger" role="alert">{{ availabilityError }}</p> }

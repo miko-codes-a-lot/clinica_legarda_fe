@@ -21,6 +21,7 @@ describe('Patient appointment changes', () => {
     const appointments = TestBed.inject(AppointmentService);
     appointment = appointments.getEmptyNonNullDoc();
     appointment._id = 'a1';
+    appointment.date = new Date('2099-10-21'); appointment.startTime = '09:00';
     appointment.createdBy = 'p1';
     appointment.patient._id = 'p1';
     appointment.dentist._id = 'd1';

@@ -1,7 +1,7 @@
 <section class="ui-page max-w-5xl">
   <app-page-header title="User details" eyebrow="Management" description="Profile, clinic access, and working hours.">
     @if (user) {
-      <button type="button" class="ui-button" (click)="onUpdate()">Edit user</button>
+      @if (!user.isDependent) { <button type="button" class="ui-button" (click)="onUpdate()">Edit user</button> } @else { <p class="ui-muted">The linked parent can edit child details under Manage children.</p> }
       @if (user.role === 'dentist') {
         <app-dentist-approval [user]="user" (approved)="setUser($event)" />
       }

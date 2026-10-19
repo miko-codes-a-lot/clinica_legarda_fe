@@ -15,6 +15,7 @@ export const USER_SETTINGS_ROUTES: Routes = [
         path: 'index',
         loadComponent: () => import('./user-settings-index/user-settings-index').then(m => m.UserSettingsIndex)
       },
+      { path: 'children', loadComponent: () => import('../dependents/dependents').then(m => m.DependentsPage) },
       {
         path: 'update',
         loadComponent: () => import('./user-settings-update/user-settings-update').then(m => m.UserSettingsUpdate)

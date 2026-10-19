@@ -11,6 +11,10 @@ import { StatusBadge } from '../status-badge/status-badge';
         <h2 class="ui-section-title">Patient account access</h2>
         <app-status-badge [status]="user.status || 'pending'" />
       </div>
+      @if (user.isDependent) {
+        <p class="ui-muted">Managed through a parent account. This patient has no independent sign-in or child OTP verification.</p>
+        <p class="ui-muted mt-2">{{ user.guardian ? 'The current verified parent can book and view published care summaries for this child.' : 'No parent is currently linked. Staff can arrange in-person care and confirm a new parent relationship.' }}</p>
+      } @else {
       @if (user.status === 'walk_in') {
         <p class="ui-muted">Registered by staff for in-person care. Clinic staff can create appointments.</p>
       }
@@ -20,6 +24,7 @@ import { StatusBadge } from '../status-badge/status-badge';
         <p class="ui-muted">This patient account is confirmed and can book online after signing in.</p>
       } @else {
         <p class="ui-muted">This account cannot be used for new bookings. Review its status with the clinic.</p>
+      }
       }
       @if (user.isWalkIn) { <p class="ui-muted mt-2">Originally registered as a walk-in patient.</p> }
     </section>

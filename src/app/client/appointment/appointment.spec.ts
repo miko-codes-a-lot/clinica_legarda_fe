@@ -34,6 +34,7 @@ describe('Patient appointment booking form', () => {
     fixture.componentRef.setInput('dentalServices', [{ _id: 'service-1', name: 'Cleaning', duration: 30 }]);
     fixture.detectChanges();
     http.expectOne('/appointments').flush([]);
+    http.expectOne('/dependents').flush([]);
     http.expectNone('/reasons');
     fixture.detectChanges();
   });
@@ -45,6 +46,7 @@ describe('Patient appointment booking form', () => {
 
   it('enables Save after valid appointment choices without leaving date or time invalid', () => {
     const component = fixture.componentInstance;
+    component.selectPatient({ _id: 'child-1', firstName: 'Child', lastName: 'Patient' });
     const dentist = TestBed.inject(MockService).mockUserBase();
     component.clinic.setValue('clinic-1');
     http.expectOne('/users/dentists').flush([{ ...dentist, _id: 'dentist-1', clinic: 'clinic-1', role: 'dentist', status: 'confirmed' }]);
@@ -68,6 +70,8 @@ describe('Patient appointment booking form', () => {
     expect(component.time.valid).toBeTrue();
     const save: HTMLButtonElement = fixture.nativeElement.querySelector('app-form button');
     expect(save.disabled).toBeFalse();
+    const emitted = jasmine.createSpy('booking'); component.onSubmitEvent.subscribe(emitted); component.onSubmit();
+    expect(emitted).toHaveBeenCalledWith(jasmine.objectContaining({ patient: 'child-1' }));
     expect(fixture.nativeElement.querySelector('.mat-form-field-invalid')).toBeNull();
     component.services.setValue([]);
     expect(component.time.value).toBe('');

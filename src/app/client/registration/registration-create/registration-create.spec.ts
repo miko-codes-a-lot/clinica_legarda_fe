@@ -45,6 +45,7 @@ describe('Public patient registration', () => {
       firstName: 'Jamie', middleName: '', lastName: 'Flores', username: 'jamie.flores',
       emailAddress: 'jamie.flores@example.test', mobileNumber: '+639171113002',
       address: 'Manila', password: 'Password1!', role: 'user', status: 'pending', operatingHours: [],
+      birthDate: '', sex: '', occupation: '', religion: '', maritalStatus: '',
     });
     request.flush({ role: 'user', status: 'pending' });
     expect(navigate).toHaveBeenCalledWith(['/app/login']);
