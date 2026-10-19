@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { of, Subject, switchMap, startWith, throwError } from 'rxjs';
 import { StaffDashboard } from './staff-dashboard';
@@ -7,6 +8,7 @@ import { ClinicService } from '../service/clinic-service';
 import { NotificationService } from '../service/notification-service';
 import { AnalyticsReportState, ReportSelection } from '../model/analytics-report';
 import { analyticsFixture } from '../model/analytics-report.fixtures';
+import { GenericTableComponent } from '../component/table/generic-table.component';
 
 describe('Dashboard report selection and operational widgets', () => {
   const states = new Subject<AnalyticsReportState>();
@@ -49,5 +51,13 @@ describe('Dashboard report selection and operational widgets', () => {
     getQueue.and.returnValue(throwError(() => new Error('Queue offline')));
     const fixture = TestBed.createComponent(StaffDashboard); fixture.detectChanges(); ready(fixture);
     expect(fixture.componentInstance.queueError).not.toBe(''); expect(fixture.componentInstance.canExport).toBeTrue(); fixture.destroy();
+  });
+  it('does not keep resetting the table while the clinic lookup is pending', () => {
+    spyOn(TestBed.inject(ClinicService), 'getAccessible').and.returnValue(new Subject());
+    const fixture = TestBed.createComponent(StaffDashboard); fixture.detectChanges();
+    const table = fixture.debugElement.query(By.directive(GenericTableComponent)).componentInstance;
+    const changes = spyOn(table, 'ngOnChanges').and.callThrough();
+    fixture.detectChanges(); fixture.detectChanges();
+    expect(changes).not.toHaveBeenCalled(); fixture.destroy();
   });
 });

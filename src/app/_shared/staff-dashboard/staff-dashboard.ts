@@ -73,6 +73,7 @@ export class StaffDashboard {
   private readonly clinicSelection = new BehaviorSubject('all');
   private readonly reportSelection = new BehaviorSubject<ReportSelection>({ clinicId: 'all', query: this.query });
   operationalQueue: AnalyticsQueueEntry[] = [];
+  private readonly emptyQueue: AnalyticsQueueEntry[] = [];
   queueLoading = false; queueError = '';
   private viewReady = false;
   state: AnalyticsReportState = { status: 'loading', clinicId: 'all' };
@@ -119,7 +120,7 @@ export class StaffDashboard {
       ? this.state.report : undefined;
   }
   get query(): ReportQuery { return { period: this.period, anchor: this.anchor }; }
-  get appointmentQueue() { return this.clinicsLoaded && !this.hasNoAssignedClinics ? this.operationalQueue : []; }
+  get appointmentQueue() { return this.clinicsLoaded && !this.hasNoAssignedClinics ? this.operationalQueue : this.emptyQueue; }
   get periodLabel(): string { const period = this.report?.period; return period ? `${formatReportDate(period.start)} – ${formatReportDate(period.end)} (Manila)` : ''; }
   get todayLabel(): string { return formatReportDate(clinicToday()); }
   get periodTitle(): string { return this.period[0].toUpperCase() + this.period.slice(1); }
