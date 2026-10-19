@@ -11,7 +11,7 @@ import { UserSimple } from '../../_shared/model/user-simple';
 describe('Dentist availability review', () => {
   const day = new Date(2026, 10, 4);
   let api: jasmine.SpyObj<DentistAvailabilityApi>;
-  const user = { _id: 'dentist', role: 'dentist', operatingHours: [{ day: 'wednesday', startTime: '09:00', endTime: '17:00' }] } as UserSimple;
+  const user = { _id: 'dentist', role: 'dentist', clinics: ['clinic'], operatingHours: [{ day: 'wednesday', startTime: '09:00', endTime: '17:00' }] } as UserSimple;
   beforeEach(() => {
     api = jasmine.createSpyObj('AvailabilityApi', ['list', 'preview', 'save']);
     api.list.and.returnValue(of([])); api.preview.and.returnValue(of({ appointments: [], total: 0 }));
@@ -21,6 +21,21 @@ describe('Dentist availability review', () => {
       { provide: ClinicService, useValue: { getAccessible: () => of([{ _id: 'clinic', name: 'Clinic', operatingHours: user.operatingHours }]) } },
       { provide: AppointmentService, useValue: { getAllByDentist: () => of([]) } },
     ] });
+  });
+  it('selects only the dentist’s current assigned clinic even when the API returns other clinics first', () => {
+    TestBed.overrideProvider(AuthService, { useValue: { currentUser$: of({ ...user, clinics: ['other'] }) } });
+    TestBed.overrideProvider(ClinicService, { useValue: { getAccessible: () => of([{ _id: 'clinic', name: 'Unassigned clinic' }, { _id: 'other', name: 'Assigned clinic' }]) } });
+    const fixture = TestBed.createComponent(DentistAvailability); fixture.detectChanges();
+    expect(fixture.componentInstance.clinics.map(clinic => clinic._id)).toEqual(['other']);
+    expect(fixture.componentInstance.clinicId).toBe('other');
+    expect(api.list).toHaveBeenCalledWith('dentist', 'other', jasmine.any(String), jasmine.any(String));
+    fixture.destroy();
+  });
+  it('keeps the no-assignment state instead of requesting an unassigned clinic', () => {
+    TestBed.overrideProvider(AuthService, { useValue: { currentUser$: of({ ...user, clinics: [] }) } });
+    const fixture = TestBed.createComponent(DentistAvailability); fixture.detectChanges();
+    expect(fixture.componentInstance.clinics).toEqual([]); expect(fixture.componentInstance.clinicId).toBe('');
+    expect(api.list).not.toHaveBeenCalled(); fixture.destroy();
   });
   it('requires review, clears it on edits and sends the reviewed affected IDs', () => {
     const fixture = TestBed.createComponent(DentistAvailability); fixture.detectChanges();

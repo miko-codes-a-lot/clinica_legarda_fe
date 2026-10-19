@@ -1,3 +1,4 @@
+import { assignedClinicIds } from '../../_shared/model/user';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -30,12 +31,14 @@ export class DentistAvailability implements OnInit {
   private version = 0; private editVersion = 0;
   ngOnInit() {
     this.auth.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(user => {
-      this.user = user; this.version++; this.days = []; this.appointments = []; this.invalidate();
+      this.user = user; const version = ++this.version; this.days = []; this.appointments = []; this.clinics = []; this.clinicId = ''; this.loading = false; this.invalidate();
       if (!user) return;
       this.clinicsApi.getAccessible().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ next: clinics => {
-        if (this.user?._id !== user._id) return;
-        this.clinics = clinics; this.clinicId = clinics[0]?._id ?? ''; this.load();
-      }, error: error => this.error = careError(error) });
+        if (version !== this.version || this.user?._id !== user._id) return;
+        const assigned = assignedClinicIds(user);
+        this.clinics = clinics.filter(clinic => !!clinic._id && assigned.includes(clinic._id));
+        this.clinicId = this.clinics[0]?._id ?? ''; this.load();
+      }, error: error => { if (version === this.version) this.error = careError(error); } });
     });
   }
   load() {
