@@ -5,7 +5,8 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, map, Observable, of } from 'rxjs';
-import { AnalyticsReport, AnalyticsReportState } from '../_shared/model/analytics-report';
+import { AnalyticsReportState, ReportSelection } from '../_shared/model/analytics-report';
+import { analyticsFixture } from '../_shared/model/analytics-report.fixtures';
 import { Clinic } from '../_shared/model/clinic';
 import { UserSimple } from '../_shared/model/user-simple';
 import { AlertService } from '../_shared/service/alert.service';
@@ -28,18 +29,7 @@ import { UserUpdate } from './user/user-update/user-update';
 
 const appointment = dentistAppointment();
 const clinic = appointment.clinic;
-const report: AnalyticsReport = {
-  clinicId: 'all',
-  summary: {
-    weekOf: '2026-09-07', weekEnd: '2026-09-13', today: '2026-09-10',
-    totalAppointments: 0, appointmentsUpdated: 0, preferredServices: {}, declinedReferrals: {},
-  },
-  trend: {
-    weekOf: '2026-09-07', weekEnd: '2026-09-13', labels: [],
-    appointments: [], completed: [], serviceTrend: {},
-  },
-  queue: [],
-};
+const report = analyticsFixture({ period: 'week', anchor: '2026-09-07' });
 
 describe('Admin clinic access contract', () => {
   let http: HttpTestingController;
@@ -67,8 +57,9 @@ describe('Admin clinic access contract', () => {
         notifications$: of([]), getAllNotifications: () => of([]),
       } },
       { provide: AnalyticsService, useValue: {
-        watchReports: (clinics: Observable<string>) => clinics.pipe(map((clinicId): AnalyticsReportState => ({
-          status: 'ready', clinicId, report: { ...report, clinicId, summary: { ...report.summary, totalAppointments } },
+        getQueue: () => of([]),
+        watchReports: (selections: Observable<ReportSelection>) => selections.pipe(map(({clinicId,query}): AnalyticsReportState => ({
+          status: 'ready', clinicId, report: { ...analyticsFixture(query), clinicId, totalAppointments },
         }))),
       } },
     ] });
@@ -147,13 +138,13 @@ describe('Admin clinic access contract', () => {
   it('refreshes an all-assigned report after rechecking current clinic access', () => {
     const view = dashboard();
     respondWithClinics();
-    expect(view.report?.summary.totalAppointments).toBe(0);
+    expect(view.report?.totalAppointments).toBe(0);
     totalAppointments = 4;
     view.loadClinics();
     respondWithClinics([{ ...clinic, _id: 'clinic-2' }]);
 
     expect(view.selectedClinic).toBe('all');
-    expect(view.report?.summary.totalAppointments).toBe(4);
+    expect(view.report?.totalAppointments).toBe(4);
   });
 
   it('retains global reporting for a super admin through the authenticated clinic directory', () => {
@@ -169,9 +160,9 @@ describe('Admin clinic access contract', () => {
       respondWithClinics();
       view.state = { status: 'ready', clinicId: 'all', report: {
         ...report,
-        summary: { ...report.summary, totalAppointments: 3, preferredServices: { Cleaning: 3 },
-          declinedReferrals: { 'Service unavailable': 1 } },
+        totalAppointments: 3, preferredServices: { Cleaning: 3 },
       } };
+      view.anchor = report.period.anchor;
       const printed = document.implementation.createHTMLDocument();
       spyOn(window, 'open').and.returnValue({
         document: printed, opener: null, focus: () => undefined, print: () => undefined,
@@ -193,7 +184,7 @@ describe('Admin clinic access contract', () => {
     const view = dashboard('super-admin');
     respondWithClinics();
     view.state = { status: 'ready', clinicId: 'all', report: {
-      ...report, trend: { ...report.trend, labels: ['Monday'], serviceTrend: { Cleaning: [1] } },
+      ...report, period: { ...report.period, labels: ['Monday'] }, trend: { ...report.trend, serviceTrend: { Cleaning: [1] } },
     } };
     const canvas = () => new ElementRef(document.createElement('canvas'));
     view.servicesChartRef = canvas();

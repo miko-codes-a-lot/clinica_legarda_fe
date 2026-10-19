@@ -1,5 +1,5 @@
 <div class="ui-page">
-  <app-page-header [title]="title" eyebrow="Clinic operations" [description]="weekLabel">
+  <app-page-header [title]="title" eyebrow="Clinic operations" [description]="periodLabel">
     <button type="button" class="ui-button-secondary" (click)="printTables()" [disabled]="!canExport || isExporting">
       <app-icon aria-hidden="true" name="print" /> Print tables
     </button>
@@ -48,7 +48,7 @@
 
   <section class="ui-card mb-6 p-5" aria-label="Report clinic scope">
     <div class="ui-toolbar">
-      <div><h2 class="ui-section-title">Weekly overview</h2><p class="ui-muted mt-1 text-sm">{{ area === 'admin' ? 'Reports include only your currently assigned clinics.' : 'Appointment activity for the selected clinic scope.' }}</p></div>
+      <div><h2 class="ui-section-title">{{ periodTitle }} overview</h2><p class="ui-muted mt-1 text-sm">{{ area === 'admin' ? 'Reports include only your currently assigned clinics.' : 'Appointment activity for the selected clinic scope.' }}</p></div>
       <mat-form-field appearance="outline" class="w-full sm:w-72">
         <mat-label>Select clinic</mat-label>
         <mat-select [(value)]="selectedClinic" (selectionChange)="onClinicChange($event.value)" [disabled]="clinicsLoading || !!clinicError || hasNoAssignedClinics">
@@ -56,45 +56,61 @@
         </mat-select>
       </mat-form-field>
     </div>
+    <div class="mt-4 flex flex-wrap items-end gap-3">
+      <label class="text-sm">Period<select #periodChoice class="mt-1 block rounded-lg border border-stroke bg-white p-3" [value]="period" (change)="onPeriodChange(periodChoice.value)"><option value="week">Week</option><option value="month">Month</option><option value="year">Year</option></select></label>
+      <label class="text-sm">Date in period<input #anchorChoice type="date" class="mt-1 block rounded-lg border border-stroke bg-white p-3" [value]="anchor" min="2000-01-01" max="2100-12-31" (change)="onAnchorChange(anchorChoice.value)" /></label>
+      <button class="ui-button-secondary" type="button" (click)="movePeriod(-1)">Previous {{ period }}</button>
+      <button class="ui-button-secondary" type="button" (click)="currentPeriod()">Current {{ period }}</button>
+      <button class="ui-button-secondary" type="button" (click)="movePeriod(1)">Next {{ period }}</button>
+    </div>
     <p *ngIf="clinicsLoading" class="ui-muted mt-3 text-sm" role="status">Loading clinic choices…</p>
     <app-empty-state *ngIf="hasNoAssignedClinics" title="No assigned clinics" description="Ask a super admin to assign a clinic before accessing reports, users, and appointments." icon="domain" />
-    <p *ngIf="weeklyReport?.totalAppointments === 0" class="ui-muted mt-3 text-sm" role="status">No appointments scheduled for this clinic scope this week.</p>
+    <p *ngIf="report?.totalAppointments === 0" class="ui-muted mt-3 text-sm" role="status">No appointments scheduled for this clinic scope this period.</p>
   </section>
 
   <div class="mb-6 grid gap-4 sm:grid-cols-3">
     <section class="ui-card p-5">
       <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Total appointments</h2><app-icon class="text-accent" aria-hidden="true" name="event" /></div>
-      <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ weeklyReport?.totalAppointments ?? '—' }}</p>
-      <p class="ui-muted mt-2 text-xs">This report week</p>
+      <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ report?.totalAppointments ?? '—' }}</p>
+      <p class="ui-muted mt-2 text-xs">Selected report period</p>
     </section>
     <section class="ui-card p-5">
-      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Appointments updated</h2><app-icon class="text-accent" aria-hidden="true" name="assignment" /></div>
-      <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ weeklyReport?.appointmentsUpdated ?? '—' }}</p>
-      <p class="ui-muted mt-2 text-xs">This report week</p>
+      <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Patient records changed</h2><app-icon class="text-accent" aria-hidden="true" name="assignment" /></div>
+      <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ report?.patientRecordChanges?.patients ?? '—' }}</p>
+      <p class="ui-muted mt-2 text-xs">Selected report period</p>
     </section>
     <section class="ui-card p-5">
       <div class="flex items-center justify-between gap-3"><h2 class="text-sm font-medium text-muted">Today's queue</h2><app-icon class="text-accent" aria-hidden="true" name="schedule" /></div>
-      <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ report ? appointmentQueue.length : '—' }}</p>
+      <p class="mt-4 text-3xl font-semibold tracking-tight text-ink">{{ queueLoading ? '—' : appointmentQueue.length }}</p>
       <p class="ui-muted mt-2 text-xs">Confirmed appointments</p>
     </section>
   </div>
 
+  @if (report) {
+    <section class="ui-card mb-6 space-y-4 p-5" aria-label="Appointment outcomes and record audit">
+      <dl class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">@for (status of statusEntries; track status.label) { <div><dt class="text-sm text-muted">{{ status.label }}</dt><dd class="mt-1 text-xl font-semibold">{{ status.count }}</dd></div> }</dl>
+      <p class="text-sm">{{ report.uniquePatients }} unique patient(s) · Completed share: {{ report.completedShare | percent:'1.1-1' }} · No-show rate among resolved outcomes: {{ report.noShowRate | percent:'1.1-1' }}</p>
+      <p class="text-xs text-muted">{{ report.metricDefinitions.completedShare }} {{ report.metricDefinitions.noShowRate }}</p>
+      <p class="text-sm">Patient record changes: {{ report.patientRecordChanges.events }} event(s) affecting {{ report.patientRecordChanges.patients }} patient(s).</p>
+      <p class="text-xs text-muted">Audit coverage starts {{ report.patientRecordChanges.coverageFrom | date:'medium':'+0800' }} (Manila). {{ report.metricDefinitions.patientRecordChanges }}</p>
+    </section>
+  }
   <div class="mb-6 grid gap-5 xl:grid-cols-2" [hidden]="!report">
     <section class="ui-card min-w-0 p-5"><h2 class="ui-section-title mb-5">Preferred services distribution</h2>
       <div class="chart-container"><canvas #servicesChart aria-label="Preferred services distribution chart" role="img"></canvas></div>
-      <p *ngIf="(weeklyReport?.preferredServices | keyvalue)?.length === 0" class="ui-muted mt-3 text-sm">No services in this report week.</p>
+      <p *ngIf="(report?.preferredServices | keyvalue)?.length === 0" class="ui-muted mt-3 text-sm">No services in this report period.</p>
     </section>
-    <section class="ui-card min-w-0 p-5"><h2 class="ui-section-title mb-5">Weekly appointment trend</h2>
-      <div class="chart-container"><canvas #appointmentTrendChart aria-label="Weekly appointment trend chart" role="img"></canvas></div>
+    <section class="ui-card min-w-0 p-5"><h2 class="ui-section-title mb-5">Appointment trend</h2>
+      <div class="chart-container"><canvas #appointmentTrendChart aria-label="Appointment trend chart" role="img"></canvas></div>
     </section>
-    <section class="ui-card min-w-0 p-5 xl:col-span-2"><h2 class="ui-section-title mb-5">Service trend per day</h2>
-      <div class="chart-container"><canvas #serviceTrendChart aria-label="Service trend per day chart" role="img"></canvas></div>
+    <section class="ui-card min-w-0 p-5 xl:col-span-2"><h2 class="ui-section-title mb-5">Service trend</h2>
+      <div class="chart-container"><canvas #serviceTrendChart aria-label="Service trend chart" role="img"></canvas></div>
     </section>
   </div>
 
   <div class="grid gap-5 2xl:grid-cols-2">
     <section class="ui-card min-w-0 overflow-hidden">
-      <div class="border-b border-stroke p-5"><p class="ui-eyebrow mb-2">Clinic schedule</p><h2 class="ui-section-title">Today's appointment queue</h2><p class="ui-muted mt-1 text-sm">{{ todayLabel }}</p></div>
+      <div class="border-b border-stroke p-5"><p class="ui-eyebrow mb-2">Clinic schedule</p><h2 class="ui-section-title">Today's appointment queue</h2><p class="ui-muted mt-1 text-sm">{{ todayLabel }}</p><button type="button" class="ui-button-secondary mt-3" (click)="retryQueue()" [disabled]="queueLoading">Refresh today’s queue</button><p *ngIf="queueError" class="text-sm text-danger" role="alert">{{ queueError }}</p></div>
       <app-generic-table [embedded]="true" title="Today's appointment queue" [rows]="appointmentQueue" [columnDefs]="queueColumns" [displayedColumns]="displayedColumns"
         sortBy="time" sortDirection="asc" searchPlaceholder="Search patient, service or clinic"
         emptyTitle="No confirmed appointments today" emptyDescription="There are no appointments for this clinic scope today." />

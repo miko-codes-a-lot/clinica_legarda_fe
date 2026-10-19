@@ -1,8 +1,9 @@
-import { createDashboardPdf, DashboardReport } from './dashboard-report';
+import { analyticsFixture } from '../../../_shared/model/analytics-report.fixtures';
+import { createDashboardReport, renderDashboardReport, createDashboardPdf, DashboardReport } from './dashboard-report';
 
 function reportWithRows(rows: readonly (readonly string[])[]): DashboardReport {
   return {
-    clinic: 'Legarda Clinic', week: 'Sep 7, 2026 - Sep 13, 2026',
+    clinic: 'Legarda Clinic', period: 'Sep 7, 2026 - Sep 13, 2026',
     tables: [{
       title: 'Service Trend per Day', scope: 'Legarda Clinic; Sep 7, 2026 - Sep 13, 2026',
       headers: ['Date', 'Service', 'Appointments'], columnWidths: [0.3, 0.5, 0.2], rows,
@@ -32,4 +33,20 @@ describe('Dashboard table PDF', () => {
     expect(pdf.output()).toContain('Legarda Clinic');
     expect(pdf.output()).toContain('Sep 7, 2026 - Sep 13, 2026');
   });
+});
+
+
+describe('Filtered analytics table report', () => {
+  for (const period of ['week','month','year'] as const) {
+    it(`exports the selected ${period} snapshot without queue or notifications`, () => {
+      const snapshot=analyticsFixture({period,anchor:'2026-10-20'});snapshot.totalAppointments=4;snapshot.preferredServices={Cleaning:4};
+      const report=createDashboardReport({title:'Clinic Report',clinic:'Test clinic',report:snapshot});
+      const doc=document.implementation.createHTMLDocument();renderDashboardReport(doc,report);
+      expect(doc.body.textContent).toContain('Oct 20, 2026');
+      expect(doc.body.textContent).toContain('Total Appointments4');
+      expect(doc.body.textContent).toContain('Patient record');
+      expect(doc.body.textContent).not.toMatch(/Notifications|Queue|Appointments updated/);
+      expect(report.tables.find(table=>table.title==='Appointment Trend')?.rows).toHaveSize(snapshot.period.bucketKeys.length);
+    });
+  }
 });

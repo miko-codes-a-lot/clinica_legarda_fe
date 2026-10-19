@@ -2,86 +2,41 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
-import { AnalyticsReportState, AnalyticsSummary, AnalyticsTrend } from '../model/analytics-report';
+import { AnalyticsReportState, ReportSelection, shiftReportAnchor } from '../model/analytics-report';
+import { analyticsFixture } from '../model/analytics-report.fixtures';
 import { AnalyticsService } from './analytics-service';
 
-const summary: AnalyticsSummary = {
-  weekOf: '2026-09-07', weekEnd: '2026-09-13', today: '2026-09-08',
-  totalAppointments: 3, appointmentsUpdated: 2, preferredServices: { Cleaning: 3 }, declinedReferrals: { unavailable: 1 },
-};
-const trend: AnalyticsTrend = {
-  weekOf: summary.weekOf, weekEnd: summary.weekEnd,
-  labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-  appointments: [2, 1, 0, 0, 0, 0, 0], completed: [1, 0, 0, 0, 0, 0, 0], serviceTrend: { Cleaning: [2, 1, 0, 0, 0, 0, 0] },
-};
-
-describe('Analytics report scope loading', () => {
-  let service: AnalyticsService;
-  let http: HttpTestingController;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
-    service = TestBed.inject(AnalyticsService);
-    http = TestBed.inject(HttpTestingController);
-  });
+describe('Period-qualified report loading', () => {
+  let service: AnalyticsService, http: HttpTestingController;
+  const selection = (period: 'week'|'month'|'year' = 'week', clinicId = 'all'): ReportSelection => ({ clinicId, query: { period, anchor: '2026-10-20' } });
+  beforeEach(() => { TestBed.configureTestingModule({ providers:[provideHttpClient(),provideHttpClientTesting()] }); service=TestBed.inject(AnalyticsService);http=TestBed.inject(HttpTestingController); });
   afterEach(() => http.verify());
-
-  function finish(clinicId: string) {
-    http.expectOne(`/analytics/summary/${clinicId}`).flush(summary);
-    http.expectOne(`/analytics/trend/${clinicId}`).flush(trend);
-    http.expectOne(`/analytics/queue/${clinicId}`).flush([]);
-  }
-
-  it('publishes one consistent report only after all three scoped responses arrive', () => {
-    const states: AnalyticsReportState[] = [];
-    const subscription = service.watchReports(new BehaviorSubject('all')).subscribe(state => states.push(state));
-    expect(states).toEqual([{ status: 'loading', clinicId: 'all' }]);
-    http.expectOne('/analytics/summary/all').flush(summary);
-    http.expectOne('/analytics/trend/all').flush(trend);
-    expect(states.length).toBe(1);
-    const queue = Array.from({ length: 8 }, (_, index) => ({ appointmentId: String(index), time: '09:00', patientName: 'Patient', service: 'Cleaning, Checkup', clinicId: 'clinic-a', clinicName: 'Legarda' }));
-    http.expectOne('/analytics/queue/all').flush(queue);
-    expect(states[1]).toEqual({ status: 'ready', clinicId: 'all', report: { clinicId: 'all', summary, trend, queue } });
-    subscription.unsubscribe();
+  it('uses one snapshot request with the selected period and excludes operational data', () => {
+    let actual: unknown; service.getReport('clinic-a',{period:'month',anchor:'2026-10-20'}).subscribe(value=>actual=value);
+    const request=http.expectOne(r=>r.url==='/analytics/report/clinic-a');
+    expect(request.request.params.get('period')).toBe('month');expect(request.request.params.get('anchor')).toBe('2026-10-20');
+    const report={...analyticsFixture(selection('month').query),clinicId:'clinic-a'};request.flush(report);
+    expect(actual).toEqual(report); http.expectNone(r=>r.url.includes('/queue/'));
   });
-
-  it('cancels old clinic requests and clears ready values immediately on selection', () => {
-    const scopes = new BehaviorSubject('all');
-    const states: AnalyticsReportState[] = [];
-    const subscription = service.watchReports(scopes).subscribe(state => states.push(state));
-    finish('all');
-    scopes.next('clinic-a');
-    expect(states[states.length - 1]).toEqual({ status: 'loading', clinicId: 'clinic-a' });
-    const stale = http.match(request => request.url.endsWith('/clinic-a'));
-    scopes.next('clinic-b');
-    expect(stale.length).toBe(3);
-    expect(stale.every(request => request.cancelled)).toBeTrue();
-    finish('clinic-b');
-    expect(states.filter(state => state.status === 'ready').map(state => state.clinicId)).toEqual(['all', 'clinic-b']);
-    subscription.unsubscribe();
+  it('cancels old clinic and period requests and disables the previous snapshot immediately', () => {
+    const choices=new BehaviorSubject(selection()),states:AnalyticsReportState[]=[];
+    const sub=service.watchReports(choices).subscribe(state=>states.push(state));
+    const old=http.expectOne(r=>r.url==='/analytics/report/all');choices.next(selection('month'));
+    expect(old.cancelled).toBeTrue();const month=http.expectOne(r=>r.url==='/analytics/report/all');choices.next(selection('year','clinic-b'));
+    expect(month.cancelled).toBeTrue();expect(states.at(-1)?.status).toBe('loading');
+    http.expectOne(r=>r.url==='/analytics/report/clinic-b').flush({...analyticsFixture(selection('year').query),clinicId:'clinic-b'});
+    expect(states.filter(state=>state.status==='ready').map(state=>state.clinicId)).toEqual(['clinic-b']);sub.unsubscribe();
   });
-
-  it('marks a partial failure unavailable and allows retrying the same scope', () => {
-    const scopes = new BehaviorSubject('all');
-    const states: AnalyticsReportState[] = [];
-    const subscription = service.watchReports(scopes).subscribe(state => states.push(state));
-    const pending = http.match(request => request.url.endsWith('/all'));
-    pending[0].flush({}, { status: 503, statusText: 'Unavailable' });
-    expect(states[1]).toEqual({ status: 'error', clinicId: 'all' });
-    expect(pending.slice(1).every(request => request.cancelled)).toBeTrue();
-    scopes.next('all');
-    finish('all');
-    expect(states[states.length - 1].status).toBe('ready');
-    subscription.unsubscribe();
+  it('rejects a mismatched snapshot and allows retrying the same selection', () => {
+    const choices=new BehaviorSubject(selection('month')),states:AnalyticsReportState[]=[];
+    const sub=service.watchReports(choices).subscribe(state=>states.push(state));
+    http.expectOne(r=>r.url==='/analytics/report/all').flush(analyticsFixture());expect(states.at(-1)?.status).toBe('error');
+    choices.next(selection('month'));http.expectOne(r=>r.url==='/analytics/report/all').flush(analyticsFixture(selection('month').query));
+    expect(states.at(-1)?.status).toBe('ready');sub.unsubscribe();
   });
-
-  it('rejects different report weeks if requests cross the Manila week boundary', () => {
-    const states: AnalyticsReportState[] = [];
-    const subscription = service.watchReports(new BehaviorSubject('all')).subscribe(state => states.push(state));
-    http.expectOne('/analytics/summary/all').flush(summary);
-    http.expectOne('/analytics/trend/all').flush({ ...trend, weekOf: '2026-09-14', weekEnd: '2026-09-20' });
-    http.expectOne('/analytics/queue/all').flush([]);
-    expect(states[1]).toEqual({ status: 'error', clinicId: 'all' });
-    subscription.unsubscribe();
+  it('moves by week, calendar month and year without rolling over long or leap-day dates', () => {
+    expect(shiftReportAnchor({period:'week',anchor:'2026-12-31'},1)).toBe('2027-01-07');
+    expect(shiftReportAnchor({period:'month',anchor:'2026-03-31'},-1)).toBe('2026-02-01');
+    expect(shiftReportAnchor({period:'year',anchor:'2028-02-29'},-1)).toBe('2027-01-01');
   });
 });

@@ -20,10 +20,11 @@ import { MatOptionModule } from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
-import { BehaviorSubject, map, Observable, shareReplay, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AnalyticsService } from '../service/analytics-service';
-import { AnalyticsReportState, AnalyticsQueueEntry, formatReportDate } from '../model/analytics-report';
+import { AnalyticsReportState, AnalyticsQueueEntry, formatReportDate, ReportPeriodKind, ReportQuery, ReportSelection, shiftReportAnchor } from '../model/analytics-report';
+import { clinicToday } from '../../care/care.models';
 import { NotificationService } from '../service/notification-service';
 import { ClinicService } from '../service/clinic-service';
 import { Notification, NotificationType } from '../model/notification';
@@ -67,7 +68,12 @@ export class StaffDashboard {
   private readonly document = inject(DOCUMENT);
   private readonly themeService = inject(ThemeService);
   private chartTheme = readChartTheme(this.document);
+  period: ReportPeriodKind = 'week';
+  anchor = clinicToday();
   private readonly clinicSelection = new BehaviorSubject('all');
+  private readonly reportSelection = new BehaviorSubject<ReportSelection>({ clinicId: 'all', query: this.query });
+  operationalQueue: AnalyticsQueueEntry[] = [];
+  queueLoading = false; queueError = '';
   private viewReady = false;
   state: AnalyticsReportState = { status: 'loading', clinicId: 'all' };
   clinics: Pick<Clinic, '_id' | 'name'>[] = [];
@@ -78,7 +84,7 @@ export class StaffDashboard {
   reportError = '';
   clinicError = '';
   notificationError = '';
-  private reportNotifications: Notification[] = [];
+  private latestNotifications: Notification[] = [];
 
   servicesChart!: Chart<'doughnut', number[], string>;
   appointmentTrendChart!: Chart<'line', number[], string>;
@@ -112,14 +118,17 @@ export class StaffDashboard {
     return this.clinicsLoaded && !this.hasNoAssignedClinics && this.state.status === 'ready'
       ? this.state.report : undefined;
   }
-  get weeklyReport() { return this.report?.summary; }
-  private readonly emptyQueue: AnalyticsQueueEntry[] = [];
-  get appointmentQueue() { return this.report?.queue ?? this.emptyQueue; }
-  get weekLabel(): string {
-    const summary = this.weeklyReport;
-    return summary ? `${formatReportDate(summary.weekOf)} – ${formatReportDate(summary.weekEnd)} (Manila)` : '';
-  }
-  get todayLabel(): string { return this.weeklyReport ? formatReportDate(this.weeklyReport.today) : ''; }
+  get query(): ReportQuery { return { period: this.period, anchor: this.anchor }; }
+  get appointmentQueue() { return this.clinicsLoaded && !this.hasNoAssignedClinics ? this.operationalQueue : []; }
+  get periodLabel(): string { const period = this.report?.period; return period ? `${formatReportDate(period.start)} – ${formatReportDate(period.end)} (Manila)` : ''; }
+  get todayLabel(): string { return formatReportDate(clinicToday()); }
+  get periodTitle(): string { return this.period[0].toUpperCase() + this.period.slice(1); }
+  get statusEntries() { return Object.entries(this.report?.statuses ?? {}).map(([status,count]) => ({ label: status === 'no_show' ? 'No-show' : status[0].toUpperCase() + status.slice(1), count })); }
+  private emitReport() { this.reportSelection.next({ clinicId: this.selectedClinic, query: this.query }); }
+  onPeriodChange(value: string) { if (!['week','month','year'].includes(value)) return; this.period = value as ReportPeriodKind; this.emitReport(); }
+  onAnchorChange(value: string) { if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value < '2000-01-01' || value > '2100-12-31') return; this.anchor = value; this.emitReport(); }
+  movePeriod(offset: number) { this.onAnchorChange(shiftReportAnchor(this.query, offset)); }
+  currentPeriod() { this.anchor = clinicToday(); this.emitReport(); }
 
   ngOnInit(): void {
     this.themeService.themeChanges$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
@@ -127,18 +136,22 @@ export class StaffDashboard {
       this.refreshChartTheme();
     });
     this.loadClinics();
-    this.analyticsService.watchReports(this.clinicSelection).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(state => {
+    this.analyticsService.watchReports(this.reportSelection).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(state => {
       this.state = state;
       this.reportError = state.status === 'error' ? 'Report unavailable. Please retry.' : '';
       this.updateCharts();
     });
+    this.clinicSelection.pipe(switchMap(clinic => {
+      this.queueLoading = true; this.operationalQueue = []; this.queueError = '';
+      return this.analyticsService.getQueue(clinic).pipe(catchError(() => { this.queueError = 'Today’s queue could not be loaded.'; return of([]); }), finalize(() => this.queueLoading = false));
+    }), takeUntilDestroyed(this.destroyRef)).subscribe(rows => this.operationalQueue = rows);
     this.notifications$ = this.notificationService.notifications$.pipe(
       map(items => [...items].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 10)),
-      tap(items => this.reportNotifications = items),
+      tap(items => this.latestNotifications = items),
       shareReplay({ bufferSize: 1, refCount: true }),
     );
     this.unreadNotificationsCount$ = this.notificationService.notifications$.pipe(map(items => items.filter(item => !item.read).length));
-    // Keep export notifications current independently of the dropdown's visibility.
+    // Keep read actions current while the notification dropdown is closed.
     this.notifications$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
     this.notificationService.getAllNotifications().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       error: () => this.notificationError = `${this.notificationScope} could not be refreshed.`,
@@ -163,6 +176,7 @@ export class StaffDashboard {
           this.selectedClinic = 'all';
         }
         this.clinicSelection.next(this.selectedClinic);
+        this.emitReport();
       },
       error: () => this.clinicError = 'Clinic choices could not be loaded. Retry to check your current clinic access.',
     }).add(() => this.clinicsLoading = false);
@@ -171,9 +185,11 @@ export class StaffDashboard {
   onClinicChange(clinicId: string): void {
     this.selectedClinic = clinicId;
     this.clinicSelection.next(clinicId);
+    this.emitReport();
   }
 
-  retryReport(): void { this.clinicSelection.next(this.selectedClinic); }
+  retryReport(): void { this.emitReport(); }
+  retryQueue(): void { this.clinicSelection.next(this.selectedClinic); }
 
   private updateCharts(): void {
     if (!this.viewReady) return;
@@ -206,8 +222,8 @@ export class StaffDashboard {
 
   // ----------------- SERVICES CHART -----------------
   private createOrUpdateServicesChart(): void {
-    const services = Object.keys((this.weeklyReport?.preferredServices ?? {}));
-    const counts = Object.values((this.weeklyReport?.preferredServices ?? {}));
+    const services = Object.keys((this.report?.preferredServices ?? {}));
+    const counts = Object.values((this.report?.preferredServices ?? {}));
 
     if (this.servicesChart) {
       this.servicesChart.data.labels = services;
@@ -249,22 +265,24 @@ export class StaffDashboard {
     this.servicesChart = new Chart(this.servicesChartRef.nativeElement, config);
   }
 
-  // ----------------- WEEKLY APPOINTMENT TREND -----------------
-  private getWeeklyTrendData(): { labels: string[], scheduled: number[], completed: number[] } {
+  // ----------------- APPOINTMENT TREND -----------------
+  private getPeriodTrendData(): { labels: string[], scheduled: number[], completed: number[], noShow: number[] } {
     return {
-      labels: this.report?.trend.labels ?? [],
+      labels: this.report?.period.labels ?? [],
       scheduled: this.report?.trend.appointments ?? [],
       completed: this.report?.trend.completed ?? [],
+      noShow: this.report?.trend.noShow ?? [],
     };
   }
 
   private createAppointmentTrendChart(): void {
-    const trendData = this.getWeeklyTrendData();
+    const trendData = this.getPeriodTrendData();
 
     if (this.appointmentTrendChart) {
       this.appointmentTrendChart.data.labels = trendData.labels;
       this.appointmentTrendChart.data.datasets[0].data = trendData.scheduled;
       this.appointmentTrendChart.data.datasets[1].data = trendData.completed;
+      this.appointmentTrendChart.data.datasets[2].data = trendData.noShow;
       return;
     }
 
@@ -288,7 +306,8 @@ export class StaffDashboard {
             backgroundColor: this.chartTheme.fills[1],
             tension: 0.4,
             fill: true
-          }
+          },
+          { label: 'No-show', data: trendData.noShow, borderColor: this.chartTheme.colors[2], backgroundColor: this.chartTheme.fills[2], tension: .2, fill: false }
         ]
       },
       options: {
@@ -307,7 +326,7 @@ export class StaffDashboard {
   formatNotificationType = notificationTypeLabel;
 
   markAsRead(notificationId: string): void {
-    if (this.pendingReads.has(notificationId) || this.reportNotifications.find(item => item._id === notificationId)?.read) return;
+    if (this.pendingReads.has(notificationId) || this.latestNotifications.find(item => item._id === notificationId)?.read) return;
     this.pendingReads.add(notificationId);
     this.notificationService.markAsRead(notificationId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       error: () => this.notificationError = 'This notification could not be marked as read. Please try again.',
@@ -374,7 +393,7 @@ export class StaffDashboard {
   private getServiceTrendData(): { labels: string[], datasets: { label: string, data: number[], backgroundColor: string }[] } {
     const colors = this.chartTheme.colors;
     return {
-      labels: this.report?.trend.labels ?? [],
+      labels: this.report?.period.labels ?? [],
       datasets: Object.entries(this.report?.trend.serviceTrend ?? {}).map(([label, data], index) => ({
         label, data, backgroundColor: colors[index % colors.length],
       })),
@@ -383,39 +402,15 @@ export class StaffDashboard {
 
   get canExport(): boolean {
     return this.clinicsLoaded && !this.clinicsLoading && !this.clinicError && !this.hasNoAssignedClinics
-      && this.state.status === 'ready' && this.state.clinicId === this.selectedClinic;
+      && this.state.status === 'ready' && this.state.clinicId === this.selectedClinic
+      && this.state.report.period.kind === this.period && this.state.report.period.anchor === this.anchor;
   }
 
   private dashboardReport(): DashboardReport {
     const report = this.report;
     if (!report || report.clinicId !== this.selectedClinic) throw new Error('Report unavailable');
-    return createDashboardReport({
-      title: `${this.title} Report`,
-      clinic: this.clinics.find(clinic => clinic._id === report.clinicId)?.name ?? report.clinicId,
-      weekOf: report.summary.weekOf,
-      weekEnd: report.summary.weekEnd,
-      today: report.summary.today,
-      services: { labels: Object.keys(report.summary.preferredServices), datasets: [{ data: Object.values(report.summary.preferredServices) }] },
-      appointments: { labels: report.trend.labels, datasets: [{ data: report.trend.appointments }, { data: report.trend.completed }] },
-      serviceTrend: { labels: report.trend.labels, datasets: Object.entries(report.trend.serviceTrend).map(([label, data]) => ({ label, data })) },
-      metrics: {
-        totalAppointments: report.summary.totalAppointments,
-        appointmentsUpdated: report.summary.appointmentsUpdated,
-        queueCount: report.queue.length,
-      },
-      queue: report.queue.map(appointment => ({
-        time: appointment.time,
-        patient: appointment.patientName,
-        services: appointment.service,
-        clinic: appointment.clinicName,
-      })),
-      notifications: this.reportNotifications.map(notification => ({
-        type: this.formatNotificationType(notification.type),
-        message: notification.message,
-        timestamp: this.formatTimestamp(notification.createdAt),
-        status: notification.read ? 'Read' : 'Unread',
-      })),
-    });
+    return createDashboardReport({ title: `${this.title} Report`,
+      clinic: this.clinics.find(clinic => clinic._id === report.clinicId)?.name ?? report.clinicId, report });
   }
 
   printTables(): void {
