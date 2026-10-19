@@ -21,6 +21,19 @@ const day = new Date(2026, 8, 21);
 const now = new Date('2026-09-14T00:00:00Z');
 
 describe('booking availability', () => {
+  it('uses dated intervals for breaks, absences and openings while retaining clinic limits', () => {
+    const schedule = createBookingSchedule(dentist, { ...clinic, operatingHours: [{ day: 'monday', startTime: '09:00', endTime: '17:00' }] }, [], undefined, [], [
+      { date: '2026-09-21', intervals: [{ startTime: '09:00', endTime: '12:00' }, { startTime: '13:00', endTime: '16:00' }] },
+    ]);
+    const slots = bookingSlots(schedule, day, 90, 30, now);
+    expect(slots.find(slot => slot.value === '11:00')?.available).toBeFalse();
+    expect(slots.find(slot => slot.value === '12:00')?.reason).toBe('Dentist unavailable');
+    expect(slots.find(slot => slot.value === '13:00')?.available).toBeTrue();
+    const absent = createBookingSchedule(dentist, clinic, [], undefined, [], [{ date: '2026-09-21', intervals: [] }]);
+    expect(bookingSlots(absent, day, 30, 30, now).some(slot => slot.available)).toBeFalse();
+    const shortOpening = createBookingSchedule(dentist, clinic, [], undefined, [], [{ date: '2026-09-21', intervals: [{ startTime: '09:00', endTime: '10:00' }] }]);
+    expect(bookingSlots(shortOpening, day, 90, 30, now).some(slot => slot.available)).toBeFalse();
+  });
   it('offers appointment-only Sunday using the dentist hours and still blocks closures and unavailable dentists', () => {
     const sunday = new Date(2026, 9, 18);
     const place = { ...clinic, operatingHours: [], appointmentOnlyDays: ['sunday'] };

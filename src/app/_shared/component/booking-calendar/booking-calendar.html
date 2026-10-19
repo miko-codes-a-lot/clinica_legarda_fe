@@ -1,0 +1,24 @@
+<div class="booking-calendar">
+  <div class="calendar-panel">
+    <h3 class="font-semibold">Appointment day</h3>
+    <mat-calendar [selected]="date" (selectedChange)="selectDate($event)" [minDate]="minDate" [maxDate]="maxDate" [dateClass]="dateClass" />
+    <p class="text-sm text-gray-600">Choose a date to view its times. Outlined dates have available times for your selected services.</p>
+  </div>
+  <section class="slot-panel" aria-label="Appointment times">
+    <h3 class="font-semibold">{{ date ? (date | date:'EEEE, MMMM d') : 'Select an appointment day' }}</h3>
+    <p class="mt-2 text-sm text-gray-600">Duration: {{ duration }} minutes · Philippine time</p>
+    @if (date) {
+      @if (!availableCount) { <p class="my-4 rounded-lg bg-amber-50 p-3 text-amber-900" role="status">No available times for these services on this day. Please choose another date.</p> }
+      @else { <p class="my-3 text-sm" role="status">{{ availableCount }} available time(s)</p> }
+      <div class="slots">
+        @for (slot of slots; track slot.value) {
+          <button type="button" class="slot" [class.selected]="slot.value === time && slot.available" [disabled]="disabled || !slot.available" [attr.aria-pressed]="slot.value === time && slot.available" (click)="selectTime(slot)">
+            <span class="font-semibold">{{ timeLabel(slot.value) }}</span>
+            <span class="text-xs">{{ slot.available ? 'Available' : slot.reason || 'Unavailable' }}</span>
+          </button>
+        }
+      </div>
+      @if (time && slots.length) { <p class="mt-4 text-sm font-semibold" aria-live="polite">Selected: {{ timeLabel(time) }}–{{ selectedEnd }}</p> }
+    }
+  </section>
+</div>

@@ -16,8 +16,7 @@ import { RxAppointmentForm } from './rx-appointment-form';
 import { RxReferralForm } from './rx-referral-form';
 import { DentalService, servicesForClinic } from '../../_shared/model/dental-service';
 import { Clinic } from '../../_shared/model/clinic';
-import { DatePicker } from '../../_shared/component/date-picker/date-picker';
-import { TimePicker } from '../../_shared/component/time-picker/time-picker';
+import { BookingCalendar } from '../../_shared/component/booking-calendar/booking-calendar';
 import { TimeUtil } from '../../utils/time-util';
 import { AuthService } from '../../_shared/service/auth-service';
 import { FormComponent } from '../../_shared/component/form/form.component';
@@ -41,6 +40,7 @@ import { ReasonService } from '../../_shared/service/reason-service';
 import { CommonModule } from '@angular/common';
 
 import { AlertService } from '../../_shared/service/alert.service';
+import { clinicToday } from '../../care/care.models';
 
 
 @Component({
@@ -48,8 +48,7 @@ import { AlertService } from '../../_shared/service/alert.service';
   standalone: true,
   imports: [PageHeader, EmptyState,
     ReactiveFormsModule,
-    TimePicker,
-    DatePicker,
+    BookingCalendar,
     FormComponent,
     RouterLink,
     MatSelectModule,
@@ -84,11 +83,11 @@ export class AppointmentPage {
   users: DentistDirectoryEntry[] = []
   selectReferringDentist: { value: string; label: string }[] = []
 
-  minDate = new Date();
+  minDate = new Date(`${clinicToday()}T00:00:00`);
 
   // appointment limit to 3 months
   maxDate = new Date(
-    new Date().setMonth(new Date().getMonth() + 3)
+    new Date(this.minDate).setMonth(this.minDate.getMonth() + 3)
   );
 
   patientAppointments: Appointment[] = [];
@@ -238,6 +237,8 @@ export class AppointmentPage {
       this.bookingSchedule, this.date.value, this.serviceDuration(),
     ).some(slot => slot.value === this.time.value && slot.available);
   }
+
+  reloadAvailability() { this.time.setValue(''); this.setDentist(this.dentist.value); }
 
   get bookingUnavailable(): boolean {
     return !this.accountVerified || this.isLoading || this.availabilityLoading || this.confirmingClinic || this.savingReferral || !this.bookingSchedule ||

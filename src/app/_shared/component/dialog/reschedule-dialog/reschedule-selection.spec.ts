@@ -2,9 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { TestKey } from '@angular/cdk/testing';
-import { MatDatepickerInputHarness, MatDatepickerToggleHarness } from '@angular/material/datepicker/testing';
-import { MatSelectHarness } from '@angular/material/select/testing';
+import { MatCalendarHarness } from '@angular/material/datepicker/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Component } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
@@ -43,8 +41,9 @@ describe('Rescheduling date and time selection', () => {
     http = TestBed.inject(HttpTestingController);
     http.expectOne(request => request.url.endsWith('/appointments/availability/dentist-1')).flush([]);
     http.expectOne(request => request.url.endsWith('/clinic-closures/availability') && request.params.get('clinic') === 'clinic-1').flush([]);
+    http.expectOne(request => request.url.endsWith('/dentist-availability/dentist-1/public')).flush([]);
     fixture.detectChanges();
-    return TestbedHarnessEnvironment.documentRootLoader(fixture);
+    return { fixture, loader: TestbedHarnessEnvironment.documentRootLoader(fixture) };
   }
 
   afterEach(() => {
@@ -52,47 +51,35 @@ describe('Rescheduling date and time selection', () => {
     http?.verify();
   });
 
-  it('opens the calendar from the date field and lets the dentist select and save a new schedule', async () => {
-    const loader = await openDialog();
-    const dateInput = await loader.getHarness(MatDatepickerInputHarness);
-    await (await dateInput.host()).click();
-    expect(await dateInput.isCalendarOpen()).toBeTrue();
-    const calendar = await dateInput.getCalendar();
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
+  it('selects a new schedule using the inline calendar and labelled time buttons', async () => {
+    const { fixture, loader } = await openDialog();
+    const calendar = await loader.getHarness(MatCalendarHarness);
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
     if (tomorrow.getMonth() !== new Date().getMonth()) await calendar.next();
     await calendar.selectCell({ text: String(tomorrow.getDate()) });
-
-    const time = await loader.getHarness(MatSelectHarness);
-    await time.open();
-    await time.clickOptions({ text: '9:00 AM' });
+    fixture.detectChanges();
+    const time = Array.from(document.querySelectorAll<HTMLButtonElement>('app-booking-calendar button.slot'))
+      .find(button => button.textContent?.includes('9:00 AM'));
+    expect(time?.disabled).toBeFalse(); time?.click();
     expect(dialog.componentInstance.form.controls.time.value).toBe('09:00');
     dialog.componentInstance.form.controls.reason.setValue('Schedule conflict');
-    const saved = firstValueFrom(dialog.afterClosed());
-    dialog.componentInstance.onSave();
-
+    const saved = firstValueFrom(dialog.afterClosed()); dialog.componentInstance.onSave();
     const day = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
     expect(await saved).toEqual({ date: day, startTime: '09:00', endTime: '10:30', reason: 'Schedule conflict' });
   });
 
-  it('makes the time field unavailable until an appointment day is selected', async () => {
-    const loader = await openDialog();
-    const time = await loader.getHarness(MatSelectHarness);
-    expect(await time.isDisabled()).toBeTrue();
+  it('shows no time buttons until an appointment day is selected', async () => {
+    await openDialog();
+    expect(document.querySelectorAll('app-booking-calendar button.slot').length).toBe(0);
+    expect(document.querySelector('app-booking-calendar')?.textContent).toContain('Select an appointment day');
   });
 
-  it('can still open the calendar using its existing toggle', async () => {
-    const loader = await openDialog();
-    const toggle = await loader.getHarness(MatDatepickerToggleHarness);
-    await toggle.openCalendar();
-    expect(await toggle.isCalendarOpen()).toBeTrue();
-  });
-
-  it('opens the calendar with Enter while the date field has focus', async () => {
-    const loader = await openDialog();
-    const dateInput = await loader.getHarness(MatDatepickerInputHarness);
-    await dateInput.focus();
-    await (await dateInput.host()).sendKeys(TestKey.ENTER);
-    expect(await dateInput.isCalendarOpen()).toBeTrue();
+  it('supports calendar month navigation without closing the dialog', async () => {
+    const { loader } = await openDialog(); const calendar = await loader.getHarness(MatCalendarHarness);
+    const previous = await calendar.getCurrentViewLabel();
+    await calendar.next();
+    expect(await calendar.getCurrentViewLabel()).not.toBe(previous);
+    expect(dialog.componentInstance.form.controls.date.value).toBeNull();
+    expect(document.querySelector('app-booking-calendar')).not.toBeNull();
   });
 });

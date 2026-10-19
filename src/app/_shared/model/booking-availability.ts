@@ -4,6 +4,7 @@ import { Clinic } from './clinic';
 import { OperatingHour } from './operating-hour';
 import { assignedClinicIds } from './user';
 import { DentistDirectoryEntry } from './user-directory';
+import type { PublicDentistDay } from '../service/dentist-availability-api';
 
 /** The availability endpoint intentionally excludes patient and clinical details. */
 export interface AppointmentAvailability {
@@ -18,11 +19,14 @@ export interface DentistBookingSchedule {
   operatingHours: readonly OperatingHour[];
   appointments: readonly AppointmentAvailability[];
   closures?: readonly ClosureInterval[];
+  datedAvailability?: readonly PublicDentistDay[];
+  clinicOperatingHours?: readonly OperatingHour[];
+  appointmentOnlyDays?: readonly string[];
   appointmentBufferMinutes?: number;
   maxWorkingMinutesPerDay?: number;
 }
 
-export interface BookingSlot { value: string; available: boolean; }
+export interface BookingSlot { value: string; available: boolean; reason?: 'Booked' | 'Dentist unavailable' | 'Clinic closed' | 'Unavailable'; }
 
 export function isBookableDentist(dentist: DentistDirectoryEntry, clinicId: string): boolean {
   return dentist.role === 'dentist' && dentist.status === 'confirmed' && assignedClinicIds(dentist).includes(clinicId);
@@ -59,6 +63,7 @@ export function createBookingSchedule(
   appointments: readonly AppointmentAvailability[],
   excludeAppointmentId?: string,
   closures: readonly ClosureInterval[] = [],
+  datedAvailability: readonly PublicDentistDay[] = [],
 ): DentistBookingSchedule {
   const operatingHours = dentist.operatingHours.flatMap(hours => {
     if (clinic.appointmentOnlyDays?.includes(hours.day)) return [{ ...hours }];
@@ -71,6 +76,9 @@ export function createBookingSchedule(
   return {
     operatingHours,
     closures,
+    datedAvailability,
+    clinicOperatingHours: clinic.operatingHours,
+    appointmentOnlyDays: clinic.appointmentOnlyDays,
     appointments: appointments.filter(appointment => !excludeAppointmentId || appointment._id !== excludeAppointmentId),
     appointmentBufferMinutes: dentist.appointmentBufferMinutes ?? 15,
     maxWorkingMinutesPerDay: dentist.maxWorkingMinutesPerDay ?? 480,
@@ -91,13 +99,22 @@ export function bookingSlots(
 ): BookingSlot[] {
   if (Number.isNaN(date.getTime()) || !Number.isFinite(duration) || duration <= 0 || !Number.isFinite(interval) || interval <= 0) return [];
   const dayName = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][date.getDay()];
-  const hours = schedule.operatingHours.find(hours => hours.day === dayName);
-  if (!hours) return [];
+  const weekly = schedule.operatingHours.filter(hours => hours.day === dayName);
+  const dateKey = pickerDateKey(date);
+  const override = schedule.datedAvailability?.find(day => day.date === dateKey);
+  const hours = override ? override.intervals.flatMap(row => {
+    if (!schedule.clinicOperatingHours || schedule.appointmentOnlyDays?.includes(dayName)) return [{ ...row }];
+    return schedule.clinicOperatingHours.filter(hour => hour.day === dayName).flatMap(hour => {
+      const start = Math.max(timeMinutes(row.startTime), timeMinutes(hour.startTime)), end = Math.min(timeMinutes(row.endTime), timeMinutes(hour.endTime));
+      return start < end ? [{ startTime: minutesTime(start), endTime: minutesTime(end) }] : [];
+    });
+  }) : weekly;
+  const displayHours = [...weekly, ...hours];
+  if (!displayHours.length) return [];
   const parts = clinicFormatter.formatToParts(now);
   const part = (type: Intl.DateTimeFormatPartTypes) => parts.find(part => part.type === type)?.value ?? '';
   const today = `${part('year')}-${part('month')}-${part('day')}`;
   const currentMinutes = Number(part('hour')) * 60 + Number(part('minute')) + Number(part('second')) / 60;
-  const dateKey = pickerDateKey(date);
   const occupied = schedule.appointments.filter(appointment =>
     storedDateKey(appointment.date) === dateKey &&
     (appointment.status === AppointmentStatus.PENDING || appointment.status === AppointmentStatus.CONFIRMED),
@@ -107,14 +124,18 @@ export function bookingSlots(
     total + timeMinutes(appointment.endTime) - timeMinutes(appointment.startTime) + buffer, 0);
   const withinCapacity = usedMinutes + duration + buffer <= (schedule.maxWorkingMinutesPerDay ?? 480);
   const slots: BookingSlot[] = [];
-  for (let start = timeMinutes(hours.startTime); start + duration <= timeMinutes(hours.endTime); start += interval) {
+  const first = Math.min(...displayHours.map(row => timeMinutes(row.startTime))), last = Math.max(...displayHours.map(row => timeMinutes(row.endTime)));
+  for (let start = first; start + duration <= last; start += interval) {
+    const dentistAvailable = hours.some(row => start >= timeMinutes(row.startTime) && start + duration <= timeMinutes(row.endTime));
     const overlaps = occupied.some(appointment =>
       start < timeMinutes(appointment.endTime) + buffer && start + duration + buffer > timeMinutes(appointment.startTime),
     );
     const closed = schedule.closures?.some(closure => dateKey >= closure.startDate && dateKey <= closure.endDate &&
       start < (closure.endTime === '24:00' ? 1440 : timeMinutes(closure.endTime)) && start + duration > timeMinutes(closure.startTime));
-    slots.push({ value: minutesTime(start), available: withinCapacity && !overlaps && !closed &&
-      (dateKey > today || (dateKey === today && start >= currentMinutes)) });
+    const available = dentistAvailable && withinCapacity && !overlaps && !closed && (dateKey > today || (dateKey === today && start >= currentMinutes));
+    slots.push({ value: minutesTime(start), available, ...(!available ? {
+      reason: !dentistAvailable ? 'Dentist unavailable' as const : closed ? 'Clinic closed' as const : overlaps ? 'Booked' as const : 'Unavailable' as const,
+    } : {}) });
   }
   return slots;
 }

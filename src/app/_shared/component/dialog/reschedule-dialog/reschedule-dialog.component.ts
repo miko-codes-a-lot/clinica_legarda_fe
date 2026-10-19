@@ -6,13 +6,13 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { DatePicker } from '../../date-picker/date-picker';
-import { TimePicker } from '../../time-picker/time-picker';
+import { BookingCalendar } from '../../booking-calendar/booking-calendar';
 import { AlertService } from '../../../service/alert.service';
 import { User } from '../../../model/user';
 import { Clinic } from '../../../model/clinic';
 import { bookingSlots, DentistBookingSchedule } from '../../../model/booking-availability';
 import { BookingAvailabilityService } from '../../../service/booking-availability-service';
+import { clinicToday } from '../../../../care/care.models';
 
 export interface RescheduleDialogResult {
   date: string;
@@ -34,7 +34,7 @@ export interface RescheduleDialogData {
   selector: 'app-reschedule-dialog',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule,
-    MatFormFieldModule, MatInputModule, DatePicker, TimePicker],
+    MatFormFieldModule, MatInputModule, BookingCalendar],
   templateUrl: './reschedule-dialog.component.html',
   styleUrls: ['./reschedule-dialog.component.css'],
 })
@@ -49,8 +49,8 @@ export class RescheduleDialogComponent implements OnInit, OnDestroy {
   pickerDentist?: DentistBookingSchedule;
   isLoading = false;
   loadError = '';
-  readonly minDate = new Date(new Date().setHours(0, 0, 0, 0));
-  readonly maxDate = new Date(new Date().setMonth(new Date().getMonth() + 3));
+  readonly minDate = new Date(`${clinicToday()}T00:00:00`);
+  readonly maxDate = new Date(new Date(this.minDate).setMonth(this.minDate.getMonth() + 3));
   serviceDuration = 60;
 
   constructor(
@@ -81,6 +81,7 @@ export class RescheduleDialogComponent implements OnInit, OnDestroy {
   loadAvailability(): void {
     this.availabilityRequest?.unsubscribe();
     this.pickerDentist = undefined;
+    this.form.controls.time.reset();
     this.loadError = '';
     this.isLoading = true;
     this.availabilityRequest = this.availability.load(this.data.dentist, this.data.clinic, this.data.appointmentId).subscribe({
