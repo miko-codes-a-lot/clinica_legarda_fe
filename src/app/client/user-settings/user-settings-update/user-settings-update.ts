@@ -1,3 +1,4 @@
+import { demographicControls, demographicValues } from '../../../_shared/model/patient-demographics';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, OnInit, ChangeDetectorRef   } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
@@ -67,6 +68,7 @@ export class UserSettingsUpdate implements OnInit {
   ngOnInit(): void {
 
     this.profileForm = this.fb.group({
+      ...demographicControls(),
       firstName: ['', Validators.required],
       middleName: [''],
       lastName: ['', Validators.required],
@@ -223,6 +225,7 @@ onSave() {
 
     // Safely build your user payload (based on your backend’s UserPayload interface)
     const userData: UserPayload = {
+      ...(this.user.role === 'user' ? demographicValues(formValue) : {}),
       firstName: formValue.firstName,
       middleName: formValue.middleName || '',
       lastName: formValue.lastName,

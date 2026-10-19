@@ -1,3 +1,4 @@
+import { PatientDemographics } from './patient-demographics';
 import { Appointment } from "./appointment"
 import { Clinic } from "./clinic"
 import { OperatingHour } from "./operating-hour"
@@ -9,7 +10,7 @@ export enum UserStatus {
   WALK_IN = 'walk_in',
 }
 
-export interface User {
+export interface User extends PatientDemographics {
   _id?: string
   firstName: string
   middleName: string

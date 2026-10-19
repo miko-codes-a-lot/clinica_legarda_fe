@@ -1,3 +1,4 @@
+import { patientAge } from '../../_shared/model/patient-demographics';
 import { CARE_APPOINTMENT_COLUMNS, CARE_APPOINTMENT_FILTERS, careAppointmentDate } from '../care-table-config';
 import { GenericTableComponent } from '../../_shared/component/table/generic-table.component';
 import { TableCellDirective } from '../../_shared/component/table/table-cell.directive';
@@ -30,6 +31,7 @@ export class PatientRecordPage implements OnInit {
   cases: TreatmentCase[] = [];
   clinicContext = '';
   readonly today = clinicToday();
+  readonly patientAge = patientAge;
   loading = false;
   error = '';
   exporting = false;

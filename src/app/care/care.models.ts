@@ -1,6 +1,7 @@
+import { PatientDemographics } from '../_shared/model/patient-demographics';
 import { UserStatus } from '../_shared/model/user';
 
-export interface CarePerson {
+export interface CarePerson extends PatientDemographics {
   _id: string;
   firstName: string;
   middleName?: string;

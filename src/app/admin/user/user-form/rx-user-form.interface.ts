@@ -1,7 +1,8 @@
+import { DemographicControls } from '../../../_shared/model/patient-demographics';
 import { FormArray, FormControl, FormGroup } from "@angular/forms";
 import { RxOperatingHour } from "../../../_shared/model/reactive/rx-operating-hours";
 
-export interface RxUserForm {
+export interface RxUserForm extends DemographicControls {
   username: FormControl<string>
   firstName: FormControl<string>
   middleName: FormControl<string>

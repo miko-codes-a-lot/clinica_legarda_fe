@@ -1,3 +1,4 @@
+import { patientAge, manilaDay } from '../../_shared/model/patient-demographics';
 import { PatientRecordSnapshot, CarePerson } from '../care.models';
 import { createDashboardPdf, renderDashboardReport, DashboardReport, DashboardReportTable } from '../../admin/dashboard/dashboard-index/dashboard-report';
 import { formatReportDate } from '../../_shared/model/analytics-report';
@@ -9,6 +10,8 @@ export function createPatientRecordReport(snapshot: PatientRecordSnapshot): Pati
   const tables: DashboardReportTable[] = [{ title: 'Patient details', scope, headers: ['Field','Details'], columnWidths: [.28,.72], rows: [
     ['Name',name], ['Account status',patient.status ?? 'Not recorded'], ['Email',patient.emailAddress || 'Not recorded'],
     ['Mobile number',patient.mobileNumber || 'Not recorded'], ['Address',patient.address || 'Not recorded'],
+    ['Birth date',patient.birthDate ? date(patient.birthDate) : 'Not recorded'], ['Age',String(patientAge(patient.birthDate, manilaDay(new Date(snapshot.generatedAt))) ?? 'Not recorded')],
+    ['Sex',patient.sex || 'Not recorded'], ['Occupation',patient.occupation || 'Not recorded'], ['Religion',patient.religion || 'Not recorded'], ['Marital status',patient.maritalStatus || 'Not recorded'],
   ] }, { title: 'Appointment history', scope, headers: ['Schedule','Clinic / dentist','Services','Status'], columnWidths: [.23,.3,.3,.17],
     rows: snapshot.record.appointments.length ? snapshot.record.appointments.map(row => [ `${date(row.date)}\n${row.startTime}-${row.endTime}`, `${row.clinic?.name || 'Not recorded'}\nDr. ${personName(row.dentist)}`, row.services.map(service => service.name).join(', '), row.status === 'no_show' ? 'No-show' : row.status ]) : [['No appointments in the authorized scope.','','','']] }];
   if (!snapshot.visits.length) tables.push({ title: 'Visit history', scope, headers: ['Details'], columnWidths: [1], rows: [['No visit records in the authorized scope.']] });

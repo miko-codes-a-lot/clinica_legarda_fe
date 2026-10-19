@@ -1,7 +1,8 @@
+import { PatientDemographics, demographicValues } from './patient-demographics';
 import { OperatingHour } from './operating-hour';
 import { UserStatus } from './user';
 
-export interface StaffUserPayload {
+export interface StaffUserPayload extends PatientDemographics {
   _id?: string;
   firstName: string;
   middleName: string;
@@ -20,7 +21,7 @@ export interface StaffUserPayload {
   isWalkIn?: boolean;
 }
 
-export interface StaffUserFormValue {
+export interface StaffUserFormValue extends PatientDemographics {
   firstName: string;
   middleName: string;
   lastName: string;
@@ -39,6 +40,7 @@ export function buildStaffUserPayload(value: StaffUserFormValue): StaffUserPaylo
   const isDentist = value.role === 'dentist';
 
   return {
+    ...(value.role === 'user' ? demographicValues(value) : {}),
     firstName: value.firstName,
     middleName: value.middleName,
     lastName: value.lastName,

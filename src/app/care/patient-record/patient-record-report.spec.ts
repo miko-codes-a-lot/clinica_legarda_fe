@@ -11,6 +11,12 @@ describe('Staff patient record export', () => {
     expect(doc.body.textContent).toContain('Ana Patient'); expect(doc.body.textContent).toContain('Cleaning'); expect(doc.body.textContent).toContain('Assigned clinics');
     expect(doc.body.textContent).not.toMatch(/RAW_|Record ID/); expect(createPatientRecordPdf(report).output()).not.toContain('RAW_');
   });
+  it('includes optional patient details and age on the report generation date', () => {
+    const value = snapshot(); value.record.patient = { ...person, birthDate: '2000-10-21', sex: 'Female', occupation: 'Student', religion: 'Optional belief', maritalStatus: 'Single' };
+    const rows = createPatientRecordReport(value).tables[0].rows;
+    expect(rows).toContain(['Age','25']); expect(rows).toContain(['Birth date','Oct 21, 2000']);
+    expect(rows).toContain(['Occupation','Student']); expect(rows).toContain(['Religion','Optional belief']);
+  });
   it('has truthful empty states and treats patient text as inert text', () => {
     const value = snapshot(); value.record.patient = { ...person, firstName: '<script>Patient</script>' }; value.record.appointments = [];
     const report = createPatientRecordReport(value), doc = document.implementation.createHTMLDocument(); renderPatientRecordReport(doc, report);

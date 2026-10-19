@@ -1,3 +1,4 @@
+import { demographicControls, demographicFields, demographicValues } from '../../_shared/model/patient-demographics';
 import { CLINIC_PROFILE } from '../../_shared/clinic-profile';
 import { Component, EventEmitter, Input, OnInit, Output, signal, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -82,6 +83,7 @@ export class RegistrationPage implements OnInit, OnChanges {
     // fetch clinic here
 
     this.rxform = this.fb.nonNullable.group({
+      ...demographicControls(this.user),
       firstName: [this.user.firstName, Validators.required],
       middleName: [this.user.middleName],
       lastName: [this.user.lastName, Validators.required],
@@ -130,6 +132,7 @@ export class RegistrationPage implements OnInit, OnChanges {
 
   private buildUserFields() {
     this.userFields = [
+      ...demographicFields,
       { name: 'firstName', label: 'First Name', type: 'text'},
       { name: 'middleName', label: 'Middle Name', type: 'text' },
       { name: 'lastName', label: 'Last Name', type: 'text' },
@@ -153,7 +156,9 @@ export class RegistrationPage implements OnInit, OnChanges {
   }
 
   onSubmit() {
+    if (this.rxform.invalid) { this.rxform.markAllAsTouched(); return; }
     const userData = {
+      ...demographicValues(this.rxform.getRawValue()),
       firstName: this.firstName.value,
       middleName: this.middleName.value,
       lastName: this.lastName.value,

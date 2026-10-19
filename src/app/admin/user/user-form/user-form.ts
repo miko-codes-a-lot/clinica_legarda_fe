@@ -1,3 +1,4 @@
+import { demographicControls, demographicFields, demographicValues } from '../../../_shared/model/patient-demographics';
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -71,6 +72,7 @@ export class UserForm implements OnInit, OnChanges, OnDestroy {
     const isUpdate = !!this.user._id;
 
     this.rxform = this.fb.nonNullable.group({
+      ...demographicControls(this.user),
       firstName: [this.user.firstName, Validators.required],
       middleName: [this.user.middleName],
       lastName: [this.user.lastName, Validators.required],
@@ -128,6 +130,8 @@ export class UserForm implements OnInit, OnChanges, OnDestroy {
         customError: 'Select a role.'
       }
     ];
+
+    if (role === 'user') fields.push(...demographicFields);
 
     if (role === 'dentist' || (role === 'admin' && this.canAssignAdminClinics)) {
       fields.push({
@@ -219,6 +223,7 @@ export class UserForm implements OnInit, OnChanges, OnDestroy {
     }
 
     const user = buildStaffUserPayload({
+      ...demographicValues(this.rxform.getRawValue()),
       firstName: this.firstName.value,
       middleName: this.middleName.value,
       lastName: this.lastName.value,

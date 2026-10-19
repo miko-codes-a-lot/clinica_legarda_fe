@@ -73,3 +73,9 @@ it('sends a walk-in flag only for patient intake', () => {
   expect(buildStaffUserPayload(value).isWalkIn).toBeTrue();
   expect(buildStaffUserPayload({ ...value, role: 'admin' }).isWalkIn).toBeFalse();
 });
+
+it('retains trimmed optional patient details and explicit empty values for clearing', () => {
+  const payload = buildStaffUserPayload({ ...profile, role: 'user', clinics: [], operatingHours: [], birthDate: '2000-02-29', occupation: ' Student ', religion: '' });
+  expect(payload.birthDate).toBe('2000-02-29'); expect(payload.occupation).toBe('Student'); expect(payload.religion).toBe('');
+  expect(buildStaffUserPayload({ ...profile, role: 'dentist', clinics: [], operatingHours: [], occupation: 'Private' }).occupation).toBeUndefined();
+});
