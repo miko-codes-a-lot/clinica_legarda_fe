@@ -1,0 +1,5 @@
+.availability-layout { display: grid; grid-template-columns: minmax(280px, 360px) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+:host ::ng-deep .availability-day-custom .mat-calendar-body-cell-content { outline: 2px solid #0f766e; outline-offset: -3px; }
+:host ::ng-deep .availability-day-closed .mat-calendar-body-cell-content { background: #fef3c7; color: #78350f; }
+button:disabled { opacity: .55; cursor: wait; }
+@media (max-width: 850px) { .availability-layout { grid-template-columns: 1fr; } }

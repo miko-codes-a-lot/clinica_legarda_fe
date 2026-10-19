@@ -7,6 +7,7 @@ export const DENTIST_ROUTES: Routes = [
     path: '',
     component: Dentist,
     children: [
+      { path: 'availability', canActivate: [AuthGuard], data: { role: 'dentist' }, loadComponent: () => import('./availability/dentist-availability').then(m => m.DentistAvailability) },
       { path: 'care', canActivate: [AuthGuard], data: { role: 'dentist' }, loadChildren: () => import('../care/care.routes').then(m => m.CARE_ROUTES) },
       {
         path: '',

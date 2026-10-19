@@ -1,0 +1,54 @@
+<section class="space-y-6">
+  <app-page-header title="My availability" eyebrow="Appointment calendar" description="Choose a day, set your available hours and review any affected appointments." />
+  @if (error) { <p class="rounded-xl bg-red-50 p-4 text-red-800" role="alert">{{ error }} <button type="button" class="underline" (click)="load()">Reload calendar</button></p> }
+  @if (success) { <p class="rounded-xl bg-teal-50 p-4 text-teal-900" role="status">{{ success }}</p> }
+  <label class="block max-w-md">Clinic
+    <select class="mt-1 w-full rounded-lg border p-3" [(ngModel)]="clinicId" (ngModelChange)="load()" [disabled]="saving || loading">
+      @for (clinic of clinics; track clinic._id) { <option [value]="clinic._id">{{ clinic.name }}</option> }
+    </select>
+  </label>
+  @if (loading) { <p role="status">Loading availability…</p> }
+  @if (!clinics.length && !loading) { <p>No assigned clinic is available. Contact your administrator.</p> }
+  @if (clinicId) {
+    <div class="availability-layout">
+      <div class="rounded-2xl border bg-white p-4">
+        <mat-calendar [selected]="selectedDate" (selectedChange)="selectDate($event)" [minDate]="minDate" [maxDate]="maxDate" [dateClass]="dateClass" />
+        <p class="text-sm text-gray-600">Outlined dates have custom hours. Shaded dates are unavailable. Other days use your weekly hours.</p>
+      </div>
+      <div class="space-y-5 rounded-2xl border bg-white p-5">
+        <h2 class="text-xl font-semibold">{{ selectedDate | date:'EEEE, MMMM d, y' }}</h2>
+        <p class="text-sm text-gray-600">Philippine time. Add separate intervals for breaks, for example 9:00–12:00 and 13:00–17:00.</p>
+        <fieldset [disabled]="saving || loading" class="space-y-3">
+          @for (interval of intervals; track $index; let i = $index) {
+            <div class="flex flex-wrap items-end gap-3">
+              <label>From <input type="time" class="block rounded-lg border p-2" [(ngModel)]="interval.startTime" (ngModelChange)="edit()" /></label>
+              <label>To <input type="time" class="block rounded-lg border p-2" [(ngModel)]="interval.endTime" (ngModelChange)="edit()" /></label>
+              <button type="button" class="rounded-lg border px-3 py-2" (click)="removeInterval(i)" [attr.aria-label]="'Remove interval ' + (i + 1)">Remove</button>
+            </div>
+          }
+          @if (!intervals.length) { <p class="rounded-lg bg-amber-50 p-3">Dentist unavailable for the whole day.</p> }
+          <div class="flex flex-wrap gap-2">
+            <button type="button" class="rounded-lg border px-3 py-2" (click)="addInterval()" [disabled]="intervals.length >= 12">Add interval</button>
+            <button type="button" class="rounded-lg border px-3 py-2" (click)="wholeDayOff()">Whole day unavailable</button>
+            <button type="button" class="rounded-lg border px-3 py-2" (click)="restore()">Restore weekly hours</button>
+          </div>
+          @if (restoreWeekly) { <p class="text-sm">This save restores the usual weekly schedule.</p> }
+          <button type="button" class="rounded-lg bg-teal-800 px-4 py-3 text-white" (click)="preview()">Review changes</button>
+        </fieldset>
+        @if (previewed) {
+          <div class="space-y-3 rounded-xl border border-amber-300 p-4" role="status">
+            <h3 class="font-semibold">{{ previewRows.length }} affected appointment(s)</h3>
+            @for (row of previewRows; track row._id) { <p>{{ row.startTime }}–{{ row.endTime }} · {{ row.patient?.firstName }} {{ row.patient?.lastName }}</p> }
+            <p class="text-sm">Saving flags these bookings for review and notifies the patients. Existing appointments keep their date, time and status.</p>
+            <button type="button" class="rounded-lg bg-teal-800 px-4 py-3 text-white" (click)="save()" [disabled]="saving">{{ saving ? 'Saving…' : 'Acknowledge and save' }}</button>
+          </div>
+        }
+      </div>
+    </div>
+    <div class="rounded-2xl border bg-white p-5">
+      <h2 class="mb-3 text-lg font-semibold">Appointments on this day</h2>
+      @for (row of dayAppointments; track row._id) { <p class="border-t py-3"><a class="underline" [routerLink]="['/dentist/appointment/details', row._id]">{{ row.startTime }}–{{ row.endTime }} · {{ row.patient.firstName }} {{ row.patient.lastName }}</a> · {{ row.status }}</p> }
+      @empty { <p>No appointments for the selected day and clinic.</p> }
+    </div>
+  }
+</section>

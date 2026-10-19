@@ -27,6 +27,7 @@ export class Dentist {
     { label: 'Patient records', icon: 'folder_shared', link: '/dentist/care/patients' },
     { label: 'Treatment queue', icon: 'groups', link: '/dentist/care/queue' },
     { label: 'Appointments', icon: 'event', link: '/dentist/appointment' },
+    { label: 'My availability', icon: 'calendar_month', link: '/dentist/availability' },
     { label: 'Referral Request', icon: 'event', link: '/dentist/referral-request' },
     { label: 'Notifications', icon: 'notifications', link: '/dentist/notification' },
 
