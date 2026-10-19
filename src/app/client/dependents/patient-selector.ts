@@ -4,7 +4,7 @@ import { DependentsApiService, PatientIdentity } from './dependents-api.service'
 import { UserStatus } from '../../_shared/model/user';
 @Component({ selector: 'app-patient-selector', template: `
   @if (self) { <section class="mb-5 rounded-xl border border-stroke p-4" aria-label="Patient selection">
-    <label class="ui-label block">Patient<select class="ui-input mt-2 w-full" [value]="selected" (change)="select($any($event.target).value)" [disabled]="disabled || loading">
+    <label class="ui-label block">Patient<select class="ui-input mt-2 w-full" [value]="selected" (change)="selectFromEvent($event)" [disabled]="disabled || loading">
       <option [value]="self._id">{{ name(self) }} (myself)</option>
       @for (child of children; track child._id) { <option [value]="child._id">{{ name(child) }} (child)</option> }
     </select></label>
@@ -28,6 +28,7 @@ export class PatientSelector implements OnChanges {
       if (this.selected !== this.self?._id && !children.some(child => child._id === this.selected)) this.select(this.self?._id ?? '');
     }, error: () => { if (version !== this.version) return; this.children = []; this.loading = false; this.error = 'Could not load children. Refresh the patient list to try again.'; if (this.self && this.selected !== this.self._id) this.select(this.self._id); } });
   }
+  selectFromEvent(event: Event) { if (event.target instanceof HTMLSelectElement) this.select(event.target.value); }
   select(id: string) {
     const person = [this.self, ...this.children].find(person => person?._id === id);
     if (!person) return;
