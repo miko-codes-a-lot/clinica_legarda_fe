@@ -1,3 +1,4 @@
+import { DentalChart } from '../dental-chart/dental-chart';
 import { ParentRelationship } from './parent-relationship';
 import { CarePerson } from '../care.models';
 import { patientAge } from '../../_shared/model/patient-demographics';
@@ -17,7 +18,7 @@ import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
 import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
 
-@Component({ selector: 'app-patient-record', imports: [ParentRelationship, GenericTableComponent, TableCellDirective, ClinicDate, CommonModule, RouterLink, PageHeader, EmptyState, StatusBadge], templateUrl: './patient-record.html' })
+@Component({ selector: 'app-patient-record', imports: [DentalChart, ParentRelationship, GenericTableComponent, TableCellDirective, ClinicDate, CommonModule, RouterLink, PageHeader, EmptyState, StatusBadge], templateUrl: './patient-record.html' })
 export class PatientRecordPage implements OnInit {
   readonly appointmentColumns = CARE_APPOINTMENT_COLUMNS;
   readonly appointmentFilters = CARE_APPOINTMENT_FILTERS;

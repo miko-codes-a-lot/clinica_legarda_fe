@@ -17,6 +17,16 @@ describe('Staff patient record export', () => {
     expect(rows).toContain(['Age','25']); expect(rows).toContain(['Birth date','Oct 21, 2000']);
     expect(rows).toContain(['Occupation','Student']); expect(rows).toContain(['Religion','Optional belief']);
   });
+  it('exports both dentitions with the correct patient, clinic, author and tooth observations', () => {
+    const value = snapshot(); value.record.appointments = []; value.charts = [{ _id: 'RAW_CHART_ID', patient: 'RAW_PATIENT_ID', clinic, dentition: 'permanent', revision: 2, teeth: [{ tooth: 11, observation: 'Permanent observation', notes: 'Manual note' }], updatedBy: dentist, updatedAt: value.generatedAt }, { _id: 'RAW_PRIMARY_ID', patient: 'RAW_PATIENT_ID', clinic, dentition: 'primary', revision: 1, teeth: [{ tooth: 51, observation: 'Primary observation', notes: '' }], updatedBy: dentist, updatedAt: value.generatedAt }];
+    const report = createPatientRecordReport(value), permanent = report.tables.find(table => table.title === 'Dental chart - permanent'), primary = report.tables.find(table => table.title === 'Dental chart - primary');
+    expect(report.tables[0].rows).toContain(['Appointments','No appointments in the authorized scope.']);
+    expect(report.tables.some(table => table.title === 'Appointment history')).toBeFalse();
+    expect(permanent?.rows).toHaveSize(32); expect(primary?.rows).toHaveSize(20);
+    expect(permanent?.rows).toContain(['11','Permanent observation','Manual note']); expect(primary?.rows).toContain(['51','Primary observation','']);
+    expect(permanent?.scope).toContain('Ana Patient; Test clinic; Revision 2; Test Dentist');
+    const doc = document.implementation.createHTMLDocument(); renderPatientRecordReport(doc, report); expect(doc.body.textContent).not.toContain('RAW_');
+  });
   it('has truthful empty states and treats patient text as inert text', () => {
     const value = snapshot(); value.record.patient = { ...person, firstName: '<script>Patient</script>' }; value.record.appointments = [];
     const report = createPatientRecordReport(value), doc = document.implementation.createHTMLDocument(); renderPatientRecordReport(doc, report);

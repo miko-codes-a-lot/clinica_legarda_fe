@@ -1,3 +1,4 @@
+import { DentalChartsApiService } from '../dental-chart/dental-charts-api.service';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { BehaviorSubject, of, throwError } from 'rxjs';
@@ -12,6 +13,7 @@ describe('Patient record export access', () => {
   beforeEach(() => {
     api = jasmine.createSpy('snapshot').and.returnValue(of(snapshot));
     TestBed.configureTestingModule({ providers: [provideRouter([]),
+      { provide: DentalChartsApiService, useValue: { clinics: () => of([]) } },
       { provide: CareApiService, useValue: { patientRecordSnapshot: api } },
       { provide: ActivatedRoute, useValue: { paramMap: params, queryParamMap: of(convertToParamMap({ clinic: 'clinic' })) } },
     ] });

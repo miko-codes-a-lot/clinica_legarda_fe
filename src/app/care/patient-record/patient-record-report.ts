@@ -1,3 +1,4 @@
+import { chartAuthorName, chartQuadrants } from '../dental-chart/dental-chart.models';
 import { patientAge, manilaDay } from '../../_shared/model/patient-demographics';
 import { PatientRecordSnapshot, CarePerson } from '../care.models';
 import { createDashboardPdf, renderDashboardReport, DashboardReport, DashboardReportTable } from '../../admin/dashboard/dashboard-index/dashboard-report';
@@ -24,8 +25,16 @@ export function createPatientRecordReport(snapshot: PatientRecordSnapshot): Pati
   for (const careCase of snapshot.cases) tables.push({ title: `Treatment case - ${careCase.title}`, scope, headers: ['Field','Details'], columnWidths: [.25,.75], rows: [
     ['Clinic / dentist',`${careCase.clinic?.name || 'Not recorded'}\nDr. ${personName(careCase.dentist)}`], ['Status',careCase.status], ['Treatment plan',careCase.plan || 'Not recorded'], ['Clinical notes',careCase.internalNotes || 'Not recorded'],
   ] });
+  for (const chart of snapshot.charts ?? []) {
+    const chartScope = `${name}; ${chart.clinic.name}; Revision ${chart.revision}; ${chartAuthorName(chart.updatedBy)}; ${new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(chart.updatedAt))} (Manila)`;
+    tables.push({ title: `Dental chart - ${chart.dentition}`, scope: chartScope, headers: ['Tooth','Clinician observation','Notes'], columnWidths: [.12,.48,.4], rows: chartQuadrants(chart.dentition).flatMap(quadrant => quadrant.teeth).map(tooth => {
+      const entry = chart.teeth.find(item => item.tooth === tooth); return [String(tooth),entry?.observation || 'No observation entered',entry?.notes || ''];
+    }) });
+  }
   if (!snapshot.record.appointments.length && !snapshot.visits.length && !snapshot.cases.length) {
+    const charts = tables.filter(table => table.title.startsWith('Dental chart - '));
     tables.splice(1);
+    tables.push(...charts);
     tables[0] = { ...tables[0], rows: [...tables[0].rows, ['Appointments','No appointments in the authorized scope.'],
       ['Visit history','No visit records in the authorized scope.'], ['Treatment cases','No treatment cases in the authorized scope.']] };
   }

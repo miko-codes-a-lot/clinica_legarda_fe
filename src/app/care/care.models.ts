@@ -1,3 +1,4 @@
+import { DentalChartRecord } from './dental-chart/dental-chart.models';
 import { PatientDemographics } from '../_shared/model/patient-demographics';
 import { UserStatus } from '../_shared/model/user';
 
@@ -32,7 +33,7 @@ export interface CareAppointment {
 }
 export interface PatientSearchResult { items: CarePerson[]; total: number; page: number; pageSize: number; }
 export interface PatientRecord { patient: CarePerson; appointments: CareAppointment[]; }
-export interface PatientRecordSnapshot { record: PatientRecord; visits: CareVisit[]; cases: TreatmentCase[]; generatedAt: string; scopeLabel: string; }
+export interface PatientRecordSnapshot { record: PatientRecord; visits: CareVisit[]; cases: TreatmentCase[]; charts?: DentalChartRecord[]; generatedAt: string; scopeLabel: string; }
 export interface PatientSearchQuery { search?: string; clinic?: string; page?: number; status?: UserStatus; registration?: 'walk_in' | 'standard'; sortBy?: 'name' | 'username' | 'emailAddress' | 'mobileNumber' | 'status'; direction?: 'asc' | 'desc'; }
 
 export type VisitState = 'waiting' | 'in_progress' | 'completed' | 'cancelled';
