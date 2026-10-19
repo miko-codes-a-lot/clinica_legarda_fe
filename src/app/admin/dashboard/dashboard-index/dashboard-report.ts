@@ -94,23 +94,42 @@ export function createDashboardPdf(report: DashboardReport): jsPDF {
   pdf.setProperties({ title: report.title ?? 'Staff Dashboard Report' });
   report.tables.forEach((table, index) => {
     if (index > 0) pdf.addPage();
+    pdf.setFont('helvetica', 'bold').setFontSize(17);
+    const title: string[] = pdf.splitTextToSize(report.title ?? 'Staff Dashboard Report', width);
     pdf.setFont('helvetica', 'normal').setFontSize(10);
     const generated = report.generatedAt ? ` | Generated: ${new Date(report.generatedAt).toLocaleString('en-US', { timeZone: 'Asia/Manila' })} (Manila)` : '';
     const context: string[] = pdf.splitTextToSize(`Selected clinic: ${report.clinic} | Period: ${report.period}${generated}`, width);
     const scope: string[] = pdf.splitTextToSize(table.scope, width);
-    const tableTop = 80 + (context.length + scope.length) * 12;
+    pdf.setFont('helvetica', 'bold').setFontSize(13);
+    const tableTitle: string[] = pdf.splitTextToSize(table.title, width);
+    const contextY = margin + title.length * 19.55;
+    const tableTitleY = contextY + context.length * 11.5 + 16;
+    const scopeY = tableTitleY + tableTitle.length * 14.95 + 10;
+    const tableTop = scopeY + scope.length * 11.5 + 8;
     pdf.setHeaderFunction(() => {
       pdf.setFont('helvetica', 'bold').setFontSize(17);
-      pdf.text(report.title ?? 'Staff Dashboard Report', margin, margin);
+      pdf.text(title, margin, margin);
       pdf.setFont('helvetica', 'normal').setFontSize(10);
-      pdf.text(context, margin, 54);
+      pdf.text(context, margin, contextY);
       pdf.setFont('helvetica', 'bold').setFontSize(13);
-      pdf.text(table.title, margin, 70 + context.length * 12);
+      pdf.text(tableTitle, margin, tableTitleY);
       pdf.setFont('helvetica', 'normal').setFontSize(10);
-      pdf.text(scope, margin, 86 + context.length * 12);
+      pdf.text(scope, margin, scopeY);
       return [margin, tableTop, 0, 0];
     });
-    const rows = table.rows.length ? table.rows : [table.headers.map((_, column) => column === 0 ? 'No data available.' : '')];
+    const sourceRows = table.rows.length ? table.rows : [table.headers.map((_, column) => column === 0 ? 'No data available.' : '')];
+    // A clinical paragraph can exceed a page. Split logical rows into bounded
+    // continued rows before handing them to jsPDF's non-splitting table plugin.
+    const linesPerRow = Math.max(1, Math.min(18, Math.floor((pdf.internal.pageSize.getHeight() - margin - tableTop - 55) / 11.5)));
+    pdf.setFont('helvetica', 'normal').setFontSize(10);
+    const rows = sourceRows.flatMap(row => {
+      const cells = row.map((value, column) => pdf.splitTextToSize(value, width * table.columnWidths[column] - 12) as string[]);
+      const chunks = Math.max(1, ...cells.map(lines => Math.ceil(lines.length / linesPerRow)));
+      return Array.from({ length: chunks }, (_, chunk) => cells.map((lines, column) => {
+        const text = lines.slice(chunk * linesPerRow, (chunk + 1) * linesPerRow).join('\n');
+        return text || (column === 0 && chunk > 0 ? `${row[0]} (continued)` : '');
+      }));
+    });
     pdf.table(margin, tableTop, rows.map(row => Object.fromEntries(row.map((value, column) => [String(column), value]))),
       table.headers.map((header, column): CellConfig => ({
         name: String(column), prompt: header, align: 'left', padding: 6,

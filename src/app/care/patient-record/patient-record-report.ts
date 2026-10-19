@@ -1,0 +1,32 @@
+import { PatientRecordSnapshot, CarePerson } from '../care.models';
+import { createDashboardPdf, renderDashboardReport, DashboardReport, DashboardReportTable } from '../../admin/dashboard/dashboard-index/dashboard-report';
+import { formatReportDate } from '../../_shared/model/analytics-report';
+export type PatientRecordReport = DashboardReport;
+const personName = (person: CarePerson | null | undefined) => [person?.firstName, person?.middleName, person?.lastName].filter(Boolean).join(' ') || 'Not recorded';
+const date = (value: string) => formatReportDate(value.slice(0,10));
+export function createPatientRecordReport(snapshot: PatientRecordSnapshot): PatientRecordReport {
+  const patient = snapshot.record.patient, name = personName(patient), scope = `${name}; ${snapshot.scopeLabel}`;
+  const tables: DashboardReportTable[] = [{ title: 'Patient details', scope, headers: ['Field','Details'], columnWidths: [.28,.72], rows: [
+    ['Name',name], ['Account status',patient.status ?? 'Not recorded'], ['Email',patient.emailAddress || 'Not recorded'],
+    ['Mobile number',patient.mobileNumber || 'Not recorded'], ['Address',patient.address || 'Not recorded'],
+  ] }, { title: 'Appointment history', scope, headers: ['Schedule','Clinic / dentist','Services','Status'], columnWidths: [.23,.3,.3,.17],
+    rows: snapshot.record.appointments.length ? snapshot.record.appointments.map(row => [ `${date(row.date)}\n${row.startTime}-${row.endTime}`, `${row.clinic?.name || 'Not recorded'}\nDr. ${personName(row.dentist)}`, row.services.map(service => service.name).join(', '), row.status === 'no_show' ? 'No-show' : row.status ]) : [['No appointments in the authorized scope.','','','']] }];
+  if (!snapshot.visits.length) tables.push({ title: 'Visit history', scope, headers: ['Details'], columnWidths: [1], rows: [['No visit records in the authorized scope.']] });
+  for (const visit of snapshot.visits) tables.push({ title: `Visit - ${date(visit.date)}`, scope, headers: ['Field','Clinical record'], columnWidths: [.25,.75], rows: [
+    ['Clinic / dentist',`${visit.clinic?.name || 'Not recorded'}\nDr. ${personName(visit.dentist)}`], ['Purpose / status',`${visit.purpose} / ${visit.state}`],
+    ['Assessment',visit.assessment || 'Not recorded'], ['Treatments',visit.treatments.map(item => [item.description, item.tooth ? `Tooth ${item.tooth}` : '',item.notes].filter(Boolean).join(' - ')).join('\n') || 'None recorded'],
+    ['Visit summary',visit.summary || 'Not recorded'], ['Aftercare',visit.aftercare || 'Not recorded'], ['Next steps',visit.nextSteps || 'Not recorded'],
+  ] });
+  if (!snapshot.cases.length) tables.push({ title: 'Treatment cases', scope, headers: ['Details'], columnWidths: [1], rows: [['No treatment cases in the authorized scope.']] });
+  for (const careCase of snapshot.cases) tables.push({ title: `Treatment case - ${careCase.title}`, scope, headers: ['Field','Details'], columnWidths: [.25,.75], rows: [
+    ['Clinic / dentist',`${careCase.clinic?.name || 'Not recorded'}\nDr. ${personName(careCase.dentist)}`], ['Status',careCase.status], ['Treatment plan',careCase.plan || 'Not recorded'], ['Clinical notes',careCase.internalNotes || 'Not recorded'],
+  ] });
+  if (!snapshot.record.appointments.length && !snapshot.visits.length && !snapshot.cases.length) {
+    tables.splice(1);
+    tables[0] = { ...tables[0], rows: [...tables[0].rows, ['Appointments','No appointments in the authorized scope.'],
+      ['Visit history','No visit records in the authorized scope.'], ['Treatment cases','No treatment cases in the authorized scope.']] };
+  }
+  return { title: `Patient record - ${name}`, clinic: snapshot.scopeLabel, period: 'Care history in the authorized scope', generatedAt: snapshot.generatedAt, tables };
+}
+export const createPatientRecordPdf = createDashboardPdf;
+export const renderPatientRecordReport = renderDashboardReport;

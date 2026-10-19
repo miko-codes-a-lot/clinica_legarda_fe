@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { CareVisit, CheckInPayload, PatientRecord, PatientSearchQuery, PatientSearchResult, TreatmentCase, TreatmentCaseDetail, VisitRecordPayload } from './care.models';
+import { CareVisit, CheckInPayload, PatientRecord, PatientRecordSnapshot, PatientSearchQuery, PatientSearchResult, TreatmentCase, TreatmentCaseDetail, VisitRecordPayload } from './care.models';
 
 export function careError(error: unknown): string {
   if (error instanceof HttpErrorResponse) {
@@ -29,6 +29,10 @@ export class CareApiService {
   patientRecord(id: string, clinic?: string) {
     const params = clinic ? new HttpParams().set('clinic', clinic) : undefined;
     return this.http.get<PatientRecord>(`/care/patients/${id}`, { params });
+  }
+  patientRecordSnapshot(id: string, clinic?: string) {
+    const params = clinic ? new HttpParams().set('clinic', clinic) : undefined;
+    return this.http.get<PatientRecordSnapshot>(`/care/patients/${id}/report`, { params });
   }
   visits(query: { clinic?: string; patient?: string; date?: string; appointment?: string }, queue = false) {
     let params = new HttpParams();
