@@ -3,6 +3,12 @@ import { canCancelAppointment } from './appointment-permissions';
 import { dentistAppointment } from '../../dentist/appointment/appointment-test-fixtures';
 
 describe('Appointment cancellation ownership', () => {
+  beforeEach(() => { jasmine.clock().install(); jasmine.clock().mockDate(new Date('2026-09-01')); });
+  afterEach(() => jasmine.clock().uninstall());
+  it('blocks creator cancellation once the Manila scheduled start is reached', () => {
+    jasmine.clock().mockDate(new Date('2026-09-10T05:00:00Z'));
+    expect(canCancelAppointment(dentistAppointment({ createdBy: 'creator' }), 'creator')).toBeFalse();
+  });
   it('uses the creator, not the patient, dentist, or most recent history actor', () => {
     const appointment = dentistAppointment({ createdBy: 'creator', history: [
       { action: 'Appointment created.', actorId: 'other', timestamp: new Date() },

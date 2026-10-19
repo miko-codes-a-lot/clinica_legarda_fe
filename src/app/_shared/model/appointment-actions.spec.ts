@@ -20,6 +20,8 @@ for (const [role, Details] of [['dentist', DentistDetails], ['admin', AdminDetai
     let result: Subject<string | undefined>;
     let open: jasmine.Spy;
     beforeEach(() => {
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date('2026-09-01'));
       result = new Subject();
       open = jasmine.createSpy('open').and.returnValue({ afterClosed: () => result.pipe(take(1)) });
       TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]),
@@ -33,7 +35,7 @@ for (const [role, Details] of [['dentist', DentistDetails], ['admin', AdminDetai
       ));
       details.appointment = dentistAppointment({ _id: 'a1', createdBy: 'creator', status: AppointmentStatus.PENDING });
     });
-    afterEach(() => http.verify());
+    afterEach(() => { http.verify(); jasmine.clock().uninstall(); });
 
     it('hides and blocks cancellation of bookings created by someone else', () => {
       if (!details.appointment) throw new Error('Missing fixture');
