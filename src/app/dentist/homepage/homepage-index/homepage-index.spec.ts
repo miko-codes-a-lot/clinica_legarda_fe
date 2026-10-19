@@ -123,4 +123,12 @@ describe('Dentist dashboard', () => {
     expect(fixture.componentInstance.upcomingAppointments.length).toBe(1);
     expect((fixture.nativeElement as HTMLElement).querySelector('[role="alert"]')).toBeNull();
   });
+  it('refreshes a system No-show notification and removes the booking from upcoming appointments', () => {
+    appointments = [dentistAppointment()]; fixture.detectChanges();
+    expect(fixture.componentInstance.upcomingAppointments.length).toBe(1);
+    appointments = [dentistAppointment({ status: AppointmentStatus.NO_SHOW })];
+    notifications.next([{ ...notification, message: 'Your appointment has been marked as no show.' }]);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.upcomingAppointments.length).toBe(0);
+  });
 });
