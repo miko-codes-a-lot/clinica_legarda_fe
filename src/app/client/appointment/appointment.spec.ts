@@ -34,7 +34,7 @@ describe('Patient appointment booking form', () => {
     fixture.componentRef.setInput('dentalServices', [{ _id: 'service-1', name: 'Cleaning', duration: 30 }]);
     fixture.detectChanges();
     http.expectOne('/appointments').flush([]);
-    http.expectOne('/reasons').flush([]);
+    http.expectNone('/reasons');
     fixture.detectChanges();
   });
 
@@ -84,5 +84,10 @@ describe('Patient appointment booking form', () => {
     component.date.setValue(new Date()); component.time.setValue('13:00'); component.clinic.setValue('');
     expect(slots.cancelled && closures.cancelled && days.cancelled).toBeTrue();
     expect(component.bookingSchedule).toBeUndefined(); expect(component.date.value).toBeNull(); expect(component.time.value).toBe('');
+  });
+  it('accepts a new plain-text referral reason and rejects blank or short text', () => {
+    const reason = fixture.componentInstance.reason;
+    for (const value of ['  ', 'ab', 'a'.repeat(501)]) { reason.setValue(value); expect(reason.invalid).toBeTrue(); }
+    reason.setValue('Please continue care at the other clinic'); expect(reason.valid).toBeTrue();
   });
 });

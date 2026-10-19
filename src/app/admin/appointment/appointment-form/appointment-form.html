@@ -46,10 +46,8 @@
           </mat-form-field>
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Reason for referral</mat-label>
-            <mat-select formControlName="reason" required>
-              <mat-option value="" disabled>Select a reason</mat-option>
-              <mat-option *ngFor="let r of reasons" [value]="r.value">{{ r.label }}</mat-option>
-            </mat-select>
+            <textarea matInput formControlName="reason" rows="3" minlength="3" maxlength="500" required></textarea>
+            <mat-hint>Explain the referral in 3 to 500 characters.</mat-hint><mat-error>Please enter a reason of 3 to 500 characters.</mat-error>
           </mat-form-field>
         </div>
         <p class="mt-3 flex items-start gap-2 text-sm text-muted"><app-icon class="shrink-0" name="info" /> The receiving clinic will review and confirm this referral.</p>

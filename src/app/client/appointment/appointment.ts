@@ -1,3 +1,4 @@
+import { reasonTextValidator } from '../../utils/forms/reason-validator';
 import { PageHeader } from '../../_shared/ui/page-header/page-header';
 import { isOnlineBookablePatient } from '../../_shared/model/user';
 import { EmptyState } from '../../_shared/ui/empty-state/empty-state';
@@ -35,7 +36,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Referral, ReferralStatus } from '../../_shared/model/referral';
 
-import { ReasonService } from '../../_shared/service/reason-service';
 
 import { CommonModule } from '@angular/common';
 
@@ -93,7 +93,6 @@ export class AppointmentPage {
   patientAppointments: Appointment[] = [];
   appointments: Appointment[] = [];
 
-  reasons: { value: string; label: string }[] = [];
 
   constructor(
     private readonly fb: FormBuilder,
@@ -101,7 +100,6 @@ export class AppointmentPage {
     private readonly userService: UserService,
     private readonly appointmentService: AppointmentService,
     private readonly referralService: ReferralService,
-    private readonly reasonService: ReasonService,
     private dialog: MatDialog,
     private readonly alertService: AlertService,
     private readonly bookingAvailability: BookingAvailabilityService,
@@ -131,7 +129,7 @@ export class AppointmentPage {
     this.rxReferralForm = this.fb.nonNullable.group({
       fromDoctorId: ['', Validators.required],
       fromClinicId: ['', Validators.required],
-      reason: ['', Validators.required],
+      reason: ['', [Validators.required, reasonTextValidator]],
       appointment: [''],
     });
     this.clinic.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(clinicId => this.onClinicChanged(clinicId));
@@ -144,12 +142,6 @@ export class AppointmentPage {
     this.builAppointmentFields();
     this.changeDentists(clinicId, dentistId);
     this.loadAppointments();
-    this.reasonService.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: reasons => this.reasons = reasons
-        .filter(reason => reason.isActive && (reason.usage === 'referral' || reason.usage === 'both'))
-        .map(reason => ({ value: reason.code, label: reason.label })),
-      error: () => this.alertService.error('Unable to load referral reasons.'),
-    });
   }
 
   private readonly destroyRef = inject(DestroyRef);
@@ -424,7 +416,7 @@ Do you want to proceed?` },
     const referral: ReferralPayload = {
       fromDoctorId: this.fromDoctorId.value,
       fromClinicId: previousClinicId ?? '',
-      reason: this.reason.value,
+      reason: this.reason.value.trim(),
       status: ReferralStatus.PENDING,
     };
 

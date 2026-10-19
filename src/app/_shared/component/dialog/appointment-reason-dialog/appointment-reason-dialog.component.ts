@@ -4,28 +4,30 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { reasonTextValidator } from '../../../../utils/forms/reason-validator';
 
 export interface AppointmentReasonDialogData {
   action: 'cancel' | 'reject';
+  subject?: 'appointment' | 'referral';
 }
 
 @Component({
   selector: 'app-appointment-reason-dialog',
   imports: [ReactiveFormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],
   template: `
-    <h2 mat-dialog-title>{{ actionLabel }} appointment</h2>
+    <h2 mat-dialog-title>{{ actionLabel }} {{ subjectLabel }}</h2>
     <mat-dialog-content>
-      <p>{{ data.action === 'reject' ? 'Please explain why this appointment is being rejected.' : 'Please tell the clinic why you need to cancel.' }}</p>
+      <p>{{ data.action === 'reject' ? 'Please explain why this ' + subjectLabel + ' is being declined.' : 'Please tell the clinic why you need to cancel.' }}</p>
       <mat-form-field appearance="outline" style="width: 100%">
         <mat-label>Reason for {{ data.action === 'reject' ? 'rejection' : 'cancellation' }}</mat-label>
         <textarea matInput [formControl]="reason" rows="3" maxlength="500" required></textarea>
-        <mat-hint>Up to 500 characters.</mat-hint>
+        <mat-hint>{{ data.action === 'reject' ? '3 to 500 characters.' : 'Up to 500 characters.' }}</mat-hint>
         <mat-error>Please enter a reason.</mat-error>
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button mat-dialog-close>{{ data.action === 'reject' ? 'Go back' : 'Keep appointment' }}</button>
-      <button mat-flat-button (click)="confirm()" [disabled]="reason.invalid">{{ actionLabel }} appointment</button>
+      <button mat-flat-button (click)="confirm()" [disabled]="reason.invalid">{{ actionLabel }} {{ subjectLabel }}</button>
     </mat-dialog-actions>
   `,
 })
@@ -38,10 +40,12 @@ export class AppointmentReasonDialogComponent {
   constructor(
     private readonly dialogRef: MatDialogRef<AppointmentReasonDialogComponent, string>,
     @Inject(MAT_DIALOG_DATA) readonly data: AppointmentReasonDialogData,
-  ) {}
+  ) { if (data.action === 'reject') { this.reason.addValidators(reasonTextValidator); this.reason.updateValueAndValidity(); } }
+
+  get subjectLabel() { return this.data.subject ?? 'appointment'; }
 
   get actionLabel(): string {
-    return this.data.action === 'reject' ? 'Reject' : 'Cancel';
+    return this.data.action === 'reject' ? this.data.subject === 'referral' ? 'Decline' : 'Reject' : 'Cancel';
   }
 
   confirm(): void {

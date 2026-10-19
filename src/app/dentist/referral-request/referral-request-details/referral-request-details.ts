@@ -12,7 +12,7 @@ import { catchError, finalize, forkJoin, Observable, of } from 'rxjs';
 import { Referral, ReferralStatus } from '../../../_shared/model/referral';
 import { ReferralService } from '../../../_shared/service/referral-service';
 import { ConfirmDialogComponent } from '../../../_shared/component/dialog/confirm-dialog/confirm-dialog.component';
-import { FormDialogComponent } from '../../../_shared/component/dialog/form-dialog/form-dialog.component';
+import { AppointmentReasonDialogComponent } from '../../../_shared/component/dialog/appointment-reason-dialog/appointment-reason-dialog.component';
 import { Reason } from '../../../_shared/model/reason';
 import { ReasonService } from '../../../_shared/service/reason-service';
 import { AlertService } from '../../../_shared/service/alert.service';
@@ -97,18 +97,14 @@ export class ReferralRequestDetails {
 
   declineReferral() {
     if (this.isActionDisabled()) return;
-    this.dialog.open(FormDialogComponent, {
+    this.dialog.open(AppointmentReasonDialogComponent, {
       width: '500px',
       data: {
-        title: 'Decline Referral',
-        fields: [{ name: 'reason', label: 'Reason for decline', type: 'select', required: true,
-          options: this.reasons.filter(reason => reason.isActive && ['both', 'decline'].includes(reason.usage))
-            .map(reason => ({ value: reason.code, label: reason.label })),
-        }],
+        action: 'reject', subject: 'referral',
       },
-    }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
-      if (result?.result && this.referral?._id) {
-        this.saveDecision(this.referralService.rejectReferral(this.referral._id, result.data.reason));
+    }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((reason?: string) => {
+      if (reason && this.referral?._id) {
+        this.saveDecision(this.referralService.rejectReferral(this.referral._id, reason));
       }
     });
   }

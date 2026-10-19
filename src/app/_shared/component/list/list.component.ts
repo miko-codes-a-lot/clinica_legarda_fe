@@ -42,7 +42,8 @@ export class ListComponent {
 
   formatValue(value: any, key: string): any {
     if (key.toLowerCase().includes('date')) {
-      return this.datePipe.transform(value, 'mediumDate');
+      const date = value instanceof Date ? value : typeof value === 'string' || typeof value === 'number' ? new Date(value) : null;
+      if (date && Number.isFinite(date.getTime())) return this.datePipe.transform(date, 'mediumDate');
     }
     return value;
   }

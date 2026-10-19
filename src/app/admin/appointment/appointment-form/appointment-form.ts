@@ -1,3 +1,4 @@
+import { reasonTextValidator } from '../../../utils/forms/reason-validator';
 import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subscription } from 'rxjs';
@@ -30,7 +31,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { ReferralPayload } from '../../../admin/appointment/referral-payload';
 import { ReferralStatus } from '../../../_shared/model/referral';
 import { ReferralService } from '../../../_shared/service/referral-service';
-import { ReasonService } from '../../../_shared/service/reason-service';
 
 import { AlertService } from '../../../_shared/service/alert.service';
 import { AuthService } from '../../../_shared/service/auth-service';
@@ -87,7 +87,6 @@ export class AppointmentForm {
   users: DentistDirectoryEntry[] = []
   selectReferringDentist: { value: string; label: string }[] = [];
   rxReferralForm!: FormGroup<RxReferralForm>;
-  reasons: { value: string; label: string }[] = [];
 
 
   constructor(
@@ -96,7 +95,6 @@ export class AppointmentForm {
     private readonly appointmentService: AppointmentService,
     private dialog: MatDialog,
     private readonly referralService: ReferralService,
-    private readonly reasonService: ReasonService,
     private readonly alertService: AlertService,
     private readonly bookingAvailability: BookingAvailabilityService,
     private readonly authService: AuthService,
@@ -140,7 +138,7 @@ export class AppointmentForm {
     this.rxReferralForm = this.fb.nonNullable.group({
       fromDoctorId: ['', Validators.required],
       fromClinicId: ['', Validators.required],
-      reason: ['', Validators.required],
+      reason: ['', [Validators.required, reasonTextValidator]],
       appointment: [''],
     });
     this.clinic.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(clinicId => this.onClinicChanged(clinicId));
@@ -153,12 +151,6 @@ export class AppointmentForm {
     this.buildAppointmentFields();
     this.changeDentists(clinicId, dentistId);
     this.loadAppointments();
-    this.reasonService.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: reasons => this.reasons = reasons
-        .filter(reason => reason.isActive && (reason.usage === 'referral' || reason.usage === 'both'))
-        .map(reason => ({ value: reason.code, label: reason.label })),
-      error: () => this.alertService.error('Unable to load referral reasons.'),
-    });
     this.patient.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.refreshPatientAppointments();
       if (!this.isEditMode) this.applyPreviousAppointment();
@@ -458,7 +450,7 @@ Do you want to proceed?` },
       patient: this.patient.value,
       fromDoctorId: this.fromDoctorId.value,
       fromClinicId: previousClinicId ?? '',
-      reason: this.reason.value,
+      reason: this.reason.value.trim(),
       status: ReferralStatus.PENDING,
     };
 
