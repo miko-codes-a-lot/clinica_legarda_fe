@@ -11,7 +11,8 @@
     </div>
   }
   @if (appointment) {
-    @if (requiresOutcome(appointment, reminderNow)) {
+    @if (isRetainedPatient(appointment.patient)) { <p class="ui-card mb-5 text-muted" role="status">{{ appointment.patient ? 'This patient has been deleted.' : 'The patient record is unavailable.' }} This appointment is retained for history and cannot be changed.</p> }
+    @if (!isRetainedPatient(appointment.patient) && requiresOutcome(appointment, reminderNow)) {
       <div class="mb-5 rounded-xl border border-warning-border bg-warning-soft p-5 text-sm text-warning" role="status">
         <strong class="font-semibold">Outcome required</strong>
         <p class="mt-1 leading-6">This confirmed appointment has passed its scheduled end in Manila time. Record Completed or No show, or update the appointment as needed.</p>
@@ -100,8 +101,11 @@
             <button type="button" class="ui-button-danger" (click)="declineAppointment()" [disabled]="isBusy"><app-icon name="close" /> Reject</button>
           }
           @if (appointment.status === 'confirmed') {
-            <button type="button" class="ui-button" (click)="completeAppointment()" [disabled]="isBusy"><app-icon name="task_alt" /> Completed</button>
-            <button type="button" class="ui-button-secondary" (click)="noShowAppointment()" [disabled]="isBusy"><app-icon name="person_off" /> No show</button>
+            <button type="button" class="ui-button" (click)="completeAppointment()" [disabled]="isBusy || !canComplete"><app-icon name="task_alt" /> Completed</button>
+            <button type="button" class="ui-button-secondary" (click)="noShowAppointment()" [disabled]="isBusy || !canMarkNoShow"><app-icon name="person_off" /> No show</button>
+          }
+          @if (appointment.status === 'confirmed' && (!canComplete || !canMarkNoShow)) {
+            <p class="ui-muted mt-2 text-sm" role="status">Completion is available from the scheduled start; treatment cases finish through the visit record. No-show is available after the 20-minute check-in grace period. Checked-in visits must be managed through the treatment queue.</p>
           }
           @if (!appointment.rescheduleProposal) { <button type="button" class="ui-button-secondary" (click)="rescheduleAppointment()" [disabled]="isBusy"><app-icon name="event" /> Reschedule</button> }
           @if (!appointment.rescheduleProposal && (canCancel || appointment.status === 'confirmed')) {

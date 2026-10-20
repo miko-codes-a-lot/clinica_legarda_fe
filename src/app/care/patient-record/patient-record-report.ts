@@ -1,3 +1,4 @@
+import { patientDisplayName } from '../../_shared/model/patient-identity';
 import { chartAuthorName, chartQuadrants } from '../dental-chart/dental-chart.models';
 import { patientAge, manilaDay } from '../../_shared/model/patient-demographics';
 import { PatientRecordSnapshot, CarePerson } from '../care.models';
@@ -7,9 +8,9 @@ export type PatientRecordReport = DashboardReport;
 const personName = (person: CarePerson | null | undefined) => [person?.firstName, person?.middleName, person?.lastName].filter(Boolean).join(' ') || 'Not recorded';
 const date = (value: string) => formatReportDate(value.slice(0,10));
 export function createPatientRecordReport(snapshot: PatientRecordSnapshot): PatientRecordReport {
-  const patient = snapshot.record.patient, name = personName(patient), scope = `${name}; ${snapshot.scopeLabel}`;
+  const patient = snapshot.record.patient, name = patientDisplayName(patient), scope = `${name}; ${snapshot.scopeLabel}`;
   const tables: DashboardReportTable[] = [{ title: 'Patient details', scope, headers: ['Field','Details'], columnWidths: [.28,.72], rows: [
-    ['Name',name], ...(patient.isDependent ? [['Patient account','Managed by parent; no independent sign-in']] : []), ['Account status',patient.status ?? 'Not recorded'], ['Email',patient.emailAddress || 'Not recorded'],
+    ['Name',name], ...(patient.isDependent ? [['Patient account','Managed by parent; no independent sign-in']] : []), ['Account status',patient.deletedAt ? 'Deleted patient (retained history)' : patient.status ?? 'Not recorded'], ['Email',patient.emailAddress || 'Not recorded'],
     ['Mobile number',patient.mobileNumber || 'Not recorded'], ['Address',patient.address || 'Not recorded'],
     ['Birth date',patient.birthDate ? date(patient.birthDate) : 'Not recorded'], ['Age',String(patientAge(patient.birthDate, manilaDay(new Date(snapshot.generatedAt))) ?? 'Not recorded')],
     ['Sex',patient.sex || 'Not recorded'], ['Occupation',patient.occupation || 'Not recorded'], ['Religion',patient.religion || 'Not recorded'], ['Marital status',patient.maritalStatus || 'Not recorded'],

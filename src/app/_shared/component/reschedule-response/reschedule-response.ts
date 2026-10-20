@@ -1,3 +1,4 @@
+import { isRetainedPatient } from '../../model/patient-identity';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -42,6 +43,9 @@ export class RescheduleResponse implements OnInit {
   now = Date.now();
   method: 'phone' | 'in_person' = 'phone';
   agreementReason = '';
+  get activeProposal(): boolean {
+    return !!this.appointment && !isRetainedPatient(this.appointment.patient) && this.appointment.status === 'pending' && !!this.appointment.rescheduleProposal;
+  }
   get expired(): boolean {
     const appointment = this.appointment;
     return (
@@ -56,7 +60,7 @@ export class RescheduleResponse implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.now = Date.now();
-        if (this.expired && !this.busy && this.appointment?.rescheduleProposal)
+        if (this.expired && !this.busy && this.activeProposal)
           this.refresh();
       });
   }
@@ -74,7 +78,8 @@ export class RescheduleResponse implements OnInit {
   accept(): void {
     const appointment = this.appointment,
       proposal = appointment?.rescheduleProposal;
-    if (!appointment || !proposal || this.busy || this.expired) return;
+    if (!appointment || !proposal || !this.activeProposal || this.busy || this.expired) return;
+    if (appointment.disruption) return;
     if (this.mode === 'staff' && this.agreementReason.trim().length < 3) {
       this.error = 'Explain how the patient agreed to the new schedule.';
       return;
@@ -111,7 +116,7 @@ export class RescheduleResponse implements OnInit {
   anotherTime(): void {
     const appointment = this.appointment,
       proposal = appointment?.rescheduleProposal;
-    if (!appointment || !proposal || this.busy || this.expired) return;
+    if (!appointment || !proposal || !this.activeProposal || this.busy || this.expired) return;
     this.busy = true;
     this.dialog
       .open<
@@ -149,7 +154,7 @@ export class RescheduleResponse implements OnInit {
   cancel(): void {
     const appointment = this.appointment,
       proposal = appointment?.rescheduleProposal;
-    if (!appointment || !proposal || this.busy) return;
+    if (!appointment || !proposal || !this.activeProposal || this.busy) return;
     this.busy = true;
     this.dialog
       .open(AppointmentReasonDialogComponent, {

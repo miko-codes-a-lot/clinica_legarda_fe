@@ -1,3 +1,4 @@
+import { patientDisplayName, isRetainedPatient } from '../../../_shared/model/patient-identity';
 import { RescheduleResponse } from '../../../_shared/component/reschedule-response/reschedule-response';
 import { appointmentTableDate, appointmentTableFilters } from '../../../_shared/component/table/appointment-table-config';
 import { AppointmentCareLinks } from '../../../care/appointment-care-links/appointment-care-links';
@@ -37,13 +38,14 @@ import { compareAppointmentSchedule, formatAppointmentDate, requiresAppointmentO
 export class AppointmentDetails {
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
+  readonly isRetainedPatient = isRetainedPatient;
   isLoading = false;
   isSaving = false;
   isDialogOpen = false;
   actionError = '';
   readonly actorLabel = appointmentActorLabel;
   readonly requiresOutcome = requiresAppointmentOutcome;
-  reminderNow = new Date();
+  reminderNow = new Date(Date.now());
   id = '';
   appointment?: Appointment;
   appointmentHistory: Appointment[] = [];
@@ -58,7 +60,7 @@ export class AppointmentDetails {
   columnDefs = [
     { key: 'clinic', label: 'Clinic', cell: (appointment: Appointment) => appointment.clinic.name },
     { key: 'services', label: 'Services', cell: (appointment: Appointment) => appointment.services.map(service => service.name).join(', ') },
-    { key: 'patient', label: 'Patient', cell: (appointment: Appointment) => `${appointment.patient.firstName} ${appointment.patient.lastName}` },
+    { key: 'patient', label: 'Patient', cell: (appointment: Appointment) => patientDisplayName(appointment.patient) },
     { key: 'dentist', label: 'Dentist', cell: (appointment: Appointment) => `${appointment.dentist.firstName} ${appointment.dentist.lastName}` },
     { key: 'date', sortValue: appointmentTableDate, label: 'Date', cell: (appointment: Appointment) => formatAppointmentDate(appointment.date) },
     { key: 'time', label: 'Time', cell: (appointment: Appointment) => `${appointment.startTime} - ${appointment.endTime}` },
@@ -77,7 +79,7 @@ export class AppointmentDetails {
 
   ngOnInit(): void {
     this.loadAppointment();
-    interval(30_000).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.reminderNow = new Date());
+    interval(30_000).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.reminderNow = new Date(Date.now()));
   }
 
   loadAppointment(): void {
@@ -127,11 +129,11 @@ export class AppointmentDetails {
   }
 
   isActionDisabled(): boolean {
-    return this.isBusy || !this.appointment || this.appointment.status !== 'pending' || !!this.appointment.rescheduleProposal;
+    return this.isBusy || !this.appointment || isRetainedPatient(this.appointment.patient) || this.appointment.status !== 'pending' || !!this.appointment.rescheduleProposal;
   }
 
   isClinicNotesDisabled(): boolean {
-    return this.isBusy || !this.appointment || ['rejected', 'cancelled'].includes(this.appointment.status);
+    return this.isBusy || !this.appointment || isRetainedPatient(this.appointment.patient) || ['rejected', 'cancelled'].includes(this.appointment.status);
   }
 
   get isBusy(): boolean {
@@ -139,7 +141,7 @@ export class AppointmentDetails {
   }
 
   get isActive(): boolean {
-    return this.appointment?.status === 'pending' || this.appointment?.status === 'confirmed';
+    return !!this.appointment && !isRetainedPatient(this.appointment.patient) && ['pending', 'confirmed'].includes(this.appointment.status);
   }
 
   get canCancel(): boolean {
@@ -166,6 +168,20 @@ export class AppointmentDetails {
         this.saveAppointment(request, action === 'cancel' ? 'Appointment cancelled successfully!' : 'Appointment rejected successfully!');
       }
     });
+  }
+
+  private get scheduledStart(): number {
+    const appointment = this.appointment;
+    if (!appointment) return Number.NaN;
+    return Date.parse(`${new Date(appointment.date).toISOString().slice(0, 10)}T${appointment.startTime.padStart(5, '0')}:00+08:00`);
+  }
+
+  get canComplete(): boolean {
+    return !!this.appointment && !isRetainedPatient(this.appointment.patient) && this.appointment.status === 'confirmed' && !this.appointment.careCase && this.reminderNow.getTime() >= this.scheduledStart;
+  }
+
+  get canMarkNoShow(): boolean {
+    return !!this.appointment && !isRetainedPatient(this.appointment.patient) && this.appointment.status === 'confirmed' && this.reminderNow.getTime() >= this.scheduledStart + 20 * 60_000;
   }
 
   completeAppointment(): void {
@@ -196,7 +212,7 @@ export class AppointmentDetails {
   }
 
   private confirmOutcome(outcome: 'completed' | 'no_show'): void {
-    if (!this.appointment || this.appointment.status !== 'confirmed' || this.isBusy) return;
+    if (!this.appointment || this.isBusy || (outcome === 'completed' ? !this.canComplete : !this.canMarkNoShow)) return;
     const appointmentId = this.appointment._id;
     const message = outcome === 'completed'
       ? 'Mark this appointment as completed? Confirm that the patient attended and the visit is finished. This final outcome cannot be changed or rescheduled. Clinical notes and history will remain available.'
@@ -217,14 +233,14 @@ export class AppointmentDetails {
   }
 
   private setAppointment(appointment: Appointment): void {
-    this.reminderNow = new Date();
+    this.reminderNow = new Date(Date.now());
     this.appointment = appointment;
     this.displayAppointment = {
       status: appointmentStatusLabel(appointment.status), date: formatAppointmentDate(appointment.date),
       time: `${appointment.startTime} - ${appointment.endTime}`,
       clinic: appointment.clinic.name, clinicAddress: appointment.clinic.address,
       dentist: `${appointment.dentist.firstName} ${appointment.dentist.lastName}`,
-      patient: `${appointment.patient.firstName} ${appointment.patient.lastName}`,
+      patient: patientDisplayName(appointment.patient),
     };
   }
 
@@ -254,6 +270,7 @@ export class AppointmentDetails {
 
   private loadHistory(appointment: Appointment): Observable<Appointment[]> {
     this.historyError = '';
+    if (!appointment.patient?._id || isRetainedPatient(appointment.patient)) { this.setHistory([]); return of([]); }
     return this.appointmentService.getAll(appointment.patient._id).pipe(
       tap(appointments => this.setHistory(appointments)),
       catchError(() => {
@@ -265,7 +282,7 @@ export class AppointmentDetails {
 
   private setHistory(appointments: Appointment[]): void {
     this.appointmentHistory = appointments.filter(appointment =>
-      appointment.patient._id === this.appointment?.patient._id && isAppointmentHistory(appointment),
+      appointment.patient?._id === this.appointment?.patient?._id && isAppointmentHistory(appointment),
     ).sort((a, b) => compareAppointmentSchedule(b, a));
     this.dataSource.data = this.appointmentHistory;
   }

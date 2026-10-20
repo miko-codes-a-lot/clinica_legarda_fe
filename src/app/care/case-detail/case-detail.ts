@@ -1,3 +1,4 @@
+import { patientDisplayName, isRetainedPatient } from '../../_shared/model/patient-identity';
 import { LINKED_APPOINTMENT_COLUMNS, LINKED_APPOINTMENT_FILTERS, careAppointmentDate } from '../care-table-config';
 import { GenericTableComponent } from '../../_shared/component/table/generic-table.component';
 import { TableCellDirective } from '../../_shared/component/table/table-cell.directive';
@@ -20,6 +21,8 @@ export class CaseDetail implements OnInit {
   readonly appointmentFilters = LINKED_APPOINTMENT_FILTERS;
   readonly dateValue = careAppointmentDate;
 
+  readonly patientDisplayName = patientDisplayName;
+  readonly isRetainedPatient = isRetainedPatient;
   private readonly destroyRef = inject(DestroyRef);
   private readonly api = inject(CareApiService);
   private readonly auth = inject(AuthService);
@@ -35,7 +38,7 @@ export class CaseDetail implements OnInit {
   get canClose(): boolean {
     const record = this.detail?.careCase;
     const user = this.auth.currentUserValue;
-    return !!record && record.status === 'active' && (user?.role === 'super-admin' || (user?.role === 'dentist' && user._id === record.dentist._id && assignedClinicIds(user).includes(record.clinic._id)));
+    return !!record && !isRetainedPatient(record.patient) && record.status === 'active' && (user?.role === 'super-admin' || (user?.role === 'dentist' && user._id === record.dentist._id && assignedClinicIds(user).includes(record.clinic._id)));
   }
   ngOnInit(): void {
     combineLatest([this.route.paramMap, this.refreshes.pipe(startWith(undefined))]).pipe(switchMap(([params]) => {

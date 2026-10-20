@@ -1,3 +1,4 @@
+import { patientDisplayName } from '../../../_shared/model/patient-identity';
 import { TableColumn, TableFilter, tableOptions } from '../../../_shared/component/table/table-model';
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { Router } from '@angular/router';
@@ -28,7 +29,7 @@ export class ReferralRequestList implements OnInit {
   displayedColumns = ['patient', 'clinic', 'date', 'reason', 'status', 'updatedAt', 'actions'];
   readonly dateValue = (row: Referral): string => row.appointment?.date ? appointmentDateKey(row.appointment.date) : '';
   columnDefs: TableColumn<Referral>[] = [
-    { key: 'patient', label: 'Patient', cell: row => `${row.appointment?.patient?.firstName || ''} ${row.appointment?.patient?.lastName || ''}` },
+    { key: 'patient', label: 'Patient', cell: row => patientDisplayName(row.appointment?.patient ?? row.patient) },
     { key: 'clinic', label: 'Transfer clinic / dentist', cell: row => row.appointment?.clinic?.name, secondary: row => `${row.appointment?.dentist?.firstName || ''} ${row.appointment?.dentist?.lastName || ''}` },
     { key: 'date', label: 'Appointment', cell: row => row.appointment?.date ? formatAppointmentDate(row.appointment.date) : '', secondary: row => row.appointment ? `${row.appointment.startTime}–${row.appointment.endTime}` : '', sortValue: this.dateValue },
     { key: 'reason', label: 'Reason / patient note', cell: row => row.reason, secondary: row => row.appointment?.notes?.patientNotes || '' },

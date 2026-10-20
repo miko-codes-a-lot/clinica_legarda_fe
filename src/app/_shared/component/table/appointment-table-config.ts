@@ -1,3 +1,4 @@
+import { patientDisplayName } from '../../model/patient-identity';
 import { Appointment, AppointmentStatus } from '../../model/appointment';
 import { appointmentStatusLabel } from '../../model/appointment-history';
 import { appointmentDateKey, formatAppointmentDate } from '../../../dentist/appointment/appointment-schedule';
@@ -5,7 +6,7 @@ import { TableColumn, TableFilter, tableOptions } from './table-model';
 
 export const appointmentTableDate = (row: Appointment): string => appointmentDateKey(row.date);
 export const APPOINTMENT_TABLE_COLUMNS: readonly TableColumn<Appointment>[] = [
-  { key: 'patient', label: 'Patient', cell: row => `${row.patient?.firstName || ''} ${row.patient?.lastName || ''}` },
+  { key: 'patient', label: 'Patient', cell: row => patientDisplayName(row.patient) },
   { key: 'clinic', label: 'Clinic / dentist', cell: row => row.clinic?.name, secondary: row => `Dr. ${row.dentist?.firstName || ''} ${row.dentist?.lastName || ''}` },
   { key: 'date', label: 'Date', cell: row => formatAppointmentDate(row.date), sortValue: appointmentTableDate },
   { key: 'time', label: 'Time', cell: row => `${row.startTime}–${row.endTime}`, sortValue: row => row.startTime },

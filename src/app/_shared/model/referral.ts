@@ -14,6 +14,7 @@ export interface Referral {
   _id?: string
   fromDoctorId: PersonSummary
   fromClinicId: Clinic
+  patient?: PatientDirectoryEntry | null
   reason?: string
   appointment: ReferralAppointment | null
   status: ReferralStatus

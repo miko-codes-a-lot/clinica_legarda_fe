@@ -1,4 +1,4 @@
-@if (appointment; as appointment) { @if (appointment.rescheduleProposal; as
+@if (appointment; as appointment) { @if (activeProposal && appointment.rescheduleProposal; as
 proposal) {
 <section
   class="my-5 rounded-xl border border-accent/30 bg-tint p-5 sm:p-6"
@@ -33,6 +33,12 @@ proposal) {
   <p class="mt-4 whitespace-pre-wrap break-words text-sm">
     <strong>Reason:</strong> {{ proposal.reason }}
   </p>
+  @if (appointment.disruption) {
+  <p class="ui-alert-error mt-4" role="status">
+    This appointment needs clinic review. The clinic must resolve the disruption
+    or propose another time before patient agreement can confirm it.
+  </p>
+  }
   @if (expired) {
   <p class="ui-alert-error mt-4" role="status">
     The proposed time has passed. An unanswered proposal is automatically
@@ -73,7 +79,7 @@ proposal) {
     <button
       type="button"
       class="ui-button"
-      [disabled]="busy || expired || (mode === 'staff' && agreementReason.trim().length < 3)"
+      [disabled]="busy || expired || !!appointment.disruption || (mode === 'staff' && agreementReason.trim().length < 3)"
       (click)="accept()"
     >
       {{ mode === 'patient' ? 'Accept new time' : 'Record patient agreement' }}

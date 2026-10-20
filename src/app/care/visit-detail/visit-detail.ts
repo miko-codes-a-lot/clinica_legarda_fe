@@ -1,3 +1,4 @@
+import { patientDisplayName, isRetainedPatient } from '../../_shared/model/patient-identity';
 import { ClinicDate } from '../clinic-date';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
@@ -21,6 +22,8 @@ function treatmentGroup(value?: VisitTreatment) {
 }
 @Component({ selector: 'app-visit-detail', imports: [ClinicDate, CommonModule, ReactiveFormsModule, RouterLink, PageHeader, StatusBadge], templateUrl: './visit-detail.html' })
 export class VisitDetail implements OnInit {
+  readonly patientDisplayName = patientDisplayName;
+  readonly isRetainedPatient = isRetainedPatient;
   private readonly destroyRef = inject(DestroyRef);
   private readonly api = inject(CareApiService);
   private readonly auth = inject(AuthService);
@@ -43,7 +46,7 @@ export class VisitDetail implements OnInit {
   saved = '';
   get responsible(): boolean {
     const user = this.auth.currentUserValue;
-    return !!this.visit && (user?.role === 'super-admin' || (user?.role === 'dentist' && user._id === this.visit.dentist._id && assignedClinicIds(user).includes(this.visit.clinic._id)));
+    return !!this.visit && !isRetainedPatient(this.visit.patient) && (user?.role === 'super-admin' || (user?.role === 'dentist' && user._id === this.visit.dentist._id && assignedClinicIds(user).includes(this.visit.clinic._id)));
   }
   get canEdit(): boolean { return this.responsible && this.visit?.state === 'in_progress'; }
   ngOnInit(): void {

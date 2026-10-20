@@ -9,7 +9,7 @@ describe('Unsaved clinical treatment structure', () => {
     const createCase = jasmine.createSpy('createCase'), navigate = jasmine.createSpy('navigate');
     TestBed.configureTestingModule({providers:[{provide:AuthService,useValue:{currentUserValue:{role:'super-admin'}}},{provide:CareApiService,useValue:{createCase}},{provide:ActivatedRoute,useValue:{}},{provide:Router,useValue:{url:'/super-admin/care/visits/visit',navigate}}]});
     const editor = TestBed.runInInjectionContext(() => new VisitDetail());
-    editor.visit = { _id:'visit',state:'in_progress',dentist:{_id:'doctor'},clinic:{_id:'clinic'} } as CareVisit;
+    editor.visit = { _id:'visit',state:'in_progress',patient:{_id:'patient',firstName:'Test',lastName:'Patient'},dentist:{_id:'doctor'},clinic:{_id:'clinic'} } as CareVisit;
     editor.addTreatment(); editor.form.markAsPristine(); editor.removeTreatment(0);
     expect(editor.form.dirty).toBeTrue(); editor.caseForm.setValue({title:'Demo case',plan:'Demo plan',internalNotes:''});
     editor.createCase(); expect(createCase).not.toHaveBeenCalled(); expect(navigate).not.toHaveBeenCalled();

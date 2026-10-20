@@ -1,3 +1,4 @@
+import { patientDisplayName, isRetainedPatient } from '../../_shared/model/patient-identity';
 import { DentalChart } from '../dental-chart/dental-chart';
 import { ParentRelationship } from './parent-relationship';
 import { CarePerson } from '../care.models';
@@ -24,6 +25,8 @@ export class PatientRecordPage implements OnInit {
   readonly appointmentFilters = CARE_APPOINTMENT_FILTERS;
   readonly dateValue = careAppointmentDate;
 
+  readonly patientDisplayName = patientDisplayName;
+  readonly isRetainedPatient = isRetainedPatient;
   private readonly destroyRef = inject(DestroyRef);
   private readonly api = inject(CareApiService);
   private readonly route = inject(ActivatedRoute);

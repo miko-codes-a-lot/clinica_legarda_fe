@@ -8,6 +8,7 @@ export interface CarePerson extends PatientDemographics {
   middleName?: string;
   lastName: string;
   username?: string;
+  deletedAt?: string;
   role?: string;
   status?: UserStatus;
   isDependent?: boolean; guardian?: string; loginEnabled?: boolean; verificationSource?: 'email' | 'guardian';

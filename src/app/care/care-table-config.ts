@@ -1,3 +1,4 @@
+import { patientDisplayName } from '../_shared/model/patient-identity';
 import { TableColumn, TableFilter } from '../_shared/component/table/table-model';
 import { CareAppointment, CarePerson, CareVisit, TreatmentCaseDetail } from './care.models';
 import { AffectedAppointment } from './closures/closure.models';
@@ -5,7 +6,7 @@ import { formatReportDate } from '../_shared/model/analytics-report';
 
 export const careDay = (key: string): string => key ? formatReportDate(key.slice(0, 10)) : '';
 export const CARE_PERSON_COLUMNS: TableColumn<CarePerson>[] = [
-  { key: 'name', label: 'Patient', cell: row => `${row.firstName} ${row.lastName}`, secondary: row => row.username || '' },
+  { key: 'name', label: 'Patient', cell: row => patientDisplayName(row), secondary: row => row.username || '' },
   { key: 'emailAddress', label: 'Email', cell: row => row.emailAddress },
   { key: 'mobileNumber', label: 'Phone', cell: row => row.mobileNumber },
   { key: 'status', label: 'Account', cell: row => row.status, secondary: row => row.isWalkIn ? 'Walk-in registration' : '', kind: 'status' },
@@ -27,7 +28,7 @@ export const LINKED_APPOINTMENT_COLUMNS: TableColumn<LinkedAppointment>[] = [
 ];
 export const LINKED_APPOINTMENT_FILTERS: TableFilter<LinkedAppointment>[] = [{ key: 'status', label: 'Status', options: APPOINTMENT_STATUS_OPTIONS, value: row => row.status }];
 export const FINISHED_VISIT_COLUMNS: TableColumn<CareVisit>[] = [
-  { key: 'patient', label: 'Patient', cell: row => `${row.patient.firstName} ${row.patient.lastName}` },
+  { key: 'patient', label: 'Patient', cell: row => patientDisplayName(row.patient) },
   { key: 'clinic', label: 'Clinic / dentist', cell: row => row.clinic.name, secondary: row => `${row.dentist.firstName} ${row.dentist.lastName}` },
   { key: 'purpose', label: 'Visit', cell: row => row.purpose, secondary: row => row.isWalkIn ? 'Walk-in' : 'Scheduled' },
   { key: 'state', label: 'Status', cell: row => row.state, kind: 'status' },
@@ -38,7 +39,7 @@ export const FINISHED_VISIT_FILTERS: TableFilter<CareVisit>[] = [
   { key: 'purpose', label: 'Visit', options: [{ value: 'consultation', label: 'Consultation' }, { value: 'treatment', label: 'Treatment' }], value: row => row.purpose },
 ];
 export const AFFECTED_APPOINTMENT_COLUMNS: TableColumn<AffectedAppointment>[] = [
-  { key: 'patient', label: 'Patient / dentist', cell: row => `${row.patient.firstName} ${row.patient.lastName}`, secondary: row => `${row.dentist.firstName} ${row.dentist.lastName}` },
+  { key: 'patient', label: 'Patient / dentist', cell: row => patientDisplayName(row.patient), secondary: row => `${row.dentist.firstName} ${row.dentist.lastName}` },
   { key: 'date', label: 'Schedule', cell: row => careDay(row.date), secondary: row => `${row.startTime}–${row.endTime}`, sortValue: row => row.date + row.startTime },
   { key: 'status', label: 'Status', cell: row => row.status, kind: 'status' },
   { key: 'flag', label: 'Closure review', cell: row => row.disruption ? 'Needs review' : 'Resolved' },

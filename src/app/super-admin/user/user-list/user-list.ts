@@ -71,7 +71,10 @@ export class UserList implements OnInit {
   }
 
   onDelete(id: string) {
-    const confirmed = confirm('Are you sure you want to delete this user?');
+    const patient = this.dataSource.data.find(user => user._id === id)?.role === 'user';
+    const confirmed = confirm(patient
+      ? 'Delete this patient account? Their records will be kept for history, hidden from normal lists, and active appointments will be cancelled. They will no longer be able to sign in.'
+      : 'Are you sure you want to delete this user?');
 
     if (!confirmed) {
       return;
@@ -83,7 +86,7 @@ export class UserList implements OnInit {
           user => user._id !== id
         );
 
-        this.alertService.error('The user account has been deleted successfully.')
+        this.alertService.success('The user account has been deleted successfully.')
       },
       error: (e) => {
         console.error(e);

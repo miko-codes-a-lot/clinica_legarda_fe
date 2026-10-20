@@ -1,7 +1,7 @@
 import { User } from './user';
 
 export type PersonSummary = Pick<User,
-  '_id' | 'firstName' | 'middleName' | 'lastName' | 'role' | 'status'>;
+  '_id' | 'firstName' | 'middleName' | 'lastName' | 'role' | 'status' | 'deletedAt'>;
 
 export type PatientDirectoryEntry = PersonSummary;
 

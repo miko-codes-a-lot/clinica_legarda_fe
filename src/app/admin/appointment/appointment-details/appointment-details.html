@@ -8,6 +8,7 @@
     }
   </app-page-header>
   @if (appointment) {
+    @if (isRetainedPatient(appointment.patient)) { <p class="ui-card mb-5 text-muted" role="status">{{ appointment.patient ? 'This patient has been deleted.' : 'The patient record is unavailable.' }} This appointment is retained for history and cannot be changed.</p> }
     <app-list [data]="displayAppointment" />
     <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="services-title">
       <h2 id="services-title" class="ui-section-title mb-4">Services</h2>

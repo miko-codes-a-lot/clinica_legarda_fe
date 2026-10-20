@@ -30,17 +30,18 @@ export interface User extends PatientDemographics {
   status?: UserStatus
   isDependent?: boolean
   guardian?: string
+  deletedAt?: string
   loginEnabled?: boolean
   verificationSource?: 'email' | 'guardian'
   isWalkIn?: boolean
 }
 
-export function isStaffBookablePatient(patient: Pick<User, 'role' | 'status'>): boolean {
-  return patient.role === 'user' && (patient.status === UserStatus.CONFIRMED || patient.status === UserStatus.WALK_IN);
+export function isStaffBookablePatient(patient: Pick<User, 'role' | 'status' | 'deletedAt'>): boolean {
+  return !patient.deletedAt && patient.role === 'user' && (patient.status === UserStatus.CONFIRMED || patient.status === UserStatus.WALK_IN);
 }
 
-export function isOnlineBookablePatient(patient: Pick<User, 'role' | 'status'>): boolean {
-  return patient.role === 'user' && patient.status === UserStatus.CONFIRMED;
+export function isOnlineBookablePatient(patient: Pick<User, 'role' | 'status' | 'deletedAt'>): boolean {
+  return !patient.deletedAt && patient.role === 'user' && patient.status === UserStatus.CONFIRMED;
 }
 
 export interface ClinicMembership {

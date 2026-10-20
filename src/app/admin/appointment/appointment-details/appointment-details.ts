@@ -1,3 +1,4 @@
+import { patientDisplayName, isRetainedPatient } from '../../../_shared/model/patient-identity';
 import { RescheduleResponse } from '../../../_shared/component/reschedule-response/reschedule-response';
 import { AppointmentCareLinks } from '../../../care/appointment-care-links/appointment-care-links';
 import { StatusBadge } from '../../../_shared/ui/status-badge/status-badge';
@@ -33,6 +34,7 @@ export class AppointmentDetails {
   private readonly destroyRef = inject(DestroyRef);
   isDialogOpen = false;
   readonly actorLabel = appointmentActorLabel;
+  readonly isRetainedPatient = isRetainedPatient;
   isLoading = false
   id!: string
   appointment?: Appointment
@@ -61,7 +63,7 @@ export class AppointmentDetails {
           clinic: clinicData.name,
           clinicAddress: clinicData.address,
           dentist: dentistData.firstName + ' ' + dentistData.lastName,
-          patient: patientData.firstName + ' ' + patientData.lastName,
+          patient: patientDisplayName(patientData),
         }
         this.appointment = a
       },
@@ -74,15 +76,15 @@ export class AppointmentDetails {
   }
 
   isClinicNotesDisabled() {
-    return this.appointment && ['rejected', 'cancelled'].includes(this.appointment.status);
+    return !this.appointment || isRetainedPatient(this.appointment.patient) || ['rejected', 'cancelled'].includes(this.appointment.status);
   }
 
   isClinicEditDisabled() {
-    return this.isLoading || !this.appointment || this.appointment.status !== 'pending' || !!this.appointment.rescheduleProposal;
+    return this.isLoading || !this.appointment || isRetainedPatient(this.appointment.patient) || this.appointment.status !== 'pending' || !!this.appointment.rescheduleProposal;
   }
 
   openNotesDialog() {
-    if (!this.appointment || this.isBusy) return;
+    if (!this.appointment || this.isBusy || isRetainedPatient(this.appointment.patient)) return;
 
     const dialogRef = this.dialog.open(NotesDialogComponent, {
       width: '560px', maxWidth: '95vw',

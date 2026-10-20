@@ -1,3 +1,4 @@
+import { patientDisplayName, isRetainedPatient } from '../../../_shared/model/patient-identity';
 import { StatusBadge } from '../../../_shared/ui/status-badge/status-badge';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
 import { Component, DestroyRef, inject } from '@angular/core';
@@ -58,8 +59,7 @@ export class ReferralRequestDetails {
         this.displayReferral = {
           'Referred To': appointment?.dentist
             ? `${appointment.dentist.firstName} ${appointment.dentist.lastName}` : 'Awaiting appointment',
-          'Patient': appointment?.patient
-            ? `${appointment.patient.firstName} ${appointment.patient.lastName}` : 'Awaiting appointment',
+          'Patient': patientDisplayName(appointment?.patient ?? referral.patient),
           'Transfer Branch': appointment?.clinic?.name || 'Awaiting appointment',
           'Status': referral.status,
           ...(referral.reasonOfDecline && { 'Reason for Rejection': this.getReasonLabel(referral.reasonOfDecline) }),
@@ -122,7 +122,7 @@ export class ReferralRequestDetails {
 
   isActionDisabled(): boolean {
     const dentistId = this.authService.currentUserValue?._id;
-    return this.isLoading || !this.referral?._id || this.referral.status !== ReferralStatus.PENDING || !dentistId ||
+    return this.isLoading || !this.referral?._id || (isRetainedPatient(this.referral.appointment?.patient ?? this.referral.patient)) || this.referral.status !== ReferralStatus.PENDING || !dentistId ||
       (this.referral.fromDoctorId?._id !== dentistId && this.referral.appointment?.dentist?._id !== dentistId);
   }
 

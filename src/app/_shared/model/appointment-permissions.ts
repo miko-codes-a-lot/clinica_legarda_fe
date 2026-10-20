@@ -1,10 +1,11 @@
+import { isRetainedPatient } from './patient-identity';
 import { Appointment, AppointmentStatus } from './appointment';
 import { assignedClinicIds, ClinicMembership } from './user';
 
 type CancellationActor = ClinicMembership & { _id: string; role: string };
 
 export function canCancelAppointment(appointment: Appointment | undefined, actor: CancellationActor | null | undefined): boolean {
-  if (!appointment || !actor?._id || ![AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED].includes(appointment.status)) {
+  if (!appointment || isRetainedPatient(appointment.patient) || !actor?._id || ![AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED].includes(appointment.status)) {
     return false;
   }
   const day = new Date(appointment.date);

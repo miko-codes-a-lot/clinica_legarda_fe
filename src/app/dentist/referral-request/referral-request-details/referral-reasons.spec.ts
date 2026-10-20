@@ -16,7 +16,7 @@ describe('Referral text and legacy reason display', () => {
     TestBed.configureTestingModule({ providers: [
       { provide: ActivatedRoute, useValue: { snapshot: { params: { id: 'referral' } } } },
       { provide: MatDialog, useValue: { open } },
-      { provide: ReferralService, useValue: { getOne: () => of({ _id: 'referral', reason, status: 'pending', fromDoctorId: { _id: 'dentist' }, appointment: null }), rejectReferral: reject } },
+      { provide: ReferralService, useValue: { getOne: () => of({ _id: 'referral', reason, status: 'pending', fromDoctorId: { _id: 'dentist' }, patient: { _id: 'patient', firstName: 'Active', lastName: 'Patient' }, appointment: null }), rejectReferral: reject } },
       { provide: ReasonService, useValue: { getAll: () => of([{ code: 'X', label: 'Legacy patient request', isActive: false, usage: 'referral' }]) } },
       { provide: AlertService, useValue: { error: () => {} } }, { provide: AuthService, useValue: { currentUserValue: { _id: 'dentist' } } },
     ] });
@@ -24,6 +24,14 @@ describe('Referral text and legacy reason display', () => {
   it('shows an old catalogue code label even if that reason is inactive', () => {
     const fixture = TestBed.createComponent(ReferralRequestDetails); fixture.detectChanges();
     expect(fixture.componentInstance.displayReferral['Reason for Referral']).toBe('Legacy patient request'); fixture.destroy();
+  });
+  it('labels a deleted unlinked patient and disables referral decisions', () => {
+    const fixture = TestBed.createComponent(ReferralRequestDetails); fixture.detectChanges();
+    const page = fixture.componentInstance;
+    if (!page.referral?.patient) throw new Error('Missing fixture patient');
+    page.referral.patient.deletedAt = '2026-10-21';
+    expect(page.isActionDisabled()).toBeTrue();
+    page.declineReferral(); expect(open).not.toHaveBeenCalled(); fixture.destroy();
   });
   it('renders new text inertly and accepts a decline without catalogue choices', () => {
     reason = '<script>Patient needs specialist care</script>';

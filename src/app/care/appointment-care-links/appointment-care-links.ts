@@ -1,3 +1,4 @@
+import { isRetainedPatient } from '../../_shared/model/patient-identity';
 import { selectLinkedVisit } from './linked-visit';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ClosuresApiService } from '../closures/closures-api.service';
@@ -28,7 +29,7 @@ import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
           @if (!visit && !loading && !error && canCheckIn) { <a class="ui-button" [routerLink]="[base, 'check-in']" [queryParams]="{ patient: data.patient._id, clinic: data.clinic._id, dentist: data.dentist._id, appointment: data._id }">Check in appointment</a> }
           @if (!visit && cancelledVisit) { <a class="ui-button-secondary" [routerLink]="[base, 'visits', cancelledVisit._id]">Cancelled intake record</a> }
           @if (data.careCase) { <a class="ui-button-secondary" [routerLink]="[base, 'cases', data.careCase]">Linked treatment case</a> }
-          <a class="ui-button-secondary" [routerLink]="[base, 'patients', data.patient._id]" [queryParams]="{ clinic: data.clinic._id }">Patient record</a>
+          @if (data.patient) { <a class="ui-button-secondary" [routerLink]="[base, 'patients', data.patient._id]" [queryParams]="{ clinic: data.clinic._id }">Patient record</a> }
         </div>
       </section>
     }
@@ -45,7 +46,7 @@ export class AppointmentCareLinks implements OnInit, OnChanges {
   private readonly auth = inject(AuthService);
   readonly resolutionReason = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(500)] });
   flagResolved = false; resolving = false; resolutionError = '';
-  get canResolve() { return ['admin', 'super-admin'].includes(this.auth.currentUserValue?.role ?? ''); }
+  get canResolve() { return !!this.appointment && !isRetainedPatient(this.appointment.patient) && ['admin', 'super-admin'].includes(this.auth.currentUserValue?.role ?? ''); }
   resolveFlag() {
     if (!this.appointment?._id || !this.canResolve || this.resolving || this.resolutionReason.invalid) return;
     this.resolving = true; this.resolutionError = '';
@@ -55,7 +56,7 @@ export class AppointmentCareLinks implements OnInit, OnChanges {
   cancelledVisit: CareVisit | null = null;
   loading = false;
   error = '';
-  get canCheckIn(): boolean { return this.appointment?.status === AppointmentStatus.CONFIRMED && new Date(this.appointment.date).toISOString().slice(0, 10) === clinicToday(); }
+  get canCheckIn(): boolean { return !!this.appointment && !isRetainedPatient(this.appointment.patient) && this.appointment.status === AppointmentStatus.CONFIRMED && new Date(this.appointment.date).toISOString().slice(0, 10) === clinicToday(); }
   ngOnInit(): void {
     this.requests.pipe(switchMap(appointment => {
       this.loading = true; this.error = '';
