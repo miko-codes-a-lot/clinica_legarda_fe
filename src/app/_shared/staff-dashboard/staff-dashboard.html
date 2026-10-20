@@ -57,8 +57,8 @@
       </mat-form-field>
     </div>
     <div class="mt-4 flex flex-wrap items-end gap-3">
-      <label class="text-sm">Period<select #periodChoice class="mt-1 block rounded-lg border border-stroke bg-white p-3" [value]="period" (change)="onPeriodChange(periodChoice.value)"><option value="week">Week</option><option value="month">Month</option><option value="year">Year</option></select></label>
-      <label class="text-sm">Date in period<input #anchorChoice type="date" class="mt-1 block rounded-lg border border-stroke bg-white p-3" [value]="anchor" min="2000-01-01" max="2100-12-31" (change)="onAnchorChange(anchorChoice.value)" /></label>
+      <label class="min-w-0"><span class="ui-label">Period</span><select #periodChoice class="ui-input" [value]="period" (change)="onPeriodChange(periodChoice.value)"><option value="week">Week</option><option value="month">Month</option><option value="year">Year</option></select></label>
+      <label class="min-w-0"><span class="ui-label">Date in period</span><input #anchorChoice type="date" class="ui-input" [value]="anchor" min="2000-01-01" max="2100-12-31" (change)="onAnchorChange(anchorChoice.value)" /></label>
       <button class="ui-button-secondary" type="button" (click)="movePeriod(-1)">Previous {{ period }}</button>
       <button class="ui-button-secondary" type="button" (click)="currentPeriod()">Current {{ period }}</button>
       <button class="ui-button-secondary" type="button" (click)="movePeriod(1)">Next {{ period }}</button>
