@@ -1,54 +1,70 @@
-<section class="space-y-6">
+<section class="ui-page">
   <app-page-header title="My availability" eyebrow="Appointment calendar" description="Choose a day, set your available hours and review any affected appointments." />
-  @if (error) { <p class="rounded-xl bg-red-50 p-4 text-red-800" role="alert">{{ error }} <button type="button" class="underline" (click)="load()">Reload calendar</button></p> }
-  @if (success) { <p class="rounded-xl bg-teal-50 p-4 text-teal-900" role="status">{{ success }}</p> }
-  <label class="block max-w-md">Clinic
-    <select class="mt-1 w-full rounded-lg border p-3" [(ngModel)]="clinicId" (ngModelChange)="load()" [disabled]="saving || loading">
+  @if (error) { <p class="ui-alert-error mb-5" role="alert">{{ error }} <button type="button" class="font-semibold underline" (click)="load()">Reload calendar</button></p> }
+  @if (success) { <p class="mb-5 rounded-xl border border-tint-border bg-tint p-4 text-sm text-accent" role="status">{{ success }}</p> }
+  <label class="mb-6 block max-w-md">
+    <span class="ui-label">Clinic</span>
+    <select class="ui-input" [(ngModel)]="clinicId" (ngModelChange)="load()" [disabled]="saving || loading">
       @for (clinic of clinics; track clinic._id) { <option [value]="clinic._id">{{ clinic.name }}</option> }
     </select>
   </label>
-  @if (loading) { <p role="status">Loading availability…</p> }
-  @if (!clinics.length && !loading) { <p>No assigned clinic is available. Contact your administrator.</p> }
+  @if (loading) { <p class="ui-muted mb-5" role="status">Loading availability…</p> }
+  @if (!clinics.length && !loading) { <p class="ui-empty ui-muted">No assigned clinic is available. Contact your administrator.</p> }
   @if (clinicId) {
-    <div class="availability-layout">
-      <div class="rounded-2xl border bg-white p-4">
+    <div class="availability-layout mb-6">
+      <section class="ui-card availability-calendar" aria-label="Choose an availability date">
+        <h2 class="ui-section-title">Choose a day</h2>
         <mat-calendar [selected]="selectedDate" (selectedChange)="selectDate($event)" [minDate]="minDate" [maxDate]="maxDate" [dateClass]="dateClass" />
-        <p class="text-sm text-gray-600">Outlined dates have custom hours. Shaded dates are unavailable. Other days use your weekly hours.</p>
-      </div>
-      <div class="space-y-5 rounded-2xl border bg-white p-5">
-        <h2 class="text-xl font-semibold">{{ selectedDate | date:'EEEE, MMMM d, y' }}</h2>
-        <p class="text-sm text-gray-600">Philippine time. Add separate intervals for breaks, for example 9:00–12:00 and 13:00–17:00.</p>
-        <fieldset [disabled]="saving || loading" class="space-y-3">
+        <div class="border-t border-stroke pt-4">
+          <ul class="availability-legend ui-muted" aria-label="Calendar legend">
+            <li><span class="availability-key availability-key-custom" aria-hidden="true"></span>Custom hours</li>
+            <li><span class="availability-key availability-key-closed" aria-hidden="true"></span>Unavailable</li>
+          </ul>
+          <p class="ui-muted mt-3 text-xs">Other days use your weekly hours.</p>
+        </div>
+      </section>
+      <section class="ui-card min-w-0" aria-labelledby="availability-date">
+        <h2 id="availability-date" class="ui-section-title">{{ selectedDate | date:'EEEE, MMMM d, y' }}</h2>
+        <p class="ui-muted mt-2 mb-5">Philippine time. Add separate intervals for breaks, for example 9:00–12:00 and 13:00–17:00.</p>
+        <fieldset [disabled]="saving || loading" class="min-w-0 space-y-4">
+          <legend class="ui-label mb-3">Available hours</legend>
           @for (interval of intervals; track $index; let i = $index) {
-            <div class="flex flex-wrap items-end gap-3">
-              <label>From <input type="time" class="block rounded-lg border p-2" [(ngModel)]="interval.startTime" (ngModelChange)="edit()" /></label>
-              <label>To <input type="time" class="block rounded-lg border p-2" [(ngModel)]="interval.endTime" (ngModelChange)="edit()" /></label>
-              <button type="button" class="rounded-lg border px-3 py-2" (click)="removeInterval(i)" [attr.aria-label]="'Remove interval ' + (i + 1)">Remove</button>
+            <div class="availability-interval">
+              <label class="min-w-0"><span class="ui-label">From</span><input type="time" class="ui-input" [(ngModel)]="interval.startTime" (ngModelChange)="edit()" /></label>
+              <label class="min-w-0"><span class="ui-label">To</span><input type="time" class="ui-input" [(ngModel)]="interval.endTime" (ngModelChange)="edit()" /></label>
+              <button type="button" class="ui-button-ghost" (click)="removeInterval(i)" [attr.aria-label]="'Remove interval ' + (i + 1)">Remove</button>
             </div>
           }
-          @if (!intervals.length) { <p class="rounded-lg bg-amber-50 p-3">Dentist unavailable for the whole day.</p> }
+          @if (!intervals.length) { <p class="rounded-xl border border-warning-border bg-warning-soft p-4 text-sm text-warning">Dentist unavailable for the whole day.</p> }
           <div class="flex flex-wrap gap-2">
-            <button type="button" class="rounded-lg border px-3 py-2" (click)="addInterval()" [disabled]="intervals.length >= 12">Add interval</button>
-            <button type="button" class="rounded-lg border px-3 py-2" (click)="wholeDayOff()">Whole day unavailable</button>
-            <button type="button" class="rounded-lg border px-3 py-2" (click)="restore()">Restore weekly hours</button>
+            <button type="button" class="ui-button-secondary" (click)="addInterval()" [disabled]="intervals.length >= 12">Add interval</button>
+            <button type="button" class="ui-button-secondary" (click)="wholeDayOff()">Whole day unavailable</button>
+            <button type="button" class="ui-button-ghost" (click)="restore()">Restore weekly hours</button>
           </div>
-          @if (restoreWeekly) { <p class="text-sm">This save restores the usual weekly schedule.</p> }
-          <button type="button" class="rounded-lg bg-teal-800 px-4 py-3 text-white" (click)="preview()">Review changes</button>
+          @if (restoreWeekly) { <p class="ui-muted">This save restores the usual weekly schedule.</p> }
+          <div class="border-t border-stroke pt-4">
+            <button type="button" class="ui-button" (click)="preview()">Review changes</button>
+          </div>
         </fieldset>
         @if (previewed) {
-          <div class="space-y-3 rounded-xl border border-amber-300 p-4" role="status">
-            <h3 class="font-semibold">{{ previewRows.length }} affected appointment(s)</h3>
-            @for (row of previewRows; track row._id) { <p>{{ row.startTime }}–{{ row.endTime }} · {{ row.patient?.firstName }} {{ row.patient?.lastName }}</p> }
-            <p class="text-sm">Saving flags these bookings for review and notifies the patients. Existing appointments keep their date, time and status.</p>
-            <button type="button" class="rounded-lg bg-teal-800 px-4 py-3 text-white" (click)="save()" [disabled]="saving">{{ saving ? 'Saving…' : 'Acknowledge and save' }}</button>
+          <div class="mt-5 space-y-3 rounded-xl border border-warning-border bg-warning-soft p-4" role="status">
+            <h3 class="font-semibold text-warning">{{ previewRows.length }} affected appointment(s)</h3>
+            @for (row of previewRows; track row._id) { <p class="text-sm text-ink">{{ row.startTime }}–{{ row.endTime }} · {{ row.patient?.firstName }} {{ row.patient?.lastName }}</p> }
+            <p class="ui-muted">Saving flags these bookings for review and notifies the patients. Existing appointments keep their date, time and status.</p>
+            <button type="button" class="ui-button" (click)="save()" [disabled]="saving">{{ saving ? 'Saving…' : 'Acknowledge and save' }}</button>
           </div>
         }
-      </div>
+      </section>
     </div>
-    <div class="rounded-2xl border bg-white p-5">
-      <h2 class="mb-3 text-lg font-semibold">Appointments on this day</h2>
-      @for (row of dayAppointments; track row._id) { <p class="border-t py-3"><a class="underline" [routerLink]="['/dentist/appointment/details', row._id]">{{ row.startTime }}–{{ row.endTime }} · {{ row.patient.firstName }} {{ row.patient.lastName }}</a> · {{ row.status }}</p> }
-      @empty { <p>No appointments for the selected day and clinic.</p> }
-    </div>
+    <section class="ui-card" aria-labelledby="availability-appointments">
+      <h2 id="availability-appointments" class="ui-section-title mb-4">Appointments on this day</h2>
+      @for (row of dayAppointments; track row._id) {
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-stroke py-4">
+          <a class="text-sm font-medium text-accent underline underline-offset-4" [routerLink]="['/dentist/appointment/details', row._id]">{{ row.startTime }}–{{ row.endTime }} · {{ row.patient.firstName }} {{ row.patient.lastName }}</a>
+          <span class="ui-status" [attr.data-status]="row.status">{{ row.status | titlecase }}</span>
+        </div>
+      }
+      @empty { <p class="ui-empty ui-muted">No appointments for the selected day and clinic.</p> }
+    </section>
   }
 </section>

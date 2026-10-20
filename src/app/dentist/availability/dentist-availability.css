@@ -1,5 +1,14 @@
-.availability-layout { display: grid; grid-template-columns: minmax(280px, 360px) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
-:host ::ng-deep .availability-day-custom .mat-calendar-body-cell-content { outline: 2px solid #0f766e; outline-offset: -3px; }
-:host ::ng-deep .availability-day-closed .mat-calendar-body-cell-content { background: #fef3c7; color: #78350f; }
-button:disabled { opacity: .55; cursor: wait; }
-@media (max-width: 850px) { .availability-layout { grid-template-columns: 1fr; } }
+.availability-layout { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.availability-calendar { min-width: 0; }
+.availability-interval { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)) auto; align-items: end; gap: .75rem; }
+.availability-interval input { min-width: 0; }
+.availability-legend { display: flex; flex-wrap: wrap; gap: .75rem 1rem; font-size: .75rem; }
+.availability-legend li { display: inline-flex; align-items: center; gap: .5rem; }
+.availability-key { width: 1rem; height: 1rem; border-radius: 50%; flex-shrink: 0; }
+.availability-key-custom { border: 2px solid var(--color-accent); }
+.availability-key-closed { border: 1px solid var(--color-warning-border); background: var(--color-warning-soft); }
+:host ::ng-deep .availability-day-custom .mat-calendar-body-cell-content { outline: 2px solid var(--color-accent); outline-offset: -3px; }
+:host ::ng-deep .availability-day-closed .mat-calendar-body-cell-content:not(.mat-calendar-body-selected) { border: 1px solid var(--color-warning-border); background: var(--color-warning-soft); color: var(--color-warning); }
+@media (max-width: 1100px) { .availability-layout { grid-template-columns: 1fr; } .availability-calendar mat-calendar { display: block; max-width: 340px; margin-inline: auto; } }
+@media (max-width: 640px) { .availability-interval { grid-template-columns: repeat(2, minmax(0, 1fr)); } .availability-interval > button { grid-column: 1 / -1; justify-self: start; } }
+@media (max-width: 400px) { .availability-interval { grid-template-columns: 1fr; } }
