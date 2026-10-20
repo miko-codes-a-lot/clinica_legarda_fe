@@ -103,8 +103,9 @@
             <button type="button" class="ui-button-secondary" (click)="noShowAppointment()" [disabled]="isBusy"><app-icon name="person_off" /> No show</button>
           }
           <button type="button" class="ui-button-secondary" (click)="rescheduleAppointment()" [disabled]="isBusy"><app-icon name="event" /> Reschedule</button>
-          @if (canCancel) {
-            <button type="button" class="ui-button-danger" (click)="cancelAppointment()" [disabled]="isBusy"><app-icon name="cancel" /> Cancel</button>
+          @if (canCancel || appointment.status === 'confirmed') {
+            <button type="button" class="ui-button-danger" (click)="cancelAppointment()" [disabled]="isBusy || !canCancel"><app-icon name="cancel" /> Cancel appointment</button>
+            @if (!canCancel && appointment.status === 'confirmed') { <p class="ui-muted mt-2 text-sm" role="status">Cancellation is available only before the scheduled start. Checked-in visits must be managed through the treatment queue.</p> }
           }
         </div>
       </section>

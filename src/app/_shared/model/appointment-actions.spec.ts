@@ -25,7 +25,7 @@ for (const [role, Details] of [['dentist', DentistDetails], ['admin', AdminDetai
       result = new Subject();
       open = jasmine.createSpy('open').and.returnValue({ afterClosed: () => result.pipe(take(1)) });
       TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]),
-        { provide: AuthService, useValue: { currentUserValue: { _id: 'creator' } } },
+        { provide: AuthService, useValue: { currentUserValue: { _id: 'creator', role, clinics: ['clinic-1'] } } },
       ] });
       http = TestBed.inject(HttpTestingController);
       details = TestBed.runInInjectionContext(() => new Details(
@@ -44,6 +44,23 @@ for (const [role, Details] of [['dentist', DentistDetails], ['admin', AdminDetai
       details.cancelAppointment();
       expect(open).not.toHaveBeenCalled();
       http.expectNone('/appointments/a1/cancel');
+    });
+
+    it('lets authorized staff cancel a confirmed patient booking with a reason', () => {
+      if (!details.appointment) throw new Error('Missing fixture');
+      details.appointment.status = AppointmentStatus.CONFIRMED;
+      details.appointment.createdBy = 'patient';
+      if (role === 'dentist') details.appointment.dentist._id = 'creator';
+      expect(details.canCancel).toBeTrue();
+      details.cancelAppointment();
+      expect(open).toHaveBeenCalled();
+      result.next('  Dentist unavailable  ');
+      const request = http.expectOne('/appointments/a1/cancel');
+      expect(request.request.body).toEqual({ reason: 'Dentist unavailable' });
+      const appointment = details.appointment;
+      request.flush({ ...appointment, status: AppointmentStatus.CANCELLED });
+      if (role === 'dentist') http.expectOne(`/appointments?patient=${appointment.patient._id}`).flush([]);
+      expect(details.appointment?.status).toBe(AppointmentStatus.CANCELLED);
     });
 
     it('asks the creator for a reason and keeps the booking if dismissed', () => {

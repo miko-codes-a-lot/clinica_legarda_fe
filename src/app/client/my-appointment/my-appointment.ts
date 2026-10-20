@@ -106,7 +106,7 @@ export class MyAppointment {
   }
 
   canCancel(appointment: Appointment): boolean {
-    return canCancelAppointment(appointment, this.authService.currentUserValue?._id);
+    return canCancelAppointment(appointment, this.authService.currentUserValue);
   }
 
   onCancel(appointment: Appointment) {
