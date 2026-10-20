@@ -1,0 +1,110 @@
+@if (appointment; as appointment) { @if (appointment.rescheduleProposal; as
+proposal) {
+<section
+  class="my-5 rounded-xl border border-accent/30 bg-tint p-5 sm:p-6"
+  aria-label="Proposed appointment schedule"
+  [attr.aria-busy]="busy"
+>
+  <h3 class="ui-section-title">
+    {{ mode === 'patient' ? 'Please respond to the proposed time' : 'Awaiting
+    patient response' }}
+  </h3>
+  <p class="ui-muted mt-2 text-sm">
+    The clinic has proposed a different schedule. The appointment becomes
+    confirmed when the patient agrees.
+  </p>
+  <dl class="mt-4 grid gap-4 text-sm sm:grid-cols-2">
+    <div>
+      <dt class="ui-label">Previous schedule</dt>
+      <dd class="mt-1">
+        {{ (proposal.previousSchedule.date + 'T00:00:00Z') |
+        date:'mediumDate':'+0000' }} · {{ proposal.previousSchedule.startTime
+        }}–{{ proposal.previousSchedule.endTime }}
+      </dd>
+    </div>
+    <div>
+      <dt class="ui-label">Proposed schedule</dt>
+      <dd class="mt-1">
+        {{ appointment.date | date:'mediumDate':'+0000' }} · {{
+        appointment.startTime }}–{{ appointment.endTime }} (Philippine time)
+      </dd>
+    </div>
+  </dl>
+  <p class="mt-4 whitespace-pre-wrap break-words text-sm">
+    <strong>Reason:</strong> {{ proposal.reason }}
+  </p>
+  @if (expired) {
+  <p class="ui-alert-error mt-4" role="status">
+    The proposed time has passed. An unanswered proposal is automatically
+    cancelled. Refresh to see its latest status.
+  </p>
+  } @else {
+  <p class="ui-muted mt-4 text-sm">
+    Please respond before the proposed start time. An unanswered proposal will
+    automatically cancel and will not become No-show.
+  </p>
+  } @if (mode === 'staff' && !expired) {
+  <div class="mt-5 grid max-w-2xl gap-4 sm:grid-cols-2">
+    <label
+      ><span class="ui-label">Patient agreement received</span
+      ><select
+        class="ui-input mt-2 w-full"
+        [(ngModel)]="method"
+        [disabled]="busy"
+      >
+        <option value="phone">By phone</option>
+        <option value="in_person">In person</option>
+      </select></label
+    >
+    <label
+      ><span class="ui-label">Agreement note</span
+      ><textarea
+        class="ui-input mt-2 w-full"
+        rows="2"
+        maxlength="500"
+        [(ngModel)]="agreementReason"
+        [disabled]="busy"
+        placeholder="Record what the patient agreed to"
+      ></textarea>
+    </label>
+  </div>
+  }
+  <div class="mt-5 flex flex-wrap gap-3">
+    <button
+      type="button"
+      class="ui-button"
+      [disabled]="busy || expired || (mode === 'staff' && agreementReason.trim().length < 3)"
+      (click)="accept()"
+    >
+      {{ mode === 'patient' ? 'Accept new time' : 'Record patient agreement' }}
+    </button>
+    <button
+      type="button"
+      class="ui-button-secondary"
+      [disabled]="busy || expired"
+      (click)="anotherTime()"
+    >
+      {{ mode === 'patient' ? 'Request another time' : 'Revise proposed time' }}
+    </button>
+    <button
+      type="button"
+      class="ui-button-danger"
+      [disabled]="busy"
+      (click)="cancel()"
+    >
+      Cancel appointment
+    </button>
+    <button
+      type="button"
+      class="ui-button-ghost"
+      [disabled]="busy"
+      (click)="refresh()"
+    >
+      Refresh appointment
+    </button>
+  </div>
+  @if (error) {
+  <p class="ui-alert-error mt-4" role="alert">{{ error }}</p>
+  }
+</section>
+} }

@@ -1,3 +1,4 @@
+import { RescheduleResponse } from '../../../_shared/component/reschedule-response/reschedule-response';
 import { appointmentTableDate, appointmentTableFilters } from '../../../_shared/component/table/appointment-table-config';
 import { AppointmentCareLinks } from '../../../care/appointment-care-links/appointment-care-links';
 import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
@@ -29,7 +30,7 @@ import { compareAppointmentSchedule, formatAppointmentDate, requiresAppointmentO
 
 @Component({
   selector: 'app-appointment-details',
-  imports: [AppointmentCareLinks, EmptyState, StatusBadge, PageHeader, ListComponent, MatListModule, MatButtonModule, Icon, CommonModule, GenericTableComponent],
+  imports: [RescheduleResponse,AppointmentCareLinks, EmptyState, StatusBadge, PageHeader, ListComponent, MatListModule, MatButtonModule, Icon, CommonModule, GenericTableComponent],
   templateUrl: './appointment-details.html',
   styleUrl: './appointment-details.css',
 })
@@ -126,7 +127,7 @@ export class AppointmentDetails {
   }
 
   isActionDisabled(): boolean {
-    return this.isBusy || !this.appointment || this.appointment.status !== 'pending';
+    return this.isBusy || !this.appointment || this.appointment.status !== 'pending' || !!this.appointment.rescheduleProposal;
   }
 
   isClinicNotesDisabled(): boolean {
@@ -188,8 +189,8 @@ export class AppointmentDetails {
     }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(result => {
       this.isDialogOpen = false;
       if (result) {
-        this.saveAppointment(this.appointmentService.rescheduleAppointment(appointment._id, result),
-          'Appointment rescheduled and awaiting approval.');
+        this.saveAppointment(this.appointmentService.rescheduleAppointment(appointment._id, { ...result, proposalId: appointment.rescheduleProposal?.id }),
+          'Proposed schedule sent for the patient response.');
       }
     });
   }

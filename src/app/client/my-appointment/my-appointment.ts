@@ -1,3 +1,4 @@
+import { RescheduleResponse } from '../../_shared/component/reschedule-response/reschedule-response';
 import { PatientSelector } from '../dependents/patient-selector';
 import { PatientIdentity } from '../dependents/dependents-api.service';
 import { RouterLink } from '@angular/router';
@@ -29,7 +30,7 @@ import { AlertService } from '../../_shared/service/alert.service';
 @Component({
   selector: 'app-my-appointment',
   standalone: true,
-  imports: [PatientSelector, RouterLink, PageHeader, StatusBadge, EmptyState,
+  imports: [RescheduleResponse,PatientSelector, RouterLink, PageHeader, StatusBadge, EmptyState,
     CommonModule,
     ReactiveFormsModule,
     Icon,

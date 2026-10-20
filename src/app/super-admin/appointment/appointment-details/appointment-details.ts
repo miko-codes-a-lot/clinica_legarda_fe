@@ -1,3 +1,4 @@
+import { RescheduleResponse } from '../../../_shared/component/reschedule-response/reschedule-response';
 import { AppointmentCareLinks } from '../../../care/appointment-care-links/appointment-care-links';
 import { StatusBadge } from '../../../_shared/ui/status-badge/status-badge';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
@@ -23,7 +24,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
 
 @Component({
 selector: 'app-appointment-details',
-  imports: [AppointmentCareLinks, StatusBadge, PageHeader, ListComponent, MatListModule, MatButtonModule, Icon, CommonModule],
+  imports: [RescheduleResponse,AppointmentCareLinks, StatusBadge, PageHeader, ListComponent, MatListModule, MatButtonModule, Icon, CommonModule],
   templateUrl: './appointment-details.html',
   styleUrl: './appointment-details.css'
 })
@@ -77,7 +78,7 @@ export class AppointmentDetails {
   }
 
   isClinicEditDisabled() {
-    return this.isBusy || !this.appointment || this.appointment.status !== 'pending';
+    return this.isBusy || !this.appointment || this.appointment.status !== 'pending' || !!this.appointment.rescheduleProposal;
   }
 
   openNotesDialog() {
@@ -134,7 +135,7 @@ export class AppointmentDetails {
   }
 
   isActionDisabled() {
-    return this.isBusy || !this.appointment || this.appointment.status !== 'pending';
+    return this.isBusy || !this.appointment || this.appointment.status !== 'pending' || !!this.appointment.rescheduleProposal;
   }
 
   declineAppointment(): void {

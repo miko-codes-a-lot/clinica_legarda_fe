@@ -63,10 +63,11 @@
           @for (entry of appointment.history; track $index) { <div class="text-sm"><p class="font-semibold capitalize text-ink">{{ entry.action }}</p><p class="ui-muted mt-1 text-xs">{{ entry.timestamp | date:'MMM d, yyyy, h:mm a':'+0800' }}</p>@if (actorLabel(entry)) { <p class="ui-muted mt-1">By {{ actorLabel(entry) }}</p> }@if (entry.reason) { <p class="mt-2 whitespace-pre-wrap break-words text-ink"><strong>Reason:</strong> {{ entry.reason }}</p> }</div> } @empty { <p class="ui-muted text-sm">No appointment activity yet.</p> }
         </div>
       </details>
+      <app-reschedule-response [appointment]="appointment" (updated)="loadAppointments()" />
       @if (mode === 'confirmed' && !isAppointmentPast(appointment)) {
         <div class="mt-5 flex flex-wrap gap-2 border-t border-stroke pt-4"><button type="button" class="ui-button-secondary" (click)="onReschedule(appointment)" [disabled]="isLoading"><app-icon aria-hidden="true" name="event_repeat" /> Reschedule</button>@if (canCancel(appointment)) { <button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><app-icon aria-hidden="true" name="cancel" /> Cancel appointment</button> }</div>
       }
-      @if (mode === 'pending' && canCancel(appointment)) { <div class="mt-5 border-t border-stroke pt-4"><button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><app-icon aria-hidden="true" name="cancel" /> Cancel appointment</button></div> }
+      @if (mode === 'pending' && !appointment.rescheduleProposal && canCancel(appointment)) { <div class="mt-5 border-t border-stroke pt-4"><button type="button" class="ui-button-danger" (click)="onCancel(appointment)" [disabled]="isLoading"><app-icon aria-hidden="true" name="cancel" /> Cancel appointment</button></div> }
     </div>
   </article>
 </ng-template>

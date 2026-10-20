@@ -90,11 +90,12 @@
       </div>
     }
     @if (isSaving) { <p class="mt-5 text-sm text-muted" role="status">Saving appointment...</p> }
-    @if (isActive) {
+    <app-reschedule-response [appointment]="appointment" mode="staff" (updated)="loadAppointment()" />
+    @if (isActive && !appointment.rescheduleProposal) {
       <section class="ui-card mt-5 p-5 sm:p-6" aria-labelledby="appointment-actions-title">
         <h2 id="appointment-actions-title" class="ui-section-title mb-4">Appointment actions</h2>
         <div class="flex flex-wrap gap-3">
-          @if (appointment.status === 'pending') {
+          @if (appointment.status === 'pending' && !appointment.rescheduleProposal) {
             <button type="button" class="ui-button" (click)="approveAppointment()" [disabled]="isBusy"><app-icon name="check" /> Approve</button>
             <button type="button" class="ui-button-danger" (click)="declineAppointment()" [disabled]="isBusy"><app-icon name="close" /> Reject</button>
           }
@@ -102,8 +103,8 @@
             <button type="button" class="ui-button" (click)="completeAppointment()" [disabled]="isBusy"><app-icon name="task_alt" /> Completed</button>
             <button type="button" class="ui-button-secondary" (click)="noShowAppointment()" [disabled]="isBusy"><app-icon name="person_off" /> No show</button>
           }
-          <button type="button" class="ui-button-secondary" (click)="rescheduleAppointment()" [disabled]="isBusy"><app-icon name="event" /> Reschedule</button>
-          @if (canCancel || appointment.status === 'confirmed') {
+          @if (!appointment.rescheduleProposal) { <button type="button" class="ui-button-secondary" (click)="rescheduleAppointment()" [disabled]="isBusy"><app-icon name="event" /> Reschedule</button> }
+          @if (!appointment.rescheduleProposal && (canCancel || appointment.status === 'confirmed')) {
             <button type="button" class="ui-button-danger" (click)="cancelAppointment()" [disabled]="isBusy || !canCancel"><app-icon name="cancel" /> Cancel appointment</button>
             @if (!canCancel && appointment.status === 'confirmed') { <p class="ui-muted mt-2 text-sm" role="status">Cancellation is available only before the scheduled start. Checked-in visits must be managed through the treatment queue.</p> }
           }

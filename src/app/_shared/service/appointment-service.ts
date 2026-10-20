@@ -8,6 +8,7 @@ import { MockService } from './mock-service';
 import { AppointmentAvailability } from '../model/booking-availability';
 
 export interface RescheduleAppointmentPayload {
+  proposalId?: string;
   date: Date | string;
   startTime: string;
   endTime: string;
@@ -156,8 +157,12 @@ export class AppointmentService {
       .pipe(tap(() => this.changes.next()));
   }
 
-  cancelAppointment(appointmentId: string, reason?: string) {
-    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/cancel`, { reason }, { withCredentials: true }).pipe(tap(() => this.changes.next()));
+  cancelAppointment(appointmentId: string, reason?: string, proposalId?: string) {
+    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/cancel`, { reason, ...(proposalId ? { proposalId } : {}) }, { withCredentials: true }).pipe(tap(() => this.changes.next()));
+  }
+
+  respondToReschedule(appointmentId: string, payload: { proposalId: string; method: 'patient_portal' | 'phone' | 'in_person'; reason?: string }): Observable<Appointment> {
+    return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/reschedule-response`, payload, { withCredentials: true }).pipe(tap(() => this.changes.next()));
   }
 
   rescheduleAppointment(appointmentId: string, payload: RescheduleAppointmentPayload) {

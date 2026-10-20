@@ -61,7 +61,8 @@
         } @empty { <li class="ui-muted">No appointment activity yet.</li> }
       </ol>
     </section>
-    @if (canCancel || appointment.status === 'confirmed') {
+    <app-reschedule-response [appointment]="appointment" mode="staff" (updated)="ngOnInit()" />
+    @if (!appointment.rescheduleProposal && (canCancel || appointment.status === 'confirmed')) {
       <section class="ui-card mt-5 p-5 sm:p-6" aria-label="Appointment actions">
         <button type="button" class="ui-button-danger" (click)="cancelAppointment()" [disabled]="isBusy || !canCancel"><app-icon name="cancel" /> Cancel appointment</button>
             @if (!canCancel && appointment.status === 'confirmed') { <p class="ui-muted mt-2 text-sm" role="status">Cancellation is available only before the scheduled start. Checked-in visits must be managed through the treatment queue.</p> }

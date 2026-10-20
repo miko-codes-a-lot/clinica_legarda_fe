@@ -36,6 +36,8 @@ export interface Appointment {
   date: Date
   startTime: string
   endTime: string
+  scheduleVersion?: number
+  rescheduleProposal?: { id: string; proposedAt: string; reason: string; previousSchedule: { date: string; startTime: string; endTime: string } }
   status: AppointmentStatus
   isWalkIn?: boolean
   disruption?: AppointmentDisruption;
