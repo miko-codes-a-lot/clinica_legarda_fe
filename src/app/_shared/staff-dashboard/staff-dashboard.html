@@ -98,13 +98,37 @@
   <div class="mb-6 grid gap-5 xl:grid-cols-2" [hidden]="!report">
     <section class="ui-card min-w-0 p-5"><h2 class="ui-section-title mb-5">Preferred services distribution</h2>
       <div class="chart-container"><canvas #servicesChart aria-label="Preferred services distribution chart" role="img"></canvas></div>
+      <ul class="chart-legend" aria-label="Preferred services legend">
+        @for (item of chartLegends.services; track item.index) {
+          <li class="min-w-0"><button type="button" class="chart-legend-button" [attr.aria-pressed]="item.visible" (click)="toggleChartLegend('services', item.index)">
+            <span class="chart-legend-swatch" [style.background-color]="item.color" aria-hidden="true"></span>
+            <span class="min-w-0 break-words" [class.line-through]="!item.visible">{{ item.label }}</span>
+          </button></li>
+        }
+      </ul>
       <p *ngIf="(report?.preferredServices | keyvalue)?.length === 0" class="ui-muted mt-3 text-sm">No services in this report period.</p>
     </section>
     <section class="ui-card min-w-0 p-5"><h2 class="ui-section-title mb-5">Appointment trend</h2>
       <div class="chart-container"><canvas #appointmentTrendChart aria-label="Appointment trend chart" role="img"></canvas></div>
+      <ul class="chart-legend" aria-label="Appointment trend legend">
+        @for (item of chartLegends.appointments; track item.index) {
+          <li class="min-w-0"><button type="button" class="chart-legend-button" [attr.aria-pressed]="item.visible" (click)="toggleChartLegend('appointments', item.index)">
+            <span class="chart-legend-swatch" [style.background-color]="item.color" aria-hidden="true"></span>
+            <span class="min-w-0 break-words" [class.line-through]="!item.visible">{{ item.label }}</span>
+          </button></li>
+        }
+      </ul>
     </section>
     <section class="ui-card min-w-0 p-5 xl:col-span-2"><h2 class="ui-section-title mb-5">Service trend</h2>
       <div class="chart-container"><canvas #serviceTrendChart aria-label="Service trend chart" role="img"></canvas></div>
+      <ul class="chart-legend" aria-label="Service trend legend">
+        @for (item of chartLegends.serviceTrend; track item.index) {
+          <li class="min-w-0"><button type="button" class="chart-legend-button" [attr.aria-pressed]="item.visible" (click)="toggleChartLegend('serviceTrend', item.index)">
+            <span class="chart-legend-swatch" [style.background-color]="item.color" aria-hidden="true"></span>
+            <span class="min-w-0 break-words" [class.line-through]="!item.visible">{{ item.label }}</span>
+          </button></li>
+        }
+      </ul>
     </section>
   </div>
 

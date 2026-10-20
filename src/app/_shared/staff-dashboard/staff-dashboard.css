@@ -1,4 +1,9 @@
 .chart-container { position: relative; height: 19rem; min-width: 0; }
+.chart-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .5rem 1rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+.chart-legend-button { display: flex; align-items: flex-start; gap: .5rem; width: 100%; min-width: 0; padding: .25rem 0; text-align: left; color: var(--color-muted); font-size: .75rem; line-height: 1.5; border-radius: .25rem; }
+.chart-legend-button:hover { color: var(--color-ink); }
+.chart-legend-button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+.chart-legend-swatch { flex: none; width: .625rem; height: .625rem; margin-top: .25rem; border-radius: 50%; }
 .notification-popover { position: absolute; right: 0; top: 100%; z-index: 40; margin-top: .5rem; width: min(26.25rem, calc(100vw - 2rem)); border: 1px solid var(--color-stroke); border-radius: 1rem; overflow: hidden; background: var(--color-surface); box-shadow: 0 16px 40px rgb(0 0 0 / .18); }
 .notification-header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .75rem .5rem 1rem; border-bottom: 1px solid var(--color-stroke); }
 .notification-header h2 { display: flex; align-items: baseline; gap: .75rem; font-size: .9375rem; font-weight: 600; color: var(--color-ink); }

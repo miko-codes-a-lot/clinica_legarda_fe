@@ -4,7 +4,7 @@ import { applyChartTheme, readChartTheme } from './chart-theme';
 import { PageHeader } from '../ui/page-header/page-header';
 import { EmptyState } from '../ui/empty-state/empty-state';
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild, ElementRef, Input, DestroyRef, inject } from '@angular/core';
+import { Component, ViewChild, ElementRef, Input, DestroyRef, ChangeDetectorRef, inject } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -19,7 +19,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
-import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { Chart, ChartConfiguration, LegendItem, registerables } from 'chart.js';
 import { BehaviorSubject, catchError, finalize, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AnalyticsService } from '../service/analytics-service';
@@ -35,6 +35,10 @@ import { Clinic } from '../model/clinic';
 import { createDashboardPdf, createDashboardReport, DashboardReport, renderDashboardReport } from '../../admin/dashboard/dashboard-index/dashboard-report';
 
 Chart.register(...registerables);
+
+type DashboardChart = 'services' | 'appointments' | 'serviceTrend';
+interface DashboardLegendItem { label: string; color: string; index: number; visible: boolean; }
+
 
 @Component({
   selector: 'app-staff-dashboard',
@@ -65,6 +69,7 @@ export class StaffDashboard {
 
   @Input() area: 'admin' | 'super-admin' = 'admin';
   private readonly destroyRef = inject(DestroyRef);
+  private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly document = inject(DOCUMENT);
   private readonly themeService = inject(ThemeService);
   private chartTheme = readChartTheme(this.document);
@@ -87,6 +92,7 @@ export class StaffDashboard {
   notificationError = '';
   private latestNotifications: Notification[] = [];
 
+  readonly chartLegends: Record<DashboardChart, readonly DashboardLegendItem[]> = { services: [], appointments: [], serviceTrend: [] };
   servicesChart!: Chart<'doughnut', number[], string>;
   appointmentTrendChart!: Chart<'line', number[], string>;
   showNotifications = false;
@@ -162,6 +168,8 @@ export class StaffDashboard {
   ngAfterViewInit(): void {
     this.viewReady = true;
     this.updateCharts();
+    // Initial Chart.js legend rows are created after the canvas references exist.
+    this.changeDetector.detectChanges();
   }
 
   loadClinics(): void {
@@ -214,11 +222,31 @@ export class StaffDashboard {
     this.serviceTrendChart?.data.datasets.forEach((dataset, index) => {
       dataset.backgroundColor = this.chartTheme.colors[index % this.chartTheme.colors.length];
     });
-    for (const chart of [this.servicesChart, this.appointmentTrendChart, this.serviceTrendChart]) {
+    const charts = [['services', this.servicesChart], ['appointments', this.appointmentTrendChart], ['serviceTrend', this.serviceTrendChart]] as const;
+    for (const [name, chart] of charts) {
       if (!chart) continue;
       applyChartTheme(chart, this.chartTheme);
       chart.update('none');
+      this.updateLegend(name, chart.legend?.legendItems ?? []);
     }
+  }
+
+  private updateLegend(name: DashboardChart, items: readonly LegendItem[]): void {
+    this.chartLegends[name] = items.map((item, index) => ({
+      label: item.text,
+      color: String(name === 'appointments' ? item.strokeStyle : item.fillStyle),
+      index: item.index ?? item.datasetIndex ?? index,
+      visible: !item.hidden,
+    }));
+  }
+
+  toggleChartLegend(name: DashboardChart, index: number): void {
+    const chart = name === 'services' ? this.servicesChart : name === 'appointments' ? this.appointmentTrendChart : this.serviceTrendChart;
+    if (!chart) return;
+    if (name === 'services') chart.toggleDataVisibility(index);
+    else chart.setDatasetVisibility(index, !chart.isDatasetVisible(index));
+    chart.update('none');
+    this.updateLegend(name, chart.legend?.legendItems ?? []);
   }
 
   // ----------------- SERVICES CHART -----------------
@@ -247,7 +275,7 @@ export class StaffDashboard {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } },
+          legend: { display: false },
           tooltip: {
             callbacks: {
               label: (context) => {
@@ -314,7 +342,7 @@ export class StaffDashboard {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { position: 'top' } },
+        plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
       }
     };
@@ -370,7 +398,7 @@ export class StaffDashboard {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'top' },
+          legend: { display: false },
           tooltip: {
             callbacks: {
               label: (context) => `${context.dataset.label}: ${context.parsed.y}`
