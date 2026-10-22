@@ -1,7 +1,6 @@
 import { PersonSummary, PatientDirectoryEntry } from "./user-directory"
 import { Clinic } from './clinic'
 import { Appointment } from "./appointment"
-import { Reason } from "./reason"
 
 
 export enum ReferralStatus {

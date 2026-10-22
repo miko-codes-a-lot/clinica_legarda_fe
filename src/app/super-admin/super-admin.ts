@@ -37,7 +37,6 @@ export class SuperAdmin {
     { label: 'Clinics', icon: 'local_hospital', link: '/super-admin/clinic' },
     { label: 'User', icon: 'group', link: '/super-admin/user' },
     { label: 'Services', icon: 'medical_services', link: '/super-admin/service' },
-    { label: 'Reasons', icon: 'info', link: '/super-admin/reason' },
     { label: 'Appointments', icon: 'event', link: '/super-admin/appointment' },
     { label: 'Notifications', icon: 'notifications', link: '/super-admin/notification' },
   ];

@@ -77,9 +77,7 @@ export const ADMIN_ROUTES: Routes = [
       },
       {
         path: 'reason',
-        canActivate: [AuthGuard],
-        data: { role: 'admin' },
-        loadChildren: () => import('./reason/reason.routes').then(m => m.REASON_ROUTES)
+        children: [{ path: '**', redirectTo: '/admin/dashboard' }],
       },
     ]
   }
