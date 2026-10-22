@@ -235,8 +235,12 @@ export class AppointmentPage {
 
   reloadAvailability() { this.time.setValue(''); this.setDentist(this.dentist.value); }
 
+  get scheduleDisabled(): boolean {
+    return !this.accountVerified || this.isLoading || this.availabilityLoading || this.confirmingClinic || this.savingReferral;
+  }
+
   get bookingUnavailable(): boolean {
-    return !this.accountVerified || this.isLoading || this.availabilityLoading || this.confirmingClinic || this.savingReferral || !this.bookingSchedule ||
+    return this.scheduleDisabled || !this.bookingSchedule ||
       (this.isChangeBranch && this.rxReferralForm.invalid);
   }
 
