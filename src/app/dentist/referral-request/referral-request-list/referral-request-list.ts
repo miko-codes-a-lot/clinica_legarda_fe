@@ -22,7 +22,7 @@ export class ReferralRequestList implements OnInit {
   isLoading = false
   moduleUrl = '/dentist/referral-request/'
   title = 'Referral Request'
-  createLabel = 'Create appointment'
+  createLabel = 'Create referral'
   loadError = '';
   private readonly destroyRef = inject(DestroyRef);
   dataSource = new MatTableDataSource<Referral>();
@@ -69,5 +69,9 @@ export class ReferralRequestList implements OnInit {
 
   onDetails(id: string) {
     this.router.navigate([`${this.moduleUrl}details`, id])
+  }
+
+  onCreate(): void {
+    this.router.navigate([`${this.moduleUrl}create`]);
   }
 }

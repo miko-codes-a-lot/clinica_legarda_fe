@@ -118,7 +118,7 @@ export class AppointmentForm {
       patientNotes: [this.appointment?.notes?.patientNotes || ''],
       isWalkIn: [this.appointment?.isWalkIn ?? false],
     });
-    if (this.authService.currentUserValue?.role === 'dentist') {
+    if (this.authService.currentUserValue?.role === 'dentist' && this.isEditMode) {
       this.dentist.disable({ emitEvent: false });
       if (this.isEditMode) {
         this.clinic.disable({ emitEvent: false });
@@ -166,6 +166,7 @@ export class AppointmentForm {
   availabilityError = '';
   confirmingClinic = false;
   savingReferral = false;
+  private readonly savedReferrals = new Map<string, { id: string; reason: string }>();
 
   private clearAvailability() {
     this.availabilityRequest?.unsubscribe();
@@ -196,7 +197,7 @@ export class AppointmentForm {
         this.users = users;
         if (this.isChangeBranch) this.updateReferringDentists();
         this.dentists = users.filter(user => isBookableDentist(user, clinicId) &&
-          (this.authService.currentUserValue?.role !== 'dentist' || user._id === this.authService.currentUserValue._id));
+          (this.authService.currentUserValue?.role !== 'dentist' || (!this.isEditMode && !this.appointment?.careCase) || user._id === this.authService.currentUserValue._id));
         this.availabilityLoading = false;
         this.buildAppointmentFields();
         const selectedId = this.authService.currentUserValue?.role === 'dentist'
@@ -222,6 +223,7 @@ export class AppointmentForm {
       this.time.setValue('');
       return;
     }
+    if (this.requiresReferral) this.updateReferringDentists();
     this.availabilityLoading = true;
     const selectionVersion = this.clinicSelectionVersion;
     this.availabilityRequest = this.bookingAvailability.load(this.selectedDentist, clinic, this.appointment?._id)
@@ -248,7 +250,19 @@ export class AppointmentForm {
 
   get bookingUnavailable(): boolean {
     return this.isLoading || this.availabilityLoading || this.confirmingClinic || this.savingReferral || !this.bookingSchedule ||
-      (this.isChangeBranch && this.rxReferralForm.invalid);
+      (this.requiresReferral && this.rxReferralForm.invalid);
+  }
+
+  get requiresReferral(): boolean {
+    return this.isChangeBranch || (this.authService.currentUserValue?.role === 'dentist' && !this.isEditMode &&
+      !!this.selectedDentist && this.selectedDentist._id !== this.authService.currentUserValue._id);
+  }
+
+  get referralSourceAppointment(): Appointment | undefined {
+    const actor = this.authService.currentUserValue;
+    if (actor?.role !== 'dentist') return this.latestPatientAppointment;
+    return this.appointments.filter(row => row.patient?._id === this.patient.value && row.dentist?._id === actor._id)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
   }
 
   private onClinicChanged(clinicId: string) {
@@ -291,9 +305,10 @@ Do you want to proceed?` },
   }
 
   private updateReferringDentists() {
-    const last = this.latestPatientAppointment;
+    const last = this.referralSourceAppointment;
     const clinicId = last?.clinic._id || '';
-    const referring = [...new Map(this.patientAppointments
+    const actor = this.authService.currentUserValue;
+    const referring = [...new Map((actor?.role === 'dentist' ? this.appointments.filter(row => row.dentist?._id === actor._id && row.patient?._id === this.patient.value) : this.patientAppointments)
       .filter(appointment => appointment.clinic?._id === clinicId && appointment.dentist?._id)
       .map(appointment => [appointment.dentist._id, appointment.dentist])).values()];
     this.selectReferringDentist = this.mapToOptions(this.setUsersKey(referring));
@@ -422,7 +437,6 @@ Do you want to proceed?` },
     const duration = this.serviceDuration();
     const startTime = this.time.value;
     const endTime = TimeUtil.calculateEndTime(startTime, duration);
-    const previousClinicId = this.latestPatientAppointment?.clinic._id;
 
     const appointmentData: AppointmentPayload = {
       clinic: this.clinic.value ?? '',
@@ -441,7 +455,7 @@ Do you want to proceed?` },
       }
     };
 
-    if (!this.isChangeBranch) {
+    if (!this.requiresReferral) {
       this.onSubmitEvent.emit(appointmentData)
       return;
     }
@@ -449,18 +463,29 @@ Do you want to proceed?` },
     const referral: ReferralPayload = {
       patient: this.patient.value,
       fromDoctorId: this.fromDoctorId.value,
-      fromClinicId: previousClinicId ?? '',
+      fromClinicId: this.rxReferralForm.controls.fromClinicId.value,
       reason: this.reason.value.trim(),
       status: ReferralStatus.PENDING,
     };
 
-    // Create referral, then attach its ID to the appointment payload
+    // Keep the same referral across failed/lost booking responses. The backend's
+    // single-link check then prevents a retry from creating a second reservation.
+    const key = JSON.stringify([this.authService.currentUserValue?._id, referral.patient, referral.fromDoctorId, referral.fromClinicId]);
+    const saved = this.savedReferrals.get(key);
+    if (saved && saved.reason === referral.reason) {
+      appointmentData.referral = saved.id;
+      this.onSubmitEvent.emit(appointmentData);
+      return;
+    }
     this.savingReferral = true;
-    this.referralService.create(referral).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    const saveReferral = saved ? this.referralService.update(saved.id, referral) : this.referralService.create(referral);
+    saveReferral.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: savedReferral => {
         this.savingReferral = false;
-        appointmentData.referral = savedReferral._id; // optional ID
-        // Emit the payload for the parent or whoever is listening
+        const id = saved?.id ?? savedReferral._id;
+        if (!id) { this.alertService.error('The referral could not be linked. Please try again.'); return; }
+        this.savedReferrals.set(key, { id, reason: referral.reason ?? '' });
+        appointmentData.referral = id;
         this.onSubmitEvent.emit(appointmentData);
       },
       error: err => {
@@ -500,6 +525,7 @@ Do you want to proceed?` },
     ++this.clinicSelectionVersion;
     this.confirmingClinic = false;
     this.isChangeBranch = false;
+    this.rxReferralForm.reset({ fromDoctorId: '', fromClinicId: '', reason: '', appointment: '' });
     const last = this.latestPatientAppointment;
     this.rxform.patchValue({
       clinic: last?.clinic._id || '',

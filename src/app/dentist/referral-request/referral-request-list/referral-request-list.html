@@ -5,6 +5,7 @@
 }
 <app-generic-table
   [title]="title"
+  [createButtonLabel]="createLabel" (create)="onCreate()"
   [displayedColumns]="displayedColumns"
   [columnDefs]="columnDefs" [filters]="filters" [dateValue]="dateValue" sortBy="updatedAt" sortDirection="desc"
   [dataSource]="dataSource"

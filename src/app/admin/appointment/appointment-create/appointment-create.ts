@@ -85,7 +85,13 @@ export class AppointmentCreate {
   onSubmit(appointment: AppointmentPayload) {
     this.isLoading = true
     this.appointmentService.create(appointment).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (c) => this.router.navigate([`/${this.router.url.split('/')[1]}/appointment/details`, c._id], { replaceUrl: true }),
+      next: (c) => {
+        const sender = this.auth.currentUserValue;
+        const path = sender?.role === 'dentist' && c.dentist?._id !== sender._id && c.referral?._id
+          ? ['/dentist/referral-request/details', c.referral._id]
+          : [`/${this.router.url.split('/')[1]}/appointment/details`, c._id];
+        this.router.navigate(path, { replaceUrl: true });
+      },
       error: (e) => this.alertService.error(e.error?.message || 'Something went wrong')
     }).add(() => this.isLoading = false)
   }

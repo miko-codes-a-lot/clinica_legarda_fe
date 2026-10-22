@@ -1,6 +1,7 @@
 import { EmptyState } from '../../../_shared/ui/empty-state/empty-state';
 import { PageHeader } from '../../../_shared/ui/page-header/page-header';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { AuthService } from '../../../_shared/service/auth-service';
 import { Appointment } from '../../../_shared/model/appointment';
 import { PatientDirectoryEntry } from '../../../_shared/model/user-directory';
 import { UserService } from '../../../_shared/service/user-service';
@@ -22,6 +23,7 @@ import { AlertService } from '../../../_shared/service/alert.service';
   styleUrl: './appointment-create.css'
 })
 export class AppointmentCreate {
+  private readonly auth = inject(AuthService);
   loadError = ''
   isLoading = false
   initDoc!: Appointment
@@ -67,7 +69,13 @@ export class AppointmentCreate {
   onSubmit(appointment: AppointmentPayload) {
     this.isLoading = true
     this.appointmentService.create(appointment).subscribe({
-      next: (c) => this.router.navigate(['/dentist/appointment/details', c._id], { replaceUrl: true }),
+      next: (c) => {
+        const sender = this.auth.currentUserValue;
+        const path = sender?.role === 'dentist' && c.dentist?._id !== sender._id && c.referral?._id
+          ? ['/dentist/referral-request/details', c.referral._id]
+          : ['/dentist/appointment/details', c._id];
+        this.router.navigate(path, { replaceUrl: true });
+      },
       error: (e) => this.alertService.error(e.error.message)
     }).add(() => this.isLoading = false)
   }
