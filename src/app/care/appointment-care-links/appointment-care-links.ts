@@ -17,7 +17,7 @@ import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
   imports: [RouterLink, StatusBadge, ReactiveFormsModule],
   template: `
     @if (appointment; as data) {
-      @if (data.disruption && !flagResolved) { <section class="ui-card my-5 border-danger/30"><h2 class="ui-section-title mb-2">Clinic closure review needed</h2><p class="ui-muted mb-3">{{ data.disruption.message }}</p>@if (canResolve) { <label class="block max-w-3xl"><span class="ui-label">Resolution reason</span><textarea class="ui-input min-h-28 resize-y" [formControl]="resolutionReason" maxlength="500" rows="3" placeholder="Clinic reopened; original appointment can proceed"></textarea></label><button class="ui-button-secondary mt-3" type="button" [disabled]="resolving || resolutionReason.invalid" (click)="resolveFlag()">{{ resolving ? 'Saving…' : 'Clear flag after reopening' }}</button><p class="ui-muted mt-2 text-sm">Rescheduling to an open interval also resolves this flag. All overlapping closures must be reopened before keeping this schedule.</p> }@if (resolutionError) { <p class="ui-alert-error mt-3" role="alert">{{ resolutionError }}</p> }</section> }
+      @if (data.disruption && !flagResolved) { <section class="ui-card my-5 border-danger/30"><h2 class="ui-section-title mb-2">Clinic closure review needed</h2><p class="ui-muted mb-3">{{ data.disruption.message }}</p>@if (data.closureRescheduling) { <p class="ui-muted text-sm" role="status">Reopening alone does not confirm this appointment. Use the replacement schedule controls below; keeping the original time still needs a proposal and the other side’s agreement. Any active replacement deadline remains in effect.</p> } @else if (canResolve) { <label class="block max-w-3xl"><span class="ui-label">Resolution reason</span><textarea class="ui-input min-h-28 resize-y" [formControl]="resolutionReason" maxlength="500" rows="3" placeholder="Clinic reopened; original appointment can proceed"></textarea></label><button class="ui-button-secondary mt-3" type="button" [disabled]="resolving || resolutionReason.invalid" (click)="resolveFlag()">{{ resolving ? 'Saving…' : 'Clear flag after reopening' }}</button><p class="ui-muted mt-2 text-sm">Rescheduling to an open interval also resolves this flag. All overlapping closures must be reopened before keeping this schedule.</p> }@if (resolutionError) { <p class="ui-alert-error mt-3" role="alert">{{ resolutionError }}</p> }</section> }
       @if (flagResolved) { <p role="status" class="ui-muted my-3">Closure flag resolved.</p> }
       <section class="ui-card my-5">
         <h2 class="ui-section-title mb-3">Patient care</h2>
@@ -46,7 +46,7 @@ export class AppointmentCareLinks implements OnInit, OnChanges {
   private readonly auth = inject(AuthService);
   readonly resolutionReason = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(500)] });
   flagResolved = false; resolving = false; resolutionError = '';
-  get canResolve() { return !!this.appointment && !isRetainedPatient(this.appointment.patient) && ['admin', 'super-admin'].includes(this.auth.currentUserValue?.role ?? ''); }
+  get canResolve() { return !!this.appointment && !this.appointment.closureRescheduling && !isRetainedPatient(this.appointment.patient) && ['admin', 'super-admin'].includes(this.auth.currentUserValue?.role ?? ''); }
   resolveFlag() {
     if (!this.appointment?._id || !this.canResolve || this.resolving || this.resolutionReason.invalid) return;
     this.resolving = true; this.resolutionError = '';
