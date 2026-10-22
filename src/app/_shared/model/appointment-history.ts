@@ -23,7 +23,7 @@ export function isAppointmentHistory(appointment: Appointment, now = new Date())
 }
 
 const statusLabels: Record<AppointmentStatus, string> = {
-  pending: 'Pending', confirmed: 'Confirmed', completed: 'Completed',
+  needs_rescheduling: 'Needs rescheduling', pending: 'Pending', confirmed: 'Confirmed', completed: 'Completed',
   no_show: 'No show', rejected: 'Rejected', cancelled: 'Cancelled',
 };
 

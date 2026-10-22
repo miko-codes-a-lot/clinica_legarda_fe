@@ -6,6 +6,7 @@ import { User } from "./user"
 
 export enum AppointmentStatus {
   PENDING = 'pending',
+  NEEDS_RESCHEDULING = 'needs_rescheduling',
   CONFIRMED = 'confirmed',
   REJECTED = 'rejected',
   CANCELLED = 'cancelled',
@@ -38,6 +39,7 @@ export interface Appointment {
   endTime: string
   scheduleVersion?: number
   rescheduleProposal?: { id: string; proposedAt: string; reason: string; previousSchedule: { date: string; startTime: string; endTime: string } }
+  closureRescheduling?: { originalStatus: string; originalSchedule: { date: string; startTime: string; endTime: string }; enteredAt: string; expiresAt?: string; reasons: string[] }
   status: AppointmentStatus
   isWalkIn?: boolean
   disruption?: AppointmentDisruption;

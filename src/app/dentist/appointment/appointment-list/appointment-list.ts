@@ -50,7 +50,7 @@ export class AppointmentList implements OnInit, AfterViewInit {
     { value: AppointmentStatus.REJECTED, label: 'Rejected' },
     { value: AppointmentStatus.COMPLETED, label: 'Completed' }, { value: AppointmentStatus.NO_SHOW, label: 'No show' },
   ];
-  statusCounts: Record<StatusFilter, number> = { all: 0, pending: 0, confirmed: 0, cancelled: 0, rejected: 0, completed: 0, no_show: 0 };
+  statusCounts: Record<StatusFilter, number> = { all: 0, pending: 0, needs_rescheduling: 0, confirmed: 0, cancelled: 0, rejected: 0, completed: 0, no_show: 0 };
 
   displayedColumns = ['patient', 'clinic', 'date', 'time', 'visitType', 'status', 'actions'];
   columnDefs: readonly TableColumn<Appointment>[] = APPOINTMENT_TABLE_COLUMNS.map(column => column.key === 'status'
@@ -125,7 +125,7 @@ export class AppointmentList implements OnInit, AfterViewInit {
 
   private applyFilters(): void {
     const appointments = filterAppointments(this.appointments, this.selectedClinic);
-    this.statusCounts = { all: appointments.length, pending: 0, confirmed: 0, cancelled: 0, rejected: 0, completed: 0, no_show: 0 };
+    this.statusCounts = { all: appointments.length, pending: 0, needs_rescheduling: 0, confirmed: 0, cancelled: 0, rejected: 0, completed: 0, no_show: 0 };
     for (const appointment of appointments) this.statusCounts[appointment.status]++;
     this.dataSource.data = filterAppointments(appointments, 'all', this.selectedStatus);
     this.prepareDailySummary(appointments);
