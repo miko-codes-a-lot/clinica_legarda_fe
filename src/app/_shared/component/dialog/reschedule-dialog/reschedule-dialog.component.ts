@@ -22,6 +22,7 @@ export interface RescheduleDialogResult {
 }
 
 export interface RescheduleDialogData {
+  allowSameSchedule?: boolean;
   date: Date | string;
   startTime: string;
   endTime: string;
@@ -112,7 +113,7 @@ export class RescheduleDialogComponent implements OnInit, OnDestroy {
     const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     const currentDate = this.data.date instanceof Date
       ? this.data.date.toISOString().slice(0, 10) : this.data.date.slice(0, 10);
-    if (formattedDate === currentDate && time === this.data.startTime) {
+    if (!this.data.allowSameSchedule && formattedDate === currentDate && time === this.data.startTime) {
       this.alertService.error('You cannot select your current appointment date and time.');
       return;
     }

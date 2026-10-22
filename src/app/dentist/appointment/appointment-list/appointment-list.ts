@@ -45,7 +45,7 @@ export class AppointmentList implements OnInit, AfterViewInit {
   selectedClinic = 'all';
   clinicOptions: AppointmentClinicOption[] = [];
   readonly statusFilters: { value: StatusFilter; label: string }[] = [
-    { value: 'all', label: 'All' }, { value: AppointmentStatus.PENDING, label: 'Pending' },
+    { value: 'all', label: 'All' }, { value: AppointmentStatus.NEEDS_RESCHEDULING, label: 'Needs rescheduling' }, { value: AppointmentStatus.PENDING, label: 'Pending' },
     { value: AppointmentStatus.CONFIRMED, label: 'Confirmed' }, { value: AppointmentStatus.CANCELLED, label: 'Cancelled' },
     { value: AppointmentStatus.REJECTED, label: 'Rejected' },
     { value: AppointmentStatus.COMPLETED, label: 'Completed' }, { value: AppointmentStatus.NO_SHOW, label: 'No show' },

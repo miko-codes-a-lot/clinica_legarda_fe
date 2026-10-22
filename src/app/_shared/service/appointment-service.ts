@@ -161,7 +161,7 @@ export class AppointmentService {
     return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/cancel`, { reason, ...(proposalId ? { proposalId } : {}) }, { withCredentials: true }).pipe(tap(() => this.changes.next()));
   }
 
-  respondToReschedule(appointmentId: string, payload: { proposalId: string; method: 'patient_portal' | 'phone' | 'in_person'; reason?: string }): Observable<Appointment> {
+  respondToReschedule(appointmentId: string, payload: { proposalId: string; method: 'patient_portal' | 'phone' | 'in_person' | 'clinic_review'; decision?: 'accept' | 'decline'; reason?: string }): Observable<Appointment> {
     return this.http.patch<Appointment>(`${this.baseUrl}/${appointmentId}/reschedule-response`, payload, { withCredentials: true }).pipe(tap(() => this.changes.next()));
   }
 

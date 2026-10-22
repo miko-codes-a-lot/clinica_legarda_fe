@@ -165,6 +165,7 @@ export class MyAppointment {
   get confirmedAppointments(): Appointment[] {
     return this.upcomingAppointmentsData.filter(a => a.status === AppointmentStatus.CONFIRMED);
   }
+  get needsReschedulingAppointments(): Appointment[] { return this.upcomingAppointmentsData.filter(a => a.status === AppointmentStatus.NEEDS_RESCHEDULING); }
   get pendingAppointments(): Appointment[] {
     return this.upcomingAppointmentsData.filter(a => a.status === AppointmentStatus.PENDING);
   }

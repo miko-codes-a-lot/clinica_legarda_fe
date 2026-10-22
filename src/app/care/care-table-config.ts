@@ -13,11 +13,11 @@ export const CARE_PERSON_COLUMNS: TableColumn<CarePerson>[] = [
 ];
 export const CARE_APPOINTMENT_COLUMNS: TableColumn<CareAppointment>[] = [
   { key: 'date', label: 'Date / time', cell: row => careDay(row.date), secondary: row => `${row.startTime}–${row.endTime}`, sortValue: row => row.date + row.startTime },
-  { key: 'clinic', label: 'Clinic / dentist', cell: row => row.clinic.name, secondary: row => `${row.dentist.firstName} ${row.dentist.lastName}` },
+  { key: 'clinic', label: 'Clinic / dentist', cell: row => row.clinic.name, secondary: row => `${row.dentist?.firstName || ''} ${row.dentist?.lastName || ''}` },
   { key: 'services', label: 'Services', cell: row => row.services.map(service => service.name).join(', ') },
   { key: 'status', label: 'Status', cell: row => row.status, kind: 'status' },
 ];
-export const APPOINTMENT_STATUS_OPTIONS = ['pending', 'confirmed', 'completed', 'no_show', 'cancelled', 'rejected'].map(value => ({ value, label: value.replace('_', ' ').replace(/^./, letter => letter.toUpperCase()) }));
+export const APPOINTMENT_STATUS_OPTIONS = ['needs_rescheduling', 'pending', 'confirmed', 'completed', 'no_show', 'cancelled', 'rejected'].map(value => ({ value, label: value.replaceAll('_', ' ').replace(/^./, letter => letter.toUpperCase()) }));
 export const CARE_APPOINTMENT_FILTERS: TableFilter<CareAppointment>[] = [{ key: 'status', label: 'Status', options: APPOINTMENT_STATUS_OPTIONS, value: row => row.status }];
 export const careAppointmentDate = (row: { date: string }): string => row.date;
 type LinkedAppointment = TreatmentCaseDetail['appointments'][number];
@@ -29,7 +29,7 @@ export const LINKED_APPOINTMENT_COLUMNS: TableColumn<LinkedAppointment>[] = [
 export const LINKED_APPOINTMENT_FILTERS: TableFilter<LinkedAppointment>[] = [{ key: 'status', label: 'Status', options: APPOINTMENT_STATUS_OPTIONS, value: row => row.status }];
 export const FINISHED_VISIT_COLUMNS: TableColumn<CareVisit>[] = [
   { key: 'patient', label: 'Patient', cell: row => patientDisplayName(row.patient) },
-  { key: 'clinic', label: 'Clinic / dentist', cell: row => row.clinic.name, secondary: row => `${row.dentist.firstName} ${row.dentist.lastName}` },
+  { key: 'clinic', label: 'Clinic / dentist', cell: row => row.clinic.name, secondary: row => `${row.dentist?.firstName || ''} ${row.dentist?.lastName || ''}` },
   { key: 'purpose', label: 'Visit', cell: row => row.purpose, secondary: row => row.isWalkIn ? 'Walk-in' : 'Scheduled' },
   { key: 'state', label: 'Status', cell: row => row.state, kind: 'status' },
   { key: 'endedAt', label: 'Ended', cell: row => row.endedAt ? new Date(row.endedAt).toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: 'numeric', minute: '2-digit' }) : '', sortValue: row => row.endedAt },
@@ -39,9 +39,9 @@ export const FINISHED_VISIT_FILTERS: TableFilter<CareVisit>[] = [
   { key: 'purpose', label: 'Visit', options: [{ value: 'consultation', label: 'Consultation' }, { value: 'treatment', label: 'Treatment' }], value: row => row.purpose },
 ];
 export const AFFECTED_APPOINTMENT_COLUMNS: TableColumn<AffectedAppointment>[] = [
-  { key: 'patient', label: 'Patient / dentist', cell: row => patientDisplayName(row.patient), secondary: row => `${row.dentist.firstName} ${row.dentist.lastName}` },
+  { key: 'patient', label: 'Patient / dentist', cell: row => patientDisplayName(row.patient), secondary: row => `${row.dentist?.firstName || ''} ${row.dentist?.lastName || ''}` },
   { key: 'date', label: 'Schedule', cell: row => careDay(row.date), secondary: row => `${row.startTime}–${row.endTime}`, sortValue: row => row.date + row.startTime },
   { key: 'status', label: 'Status', cell: row => row.status, kind: 'status' },
-  { key: 'flag', label: 'Closure review', cell: row => row.disruption ? 'Needs review' : 'Resolved' },
+  { key: 'flag', label: 'Closure review', cell: row => row.status === 'needs_rescheduling' ? 'Needs rescheduling' : row.closureRescheduling ? 'Replacement proposed' : row.disruption ? 'Needs review' : 'Resolved' },
 ];
 export const AFFECTED_APPOINTMENT_FILTERS: TableFilter<AffectedAppointment>[] = [{ key: 'flag', label: 'Closure review', options: [{ value: 'open', label: 'Needs review' }, { value: 'resolved', label: 'Resolved' }], value: row => row.disruption ? 'open' : 'resolved' }];

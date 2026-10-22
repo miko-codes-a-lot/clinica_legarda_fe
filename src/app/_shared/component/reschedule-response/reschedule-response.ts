@@ -43,11 +43,23 @@ export class RescheduleResponse implements OnInit {
   now = Date.now();
   method: 'phone' | 'in_person' = 'phone';
   agreementReason = '';
+  get needsReplacement(): boolean {
+    return !!this.appointment && !isRetainedPatient(this.appointment.patient) && this.appointment.status === 'needs_rescheduling' && !!this.appointment.closureRescheduling;
+  }
+  get patientProposal(): boolean {
+    return this.appointment?.rescheduleProposal?.origin === 'clinic_closure' && this.appointment.rescheduleProposal.proposedBySide === 'patient';
+  }
+  get canAccept(): boolean { return this.activeProposal && !(this.patientProposal && this.mode === 'patient'); }
+  get needsAgreementNote(): boolean { return this.mode === 'staff' && !this.patientProposal; }
+  get canDecline(): boolean {
+    return this.activeProposal && this.appointment?.rescheduleProposal?.origin === 'clinic_closure' && (this.patientProposal ? this.mode === 'staff' : this.mode === 'patient');
+  }
   get activeProposal(): boolean {
     return !!this.appointment && !isRetainedPatient(this.appointment.patient) && this.appointment.status === 'pending' && !!this.appointment.rescheduleProposal;
   }
   get expired(): boolean {
     const appointment = this.appointment;
+    if (this.needsReplacement) return !appointment?.closureRescheduling?.expiresAt || Date.parse(appointment.closureRescheduling.expiresAt) <= this.now;
     return (
       !appointment ||
       Date.parse(
@@ -60,7 +72,7 @@ export class RescheduleResponse implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.now = Date.now();
-        if (this.expired && !this.busy && this.activeProposal)
+        if (this.expired && !this.busy && (this.activeProposal || this.needsReplacement))
           this.refresh();
       });
   }
@@ -78,9 +90,9 @@ export class RescheduleResponse implements OnInit {
   accept(): void {
     const appointment = this.appointment,
       proposal = appointment?.rescheduleProposal;
-    if (!appointment || !proposal || !this.activeProposal || this.busy || this.expired) return;
+    if (!appointment || !proposal || !this.canAccept || this.busy || this.expired) return;
     if (appointment.disruption) return;
-    if (this.mode === 'staff' && this.agreementReason.trim().length < 3) {
+    if (this.needsAgreementNote && this.agreementReason.trim().length < 3) {
       this.error = 'Explain how the patient agreed to the new schedule.';
       return;
     }
@@ -91,7 +103,7 @@ export class RescheduleResponse implements OnInit {
         maxWidth: '95vw',
         data: {
           message:
-            this.mode === 'patient'
+            this.patientProposal ? 'Approve the patient replacement date and time? The appointment will become confirmed.' : this.mode === 'patient'
               ? 'Accept the proposed date and time? Your appointment will become confirmed.'
               : 'Confirm that the patient agreed to this date and time by phone or in person.',
         },
@@ -104,8 +116,8 @@ export class RescheduleResponse implements OnInit {
         this.run(
           this.api.respondToReschedule(appointment._id, {
             proposalId: proposal.id,
-            method: this.mode === 'patient' ? 'patient_portal' : this.method,
-            ...(this.mode === 'staff'
+            method: this.patientProposal ? 'clinic_review' : this.mode === 'patient' ? 'patient_portal' : this.method,
+            ...(this.needsAgreementNote
               ? { reason: this.agreementReason.trim() }
               : {}),
           }),
@@ -116,7 +128,7 @@ export class RescheduleResponse implements OnInit {
   anotherTime(): void {
     const appointment = this.appointment,
       proposal = appointment?.rescheduleProposal;
-    if (!appointment || !proposal || !this.activeProposal || this.busy || this.expired) return;
+    if (!appointment || !(this.activeProposal || this.needsReplacement) || this.busy || this.expired) return;
     this.busy = true;
     this.dialog
       .open<
@@ -128,6 +140,7 @@ export class RescheduleResponse implements OnInit {
         maxWidth: '95vw',
         data: {
           appointmentId: appointment._id,
+          allowSameSchedule: this.needsReplacement,
           date: appointment.date,
           startTime: appointment.startTime,
           endTime: appointment.endTime,
@@ -143,7 +156,7 @@ export class RescheduleResponse implements OnInit {
         this.run(
           this.api.rescheduleAppointment(appointment._id, {
             ...result,
-            proposalId: proposal.id,
+            ...(proposal ? { proposalId: proposal.id } : {}),
           }),
           this.mode === 'patient'
             ? 'Your requested time is awaiting clinic review.'
@@ -154,7 +167,7 @@ export class RescheduleResponse implements OnInit {
   cancel(): void {
     const appointment = this.appointment,
       proposal = appointment?.rescheduleProposal;
-    if (!appointment || !proposal || !this.activeProposal || this.busy) return;
+    if (!appointment || !(this.activeProposal || this.needsReplacement) || this.busy) return;
     this.busy = true;
     this.dialog
       .open(AppointmentReasonDialogComponent, {
@@ -171,11 +184,23 @@ export class RescheduleResponse implements OnInit {
           this.api.cancelAppointment(
             appointment._id,
             reason.trim(),
-            proposal.id,
+            proposal?.id,
           ),
           'Appointment cancelled.',
         );
       });
+  }
+  decline(): void {
+    const appointment = this.appointment, proposal = appointment?.rescheduleProposal;
+    if (!appointment || !proposal || !this.canDecline || this.busy || this.expired || appointment.disruption) return;
+    this.busy = true;
+    this.dialog.open(ConfirmDialogComponent, { width: '460px', maxWidth: '95vw', data: {
+      message: 'Decline this proposed time? The appointment will need another replacement within seven days. This does not cancel it immediately.',
+    } }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(confirmed => {
+      this.busy = false;
+      if (confirmed !== true) return;
+      this.run(this.api.respondToReschedule(appointment._id, { proposalId: proposal.id, method: this.mode === 'patient' ? 'patient_portal' : 'clinic_review', decision: 'decline' }), 'Proposal declined. Please arrange a replacement within seven days.');
+    });
   }
   private run(request: Observable<Appointment>, success: string): void {
     this.busy = true;

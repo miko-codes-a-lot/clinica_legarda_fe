@@ -47,6 +47,7 @@ export class StaffAppointmentList implements OnInit, AfterViewInit {
   }
   readonly dataSource = new MatTableDataSource<Appointment>();
   readonly statuses = [
+    { value: AppointmentStatus.NEEDS_RESCHEDULING, label: 'Needs rescheduling' },
     { value: AppointmentStatus.PENDING, label: 'Pending' },
     { value: AppointmentStatus.CONFIRMED, label: 'Confirmed' },
     { value: AppointmentStatus.COMPLETED, label: 'Completed' },

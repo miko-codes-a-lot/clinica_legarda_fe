@@ -1,3 +1,5 @@
+import { HttpErrorResponse } from '@angular/common/http';
+import { closurePreviewColumns, closurePreviewFilters } from './closure-preview-table';
 import { AFFECTED_APPOINTMENT_COLUMNS, AFFECTED_APPOINTMENT_FILTERS, careAppointmentDate } from '../care-table-config';
 import { GenericTableComponent } from '../../_shared/component/table/generic-table.component';
 import { TableCellDirective } from '../../_shared/component/table/table-cell.directive';
@@ -14,10 +16,13 @@ import { StatusBadge } from '../../_shared/ui/status-badge/status-badge';
 import { CareClinic, clinicToday } from '../care.models';
 import { careError } from '../care-api.service';
 import { ClosuresApiService } from './closures-api.service';
-import { AffectedAppointment, ClinicClosure, ClosureDetail } from './closure.models';
+import { AffectedAppointment, ClinicClosure, ClosureDetail, ClosurePreview } from './closure.models';
 const required = (value = '') => new FormControl(value, { nonNullable: true, validators: [Validators.required] });
 @Component({ selector: 'app-clinic-closures', imports: [GenericTableComponent, TableCellDirective, CommonModule, ReactiveFormsModule, RouterLink, PageHeader, EmptyState, StatusBadge], templateUrl: './closures.html' })
 export class ClinicClosures implements OnInit {
+  readonly previewColumns = closurePreviewColumns;
+  previewFilters = closurePreviewFilters([]);
+  impact: ClosurePreview | null = null;
   readonly affectedColumns = AFFECTED_APPOINTMENT_COLUMNS;
   readonly affectedFilters = AFFECTED_APPOINTMENT_FILTERS;
   readonly dateValue = careAppointmentDate;
@@ -30,7 +35,7 @@ export class ClinicClosures implements OnInit {
   readonly form = new FormGroup({ clinic: required(), startDate: required(clinicToday()), endDate: required(clinicToday()), startTime: required('00:00'), endTime: required('24:00'), reason: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(500)] }) });
   readonly reopenReason = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(500)] });
   ngOnInit() {
-    this.form.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => { this.previewed = false; this.previewRows = []; });
+    this.form.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => { this.previewed = false; this.previewRows = []; this.impact = null; });
     this.form.controls.clinic.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => { this.detail = null; this.detailVersion++; this.load(); });
     this.clinicsApi.getAccessible().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ next: clinics => {
       this.clinics = clinics.filter(c => c._id).map(c => ({ _id: c._id ?? '', name: c.name }));
@@ -45,12 +50,13 @@ export class ClinicClosures implements OnInit {
     if (this.saving || this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.saving = true; this.error = ''; const payload = this.form.getRawValue();
     this.api.preview(payload).pipe(finalize(() => this.saving = false), takeUntilDestroyed(this.destroyRef)).subscribe({ next: result => {
-      if (JSON.stringify(payload) === JSON.stringify(this.form.getRawValue())) { this.previewRows = result.appointments; this.previewed = true; }
+      if (JSON.stringify(payload) === JSON.stringify(this.form.getRawValue())) { this.previewRows = result.appointments; this.previewed = true; this.impact = result; this.previewFilters = closurePreviewFilters(result.appointments); }
     }, error: error => this.error = careError(error) });
   }
   create() {
     if (this.saving || !this.previewed || this.form.invalid) return;
-    this.save(this.api.create(this.form.getRawValue()), 'Closure saved. Affected appointments are flagged for review.');
+    if (!this.impact) return;
+    this.save(this.api.create({ ...this.form.getRawValue(), impactToken: this.impact.impactToken }), 'Closure saved. Affected appointments need rescheduling; ongoing care stays protected.');
   }
   open(id: string) {
     if (this.saving) return; const version = ++this.detailVersion; this.error = ''; this.detail = null; this.reopenReason.reset('');
@@ -62,6 +68,9 @@ export class ClinicClosures implements OnInit {
   }
   private save(request: Observable<ClosureDetail>, message: string) {
     this.saving = true; this.error = ''; this.success = '';
-    request.pipe(finalize(() => this.saving = false), takeUntilDestroyed(this.destroyRef)).subscribe({ next: result => { this.detail = result; this.previewed = false; this.previewRows = []; this.success = message; this.load(); }, error: error => this.error = careError(error) });
+    request.pipe(finalize(() => this.saving = false), takeUntilDestroyed(this.destroyRef)).subscribe({ next: result => { this.detail = result; this.previewed = false; this.previewRows = []; this.impact = null; this.success = message; this.load(); }, error: (error: unknown) => {
+      this.error = careError(error);
+      if (error instanceof HttpErrorResponse && error.error?.code === 'CLOSURE_PREVIEW_STALE') { this.previewed = false; this.impact = null; this.previewRows = []; }
+    } });
   }
 }

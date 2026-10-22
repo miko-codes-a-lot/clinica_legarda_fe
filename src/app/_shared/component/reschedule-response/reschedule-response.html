@@ -1,3 +1,17 @@
+@if (needsReplacement && appointment; as booking) {
+<section class="my-5 rounded-xl border border-warning/30 bg-warning-soft p-5 sm:p-6" aria-label="Needs rescheduling" [attr.aria-busy]="busy">
+  <h3 class="ui-section-title">Needs rescheduling</h3>
+  <p class="mt-2 text-sm whitespace-pre-wrap">Clinic closure: {{ booking.closureRescheduling?.reasons?.join('; ') }}</p>
+  <p class="mt-3 text-sm">Propose a replacement by <strong>{{ booking.closureRescheduling?.expiresAt | date:'MMM d, yyyy, h:mm a':'+0800' }} (Philippine time)</strong>. Without a proposal, this appointment automatically cancels. A replacement needs the other side's agreement.</p>
+  @if (expired) { <p class="ui-alert-error mt-3" role="status">The replacement deadline has passed. Refresh for the latest appointment status.</p> }
+  <div class="mt-4 flex flex-wrap gap-3">
+    <button type="button" class="ui-button" [disabled]="busy || expired" (click)="anotherTime()">Propose replacement</button>
+    <button type="button" class="ui-button-danger" [disabled]="busy" (click)="cancel()">Cancel appointment</button>
+    <button type="button" class="ui-button-ghost" [disabled]="busy" (click)="refresh()">Refresh appointment</button>
+  </div>
+  @if (error) { <p class="ui-alert-error mt-4" role="alert">{{ error }}</p> }
+</section>
+}
 @if (appointment; as appointment) { @if (activeProposal && appointment.rescheduleProposal; as
 proposal) {
 <section
@@ -6,12 +20,10 @@ proposal) {
   [attr.aria-busy]="busy"
 >
   <h3 class="ui-section-title">
-    {{ mode === 'patient' ? 'Please respond to the proposed time' : 'Awaiting
-    patient response' }}
+    {{ patientProposal ? (mode === 'patient' ? 'Awaiting clinic review' : 'Review patient replacement request') : (mode === 'patient' ? 'Please respond to the proposed time' : 'Awaiting patient response') }}
   </h3>
   <p class="ui-muted mt-2 text-sm">
-    The clinic has proposed a different schedule. The appointment becomes
-    confirmed when the patient agrees.
+    {{ patientProposal ? 'The patient proposed a replacement. The appointment becomes confirmed when the dentist or clinic administrator accepts it.' : 'The clinic has proposed a different schedule. The appointment becomes confirmed when the patient agrees.' }}
   </p>
   <dl class="mt-4 grid gap-4 text-sm sm:grid-cols-2">
     <div>
@@ -46,10 +58,10 @@ proposal) {
   </p>
   } @else {
   <p class="ui-muted mt-4 text-sm">
-    Please respond before the proposed start time. An unanswered proposal will
-    automatically cancel and will not become No-show.
+    {{ patientProposal ? 'The clinic must respond before the proposed start time.' : 'The patient must respond before the proposed start time.' }}
+    An unanswered proposal will automatically cancel and will not become No-show.
   </p>
-  } @if (mode === 'staff' && !expired) {
+  } @if (needsAgreementNote && !expired) {
   <div class="mt-5 grid max-w-2xl gap-4 sm:grid-cols-2">
     <label
       ><span class="ui-label">Patient agreement received</span
@@ -76,14 +88,15 @@ proposal) {
   </div>
   }
   <div class="mt-5 flex flex-wrap gap-3">
-    <button
+    @if (canAccept) { <button
       type="button"
       class="ui-button"
-      [disabled]="busy || expired || !!appointment.disruption || (mode === 'staff' && agreementReason.trim().length < 3)"
+      [disabled]="busy || expired || !!appointment.disruption || (needsAgreementNote && agreementReason.trim().length < 3)"
       (click)="accept()"
     >
-      {{ mode === 'patient' ? 'Accept new time' : 'Record patient agreement' }}
-    </button>
+      {{ patientProposal ? 'Approve replacement' : mode === 'patient' ? 'Accept new time' : 'Record patient agreement' }}
+    </button> }
+    @if (canDecline) { <button type="button" class="ui-button-secondary" [disabled]="busy || expired || !!appointment.disruption" (click)="decline()">Decline proposed time</button> }
     <button
       type="button"
       class="ui-button-secondary"

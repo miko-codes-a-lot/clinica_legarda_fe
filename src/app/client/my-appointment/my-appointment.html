@@ -6,6 +6,9 @@
   <app-patient-selector [self]="self" [disabled]="isLoading" (patientChange)="selectPatient($event)" />
   @if (isLoading) { <p class="ui-muted mb-5 text-sm" role="status">Updating appointments…</p> }
   <div class="space-y-6" [attr.aria-busy]="isLoading">
+    @if (needsReschedulingAppointments.length) {
+      <section aria-labelledby="rescheduling-title"><h2 id="rescheduling-title" class="ui-section-title mb-3">Needs rescheduling</h2><div class="space-y-4">@for (appointment of needsReschedulingAppointments; track appointment._id) { <ng-container *ngTemplateOutlet="visit; context: { $implicit: appointment, mode: 'needs_rescheduling' }" /> }</div></section>
+    }
     <section aria-labelledby="confirmed-title">
       <div class="mb-3 flex items-center gap-2"><app-icon class="text-accent" aria-hidden="true" name="check_circle" /><h2 id="confirmed-title" class="ui-section-title">Confirmed appointments</h2></div>
       <div class="space-y-4" *ngIf="hasConfirmedAppointments; else noConfirmed">

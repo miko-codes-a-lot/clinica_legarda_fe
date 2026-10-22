@@ -38,7 +38,7 @@ export interface Appointment {
   startTime: string
   endTime: string
   scheduleVersion?: number
-  rescheduleProposal?: { id: string; proposedAt: string; reason: string; previousSchedule: { date: string; startTime: string; endTime: string } }
+  rescheduleProposal?: { origin?: 'clinic_closure'; proposedBySide?: 'patient' | 'staff'; proposedBy?: string; id: string; proposedAt: string; reason: string; previousSchedule: { date: string; startTime: string; endTime: string } }
   closureRescheduling?: { originalStatus: string; originalSchedule: { date: string; startTime: string; endTime: string }; enteredAt: string; expiresAt?: string; reasons: string[] }
   status: AppointmentStatus
   isWalkIn?: boolean
