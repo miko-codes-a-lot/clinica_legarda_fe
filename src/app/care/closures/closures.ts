@@ -64,7 +64,7 @@ export class ClinicClosures implements OnInit {
   }
   reopen() {
     if (!this.detail || this.saving || this.reopenReason.invalid) { this.reopenReason.markAsTouched(); return; }
-    this.save(this.api.reopen(this.detail.closure._id, this.reopenReason.value), 'Clinic reopened. Review and resolve any remaining appointment flags.');
+    this.save(this.api.reopen(this.detail.closure._id, this.reopenReason.value), 'Clinic reopened. Affected appointments keep their current status and rescheduling deadlines.');
   }
   private save(request: Observable<ClosureDetail>, message: string) {
     this.saving = true; this.error = ''; this.success = '';
