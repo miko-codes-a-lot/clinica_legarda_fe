@@ -81,14 +81,7 @@ export class ReferralRequestDetails {
       disableClose: true,
       width: '600px',
       data: {
-        message: `By submitting this referral I am verifying that the patient has been properly educated on the sharing of their dental and medical records with another authorized dentist or an office, which are both part of the same clinic. Sharing will take place for the purpose of continuing care and coordinating treatment planning.
-
-            The shared records may contain all or part of the following: Patient Identity, Medical and Dental History, Treatment Records/Notes, Diagnostic Imaging, Prescription Information.
-
-            I confirm that any disclosures of these records will only contain the necessary information to provide proper treatment for the patient, and will be handled according to any data protection and patient privacy laws as well as the clinic’s own Data Security Policy.
-
-            By checking this box I am certifying that the patient has granted consent for their records to be shared automatically as part of the referral process.`,
-        showConsentCheckbox: true,
+        message: 'Approve this referral request?',
       },
     }).afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(confirm => {
       if (confirm && this.referral?._id) this.saveDecision(this.referralService.approveReferral(this.referral._id));
