@@ -26,13 +26,13 @@
         </dl>
       }
     </div>
-    @if (requiresReferral) {
+    @if (isChangeBranch) {
       <section class="mt-5 rounded-xl border border-tint-border bg-tint/40 p-5" aria-labelledby="clinic-transfer-title">
         <div class="mb-4 flex items-start gap-3">
           <app-icon class="shrink-0 text-accent" name="swap_horiz" />
           <div class="min-w-0">
-            <h2 id="clinic-transfer-title" class="ui-section-title">{{ isChangeBranch ? 'Clinic transfer required' : 'Dentist referral required' }}</h2>
-            <p class="ui-muted mt-1 break-words">The patient is being referred from <strong>{{ referralSourceAppointment?.clinic?.name }}</strong>. A referral is required to proceed.</p>
+            <h2 id="clinic-transfer-title" class="ui-section-title">Clinic transfer required</h2>
+            <p class="ui-muted mt-1 break-words">You are switching from <strong>{{ latestPatientAppointment?.clinic?.name }}</strong>. A referral is required to proceed.</p>
           </div>
         </div>
         <div [formGroup]="rxReferralForm" class="ui-form-grid">
